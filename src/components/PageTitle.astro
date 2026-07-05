@@ -1,0 +1,26 @@
+---
+import Default from '@astrojs/starlight/components/PageTitle.astro';
+
+const { entry } = Astro.locals.starlightRoute;
+const editions = entry.data.editions as
+	| Array<'edge' | 'cloud' | 'enterprise'>
+	| undefined;
+
+const LABELS: Record<string, string> = {
+	edge: 'Edge',
+	cloud: 'Cloud',
+	enterprise: 'Enterprise',
+};
+---
+
+<Default><slot /></Default>
+{
+	editions && editions.length > 0 && (
+		<div class="t0-editions" aria-label="Available in editions">
+			<span class="t0-editions-label">Available in</span>
+			{editions.map((e) => (
+				<span class={`t0-edition t0-edition--${e}`}>{LABELS[e]}</span>
+			))}
+		</div>
+	)
+}

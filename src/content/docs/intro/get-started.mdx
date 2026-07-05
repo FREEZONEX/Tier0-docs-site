@@ -1,0 +1,102 @@
+---
+title: Get Started
+description: Install the tier0 CLI and agent skills, set up your edition (Cloud, Edge, or Enterprise), and take the Demo Factory tour.
+---
+
+import { Tabs, TabItem, Steps } from '@astrojs/starlight/components';
+
+Tier0 ships in three editions — **Edge** (open source, single machine), **Cloud** (managed SaaS), and **Enterprise** (private deployment). They share the same namespace model, flows, and CLI, so everything you learn here applies everywhere. Not sure which fits? See [Choosing the Best Version](/architecture/choosing-version/).
+
+## Installation
+
+### The `tier0` CLI + agent skills
+
+Whatever edition you run, the CLI is the fastest way in — for humans and AI agents alike. One command installs the `tier0` binary **and** the agent skills for Cursor / Claude:
+
+```bash
+npx @tier0/cli@latest install
+```
+
+Alternatives (install script per OS, skills separately) are on [FREEZONEX/Tier0-cli](https://github.com/FREEZONEX/Tier0-cli); skills live at [FREEZONEX/Tier0-skill](https://github.com/FREEZONEX/Tier0-skill).
+
+### Set up your edition
+
+<Tabs syncKey="edition">
+	<TabItem label="Cloud">
+		Nothing to install — apply for a workspace at [tier0.app/cloud-trial](https://tier0.app/cloud-trial) and your link arrives by email. Then log in from the CLI:
+
+		```bash
+		tier0 login   # or: tier0 config --api-key sk-per-xxxxxx
+		tier0 uns browse
+		```
+	</TabItem>
+	<TabItem label="Edge (open source)">
+		Apache-2.0, runs on a single machine with Docker. Minimum 4-core CPU, 8 GB RAM, 100 GB disk; Ubuntu 24.04 or Windows 10/11.
+
+		```bash
+		git clone https://github.com/FREEZONEX/Tier0-Edge
+		```
+
+		Configure `.env` and run the install script — the [Tier0-Edge README](https://github.com/FREEZONEX/Tier0-Edge#readme) walks through both. Then point the CLI at your instance:
+
+		```bash
+		tier0 config --base-url http://your-edge-host
+		tier0 login
+		```
+	</TabItem>
+	<TabItem label="Enterprise">
+		Deployment packages are delivered with your license — start at [tier0.app/download](https://tier0.app/download) or [talk to the team](https://tier0.app/talk-to-team). Topologies and components are covered in [Hosting Tier0](/architecture/hosting/). Once your instance is up:
+
+		```bash
+		tier0 config --base-url https://tier0.your-company.com
+		tier0 login
+		tier0 info    # verify gateway connectivity
+		```
+	</TabItem>
+</Tabs>
+
+:::caution[Changed the base URL?]
+API keys are per-instance. After any `--base-url` change, run the login flow again — old keys against a new address fail with an `authentication` error.
+:::
+
+## Try the Demo Factory in Tier0
+
+The quickest way to *get* Tier0 is to poke at a factory that already works. Your **Cloud trial workspace** (14 days) comes with a preloaded plant: a live namespace, flows feeding it, notebooks, and apps on top.
+
+<Steps>
+
+1. **Browse the namespace.** Open the UNS explorer, or from your terminal:
+
+   ```bash
+   tier0 uns browse
+   tier0 uns browse Plant/Line1 --max-depth 2
+   ```
+
+   Paths are folders (`Plant/Line1`); leaves are topics (`Plant/Line1/Metric/Temperature`). Only topics hold values.
+
+2. **Read live values.** The namespace is MQTT pub/sub underneath — data moves when it changes:
+
+   ```bash
+   tier0 uns read "Plant/+/Metric/Temperature" --json
+   ```
+
+3. **See where data comes from.** Flow names mirror the topic paths they feed (`Line1-Collector` → `Plant/Line1/…`):
+
+   ```bash
+   tier0 flow list --source
+   ```
+
+4. **Open a notebook.** Query the same topics live — group by asset, plot a trend, join metrics with order context. See [Analytics](/using-tier0/analytics/).
+
+5. **Generate an app.** Describe something small in the App Builder — an inspection checklist, a maintenance form — review the spec, generate, and try it in the sandbox. See [Build](/using-tier0/build/).
+
+</Steps>
+
+:::note
+The exact demo tree and preloaded apps may differ per trial workspace — substitute what you see in `tier0 uns browse`. On **Edge** there's no preloaded factory: create your first nodes with `tier0 uns create` instead, then follow [Connect](/using-tier0/connect/).
+:::
+
+## Next
+
+- [Choosing the Best Version](/architecture/choosing-version/) — Edge vs Cloud vs Enterprise, plans and capability matrix
+- [Connect your own data](/using-tier0/connect/)
