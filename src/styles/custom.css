@@ -448,6 +448,46 @@ main:has(.t0-banner) .t0-banner {
 	white-space: nowrap;
 }
 
+/* Paste-ready agent prompt (homepage) */
+.t0-prompt {
+	font-family: var(--sl-font-mono);
+	font-size: 0.75rem;
+	line-height: 1.6;
+	color: var(--sl-color-gray-1);
+	background: var(--sl-color-gray-6);
+	border: 1px solid var(--t0-line);
+	padding: 0.875rem 1rem;
+	margin: 0.25rem 0 0;
+	max-width: 100%;
+	white-space: pre-wrap;
+	overflow-wrap: anywhere;
+}
+
+.t0-copy {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.5rem;
+	background: var(--sl-color-accent);
+	color: #050b14;
+	font-family: var(--sl-font);
+	font-size: 0.875rem;
+	font-weight: 500;
+	padding: 0.5rem 1rem;
+	border: 0;
+	border-radius: 2px;
+	cursor: pointer;
+	margin-top: 0.25rem;
+}
+
+:root[data-theme='light'] .t0-copy {
+	background: #ccf368;
+	color: #333333;
+}
+
+.t0-copy:hover {
+	filter: brightness(1.06);
+}
+
 .t0-banner-side {
 	border-inline-start: 1px solid var(--t0-line-accent);
 	background-image: radial-gradient(var(--t0-dot) 1px, transparent 1.5px);

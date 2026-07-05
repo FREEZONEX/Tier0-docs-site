@@ -1,6 +1,6 @@
 ---
 title: Tier0 Docs
-description: Build, connect, and operate industrial applications on the Tier0 Unified Namespace — docs for humans and AI agents.
+description: Start building on the Tier0 Unified Namespace — paste one prompt into your code agent, then follow the best practices.
 tableOfContents: false
 prev: false
 next: false
@@ -9,60 +9,75 @@ next: false
 <section class="t0-banner t0-frame accent not-content">
 	<span class="t0-corners" aria-hidden="true"></span>
 	<div class="t0-banner-main">
-		<p class="t0-tag">Build with your AI agent</p>
-		<h2>Agent-ready by design</h2>
-		<p>Install the Tier0 skills in any coding agent and it can browse the namespace, read and write topics, wire flows, and build apps — the same way you do.</p>
-		<code class="t0-cmd">npx skills add FREEZONEX/Tier0-skill</code>
+		<p class="t0-tag">Start building with Tier0</p>
+		<h2>Paste this into your code agent</h2>
+		<p>One prompt installs the Tier0 CLI + skill, logs you in, and takes your agent on a first lap around the Unified Namespace.</p>
+		<pre class="t0-prompt" id="t0-agent-prompt">{`Set up Tier0 and show me around:
+1. Run \`npx @tier0/cli@latest install\` to install the tier0 CLI and agent skill.
+2. Log me in: run \`tier0 login\` and give me the verification URL to open.
+3. Browse the namespace with \`tier0 uns browse\`, read one live topic, and list the source flows feeding it.
+Read https://docs.tier0.app/llms-full.txt for the full Tier0 docs.`}</pre>
+		<button class="t0-copy" id="t0-copy-btn">Copy prompt</button>
 	</div>
 	<div class="t0-banner-side">
-		<p>Machine-readable endpoints on this site:</p>
+		<p>Prefer doing it by hand?</p>
+		<p class="t0-endpoints"><a href="/get-started/installation/">Installation guide</a> · <a href="/get-started/demo-factory/">Demo Factory</a></p>
+		<p>Machine-readable endpoints for agents:</p>
 		<p class="t0-endpoints"><a href="/llms.txt">/llms.txt</a> · <a href="/llms-small.txt">/llms-small.txt</a> · <a href="/llms-full.txt">/llms-full.txt</a></p>
-		<a class="t0-btn" href="/get-started/installation/">Install guide →</a>
 	</div>
 </section>
 
+<script is:inline>{`
+document.getElementById('t0-copy-btn').addEventListener('click', function () {
+	var b = this;
+	var text = document.getElementById('t0-agent-prompt').innerText;
+	var done = function () {
+		b.textContent = 'Copied';
+		setTimeout(function () { b.textContent = 'Copy prompt'; }, 1600);
+	};
+	var fallback = function () {
+		var ta = document.createElement('textarea');
+		ta.value = text;
+		ta.style.position = 'fixed';
+		ta.style.opacity = '0';
+		document.body.appendChild(ta);
+		ta.select();
+		try { document.execCommand('copy'); } catch (e) {}
+		document.body.removeChild(ta);
+		done();
+	};
+	if (navigator.clipboard && navigator.clipboard.writeText) {
+		navigator.clipboard.writeText(text).then(done, fallback);
+	} else {
+		fallback();
+	}
+});
+`}</script>
+
 <div class="t0-explore not-content">
-	<h2>Explore the docs</h2>
-	<p>From first install to front-line rollout.</p>
+	<h2>Best Practice</h2>
+	<p>Field-tested patterns from real Tier0 deployments.</p>
 </div>
 
 <section class="t0-grid-wrap t0-frame not-content">
 	<span class="t0-corners" aria-hidden="true"></span>
 	<div class="t0-grid">
-		<a class="t0-cell" href="/using-tier0/uns-concepts/">
-			<span class="t0-tag">Concepts</span>
-			<h3>UNS Concepts</h3>
-			<p>Paths, topics, Metric/State/Action, VQT payloads — and how the namespace stores data.</p>
+		<a class="t0-cell" href="/best-practice/uns-modeling/">
+			<span class="t0-tag">Modeling</span>
+			<h3>UNS Modeling</h3>
+			<p>How the Demo UNS is designed — hierarchy, avoiding topic explosion, and payload structure that scales.</p>
 			<span class="t0-more">Read more</span>
 		</a>
-		<a class="t0-cell" href="/using-tier0/connect-data/">
-			<span class="t0-tag">Data Collection</span>
-			<h3>Connect Data to UNS</h3>
-			<p>Model the namespace and bring data in with SourceFlows. OPC UA, Modbus, MQTT, S7, and more.</p>
+		<a class="t0-cell" href="/best-practice/protocol-connections/">
+			<span class="t0-tag">Protocols</span>
+			<h3>Connecting OPC UA / Modbus</h3>
+			<p>Node-RED flows for typical industrial protocols, with real importable flow JSON references.</p>
 			<span class="t0-more">Read more</span>
 		</a>
-		<a class="t0-cell" href="/using-tier0/build-apps/">
-			<span class="t0-tag">Apps</span>
-			<h3>Build Apps on UNS</h3>
-			<p>A container is an app — deploy on Edge and Enterprise, with Event Flows as your logic layer.</p>
-			<span class="t0-more">Read more</span>
-		</a>
-		<a class="t0-cell" href="/using-tier0/analyze-data/">
-			<span class="t0-tag">Notebook</span>
-			<h3>Analyze UNS Data</h3>
-			<p>Query live namespace data and build interactive analyses and machine-learning apps.</p>
-			<span class="t0-more">Read more</span>
-		</a>
-		<a class="t0-cell" href="/using-tier0/agents/">
-			<span class="t0-tag">AI Agents</span>
-			<h3>Operate with Agents</h3>
-			<p>Install the Tier0 Skill and let agents browse the namespace, move data, and manage flows.</p>
-			<span class="t0-more">Read more</span>
-		</a>
-		<a class="t0-cell" href="/get-started/choosing-version/">
-			<span class="t0-tag">Editions</span>
-			<h3>Choosing the Best Version</h3>
-			<p>Edge, Cloud, or Enterprise — plans, hardware requirements, and the capability matrix.</p>
+		<a class="t0-cell" href="/best-practice/analytics-apps/">
+			<span class="t0-tag">Analytics</span>
+			<h3>Building Analytics Apps</h3>
+			<p>From Notebook query to interactive analysis app — the Aramco Bowtie case, on sanitized data.</p>
 			<span class="t0-more">Read more</span>
 		</a>
 	</div>

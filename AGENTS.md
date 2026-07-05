@@ -70,7 +70,7 @@ Dark canvas `#161616` (neutral gray, never blue-tinted), lime `#B2ED1D` / deep g
 
 ## Known TODOs before going live
 
-1. `site` in astro.config.mjs is a placeholder (`https://docs.tier0.app`) — set the real domain (llms.txt links depend on it).
+1. `site` in astro.config.mjs is a placeholder (`https://docs.tier0.app`) — set the real domain (llms.txt links depend on it; also update the llms-full.txt URL inside the homepage copy-prompt).
 2. ~~Edit-link repo~~ — done: `github.com/FREEZONEX/Tier0-docs-site`.
 3. Prices on Choosing the Best Version are snapshots — sync with tier0.app/pricing before release.
 4. No CI yet — recommend a workflow that runs `npm run build` on PRs.
