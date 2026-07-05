@@ -68,6 +68,5 @@ The complete, binding conventions live in [AGENTS.md](AGENTS.md) (symlinked as `
 | Item | Where |
 |---|---|
 | Set the real docs domain (currently `https://docs.tier0.app` placeholder) | `site` in `astro.config.mjs` |
-| Create/point the edit-link repo (currently `FREEZONEX/tier0-docs`) | `editLink.baseUrl` in `astro.config.mjs` |
 | Re-verify prices against tier0.app/pricing | `architecture/choosing-version.mdx` |
 | Add CI running `npm run build` on PRs | — |

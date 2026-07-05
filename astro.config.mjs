@@ -35,7 +35,7 @@ export default defineConfig({
 				{ icon: 'discord', label: 'Discord', href: 'https://tier0.app/media' },
 			],
 			editLink: {
-				baseUrl: 'https://github.com/FREEZONEX/tier0-docs/edit/main/',
+				baseUrl: 'https://github.com/FREEZONEX/Tier0-docs-site/edit/main/',
 			},
 			expressiveCode: {
 				themes: ['vitesse-dark', 'vitesse-light'],
