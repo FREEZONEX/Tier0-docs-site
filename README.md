@@ -20,23 +20,29 @@ Requires Node 18+. No other services needed.
 ```
 src/content/docs/                  # pages — URL mirrors the file path
 ├── index.mdx                      # wireframe landing
-├── intro/
-│   ├── what-is-tier0.md           # concepts (edition-agnostic)
-│   └── get-started.mdx            # CLI install + edition tabs + demo tour
-├── architecture/
-│   ├── choosing-version.mdx       # edition board + decision tree + matrix
-│   └── hosting.md                 # topologies (Edge + Enterprise)
-└── using-tier0/
-    ├── connect.md                 # all editions
-    ├── build.md                   # Cloud + Enterprise
-    ├── analytics.md               # Cloud + Enterprise
-    └── front-line-user.md         # Cloud + Enterprise
+├── get-started/
+│   ├── installation.mdx           # CLI via Skill/GitHub + edition tabs
+│   ├── demo-factory.mdx           # Cloud trial tour
+│   └── choosing-version.mdx       # edition board + hw requirements + matrix
+├── using-tier0/
+│   ├── uns-concepts.mdx           # Metric/State/Action, VQT, storage (skeleton)
+│   ├── connect-data.md            # modeling + SourceFlow
+│   ├── working-with-uns-data.mdx  # MQTT / API / CLI (skeleton)
+│   ├── build-apps.mdx             # containers as apps + Event Flow (skeleton)
+│   ├── analyze-data.md            # Notebook, interactive + ML
+│   └── agents.mdx                 # Tier0 Skill (skeleton)
+└── best-practice/
+    ├── uns-modeling.mdx           # topic explosion, payloads (skeleton)
+    ├── protocol-connections.mdx   # OPC UA/Modbus flows + JSON refs (skeleton)
+    └── analytics-apps.mdx         # Aramco Bowtie case (skeleton)
 
 astro.config.mjs                   # sidebar, plugins (mermaid, llms.txt), site URL
 src/styles/custom.css              # the entire theme, sectioned by comments
 src/components/PageTitle.astro     # renders edition badges from frontmatter
 src/content.config.ts              # frontmatter schema (editions field)
 ```
+
+**Skeleton pages** carry a `:::caution[TODO — 写作线索]` block with writing directions — search the repo for `写作线索` to list everything awaiting content.
 
 ## Adding a page
 

@@ -1,0 +1,59 @@
+---
+title: UNS Concepts in Tier0
+description: The Unified Namespace model — paths, topics, Metric/State/Action, VQT payloads, and how data is stored.
+editions: [edge, cloud, enterprise]
+sidebar:
+  order: 1
+---
+
+:::caution[TODO — 写作线索 (Huize)]
+这部分讲 UNS 的 **State、Action、Metric**,以及 **UNS 如何存储**。建议覆盖:三种 topicType 的语义与选型(什么时候建 Metric / State / Action)、VQT 结构(value 是对象不是标量、quality、timeStamp)、存储层(实时值 vs 历史:MQTT broker + TimescaleDB 时序 / PostgreSQL 关系)、路径与 topic 的区别(browse 文件夹 vs read/write 叶子)。
+:::
+
+*(Placeholder — this page will be rewritten. The skeleton below marks the intended structure.)*
+
+The Unified Namespace (UNS) is Tier0's single source of truth: a semantic tree of paths whose leaves — **topics** — carry live, structured values over MQTT pub/sub.
+
+```mermaid
+flowchart TD
+  plant["Plant/"] --> line1["Line1/"]
+  line1 --> metric["Metric/"]
+  line1 --> state["State/"]
+  line1 --> action["Action/"]
+  metric --> temp(["Temperature"])
+  state --> status(["MachineStatus"])
+  action --> start(["StartBatch"])
+  classDef t0accent fill:#B2ED1D,stroke:#73B200,color:#171717
+  class temp,status,start t0accent
+```
+
+## Paths vs topics
+
+> TODO: folders are browsable, leaves are readable/writable; wildcard reads.
+
+## Metric, State, Action
+
+> TODO: semantics of the three topic types and when to model which.
+
+| Topic type | Carries | Example |
+|---|---|---|
+| `METRIC` | — | — |
+| `STATE` | — | — |
+| `ACTION` | — | — |
+
+## The VQT payload
+
+> TODO: `value` (object, not scalar) + `quality` + `timeStamp`; field definitions.
+
+```json
+{ "value": { "temperature": 27.5, "unit": "C" }, "quality": "Good", "timeStamp": 1733382000000 }
+```
+
+## How the UNS stores data
+
+> TODO: live values on the MQTT broker; history in TimescaleDB (time-series) and PostgreSQL (relational); retention.
+
+## Next
+
+- [Connect Data to UNS](/using-tier0/connect-data/)
+- [Working with UNS Data](/using-tier0/working-with-uns-data/)

@@ -1,0 +1,65 @@
+---
+title: Installation
+description: Install the tier0 CLI and agent skills via Skill or GitHub, then set up your edition.
+sidebar:
+  order: 1
+---
+
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+
+Tier0 ships in three editions — **Edge** (open source), **Cloud** (managed SaaS), and **Enterprise** (private deployment). They share the same namespace model, flows, and CLI, so everything you learn here applies everywhere. Not sure which fits? See [Choosing the Best Version](/get-started/choosing-version/).
+
+## The `tier0` CLI + agent skills
+
+Whatever edition you run, the CLI is the fastest way in — for humans and AI agents alike. One command installs the `tier0` binary **and** the agent skills for Cursor / Claude:
+
+```bash
+npx @tier0/cli@latest install
+```
+
+Alternatives (install script per OS, skills separately) are on [FREEZONEX/Tier0-cli](https://github.com/FREEZONEX/Tier0-cli); skills live at [FREEZONEX/Tier0-skill](https://github.com/FREEZONEX/Tier0-skill).
+
+## Set up your edition
+
+<Tabs syncKey="edition">
+	<TabItem label="Cloud">
+		Nothing to install — apply for a workspace at [tier0.app/cloud-trial](https://tier0.app/cloud-trial) and your link arrives by email. Then log in from the CLI:
+
+		```bash
+		tier0 login   # or: tier0 config --api-key sk-per-xxxxxx
+		tier0 uns browse
+		```
+	</TabItem>
+	<TabItem label="Edge (open source)">
+		Apache-2.0, runs on a single machine with Docker. Minimum 4-core CPU, 8 GB RAM, 100 GB disk; Ubuntu 24.04 or Windows 10/11.
+
+		```bash
+		git clone https://github.com/FREEZONEX/Tier0-Edge
+		```
+
+		Configure `.env` and run the install script — the [Tier0-Edge README](https://github.com/FREEZONEX/Tier0-Edge#readme) walks through both. Then point the CLI at your instance:
+
+		```bash
+		tier0 config --base-url http://your-edge-host
+		tier0 login
+		```
+	</TabItem>
+	<TabItem label="Enterprise">
+		Deployment packages are delivered with your license — start at [tier0.app/download](https://tier0.app/download) or [talk to the team](https://tier0.app/talk-to-team). Once your instance is up:
+
+		```bash
+		tier0 config --base-url https://tier0.your-company.com
+		tier0 login
+		tier0 info    # verify gateway connectivity
+		```
+	</TabItem>
+</Tabs>
+
+:::caution[Changed the base URL?]
+API keys are per-instance. After any `--base-url` change, run the login flow again — old keys against a new address fail with an `authentication` error.
+:::
+
+## Next
+
+- [Try the Demo Factory](/get-started/demo-factory/) — a preloaded plant to explore
+- [Choosing the Best Version](/get-started/choosing-version/)

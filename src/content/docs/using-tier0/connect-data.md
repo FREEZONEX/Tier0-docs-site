@@ -1,8 +1,14 @@
 ---
-title: Connect
-description: Collect data from PLCs, devices, and business systems into the Unified Namespace with SourceFlows. Available in all editions.
+title: Connect Data to UNS
+description: Model your namespace and bring data in with SourceFlows. Available in all editions.
 editions: [edge, cloud, enterprise]
+sidebar:
+  order: 2
 ---
+
+:::caution[TODO — 写作线索 (Huize)]
+这部分讲**如何在 UNS 中建模,如何用 Source Flow 连接数据进入 UNS**。现有内容(下方)可作素材改写。建议结构:① 建模先行——设计路径层级、选 topicType、定义字段(`tier0 uns create` / JSON 批量导入);② SourceFlow——从协议节点到发布 UNS 的完整流程(拖节点 → 转换 → 发布 → 部署);③ 验证数据流。深入的协议接法放 [Best Practice](/best-practice/protocol-connections/)。
+:::
 
 **Connect** is where every Tier0 project starts: get signals out of equipment and systems, into the Unified Namespace, once. After that, every app, notebook, and agent consumes from the namespace — no more point-to-point integrations.
 
@@ -79,5 +85,5 @@ Quality (`Good` / otherwise) and fresh `timeStamp`s tell you the flow is alive.
 
 ## Next
 
-- [Build](/using-tier0/build/) an app on the data you just connected
-- [Analytics](/using-tier0/analytics/) — trend and analyze the new topics
+- [Build Apps on UNS](/using-tier0/build-apps/) — put the data to work
+- [Analyze UNS Data](/using-tier0/analyze-data/) — trend and analyze the new topics

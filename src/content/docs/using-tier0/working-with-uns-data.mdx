@@ -1,0 +1,56 @@
+---
+title: Working with UNS Data
+description: Read and write namespace data over MQTT, the REST API, and the CLI — with the API reference.
+editions: [edge, cloud, enterprise]
+sidebar:
+  order: 3
+---
+
+:::caution[TODO — 写作线索 (Huize)]
+介绍 **MQTT、API 方式操作 UNS,附上 API 文档**。建议覆盖:MQTT 直连(broker 地址/认证、topic 订阅通配符、发布 VQT payload 的格式约束)、REST API(读当前值、写入、历史查询、节点 CRUD——附 OpenAPI/API 文档链接或内嵌 reference)、CLI 对应命令速查(read/write/history/create)、三种方式怎么选(实时订阅用 MQTT、集成用 API、脚本/agent 用 CLI)。API 文档落地方式待定:外链 Swagger 或用 starlight-openapi 内嵌。
+:::
+
+*(Placeholder — this page will be rewritten. The skeleton below marks the intended structure.)*
+
+Everything in the namespace is reachable three ways — pick by use case:
+
+| Channel | Best for |
+|---|---|
+| **MQTT** | Real-time subscriptions, edge publishers |
+| **REST API** | System integrations, backends |
+| **`tier0` CLI** | Scripts, operations, AI agents |
+
+## MQTT
+
+> TODO: broker endpoint & auth per edition; subscribe with wildcards; publishing valid VQT payloads.
+
+```bash
+# placeholder
+mosquitto_sub -t 'Plant/+/Metric/#'
+```
+
+## REST API
+
+> TODO: auth (API keys), read/write/history endpoints, node CRUD; link or embed the API reference.
+
+```bash
+# placeholder
+curl -H "Authorization: Bearer sk-per-..." https://<instance>/api/...
+```
+
+## CLI quick reference
+
+```bash
+tier0 uns read Plant/Line1/Metric/Temperature
+tier0 uns write --topic Plant/Line1/Metric/Temperature --value '{"temperature":27.5,"unit":"C"}'
+tier0 uns history Plant/Line1/Metric/Temperature --start 1715000000 --end 1715600000
+```
+
+## API reference
+
+> TODO: attach the full API documentation here.
+
+## Next
+
+- [Build Apps on UNS](/using-tier0/build-apps/)
+- [Analyze UNS Data](/using-tier0/analyze-data/)

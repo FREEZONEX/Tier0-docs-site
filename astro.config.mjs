@@ -50,29 +50,33 @@ export default defineConfig({
 			],
 			sidebar: [
 				{
-					label: 'Intro',
+					label: 'Get Started',
 					collapsed: false,
 					items: [
-						{ label: 'What is Tier0', slug: 'intro/what-is-tier0' },
-						{ label: 'Get Started', slug: 'intro/get-started' },
-					],
-				},
-				{
-					label: 'Architecture',
-					collapsed: false,
-					items: [
-						{ label: 'Choosing the Best Version', slug: 'architecture/choosing-version' },
-						{ label: 'Hosting Tier0', slug: 'architecture/hosting' },
+						{ label: 'Installation', slug: 'get-started/installation' },
+						{ label: 'Try the Demo Factory', slug: 'get-started/demo-factory' },
+						{ label: 'Choosing the Best Version', slug: 'get-started/choosing-version' },
 					],
 				},
 				{
 					label: 'Using Tier0',
 					collapsed: false,
 					items: [
-						{ label: 'Connect', slug: 'using-tier0/connect' },
-						{ label: 'Build', slug: 'using-tier0/build' },
-						{ label: 'Analytics', slug: 'using-tier0/analytics' },
-						{ label: 'Front-Line User', slug: 'using-tier0/front-line-user' },
+						{ label: 'UNS Concepts', slug: 'using-tier0/uns-concepts' },
+						{ label: 'Connect Data to UNS', slug: 'using-tier0/connect-data' },
+						{ label: 'Working with UNS Data', slug: 'using-tier0/working-with-uns-data' },
+						{ label: 'Build Apps on UNS', slug: 'using-tier0/build-apps' },
+						{ label: 'Analyze UNS Data', slug: 'using-tier0/analyze-data' },
+						{ label: 'Operate Tier0 with Agents', slug: 'using-tier0/agents' },
+					],
+				},
+				{
+					label: 'Best Practice',
+					collapsed: false,
+					items: [
+						{ label: 'UNS Modeling', slug: 'best-practice/uns-modeling' },
+						{ label: 'Connecting OPC UA / Modbus', slug: 'best-practice/protocol-connections' },
+						{ label: 'Building Analytics Apps', slug: 'best-practice/analytics-apps' },
 					],
 				},
 			],
@@ -87,8 +91,16 @@ export default defineConfig({
 						{
 							label: 'Edge (open-source) essentials',
 							description:
-								'Everything that applies to the open-source Tier0 Edge edition: concepts, install, data collection',
-							paths: ['intro/**', 'architecture/**', 'using-tier0/connect'],
+								'Everything that applies to the open-source Tier0 Edge edition: concepts, install, data collection, best practices',
+							paths: [
+								'get-started/**',
+								'using-tier0/uns-concepts',
+								'using-tier0/connect-data',
+								'using-tier0/working-with-uns-data',
+								'using-tier0/agents',
+								'best-practice/uns-modeling',
+								'best-practice/protocol-connections',
+							],
 						},
 					],
 					optionalLinks: [

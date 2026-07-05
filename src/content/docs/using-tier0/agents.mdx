@@ -1,0 +1,45 @@
+---
+title: Operate Tier0 with Agents
+description: Install the Tier0 Skill and let AI agents browse the namespace, read/write data, and manage flows.
+editions: [edge, cloud, enterprise]
+sidebar:
+  order: 6
+---
+
+:::caution[TODO — 写作线索 (Huize)]
+这部分描述 **Tier0 Skill 的功能,如何安装 Tier0 Skill**。建议覆盖:一键安装(`npx @tier0/cli@latest install` 同时装 CLI+Skill;或 `npx skills add FREEZONEX/Tier0-skill`)、支持的 agent 环境(Claude Code / Cursor 等)、Skill 能力清单(UNS:browse/read/write/history/search/create/update/delete;Flow:list/create/deploy/导入导出画布)、agent 推荐用 API-key 登录(device flow 需要人在浏览器)、高风险操作的确认机制(flow deploy/delete 的 --yes 协议)、本站的 llms.txt 端点(/llms.txt、/llms-full.txt、Edge 子集)让 agent 自主查文档。
+:::
+
+*(Placeholder — this page will be rewritten. The skeleton below marks the intended structure.)*
+
+Tier0 is agent-ready by design: the same CLI humans use is packaged as an **agent skill**, and these docs ship machine-readable endpoints.
+
+## Install the Tier0 Skill
+
+```bash
+npx @tier0/cli@latest install        # CLI + skills in one step
+# or skills only:
+npx skills add FREEZONEX/Tier0-skill
+```
+
+> TODO: supported agent environments (Claude Code, Cursor, …); what gets installed where.
+
+## What agents can do
+
+> TODO: capability list — namespace browse/read/write/history/create; flow list/create/deploy; canvas export/import.
+
+## Authentication for agents
+
+> TODO: prefer API keys (`tier0 config --api-key sk-per-…`); device flow needs a human in the browser; per-instance keys.
+
+## Guardrails
+
+> TODO: high-risk operations (flow deploy/delete) require explicit `--yes` confirmation — the exit-10 protocol.
+
+## Machine-readable docs
+
+Agents can fetch this site directly: [/llms.txt](/llms.txt) (index) · [/llms-full.txt](/llms-full.txt) (complete) · Edge-only subset linked from the index.
+
+## Next
+
+- [Working with UNS Data](/using-tier0/working-with-uns-data/)

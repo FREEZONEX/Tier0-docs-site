@@ -1,6 +1,8 @@
 ---
 title: Choosing the Best Version
 description: Edge, Cloud, or Enterprise — positioning, plans, and a capability matrix for picking your Tier0 edition.
+sidebar:
+  order: 3
 ---
 
 Tier0 is one platform in three editions. Same namespace model, same flows, same CLI — the difference is who runs it and how much platform you get.
@@ -71,6 +73,19 @@ Tier0 is one platform in three editions. Same namespace model, same flows, same 
 
 **Add-ons:** extra edge nodes $2,000 /edge/year · additional instances $10,000 /instance/year. Prices are for orientation — the source of truth is [tier0.app/pricing](https://tier0.app/pricing).
 
+## Edge hardware requirements
+
+:::caution[TODO — 写作线索 (Huize)]
+Edge 适合进行技术测试、或具备充分技术能力的用户——这里要加入**硬件要求**。建议做成表格:最低 / 推荐配置(CPU、内存、磁盘容量与 IOPS)、支持的 OS(Ubuntu 24.04 / Windows 10/11)、Docker 版本要求。数据源:[Tier0-Edge README](https://github.com/FREEZONEX/Tier0-Edge#readme)。
+:::
+
+| | Minimum | Recommended |
+|---|---|---|
+| CPU | 4 cores | 8 cores |
+| Memory | 8 GB | 16 GB |
+| Disk | 100 GB (1000 IOPS) | 1 TB |
+| OS | Ubuntu 24.04 · Windows 10/11 (Docker) | — |
+
 ## Not sure? Trace the path
 
 ```mermaid
@@ -107,5 +122,5 @@ In Cloud plans, an *edge* is a connection point that collects data close to your
 
 ## Next
 
-- [Hosting Tier0](/architecture/hosting/) — topologies and operations for Enterprise and Edge
-- [Get Started](/intro/get-started/) — the 14-day Cloud trial is the full platform
+- [Build Apps on UNS](/using-tier0/build-apps/) — deploying containers on Edge and Enterprise
+- [Installation](/get-started/installation/) — the 14-day Cloud trial is the full platform

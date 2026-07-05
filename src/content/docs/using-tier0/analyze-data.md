@@ -1,8 +1,14 @@
 ---
-title: Analytics
-description: Explore, calculate, and operationalize live namespace data with Tier0 Notebook. Available in Cloud and Enterprise.
+title: Analyze UNS Data
+description: Query live namespace data in Tier0 Notebook and build interactive analyses and machine-learning apps. Available in Cloud and Enterprise.
 editions: [cloud, enterprise]
+sidebar:
+  order: 5
 ---
+
+:::caution[TODO — 写作线索 (Huize)]
+这部分讲**如何使用 Notebook 查询数据,并构建交互式分析、机器学习应用**。现有内容(下方)可作素材改写。建议补充:① Notebook 查询 UNS 的具体方式(内置数据接口/SQL/Python 示例);② 交互式分析——marimo 的响应式单元、控件(滑块/下拉)驱动的探索;③ ML 应用——训练→推理→结果回写 UNS 的闭环示例;④ 案例入口指向 [Best Practice: Building Analytics Apps](/best-practice/analytics-apps/)。
+:::
 
 :::note[Edge edition]
 Tier0 Notebook is not part of the open-source Edge edition. On Edge, query history via the CLI (`tier0 uns history`) or connect your own tooling — the notebook engine is built on the open-source [marimo](https://github.com/FREEZONEX/marimo) project.
@@ -22,7 +28,7 @@ because equipment, process, and business data share one semantic structure. Code
 
 ## Working with data
 
-Everything you connected in [Connect](/using-tier0/connect/) and everything your apps record in [Build](/using-tier0/build/) is queryable — raw edge signals, MES-class records, and contextualized layers alike.
+Everything you connected in [Connect Data to UNS](/using-tier0/connect-data/) and everything your apps record is queryable — raw edge signals, MES-class records, and contextualized layers alike.
 
 From notebooks you analyze live topics; the same data is reachable from the CLI when you're scripting or agent-driven:
 
@@ -56,5 +62,5 @@ Build the analysis once, keep it running against live data, and let operations c
 
 ## Next
 
-- [Front-Line User](/using-tier0/front-line-user/) — where operationalized insights land
-- [What is Tier0](/intro/what-is-tier0/) — the namespace model these analyses run on
+- [Build Apps on UNS](/using-tier0/build-apps/) — where operationalized insights land
+- [UNS Concepts](/using-tier0/uns-concepts/) — the namespace model these analyses run on
