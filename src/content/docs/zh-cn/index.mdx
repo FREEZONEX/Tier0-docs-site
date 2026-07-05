@@ -1,0 +1,84 @@
+---
+title: Tier0 文档
+description: 在 Tier0 Unified Namespace 上开始构建——把一段 prompt 贴进你的 code agent,然后跟随最佳实践。
+tableOfContents: false
+prev: false
+next: false
+---
+
+<section class="t0-banner t0-frame accent not-content">
+	<span class="t0-corners" aria-hidden="true"></span>
+	<div class="t0-banner-main">
+		<p class="t0-tag">用 Tier0 开始构建</p>
+		<h2>把这段话贴进你的 code agent</h2>
+		<p>一段 prompt 完成安装 Tier0 CLI + Skill、登录,并带你的 agent 把 Unified Namespace 逛一遍。</p>
+		<pre class="t0-prompt" id="t0-agent-prompt">{`帮我配置 Tier0 并带我熟悉一下:
+1. 运行 \`npx @tier0/cli@latest install\` 安装 tier0 CLI 和 agent skill。
+2. 帮我登录:运行 \`tier0 login\`,把验证链接给我打开。
+3. 用 \`tier0 uns browse\` 浏览命名空间,读取一个实时 topic,并列出为它供数的 source flows。
+阅读 https://docs.tier0.app/llms-full.txt 获取完整 Tier0 文档。`}</pre>
+		<button class="t0-copy" id="t0-copy-btn">复制 prompt</button>
+	</div>
+	<div class="t0-banner-side">
+		<p>更喜欢手动来?</p>
+		<p class="t0-endpoints"><a href="/zh-cn/get-started/installation/">安装指南</a> · <a href="/zh-cn/get-started/demo-factory/">演示工厂</a></p>
+		<p>给 agent 的机器可读端点:</p>
+		<p class="t0-endpoints"><a href="/llms.txt">/llms.txt</a> · <a href="/llms-small.txt">/llms-small.txt</a> · <a href="/llms-full.txt">/llms-full.txt</a></p>
+	</div>
+</section>
+
+<script is:inline>{`
+document.getElementById('t0-copy-btn').addEventListener('click', function () {
+	var b = this;
+	var text = document.getElementById('t0-agent-prompt').innerText;
+	var done = function () {
+		b.textContent = '已复制';
+		setTimeout(function () { b.textContent = '复制 prompt'; }, 1600);
+	};
+	var fallback = function () {
+		var ta = document.createElement('textarea');
+		ta.value = text;
+		ta.style.position = 'fixed';
+		ta.style.opacity = '0';
+		document.body.appendChild(ta);
+		ta.select();
+		try { document.execCommand('copy'); } catch (e) {}
+		document.body.removeChild(ta);
+		done();
+	};
+	if (navigator.clipboard && navigator.clipboard.writeText) {
+		navigator.clipboard.writeText(text).then(done, fallback);
+	} else {
+		fallback();
+	}
+});
+`}</script>
+
+<div class="t0-explore not-content">
+	<h2>最佳实践</h2>
+	<p>来自真实 Tier0 部署的实战经验。</p>
+</div>
+
+<section class="t0-grid-wrap t0-frame not-content">
+	<span class="t0-corners" aria-hidden="true"></span>
+	<div class="t0-grid">
+		<a class="t0-cell" href="/zh-cn/best-practice/uns-modeling/">
+			<span class="t0-tag">建模</span>
+			<h3>UNS 建模</h3>
+			<p>Demo UNS 的设计思路——层级规划、防止 Topic 爆炸、可扩展的 payload 结构。</p>
+			<span class="t0-more">阅读全文</span>
+		</a>
+		<a class="t0-cell" href="/zh-cn/best-practice/protocol-connections/">
+			<span class="t0-tag">协议</span>
+			<h3>连接 OPC UA / Modbus</h3>
+			<p>典型工业协议的 Node-RED 接入流程,附可直接导入的真实 Flow JSON 参考。</p>
+			<span class="t0-more">阅读全文</span>
+		</a>
+		<a class="t0-cell" href="/zh-cn/best-practice/analytics-apps/">
+			<span class="t0-tag">分析</span>
+			<h3>开发数据分析应用</h3>
+			<p>从 Notebook 查询到交互式分析应用——Aramco Bowtie 案例(脱敏数据)。</p>
+			<span class="t0-more">阅读全文</span>
+		</a>
+	</div>
+</section>

@@ -30,6 +30,13 @@ export default defineConfig({
 				dark: './src/assets/tier0-logo-white.svg',
 				replacesTitle: true,
 			},
+			defaultLocale: 'root',
+			locales: {
+				root: { label: 'English', lang: 'en' },
+				'zh-cn': { label: '简体中文', lang: 'zh-CN' },
+				ja: { label: '日本語', lang: 'ja' },
+				es: { label: 'Español', lang: 'es' },
+			},
 			social: [
 				{ icon: 'github', label: 'GitHub', href: 'https://github.com/FREEZONEX' },
 				{ icon: 'discord', label: 'Discord', href: 'https://tier0.app/media' },
@@ -51,32 +58,83 @@ export default defineConfig({
 			sidebar: [
 				{
 					label: 'Get Started',
+					translations: { 'zh-CN': '快速开始', ja: 'はじめに', es: 'Primeros pasos' },
 					collapsed: false,
 					items: [
-						{ label: 'Installation', slug: 'get-started/installation' },
-						{ label: 'Try the Demo Factory', slug: 'get-started/demo-factory' },
-						{ label: 'Choosing the Best Version', slug: 'get-started/choosing-version' },
+						{
+							label: 'Installation',
+							translations: { 'zh-CN': '安装', ja: 'インストール', es: 'Instalación' },
+							slug: 'get-started/installation',
+						},
+						{
+							label: 'Try the Demo Factory',
+							translations: { 'zh-CN': '体验演示工厂', ja: 'デモファクトリーを試す', es: 'Prueba la fábrica demo' },
+							slug: 'get-started/demo-factory',
+						},
+						{
+							label: 'Choosing the Best Version',
+							translations: { 'zh-CN': '选择合适的版本', ja: '最適なエディションの選択', es: 'Elegir la mejor versión' },
+							slug: 'get-started/choosing-version',
+						},
 					],
 				},
 				{
 					label: 'Using Tier0',
+					translations: { 'zh-CN': '使用 Tier0', ja: 'Tier0 の使い方', es: 'Uso de Tier0' },
 					collapsed: false,
 					items: [
-						{ label: 'UNS Concepts', slug: 'using-tier0/uns-concepts' },
-						{ label: 'Connect Data to UNS', slug: 'using-tier0/connect-data' },
-						{ label: 'Working with UNS Data', slug: 'using-tier0/working-with-uns-data' },
-						{ label: 'Build Apps on UNS', slug: 'using-tier0/build-apps' },
-						{ label: 'Analyze UNS Data', slug: 'using-tier0/analyze-data' },
-						{ label: 'Operate Tier0 with Agents', slug: 'using-tier0/agents' },
+						{
+							label: 'UNS Concepts',
+							translations: { 'zh-CN': 'UNS 核心概念', ja: 'UNS の概念', es: 'Conceptos de UNS' },
+							slug: 'using-tier0/uns-concepts',
+						},
+						{
+							label: 'Connect Data to UNS',
+							translations: { 'zh-CN': '连接数据到 UNS', ja: 'UNS へのデータ接続', es: 'Conectar datos a UNS' },
+							slug: 'using-tier0/connect-data',
+						},
+						{
+							label: 'Working with UNS Data',
+							translations: { 'zh-CN': '使用 UNS 数据', ja: 'UNS データの操作', es: 'Trabajar con datos de UNS' },
+							slug: 'using-tier0/working-with-uns-data',
+						},
+						{
+							label: 'Build Apps on UNS',
+							translations: { 'zh-CN': '在 UNS 上构建应用', ja: 'UNS 上でアプリを構築', es: 'Crear apps sobre UNS' },
+							slug: 'using-tier0/build-apps',
+						},
+						{
+							label: 'Analyze UNS Data',
+							translations: { 'zh-CN': '分析 UNS 数据', ja: 'UNS データの分析', es: 'Analizar datos de UNS' },
+							slug: 'using-tier0/analyze-data',
+						},
+						{
+							label: 'Operate Tier0 with Agents',
+							translations: { 'zh-CN': '用 Agent 操作 Tier0', ja: 'エージェントで Tier0 を操作', es: 'Operar Tier0 con agentes' },
+							slug: 'using-tier0/agents',
+						},
 					],
 				},
 				{
 					label: 'Best Practice',
+					translations: { 'zh-CN': '最佳实践', ja: 'ベストプラクティス', es: 'Buenas prácticas' },
 					collapsed: false,
 					items: [
-						{ label: 'UNS Modeling', slug: 'best-practice/uns-modeling' },
-						{ label: 'Connecting OPC UA / Modbus', slug: 'best-practice/protocol-connections' },
-						{ label: 'Building Analytics Apps', slug: 'best-practice/analytics-apps' },
+						{
+							label: 'UNS Modeling',
+							translations: { 'zh-CN': 'UNS 建模', ja: 'UNS モデリング', es: 'Modelado de UNS' },
+							slug: 'best-practice/uns-modeling',
+						},
+						{
+							label: 'Connecting OPC UA / Modbus',
+							translations: { 'zh-CN': '连接 OPC UA / Modbus', ja: 'OPC UA / Modbus 接続', es: 'Conexión OPC UA / Modbus' },
+							slug: 'best-practice/protocol-connections',
+						},
+						{
+							label: 'Building Analytics Apps',
+							translations: { 'zh-CN': '开发数据分析应用', ja: '分析アプリの構築', es: 'Apps de analítica' },
+							slug: 'best-practice/analytics-apps',
+						},
 					],
 				},
 			],

@@ -56,7 +56,11 @@ System font stack for ALL text (no webfonts for prose), Source Code Pro for code
 
 Dark canvas `#161616` (neutral gray, never blue-tinted), lime `#B2ED1D` / deep green `#73B200` as accents. Blue is banned everywhere — including code-syntax themes (we use vitesse-dark/light for this reason) and aside variants (note is restyled gray).
 
-### 5. Writing rules
+### 5. i18n = progressive translation, English is the source of truth
+
+Four locales: **en** (root, no URL prefix), **zh-cn**, **ja**, **es**. Author in English first; translations mirror the path under `src/content/docs/<locale>/…`. Untranslated pages automatically fall back to English with a notice — never block on translation. When you change shared UI: sidebar labels get `translations` in astro.config.mjs; the edition-badge label lives in PageTitle.astro (`AVAILABLE_IN`); the nav "Documentation" label is per-lang CSS in custom.css. The homepage exists once per locale (4 copies) — structural edits must touch all four `index.mdx` files. llms.txt stays English-only.
+
+### 6. Writing rules
 
 - **Tier0** is spelled with a zero. **FREEZONEX** is all caps.
 - Answer first, then explain. Real commands over prose.

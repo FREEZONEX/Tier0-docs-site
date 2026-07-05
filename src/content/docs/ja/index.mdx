@@ -1,0 +1,84 @@
+---
+title: Tier0 ドキュメント
+description: Tier0 Unified Namespace で構築を始める — プロンプトをコードエージェントに貼り付け、ベストプラクティスに従うだけ。
+tableOfContents: false
+prev: false
+next: false
+---
+
+<section class="t0-banner t0-frame accent not-content">
+	<span class="t0-corners" aria-hidden="true"></span>
+	<div class="t0-banner-main">
+		<p class="t0-tag">Tier0 で構築を始める</p>
+		<h2>これをコードエージェントに貼り付け</h2>
+		<p>ひとつのプロンプトで Tier0 CLI + スキルのインストール、ログイン、Unified Namespace の一巡りまで完了します。</p>
+		<pre class="t0-prompt" id="t0-agent-prompt">{`Tier0 をセットアップして案内してください:
+1. \`npx @tier0/cli@latest install\` を実行して tier0 CLI とエージェントスキルをインストール。
+2. ログインを手伝って:\`tier0 login\` を実行し、認証 URL を教えてください。
+3. \`tier0 uns browse\` でネームスペースを閲覧し、ライブトピックを 1 つ読み、それに供給している source flow を一覧表示。
+完全なドキュメントは https://docs.tier0.app/llms-full.txt を参照。`}</pre>
+		<button class="t0-copy" id="t0-copy-btn">プロンプトをコピー</button>
+	</div>
+	<div class="t0-banner-side">
+		<p>手動で進めたい場合:</p>
+		<p class="t0-endpoints"><a href="/ja/get-started/installation/">インストールガイド</a> · <a href="/ja/get-started/demo-factory/">デモファクトリー</a></p>
+		<p>エージェント向けエンドポイント:</p>
+		<p class="t0-endpoints"><a href="/llms.txt">/llms.txt</a> · <a href="/llms-small.txt">/llms-small.txt</a> · <a href="/llms-full.txt">/llms-full.txt</a></p>
+	</div>
+</section>
+
+<script is:inline>{`
+document.getElementById('t0-copy-btn').addEventListener('click', function () {
+	var b = this;
+	var text = document.getElementById('t0-agent-prompt').innerText;
+	var done = function () {
+		b.textContent = 'コピーしました';
+		setTimeout(function () { b.textContent = 'プロンプトをコピー'; }, 1600);
+	};
+	var fallback = function () {
+		var ta = document.createElement('textarea');
+		ta.value = text;
+		ta.style.position = 'fixed';
+		ta.style.opacity = '0';
+		document.body.appendChild(ta);
+		ta.select();
+		try { document.execCommand('copy'); } catch (e) {}
+		document.body.removeChild(ta);
+		done();
+	};
+	if (navigator.clipboard && navigator.clipboard.writeText) {
+		navigator.clipboard.writeText(text).then(done, fallback);
+	} else {
+		fallback();
+	}
+});
+`}</script>
+
+<div class="t0-explore not-content">
+	<h2>ベストプラクティス</h2>
+	<p>実際の Tier0 導入で実証されたパターン。</p>
+</div>
+
+<section class="t0-grid-wrap t0-frame not-content">
+	<span class="t0-corners" aria-hidden="true"></span>
+	<div class="t0-grid">
+		<a class="t0-cell" href="/ja/best-practice/uns-modeling/">
+			<span class="t0-tag">モデリング</span>
+			<h3>UNS モデリング</h3>
+			<p>Demo UNS の設計 — 階層構成、トピック爆発の防止、スケールする payload 構造。</p>
+			<span class="t0-more">続きを読む</span>
+		</a>
+		<a class="t0-cell" href="/ja/best-practice/protocol-connections/">
+			<span class="t0-tag">プロトコル</span>
+			<h3>OPC UA / Modbus 接続</h3>
+			<p>代表的な産業プロトコルの Node-RED フロー。そのままインポートできる実フロー JSON 付き。</p>
+			<span class="t0-more">続きを読む</span>
+		</a>
+		<a class="t0-cell" href="/ja/best-practice/analytics-apps/">
+			<span class="t0-tag">分析</span>
+			<h3>分析アプリの構築</h3>
+			<p>Notebook のクエリからインタラクティブな分析アプリへ — Aramco Bowtie 事例(匿名化データ)。</p>
+			<span class="t0-more">続きを読む</span>
+		</a>
+	</div>
+</section>
