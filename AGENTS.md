@@ -64,7 +64,7 @@ Four locales: **en** (root, no URL prefix), **zh-cn**, **ja**, **es**. Author in
 
 - **Tier0** is spelled with a zero. **FREEZONEX** is all caps.
 - Answer first, then explain. Real commands over prose.
-- Content must read well as plain Markdown — it ships verbatim into `/llms.txt`, `/llms-full.txt`, and the Edge subset. No meaning carried only by layout.
+- Content must read well as plain Markdown — it ships verbatim into `/llms.txt`. No meaning carried only by layout.
 
 ## Layout notes (if you touch custom.css)
 
@@ -74,7 +74,7 @@ Four locales: **en** (root, no URL prefix), **zh-cn**, **ja**, **es**. Author in
 
 ## Known TODOs before going live
 
-1. `site` in astro.config.mjs is a placeholder (`https://docs.tier0.app`) — set the real domain (llms.txt links depend on it; also update the llms-full.txt URL inside the homepage copy-prompt).
+1. `site` in astro.config.mjs is a placeholder (`https://docs.tier0.app`) — set the real domain (llms.txt links depend on it; also update the llms.txt URL inside the homepage copy-prompt).
 2. ~~Edit-link repo~~ — done: `github.com/FREEZONEX/Tier0-docs-site`.
 3. Prices on Choosing the Best Version are snapshots — sync with tier0.app/pricing before release.
 4. No CI yet — recommend a workflow that runs `npm run build` on PRs.

@@ -145,22 +145,6 @@ export default defineConfig({
 						'Tier0 is an agentic industrial platform: a Unified Namespace (UNS) for real-time industrial data, flow-based data collection, an AI app builder, notebooks for analytics, and a launchpad for front-line users.',
 					details:
 						'Tier0 is built by FREEZONEX. The UNS organizes data semantically (site / area / equipment / process / order) over MQTT pub/sub. Interact with the platform via the web UI or the `tier0` CLI (npm: @tier0/cli, GitHub: FREEZONEX/Tier0-cli). Agent skills are available via `npx skills add FREEZONEX/Tier0-skill`.',
-					customSets: [
-						{
-							label: 'Edge (open-source) essentials',
-							description:
-								'Everything that applies to the open-source Tier0 Edge edition: concepts, install, data collection, best practices',
-							paths: [
-								'get-started/**',
-								'using-tier0/uns-concepts',
-								'using-tier0/connect-data',
-								'using-tier0/working-with-uns-data',
-								'using-tier0/agents',
-								'best-practice/uns-modeling',
-								'best-practice/protocol-connections',
-							],
-						},
-					],
 					optionalLinks: [
 						{
 							label: 'Tier0 website',

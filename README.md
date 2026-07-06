@@ -2,7 +2,7 @@
 
 Documentation site for [Tier0](https://tier0.app) — the agentic industrial platform — built with [Astro Starlight](https://starlight.astro.build).
 
-Human-friendly and agent-readable: every build emits `/llms.txt`, `/llms-small.txt`, `/llms-full.txt`, and an Edge-only subset via [starlight-llms-txt](https://github.com/delucis/starlight-llms-txt).
+Human-friendly and agent-readable: every build emits a single `/llms.txt` (full docs) via [starlight-llms-txt](https://github.com/delucis/starlight-llms-txt).
 
 ## Quick start
 
