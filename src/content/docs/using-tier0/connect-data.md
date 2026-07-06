@@ -7,7 +7,7 @@ sidebar:
 ---
 
 :::caution[TODO — 写作线索 (Huize)]
-这部分讲**如何在 UNS 中建模,如何用 Source Flow 连接数据进入 UNS**。现有内容(下方)可作素材改写。建议结构:① 建模先行——设计路径层级、选 topicType、定义字段(`tier0 uns create` / JSON 批量导入);② SourceFlow——从协议节点到发布 UNS 的完整流程(拖节点 → 转换 → 发布 → 部署);③ 验证数据流。深入的协议接法放 [Best Practice](/best-practice/protocol-connections/)。
+这部分讲如何在 UNS 中建模,如何用 Source Flow 连接数据进入 UNS。(现有内容仅为素材,按线索彻底重写。)
 :::
 
 **Connect** is where every Tier0 project starts: get signals out of equipment and systems, into the Unified Namespace, once. After that, every app, notebook, and agent consumes from the namespace — no more point-to-point integrations.

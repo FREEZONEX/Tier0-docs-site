@@ -7,7 +7,7 @@ sidebar:
 ---
 
 :::caution[TODO — 写作线索 (Huize)]
-这部分讲**如何使用 Notebook 查询数据,并构建交互式分析、机器学习应用**。现有内容(下方)可作素材改写。建议补充:① Notebook 查询 UNS 的具体方式(内置数据接口/SQL/Python 示例);② 交互式分析——marimo 的响应式单元、控件(滑块/下拉)驱动的探索;③ ML 应用——训练→推理→结果回写 UNS 的闭环示例;④ 案例入口指向 [Best Practice: Building Analytics Apps](/best-practice/analytics-apps/)。
+这部分讲如何使用 Notebook 查询数据,并构建交互式分析、机器学习应用。(现有内容仅为素材,按线索彻底重写。)
 :::
 
 :::note[Edge edition]
