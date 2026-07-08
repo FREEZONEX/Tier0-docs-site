@@ -49,8 +49,14 @@ export default defineConfig({
 			},
 			components: {
 				PageTitle: './src/components/PageTitle.astro',
+				Pagination: './src/components/Pagination.astro',
 			},
 			customCss: [
+				'@fontsource/ibm-plex-sans/400.css',
+				'@fontsource/ibm-plex-sans/500.css',
+				'@fontsource/ibm-plex-sans/700.css',
+				'@fontsource/ibm-plex-mono/400.css',
+				'@fontsource/ibm-plex-mono/500.css',
 				'@fontsource/source-code-pro/400.css',
 				'@fontsource/source-code-pro/500.css',
 				'./src/styles/custom.css',
