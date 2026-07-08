@@ -17,7 +17,7 @@ export default defineConfig({
 				fontFamily:
 					"-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif",
 				themeVariables: {
-					fontSize: '15px',
+					fontSize: '16px',
 				},
 			},
 		}),

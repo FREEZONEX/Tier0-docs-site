@@ -143,6 +143,15 @@ h1[id='_top'] {
 	border-radius: var(--t0-radius);
 }
 
+/* Inline UI icons in docs should not inherit Starlight's block image layout. */
+.sl-markdown-content img:not([width]) {
+	display: inline-block !important;
+	width: auto;
+	height: 1.25em;
+	margin: 0 0.125rem;
+	vertical-align: -0.25em;
+}
+
 /* Code blocks: Stripe = 13/19, flat frames (no shadow) */
 .expressive-code pre,
 .sl-markdown-content pre code {
@@ -151,6 +160,33 @@ h1[id='_top'] {
 
 .expressive-code {
 	--ec-frm-frameBoxShdCssVal: none;
+}
+
+.notebook-cell {
+	margin: 1rem 0;
+	border: 1px solid color-mix(in srgb, var(--sl-color-gray-5), transparent 55%);
+	border-radius: 0.5rem;
+	background: transparent;
+}
+
+.notebook-cell > summary {
+	cursor: pointer;
+	padding: 0.75rem 0.875rem;
+	font-weight: 600;
+	color: inherit;
+}
+
+.notebook-cell[open] > summary {
+	border-bottom: 1px solid color-mix(in srgb, var(--sl-color-gray-5), transparent 55%);
+}
+
+.notebook-cell > .expressive-code {
+	margin: 0;
+}
+
+.notebook-cell > .expressive-code pre {
+	border-top-left-radius: 0;
+	border-top-right-radius: 0;
 }
 
 /* Body links: colored, no underline until hover (Stripe rule) */
@@ -800,12 +836,58 @@ main:has(.t0-banner) .t0-banner {
 
 /* Capability matrix marks */
 .t0-yes {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	min-width: 2.25rem;
+	margin-right: 0.25rem;
+	padding: 0.0625rem 0.375rem;
+	border-radius: 999px;
+	background: var(--sl-color-accent-low);
 	color: var(--sl-color-accent-high);
 	font-weight: 700;
+	font-size: 0.8125rem;
+	line-height: 1.4;
 }
 
 .t0-no {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	min-width: 2.25rem;
+	margin-right: 0.25rem;
+	padding: 0.0625rem 0.375rem;
+	border-radius: 999px;
+	background: var(--sl-color-gray-6);
 	color: var(--sl-color-gray-4);
+	font-weight: 700;
+	font-size: 0.8125rem;
+	line-height: 1.4;
+}
+
+.sl-markdown-content h2#capability-matrix + table {
+	width: 100%;
+	font-size: 0.9375rem;
+	line-height: 1.5;
+	table-layout: fixed;
+}
+
+.sl-markdown-content h2#capability-matrix + table th,
+.sl-markdown-content h2#capability-matrix + table td {
+	padding: 0.75rem 0.875rem;
+	vertical-align: top;
+}
+
+.sl-markdown-content h2#capability-matrix + table th:first-child,
+.sl-markdown-content h2#capability-matrix + table td:first-child {
+	width: 26%;
+	font-weight: 700;
+	color: var(--sl-color-gray-1);
+}
+
+.sl-markdown-content h2#capability-matrix + table th:not(:first-child),
+.sl-markdown-content h2#capability-matrix + table td:not(:first-child) {
+	width: 24.666%;
 }
 
 @media (max-width: 60rem) {
@@ -818,26 +900,46 @@ main:has(.t0-banner) .t0-banner {
 .mermaid {
 	display: flex;
 	justify-content: center;
-	border: 1px solid var(--t0-line);
-	padding: 1.5rem 1rem;
+	border: 1px solid color-mix(in srgb, var(--t0-line) 72%, transparent);
+	border-radius: 6px;
+	padding: 1.75rem 1rem;
 	margin: 1.5rem 0;
 	overflow-x: auto;
+}
+
+.mermaid rect,
+.mermaid path {
+	rx: 8px;
+	ry: 8px;
+}
+
+.mermaid .nodeLabel,
+.mermaid .edgeLabel,
+.mermaid .cluster-label {
+	font-size: 1rem !important;
+	line-height: 1.35 !important;
+}
+
+.mermaid .cluster-label {
+	font-weight: 700 !important;
 }
 
 .mermaid .node:not(.t0accent) rect,
 .mermaid .node:not(.t0accent) polygon,
 .mermaid .node:not(.t0accent) circle,
 .mermaid .node:not(.t0accent) path {
-	fill: var(--sl-color-gray-6) !important;
-	stroke: var(--sl-color-gray-4) !important;
+	fill: color-mix(in srgb, var(--sl-color-gray-6) 72%, var(--sl-color-black)) !important;
+	stroke: color-mix(in srgb, var(--sl-color-gray-4) 45%, transparent) !important;
+	stroke-width: 1px !important;
 }
 
 .mermaid .node.t0accent rect,
 .mermaid .node.t0accent polygon,
 .mermaid .node.t0accent circle,
 .mermaid .node.t0accent path {
-	fill: #b2ed1d !important;
-	stroke: #73b200 !important;
+	fill: #c5f25a !important;
+	stroke: color-mix(in srgb, #73b200 55%, transparent) !important;
+	stroke-width: 1px !important;
 }
 
 .mermaid .node:not(.t0accent) .nodeLabel {
@@ -849,8 +951,9 @@ main:has(.t0-banner) .t0-banner {
 }
 
 .mermaid .cluster rect {
-	fill: transparent !important;
-	stroke: var(--t0-line) !important;
+	fill: color-mix(in srgb, var(--sl-color-gray-6) 24%, transparent) !important;
+	stroke: color-mix(in srgb, var(--t0-line) 52%, transparent) !important;
+	stroke-width: 1px !important;
 }
 
 .mermaid .cluster-label .nodeLabel,
@@ -860,12 +963,13 @@ main:has(.t0-banner) .t0-banner {
 
 .mermaid .edgePath .path,
 .mermaid .flowchart-link {
-	stroke: var(--sl-color-gray-3) !important;
+	stroke: color-mix(in srgb, var(--sl-color-gray-3) 58%, transparent) !important;
+	stroke-width: 1.25px !important;
 }
 
 .mermaid .arrowheadPath,
 .mermaid marker path {
-	fill: var(--sl-color-gray-3) !important;
+	fill: color-mix(in srgb, var(--sl-color-gray-3) 62%, transparent) !important;
 	stroke: none !important;
 }
 

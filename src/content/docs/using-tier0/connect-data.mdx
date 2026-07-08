@@ -1,0 +1,86 @@
+---
+title: Connect Data to UNS
+description: Model your namespace and bring data in with Source Flows. Available in all editions.
+editions: [edge, cloud, enterprise]
+sidebar:
+  order: 2
+---
+import { Steps } from '@astrojs/starlight/components';
+
+
+## How to Build a Data Model
+Based on simple folder-file structure, you can define the data hierarchy to a tree map.
+
+### Building Models Manually
+
+:::note
+**factory/equipment/CNC** will be used as an example, in which `factory` and `equipment` are paths and `CNC` is a topic.
+:::
+<Steps>
+1. Log in to Tier0, select **UNS**.
+2. Hover over the upper-right corner icon <img src="http://communityimage2.oss-cn-hangzhou.aliyuncs.com/75.png" /> > **New Path** to add a path `factory`.
+3. Enter the path name `factory`, click **Create**.
+4. Select `factory`, hover over the same icon and add another path `equipment` under it.
+5. Select `equipment`, hover over the same icon > **New Topic**, and add a topic `CNC` under it.
+6. Set the topic **Name**, **Type**, select **Enable History**/**Mock Data***, click the arrow to continue.
+7. Set the payload fields, click **Create** to finish the topic creation.
+</Steps>
+
+
+:::tip[Different selections]
+When the **Topic Type** is set to **State** or **Action**:
+- **Mock Data**: Select it to generate mock data flow for testing.
+- **Enable History**: Select it to store the data in Tier0 database.
+:::
+
+### Importing Models
+- By JSON text
+  <Steps>
+  1. On the **UNS** page, click the upper-right corner icon **Import**.
+  2. Select the **JSON** tab, wirte JSON text on the window.
+  3. Click **Submit** to import the model.
+  </Steps>
+- By JSON file
+  <Steps>
+  1. On the **Import** window, select the **File** tab.
+  2. Click **Download Template** at the upper-right corner to download a JSON template.
+  3. Enter the model content in the template and save it.
+  4. Upload the file on the **Import** window, and click **Submit** to complete.
+  </Steps>
+
+:::tip[Live template for easier import]
+You can manually add a path and topic, export it and use it as an example for import.
+:::
+
+## How to Connect Data to UNS
+<Steps>
+1. Log in to Tier0, go to **Flows**.
+2. Click **New Flow** at the upper-right corner.
+3. Enter a name, set the **Flow Type** to **Source Flow**, and click **Create**.
+4. Click the flow you just added, drag in nodes according to your data source type (e.g.`modbus`) on the canvas.
+5. Drag in an `mqtt out` node, select the **Server** as **emqx**.
+6. Enter the topic name copies from **UNS** (e.g. `factory/equipment/CNC`), click **Done**.
+7. Click **Deploy** at the upper-right corner, trigger the flow and the data will be sent to corresponding model under **UNS**.
+</Steps>
+
+## Addtional Options
+:::note
+This part states addtional parameters or configurations related to the workflow.
+:::
+
+| Scope | Parameter | Item | When to use |
+|------|-----------|------|-------------|
+| Path | Extended Attribute/Custom Attributes | - | Use when you need to add additional attributes to the path, such as unit information. |
+| Topic | Topic Type | [Metric, State, Action](/using-tier0/uns-concepts/#metric-state-action) | Select the topic type that matches the data semantics: measurements, current status, or executable operations. |
+| Topic | Attribute Generation Method | Pre-defined | Manually set attributes for the topic one by one. |
+| Topic | Attribute Generation Method | Auto-Parsing | Generates attributes automatically from JSON text in batches. |
+
+
+## Next
+
+- [Build Apps on UNS](/using-tier0/build-apps/) — Build industrial applications with UNS data.
+- [Analyze UNS Data](/using-tier0/analyze-data/) — Analyze UNS data with Marimo Notebook and Python.
+
+
+
+
