@@ -7,66 +7,82 @@ sidebar:
 
 Tier0 is one platform in three editions. Same namespace model, same flows, same CLI — the difference is who runs it and how much platform you get.
 
-<section class="t0-board t0-frame not-content">
-	<span class="t0-corners" aria-hidden="true"></span>
+<section class="t0-board not-content">
 	<div class="t0-board-grid">
 		<div class="t0-col">
-			<p class="t0-tag">Open source</p>
-			<h3>Edge</h3>
-			<p class="t0-col-tagline">The UNS foundation, on one machine. Yours entirely.</p>
-			<p class="t0-col-for">For technical evaluation, PoCs, and teams comfortable operating open-source software on their own.</p>
-			<div class="t0-plans">
-				<div class="t0-plan">
-					<span class="t0-plan-name">Apache-2.0</span>
-					<span class="t0-plan-price">free</span>
-					<p class="t0-plan-desc">UNS core, SourceFlows/EventFlows, history storage — single-machine Docker deployment.</p>
-				</div>
+			<div class="t0-col-header">
+				<p class="t0-tag">Open source</p>
 			</div>
-			<a class="t0-col-cta" href="https://github.com/FREEZONEX/Tier0-Edge">Clone on GitHub</a>
+			<div class="t0-col-body">
+				<div class="t0-col-top">
+					<h3>Edge</h3>
+					<p class="t0-col-tagline">The UNS foundation, on one machine. Yours entirely.</p>
+					<p class="t0-col-for">For technical evaluation, PoCs, and teams comfortable operating open-source software on their own.</p>
+				</div>
+				<div class="t0-plans">
+					<div class="t0-plan t0-plan--apache">
+						<span class="t0-plan-name">Apache-2.0</span>
+						<span class="t0-plan-price">free</span>
+						<p class="t0-plan-desc">UNS core, SourceFlows/EventFlows, history storage — single-machine Docker deployment.</p>
+					</div>
+				</div>
+				<a class="t0-col-cta" href="https://github.com/FREEZONEX/Tier0-Edge">Clone on GitHub</a>
+			</div>
 		</div>
 		<div class="t0-col t0-col--accent">
-			<p class="t0-tag">Managed SaaS</p>
-			<span class="t0-col-flag">Most teams start here</span>
-			<h3>Cloud</h3>
-			<p class="t0-col-tagline">The full platform, operated for you.</p>
-			<p class="t0-col-for">Apps, notebooks, and launchpad on day one — no infrastructure to run.</p>
-			<div class="t0-plans">
-				<div class="t0-plan t0-plan--rec">
-					<span class="t0-plan-name">Growth <span class="t0-pill">Recommended</span></span>
-					<span class="t0-plan-price">$20,000/yr</span>
-					<p class="t0-plan-desc">Up to 5 edges. For a single factory with a few apps, wanting a quick start.</p>
-				</div>
-				<div class="t0-plan">
-					<span class="t0-plan-name">Scale</span>
-					<span class="t0-plan-price">$38,000/yr</span>
-					<p class="t0-plan-desc">Up to 10 edges. For users with multiple factories and many apps.</p>
-				</div>
+			<div class="t0-col-header">
+				<p class="t0-tag">Managed SaaS</p>
 			</div>
-			<a class="t0-col-cta t0-cta-btn" href="https://tier0.app/cloud-trial">Start the 14-day trial</a>
+			<div class="t0-col-body">
+				<div class="t0-col-top">
+					<h3>Cloud <span class="t0-col-flag">Most teams start here</span></h3>
+					<p class="t0-col-tagline">The full platform, operated for you.</p>
+					<p class="t0-col-for">Apps, notebooks, and launchpad on day one — no infrastructure to run.</p>
+				</div>
+				<div class="t0-plans">
+					<div class="t0-plan t0-plan--growth">
+						<span class="t0-plan-name">Growth <span class="t0-plan-star" aria-hidden="true">★</span></span>
+						<span class="t0-plan-price">$20,000/yr</span>
+						<p class="t0-plan-desc">Up to 5 edges. For a single factory with a few apps, wanting a quick start.</p>
+					</div>
+					<div class="t0-plan t0-plan--scale">
+						<span class="t0-plan-name">Scale</span>
+						<span class="t0-plan-price">$38,000/yr</span>
+						<p class="t0-plan-desc">Up to 10 edges. For users with multiple factories and many apps.</p>
+					</div>
+				</div>
+				<a class="t0-col-cta t0-cta-btn" href="https://tier0.app/cloud-trial">Start the 14-day trial</a>
+			</div>
 		</div>
-		<div class="t0-col">
-			<p class="t0-tag">Private deployment</p>
-			<h3>Enterprise</h3>
-			<p class="t0-col-tagline">The full platform, on your terms.</p>
-			<p class="t0-col-for">For data sovereignty, scale, governance, and enterprise-grade oversight.</p>
-			<div class="t0-plans">
-				<div class="t0-plan">
-					<span class="t0-plan-name">Base</span>
-					<span class="t0-plan-price">$10,000/yr</span>
-					<p class="t0-plan-desc">Data Foundation. A small number of single-purpose apps — e.g. energy monitoring, equipment management.</p>
-				</div>
-				<div class="t0-plan">
-					<span class="t0-plan-name">Plus</span>
-					<span class="t0-plan-price">$20,000/yr</span>
-					<p class="t0-plan-desc">Single Instance. Single-factory data integration, apps across multiple use cases.</p>
-				</div>
-				<div class="t0-plan t0-plan--rec">
-					<span class="t0-plan-name">Cluster <span class="t0-pill">Recommended</span></span>
-					<span class="t0-plan-price">$39,900+/yr</span>
-					<p class="t0-plan-desc">Multi-Instance. Multiple factories, many apps, centralized private-cloud management.</p>
-				</div>
+		<div class="t0-col t0-col--dark">
+			<div class="t0-col-header">
+				<p class="t0-tag">Private deployment</p>
 			</div>
-			<a class="t0-col-cta" href="https://tier0.app/talk-to-team">Talk to the team</a>
+			<div class="t0-col-body">
+				<div class="t0-col-top">
+					<h3>Enterprise</h3>
+					<p class="t0-col-tagline">The full platform, on your terms.</p>
+					<p class="t0-col-for">For data sovereignty, scale, governance, and enterprise-grade oversight.</p>
+				</div>
+				<div class="t0-plans">
+					<div class="t0-plan t0-plan--base">
+						<span class="t0-plan-name">Base</span>
+						<span class="t0-plan-price">$10,000/yr</span>
+						<p class="t0-plan-desc">Data Foundation. A small number of single-purpose apps — e.g. energy monitoring, equipment management.</p>
+					</div>
+					<div class="t0-plan t0-plan--plus">
+						<span class="t0-plan-name">Plus</span>
+						<span class="t0-plan-price">$20,000/yr</span>
+						<p class="t0-plan-desc">Single Instance. Single-factory data integration, apps across multiple use cases.</p>
+					</div>
+					<div class="t0-plan t0-plan--cluster">
+						<span class="t0-plan-name">Cluster <span class="t0-plan-star" aria-hidden="true">★</span></span>
+						<span class="t0-plan-price">$39,900+/yr</span>
+						<p class="t0-plan-desc">Multi-Instance. Multiple factories, many apps, centralized private-cloud management.</p>
+					</div>
+				</div>
+				<a class="t0-col-cta" href="https://tier0.app/talk-to-team">Talk to the team</a>
+			</div>
 		</div>
 	</div>
 </section>
@@ -98,7 +114,6 @@ flowchart TD
   q3 -- "yes" --> scale["Cloud Scale"]
   q4 -- "yes" --> cluster["Enterprise Cluster ★"]
   q4 -- "no" --> baseplus["Enterprise Base / Plus"]
-  classDef t0accent fill:#B2ED1D,stroke:#73B200,color:#171717
   class growth,cluster t0accent
 ```
 

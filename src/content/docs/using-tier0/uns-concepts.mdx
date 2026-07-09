@@ -6,11 +6,17 @@ sidebar:
   order: 1
 ---
 
-:::caution[TODO — 写作线索 (Huize)]
-这部分讲 UNS 的 State、Action、Metric,以及 UNS 如何存储。
-:::
+Data collected to Tier0 UNS is categorized into 3 types: **Metric**, **State**, and **Action**.
+Different types correspond to different storage methods.
 
-*(Placeholder — this page will be rewritten. The skeleton below marks the intended structure.)*
+## Metric, State, Action
+
+| Topic type | Carries | Example |
+|---|---|---|
+| `METRIC` | Real-time data | Machine temperature/pressure/voltage |
+| `STATE` | Status data | Machine operational status |
+| `ACTION` | Commands or events | Start batch, stop machine |
+
 
 ```mermaid
 flowchart TD
@@ -21,25 +27,18 @@ flowchart TD
   metric --> temp(["Temperature"])
   state --> status(["MachineStatus"])
   action --> start(["StartBatch"])
-  classDef t0accent fill:#B2ED1D,stroke:#73B200,color:#171717
   class temp,status,start t0accent
 ```
 
-## Metric, State, Action
-
-> TODO
-
-| Topic type | Carries | Example |
-|---|---|---|
-| `METRIC` | — | — |
-| `STATE` | — | — |
-| `ACTION` | — | — |
-
 ## How the UNS stores data
 
-> TODO
+| Data Type | Storage | Description |
+|-----------|---------|-------------|
+| Metric | Time-series database | Optimized for high-frequency measurements such as temperature and pressure. Each topic includes default fields: `timestamp` and `quality`. |
+| State | PostgreSQL (JSONB) | Stores machine or system states in a flexible JSON format. |
+| Action | PostgreSQL (JSONB) | Stores commands or actions in a flexible JSON format. |
 
 ## Next
 
-- [Connect Data to UNS](/using-tier0/connect-data/)
-- [Working with UNS Data](/using-tier0/working-with-uns-data/)
+- [Connect Data to UNS](/using-tier0/connect-data/) — How to model your plant to UNS and connect data to the model.
+- [Working with UNS Data](/using-tier0/working-with-uns-data/) — How to operate on your UNS model through MQTT and APIs.

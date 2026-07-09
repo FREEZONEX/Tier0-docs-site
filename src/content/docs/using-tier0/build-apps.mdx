@@ -13,23 +13,51 @@ sidebar:
 
 *(Placeholder — this page will be rewritten. The skeleton below marks the intended structure.)*
 
-## A container is an app
+## What is a Tier0 App
 
-> TODO: 什么是 Tier0 App。
+A Tier0 application, is a **container** that integrates with **UNS data foundation**, 
+relying on **Event Flow** to build internal logic, and **AI Agent** to combine
+them together and provide you a complete solution.
 
 ```mermaid
-flowchart LR
-  uns[("Unified Namespace")] --> app["Your app<br/>(container)"]
-  app -- "publish results" --> uns
-  classDef t0accent fill:#B2ED1D,stroke:#73B200,color:#171717
+flowchart TB
+  subgraph tier0App["Tier0 App"]
+    direction TB
+    ai["AI Agent<br/>builds and orchestrates"]
+    ui["App UI<br/>central experience"]
+
+    subgraph foundation["Data and logic foundation"]
+      direction LR
+      uns[("UNS<br/>data foundation")]
+      ef["Event Flow<br/>backend logic"]
+    end
+  end
+
+  ai -. "design / operate" .-> ui
+  ai -. "read / write" .-> uns
+  ai -. "compose logic" .-> ef
+
+  uns -- "display data" --> ui
+  ui -- "write back" --> uns
+  uns -- "data changes" --> ef
+  ef -- "logic result" --> ui
+
+  class tier0App,foundation t0Frame
   class uns t0accent
+  class ef t0soft
+  class ai t0agent
+  class ui t0ui
 ```
 
-### Deploy on Tier0 Edge
+## How to Deploy a Tier0 App
+
+### Building a Tier0 App
+
+### Deploying on Tier0 Edge
 
 > TODO
 
-### Deploy on Tier0 Enterprise
+### Deploying on Tier0 Enterprise
 
 > TODO
 
@@ -41,7 +69,6 @@ flowchart LR
 flowchart LR
   uns[("UNS topic")] --> ef["Event Flow<br/>(Node-RED)"]
   ef -- "alarm / action" --> out["Notification · API · UNS write-back"]
-  classDef t0accent fill:#B2ED1D,stroke:#73B200,color:#171717
   class ef t0accent
 ```
 
