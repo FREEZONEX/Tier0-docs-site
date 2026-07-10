@@ -46,6 +46,9 @@ export default defineConfig({
 			},
 			expressiveCode: {
 				themes: ['vitesse-dark', 'vitesse-light'],
+				defaultProps: {
+					frame: 'terminal',
+				},
 			},
 			components: {
 				PageTitle: './src/components/PageTitle.astro',

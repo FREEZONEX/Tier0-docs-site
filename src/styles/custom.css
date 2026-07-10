@@ -640,6 +640,19 @@ h1[id='_top'] {
 	left: 17px;
 }
 
+:root[data-theme='light'] .expressive-code button[title='Copy to clipboard'] {
+	background: #ffffff;
+	border: 1px solid #ebebeb;
+	border-radius: 4px;
+	color: #393a34;
+}
+
+:root[data-theme='light'] .expressive-code button[title='Copy to clipboard']:hover {
+	background: #f9f9f9;
+	border-color: #d4d4d4;
+	color: #171717;
+}
+
 /* Code copy button (dark) */
 :root[data-theme='dark'] .expressive-code button[title='Copy to clipboard'] {
 	background: #2a2a2a;
@@ -707,6 +720,31 @@ h1[id='_top'] {
 }
 
 :root[data-theme='light'] .sl-markdown-content li + li {
+	margin-top: 0.5rem;
+}
+
+/* Nested steps under list labels (e.g. protocol-connections node configs) */
+.sl-markdown-content ul > li > .sl-steps {
+	padding-top: 0.75rem;
+}
+
+:root[data-theme='light'] .sl-markdown-content ul > li:has(> .sl-steps) + li {
+	margin-top: 1rem;
+}
+
+:root[data-theme='light'] .sl-markdown-content ul > li > .sl-steps > li + li {
+	margin-top: 0.75rem;
+}
+
+:root[data-theme='dark'] .sl-markdown-content ul > li > .sl-steps > li + li {
+	margin-top: 0.75rem;
+}
+
+:root[data-theme='light'] .sl-markdown-content .sl-steps > li > p + .expressive-code {
+	margin-top: 0.5rem;
+}
+
+:root[data-theme='dark'] .sl-markdown-content .sl-steps > li > p + .expressive-code {
 	margin-top: 0.5rem;
 }
 
