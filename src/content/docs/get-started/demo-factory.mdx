@@ -14,7 +14,40 @@ The quickest way to *get* Tier0 is to poke at a factory that already works.
 Your **Cloud trial workspace** (14 days) comes with a preloaded plant: 
 A live namespace, flows feeding it with industrial data, notebooks, and applications working on top of the UNS data foundation.
 
+<Steps>
+
+1. **Browse the namespace.** Open the UNS explorer, or from your terminal:
+
+   ```bash
+   tier0 uns browse
+   tier0 uns browse Plant/Line1 --max-depth 2
+   ```
+
+   Paths are folders (`Plant/Line1`); leaves are topics (`Plant/Line1/Metric/Temperature`). Only topics hold values.
+
+2. **Read live values.** The namespace is MQTT pub/sub underneath — data moves when it changes:
+
+   ```bash
+   tier0 uns read "Plant/+/Metric/Temperature" --json
+   ```
+
+3. **See where data comes from.** Flow names mirror the topic paths they feed (`Line1-Collector` → `Plant/Line1/…`):
+
+   ```bash
+   tier0 flow list --source
+   ```
+
+4. **Open a notebook.** Query the same topics live — group by asset, plot a trend, join metrics with order context. See [Analyze UNS Data](/using-tier0/analyze-data/).
+
+5. **Generate an app.** Describe something small in the App Builder — an inspection checklist, a maintenance form — review the spec, generate, and try it in the sandbox.
+
+</Steps>
+
+:::note
+The exact demo tree and preloaded apps may differ per trial workspace — substitute what you see in `tier0 uns browse`. On **Edge** there's no preloaded factory: create your first nodes with `tier0 uns create` instead, then follow [Connect Data to UNS](/using-tier0/connect-data/).
+:::
+
 ## Next
 
 - [Choosing the Best Version](/get-started/choosing-version/)
-- [UNS Concepts](/using-tier0/uns-concepts/) — Understand what you just browsed.
+- [UNS Concepts](/using-tier0/uns-concepts/) — understand what you just browsed

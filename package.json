@@ -11,6 +11,8 @@
   },
   "dependencies": {
     "@astrojs/starlight": "^0.41.2",
+    "@fontsource/ibm-plex-mono": "^5.2.7",
+    "@fontsource/ibm-plex-sans": "^5.2.8",
     "@fontsource/source-code-pro": "^5.2.7",
     "astro": "^7.0.2",
     "astro-mermaid": "^2.1.0",
@@ -18,5 +20,5 @@
     "sharp": "^0.34.5",
     "starlight-llms-txt": "^0.11.0"
   },
-  "description": "Documentation site for Tier0 (tier0.app) \u2014 Astro Starlight, agent-readable via llms.txt"
+  "description": "Documentation site for Tier0 (tier0.app) — Astro Starlight, agent-readable via llms.txt"
 }
