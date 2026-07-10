@@ -1,9 +1,11 @@
 ---
 title: Build Apps on UNS
 description: A container is an app — deploy full containers on Tier0 Edge and Enterprise; build logic with Event Flow.
+editions: [cloud]
 sidebar:
   order: 4
 ---
+import { Steps } from '@astrojs/starlight/components';
 
 :::caution[TODO — 写作线索 (Huize)]
 **容器就是 App**:讲什么是 Tier0 App,如何将完整的容器部署在 Tier0 Edge 和 Enterprise 中。
@@ -15,75 +17,44 @@ sidebar:
 
 ## What is a Tier0 App
 
-A Tier0 application, is a **container** that integrates with **UNS data foundation**, 
-relying on **Event Flow** to build internal logic, and **AI Agent** to combine
-them together and provide you a complete solution.
-
-```mermaid
-flowchart TB
-  subgraph tier0App["Tier0 App"]
-    direction TB
-    ai["AI Agent<br/>builds and orchestrates"]
-    ui["App UI<br/>central experience"]
-
-    subgraph foundation["Data and logic foundation"]
-      direction LR
-      uns[("UNS<br/>data foundation")]
-      ef["Event Flow<br/>backend logic"]
-    end
-  end
-
-  ai -. "design / operate" .-> ui
-  ai -. "read / write" .-> uns
-  ai -. "compose logic" .-> ef
-
-  uns -- "display data" --> ui
-  ui -- "write back" --> uns
-  uns -- "data changes" --> ef
-  ef -- "logic result" --> ui
-
-  classDef t0Frame fill:#FFFFFF,stroke:#D9E2CC,stroke-width:1px,color:#2A2A2A
-  classDef t0accent fill:#EAF8C8,stroke:#A6CF38,stroke-width:1px,color:#171717
-  classDef t0soft fill:#F7FAF2,stroke:#D8E6B8,stroke-width:1px,color:#2A2A2A
-  classDef t0agent fill:#EEF4FF,stroke:#B7C7E8,stroke-width:1px,color:#1F2937
-  classDef t0ui fill:#FFFFFF,stroke:#BFD8A5,stroke-width:1px,color:#171717
-
-  class tier0App,foundation t0Frame
-  class uns t0accent
-  class ef t0soft
-  class ai t0agent
-  class ui t0ui
-```
+A Tier0 application has the following features:
+- It is a **Docker Container**.
+- It is generated from the conversation you have with the **App Builder**, zero-coding, no programming required.
+- It feeds on industrial data already in the **UNS**, and can *write back* to the **UNS**.
+- It relies on **Event Flow** to implement logic, which means you have control over the small tweaks and refinements.
 
 ## How to Deploy a Tier0 App
 
 ### Building a Tier0 App
-
-### Deploying on Tier0 Edge
-
-> TODO
+<Steps>
+1. Log in to Tier0, and select **App** > **Projects**.
+2. Click **Create Project**, enter the project name and description, select an industry and click **Create**.
+3. Open the project, click **Create App**, and you will be redirected to the application building page.
+4. Delete the sample prompt and write the application requirements in the dialog.
+</Steps>
+:::tip[What to be included in the prompt]
+Make sure you state the following information in the prompt:
+- Use the UNS model *[uns_model_path]* as the data source and *[uns_model_path]* as write back destination.
+- (optional) Create UNS model and flows in Source Flow to connect data sources.
+- Create flows in Event Flow to trigger anomaly alarms/low health scores/other events.
+:::
+<Steps>
+5. Start building the application, change as you need by talking to the LLM upon preview.
+6. Click **Deploy** at the upper-right corner, enter changelog and then click **Submit**.
+</Steps>
 
 ### Deploying on Tier0 Enterprise
+<Steps>
+1. Go to **Projects**, find the application inside your project.
+2. Access the application, click the **...** icon of the **Active** version, and select **Download ZIP**.
+3. Log in to Tier0 Enterprise, and go to **Project**.
+4. Click **Create Project**, enter a name and click **Save**.
+5. Access the project, and click **Import App**, select and upload the ZIP package downloaded from Cloud.
+6. Click **Save**, access the application and use it on Enterprise.
+</Steps>
 
-> TODO
-
-## Using Event Flow to build logics
-
-> TODO: Event Flow 如何完成逻辑,例如触发报警。
-
-```mermaid
-flowchart LR
-  uns[("UNS topic")] --> ef["Event Flow<br/>(Node-RED)"]
-  ef -- "alarm / action" --> out["Notification · API · UNS write-back"]
-  classDef t0accent fill:#B2ED1D,stroke:#73B200,color:#171717
-  class ef t0accent
-```
-
-### Event Flow as the app backend
-
-> TODO: 如何将 Event Flow 作为 Tier0 App 的后端。
 
 ## Next
 
-- [Analyze UNS Data](/using-tier0/analyze-data/)
+- [Analyze UNS Data](/using-tier0/analyze-data/) — Analyze UNS data with Marimo Notebook and Python.
 - [Best practice: connecting industrial protocols](/best-practice/protocol-connections/)
