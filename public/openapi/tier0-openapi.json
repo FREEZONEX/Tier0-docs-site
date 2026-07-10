@@ -1,0 +1,2564 @@
+{
+  "components": {
+    "schemas": {
+      "AssetUploadReq": {
+        "properties": {
+          "business": {
+            "description": "Business domain or feature that owns the uploaded file.",
+            "type": "string"
+          },
+          "contentType": {
+            "description": "MIME content type of the file, for example application/octet-stream.",
+            "type": "string"
+          },
+          "fileName": {
+            "description": "Original file name used when creating the upload URL.",
+            "type": "string"
+          },
+          "isPublic": {
+            "description": "Whether the uploaded object should be readable through a public file URL.",
+            "format": "boolean",
+            "type": "boolean"
+          },
+          "sha256": {
+            "description": "Optional SHA-256 checksum of the file content.",
+            "type": "string"
+          },
+          "size": {
+            "description": "File size in bytes.",
+            "format": "int64",
+            "type": "integer"
+          },
+          "storageKey": {
+            "description": "Optional object storage key. Omit it to let the server generate one.",
+            "type": "string"
+          },
+          "useBy": {
+            "description": "Usage scenario or owner category for the uploaded file.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "fileName"
+        ],
+        "title": "AssetUploadReq",
+        "type": "object"
+      },
+      "AssetUploadResp": {
+        "properties": {
+          "filePath": {
+            "type": "string"
+          },
+          "fileUrl": {
+            "type": "string"
+          },
+          "uploadUrl": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "uploadUrl",
+          "filePath"
+        ],
+        "title": "AssetUploadResp",
+        "type": "object"
+      },
+      "AuthWhoamiResp": {
+        "properties": {
+          "apiKeyName": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "keyPrefix": {
+            "type": "string"
+          },
+          "keyType": {
+            "type": "string"
+          },
+          "permissions": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "roles": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "userID": {
+            "format": "int64",
+            "type": "integer"
+          },
+          "userName": {
+            "type": "string"
+          },
+          "workspaceID": {
+            "format": "int64",
+            "type": "integer"
+          },
+          "workspaceName": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "userID",
+          "userName",
+          "email",
+          "workspaceID",
+          "workspaceName",
+          "apiKeyName",
+          "keyPrefix",
+          "permissions",
+          "roles",
+          "keyType"
+        ],
+        "title": "AuthWhoamiResp",
+        "type": "object"
+      },
+      "BrowseReq": {
+        "properties": {
+          "include_leaf_value": {
+            "description": "Whether returned leaf nodes should include latest payload values.",
+            "format": "boolean",
+            "type": "boolean"
+          },
+          "include_metadata": {
+            "description": "Whether returned nodes should include metadata.",
+            "format": "boolean",
+            "type": "boolean"
+          },
+          "max_depth": {
+            "description": "Maximum tree depth to return. Omit or use 0 for the default depth.",
+            "format": "int64",
+            "type": "integer"
+          },
+          "path": {
+            "description": "Root UNS path to browse. Empty means the workspace root.",
+            "type": "string"
+          }
+        },
+        "title": "BrowseReq",
+        "type": "object"
+      },
+      "BrowseResp": {
+        "properties": {
+          "tree": {
+            "items": {
+              "$ref": "#/components/schemas/OpenapiNodeInfo"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "tree"
+        ],
+        "title": "BrowseResp",
+        "type": "object"
+      },
+      "CliAuthStatusReq": {
+        "properties": {
+          "setupCode": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "setupCode"
+        ],
+        "title": "CliAuthStatusReq",
+        "type": "object"
+      },
+      "CreateResp": {
+        "properties": {
+          "results": {
+            "items": {
+              "$ref": "#/components/schemas/OpenapiCreateResult"
+            },
+            "type": "array"
+          },
+          "success": {
+            "format": "boolean",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "success",
+          "results"
+        ],
+        "title": "CreateResp",
+        "type": "object"
+      },
+      "FlowCreateReq": {
+        "properties": {
+          "description": {
+            "description": "Flow description.",
+            "type": "string"
+          },
+          "flowName": {
+            "description": "Flow name.",
+            "type": "string"
+          },
+          "flowType": {
+            "description": "Flow category. Allowed values: SourceFlow, EventFlow.",
+            "enum": [
+              "SourceFlow",
+              "EventFlow"
+            ],
+            "type": "string"
+          },
+          "template": {
+            "description": "Optional flow template JSON.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "flowName",
+          "flowType"
+        ],
+        "title": "FlowCreateReq",
+        "type": "object"
+      },
+      "FlowCreateResp": {
+        "properties": {
+          "brokerID": {
+            "type": "string"
+          },
+          "id": {
+            "format": "int64",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "id",
+          "brokerID"
+        ],
+        "title": "FlowCreateResp",
+        "type": "object"
+      },
+      "FlowDataResp": {
+        "properties": {
+          "flows": {
+            "items": {
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "rev": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "rev",
+          "flows"
+        ],
+        "title": "FlowDataResp",
+        "type": "object"
+      },
+      "FlowDeleteReq": {
+        "properties": {
+          "ids": {
+            "description": "Flow IDs to delete.",
+            "items": {
+              "format": "int64",
+              "type": "integer"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "ids"
+        ],
+        "title": "FlowDeleteReq",
+        "type": "object"
+      },
+      "FlowDeployReq": {
+        "properties": {
+          "flowsJson": {
+            "description": "Node-RED flows JSON to deploy.",
+            "type": "string"
+          },
+          "id": {
+            "description": "Flow ID to deploy.",
+            "format": "int64",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "id",
+          "flowsJson"
+        ],
+        "title": "FlowDeployReq",
+        "type": "object"
+      },
+      "FlowDeployResp": {
+        "properties": {
+          "flowId": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "flowId"
+        ],
+        "title": "FlowDeployResp",
+        "type": "object"
+      },
+      "FlowEmptyResp": {
+        "properties": {
+          "success": {
+            "format": "boolean",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "success"
+        ],
+        "title": "FlowEmptyResp",
+        "type": "object"
+      },
+      "FlowGetReq": {
+        "properties": {
+          "id": {
+            "description": "Flow ID.",
+            "format": "int64",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "id"
+        ],
+        "title": "FlowGetReq",
+        "type": "object"
+      },
+      "FlowInfo": {
+        "properties": {
+          "createdTime": {
+            "format": "int64",
+            "type": "integer"
+          },
+          "currentVersionId": {
+            "format": "int64",
+            "type": "integer"
+          },
+          "currentVersionName": {
+            "type": "string"
+          },
+          "currentVersionType": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "flowId": {
+            "type": "string"
+          },
+          "flowName": {
+            "type": "string"
+          },
+          "flowStatus": {
+            "type": "string"
+          },
+          "flowType": {
+            "type": "string"
+          },
+          "id": {
+            "format": "int64",
+            "type": "integer"
+          },
+          "isFavorite": {
+            "format": "int64",
+            "type": "integer"
+          },
+          "template": {
+            "type": "string"
+          },
+          "updatedTime": {
+            "format": "int64",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "id",
+          "flowId",
+          "flowName",
+          "flowType",
+          "flowStatus",
+          "template",
+          "description",
+          "isFavorite",
+          "currentVersionId",
+          "currentVersionName",
+          "currentVersionType",
+          "createdTime",
+          "updatedTime"
+        ],
+        "title": "FlowInfo",
+        "type": "object"
+      },
+      "FlowListReq": {
+        "properties": {
+          "flowType": {
+            "description": "Flow category filter. Allowed values: SourceFlow, EventFlow.",
+            "enum": [
+              "SourceFlow",
+              "EventFlow"
+            ],
+            "type": "string"
+          },
+          "keyword": {
+            "description": "Keyword matched against flow names and descriptions.",
+            "type": "string"
+          }
+        },
+        "title": "FlowListReq",
+        "type": "object"
+      },
+      "FlowListResp": {
+        "properties": {
+          "list": {
+            "items": {
+              "$ref": "#/components/schemas/FlowInfo"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "list"
+        ],
+        "title": "FlowListResp",
+        "type": "object"
+      },
+      "FlowNodesReq": {
+        "properties": {
+          "flowType": {
+            "description": "Flow category whose Node-RED node set should be returned. Allowed values: SourceFlow, EventFlow.",
+            "enum": [
+              "SourceFlow",
+              "EventFlow"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "flowType"
+        ],
+        "title": "FlowNodesReq",
+        "type": "object"
+      },
+      "FlowNodesResp": {
+        "properties": {
+          "nodes": {
+            "items": {
+              "$ref": "#/components/schemas/NodeRedNodeSet"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "nodes"
+        ],
+        "title": "FlowNodesResp",
+        "type": "object"
+      },
+      "FlowUpdateReq": {
+        "properties": {
+          "description": {
+            "description": "Updated flow description.",
+            "type": "string"
+          },
+          "flowName": {
+            "description": "Updated flow name.",
+            "type": "string"
+          },
+          "id": {
+            "description": "Flow ID to update.",
+            "format": "int64",
+            "type": "integer"
+          },
+          "isFavorite": {
+            "description": "Favorite state. Allowed values: 1 favorite, 2 not favorite.",
+            "enum": [
+              1,
+              2
+            ],
+            "format": "int64",
+            "type": "integer"
+          },
+          "template": {
+            "description": "Updated flow template JSON.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id"
+        ],
+        "title": "FlowUpdateReq",
+        "type": "object"
+      },
+      "HistoryAggregation": {
+        "properties": {
+          "field": {
+            "description": "First-level payload field to aggregate, for example value.",
+            "type": "string"
+          },
+          "function": {
+            "description": "Aggregation function. Allowed values: avg, min, max, sum, count, first, last.",
+            "enum": [
+              "avg",
+              "min",
+              "max",
+              "sum",
+              "count",
+              "first",
+              "last"
+            ],
+            "type": "string"
+          },
+          "interval": {
+            "description": "Positive aggregation window. Supports Go duration strings such as 1m, 5m, 1h, and day strings such as 1d.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "interval",
+          "function",
+          "field"
+        ],
+        "title": "HistoryAggregation",
+        "type": "object"
+      },
+      "HistoryReq": {
+        "properties": {
+          "aggregation": {
+            "$ref": "#/components/schemas/HistoryAggregation",
+            "description": "Optional aggregation settings for bucketed history results."
+          },
+          "end_time": {
+            "description": "History query end time in RFC3339 format, for example 2026-06-22T01:00:00Z.",
+            "type": "string"
+          },
+          "page": {
+            "description": "Page number, starting from 1.",
+            "format": "int64",
+            "type": "integer"
+          },
+          "size": {
+            "description": "Page size.",
+            "format": "int64",
+            "type": "integer"
+          },
+          "start_time": {
+            "description": "History query start time in RFC3339 format, for example 2026-06-22T00:00:00Z.",
+            "type": "string"
+          },
+          "topics": {
+            "description": "UNS topic paths whose history should be queried.",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "topics",
+          "start_time",
+          "end_time"
+        ],
+        "title": "HistoryReq",
+        "type": "object"
+      },
+      "HistoryResp": {
+        "properties": {
+          "page": {
+            "format": "int64",
+            "type": "integer"
+          },
+          "results": {
+            "items": {
+              "$ref": "#/components/schemas/OpenapiHistoryItem"
+            },
+            "type": "array"
+          },
+          "size": {
+            "format": "int64",
+            "type": "integer"
+          },
+          "success": {
+            "format": "boolean",
+            "type": "boolean"
+          },
+          "total": {
+            "format": "int64",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "success",
+          "results",
+          "page",
+          "size",
+          "total"
+        ],
+        "title": "HistoryResp",
+        "type": "object"
+      },
+      "InfoReq": {
+        "title": "InfoReq",
+        "type": "object"
+      },
+      "NamespaceNode": {
+        "properties": {
+          "alias": {
+            "description": "Optional topic alias.",
+            "type": "string"
+          },
+          "children": {
+            "description": "Child nodes to create under this node.",
+            "items": {
+              "$ref": "#/components/schemas/NamespaceNode"
+            },
+            "type": "array"
+          },
+          "description": {
+            "description": "Human-readable node description.",
+            "type": "string"
+          },
+          "displayName": {
+            "description": "Display name shown in clients.",
+            "type": "string"
+          },
+          "enableHistory": {
+            "description": "Whether history storage is enabled for this topic.",
+            "format": "boolean",
+            "type": "boolean"
+          },
+          "extendProperties": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "Custom metadata key-value pairs for the node.",
+            "type": "object"
+          },
+          "fields": {
+            "description": "Payload schema fields for TOPIC nodes.",
+            "items": {
+              "$ref": "#/components/schemas/SchemaField"
+            },
+            "type": "array"
+          },
+          "name": {
+            "description": "Node name. For nested create, this is the segment under its parent.",
+            "type": "string"
+          },
+          "topicType": {
+            "description": "Topic data category for TOPIC nodes. Allowed values: STATE, ACTION, METRIC.",
+            "enum": [
+              "STATE",
+              "ACTION",
+              "METRIC"
+            ],
+            "type": "string"
+          },
+          "type": {
+            "description": "Node type. Allowed values: PATH, TOPIC.",
+            "enum": [
+              "PATH",
+              "TOPIC"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "name"
+        ],
+        "title": "NamespaceNode",
+        "type": "object"
+      },
+      "NodeCreateReq": {
+        "properties": {
+          "namespace": {
+            "description": "UNS nodes to create. Children can be nested to create a subtree.",
+            "items": {
+              "$ref": "#/components/schemas/NamespaceNode"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "namespace"
+        ],
+        "title": "NodeCreateReq",
+        "type": "object"
+      },
+      "NodeDeleteReq": {
+        "properties": {
+          "hard_delete": {
+            "description": "Whether to permanently delete nodes instead of moving them to recycle state.",
+            "format": "boolean",
+            "type": "boolean"
+          },
+          "topics": {
+            "description": "UNS topic or path node paths to delete.",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "topics"
+        ],
+        "title": "NodeDeleteReq",
+        "type": "object"
+      },
+      "NodeRedNodeSet": {
+        "properties": {
+          "enabled": {
+            "format": "boolean",
+            "type": "boolean"
+          },
+          "id": {
+            "type": "string"
+          },
+          "module": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "types": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "version": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "types",
+          "enabled",
+          "module",
+          "version"
+        ],
+        "title": "NodeRedNodeSet",
+        "type": "object"
+      },
+      "NodeRestoreReq": {
+        "properties": {
+          "path": {
+            "description": "UNS topic or path node to restore from recycle state.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "path"
+        ],
+        "title": "NodeRestoreReq",
+        "type": "object"
+      },
+      "NodeUpdateReq": {
+        "properties": {
+          "alias": {
+            "description": "Updated topic alias.",
+            "type": "string"
+          },
+          "description": {
+            "description": "Updated node description.",
+            "type": "string"
+          },
+          "displayName": {
+            "description": "Updated display name.",
+            "type": "string"
+          },
+          "enableHistory": {
+            "format": "boolean",
+            "type": "boolean"
+          },
+          "extendProperties": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "Updated custom metadata key-value pairs.",
+            "type": "object"
+          },
+          "fields": {
+            "description": "Updated payload schema fields.",
+            "items": {
+              "$ref": "#/components/schemas/SchemaField"
+            },
+            "type": "array"
+          },
+          "name": {
+            "description": "New node name.",
+            "type": "string"
+          },
+          "path": {
+            "description": "Existing UNS topic or path node to update.",
+            "type": "string"
+          },
+          "updateMask": {
+            "description": "Fields to update. Allowed values: name, description, displayName, extendProperties, fields, alias.",
+            "items": {
+              "enum": [
+                "name",
+                "description",
+                "displayName",
+                "extendProperties",
+                "fields",
+                "alias"
+              ],
+              "type": "string"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "path"
+        ],
+        "title": "NodeUpdateReq",
+        "type": "object"
+      },
+      "OpenapiCreateResult": {
+        "properties": {
+          "error": {
+            "$ref": "#/components/schemas/OpenapiItemError"
+          },
+          "success": {
+            "format": "boolean",
+            "type": "boolean"
+          },
+          "topic": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "success",
+          "topic"
+        ],
+        "title": "OpenapiCreateResult",
+        "type": "object"
+      },
+      "OpenapiEmptyResp": {
+        "properties": {
+          "success": {
+            "format": "boolean",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "success"
+        ],
+        "title": "OpenapiEmptyResp",
+        "type": "object"
+      },
+      "OpenapiHistoryItem": {
+        "properties": {
+          "error": {
+            "$ref": "#/components/schemas/OpenapiItemError"
+          },
+          "result": {
+            "$ref": "#/components/schemas/OpenapiHistoryResult"
+          },
+          "success": {
+            "format": "boolean",
+            "type": "boolean"
+          },
+          "topic": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "success",
+          "topic"
+        ],
+        "title": "OpenapiHistoryItem",
+        "type": "object"
+      },
+      "OpenapiHistoryResult": {
+        "properties": {
+          "values": {
+            "items": {
+              "$ref": "#/components/schemas/OpenapiHistoryValue"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "values"
+        ],
+        "title": "OpenapiHistoryResult",
+        "type": "object"
+      },
+      "OpenapiHistoryValue": {
+        "properties": {
+          "quality": {
+            "type": "string"
+          },
+          "timeStamp": {
+            "format": "int64",
+            "type": "integer"
+          },
+          "value": {
+            "type": "object"
+          }
+        },
+        "required": [
+          "quality",
+          "timeStamp"
+        ],
+        "title": "OpenapiHistoryValue",
+        "type": "object"
+      },
+      "OpenapiItemError": {
+        "properties": {
+          "code": {
+            "format": "int64",
+            "type": "integer"
+          },
+          "message": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "code",
+          "message"
+        ],
+        "title": "OpenapiItemError",
+        "type": "object"
+      },
+      "OpenapiNodeInfo": {
+        "properties": {
+          "alias": {
+            "type": "string"
+          },
+          "bindFlowID": {
+            "format": "int64",
+            "type": "integer"
+          },
+          "children": {
+            "items": {
+              "$ref": "#/components/schemas/OpenapiNodeInfo"
+            },
+            "type": "array"
+          },
+          "description": {
+            "type": "string"
+          },
+          "displayName": {
+            "type": "string"
+          },
+          "enableHistory": {
+            "format": "boolean",
+            "type": "boolean"
+          },
+          "extendProperties": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "type": "object"
+          },
+          "fields": {
+            "items": {
+              "$ref": "#/components/schemas/SchemaField"
+            },
+            "type": "array"
+          },
+          "id": {
+            "format": "int64",
+            "type": "integer"
+          },
+          "name": {
+            "type": "string"
+          },
+          "path": {
+            "type": "string"
+          },
+          "payload": {
+            "$ref": "#/components/schemas/OpenapiVQT"
+          },
+          "topicType": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "path",
+          "name",
+          "type",
+          "topicType"
+        ],
+        "title": "OpenapiNodeInfo",
+        "type": "object"
+      },
+      "OpenapiReadItem": {
+        "properties": {
+          "error": {
+            "$ref": "#/components/schemas/OpenapiItemError"
+          },
+          "metadata": {
+            "$ref": "#/components/schemas/OpenapiNodeInfo"
+          },
+          "result": {
+            "$ref": "#/components/schemas/OpenapiVQT"
+          },
+          "success": {
+            "format": "boolean",
+            "type": "boolean"
+          },
+          "topic": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "success",
+          "topic"
+        ],
+        "title": "OpenapiReadItem",
+        "type": "object"
+      },
+      "OpenapiVQT": {
+        "properties": {
+          "quality": {
+            "type": "string"
+          },
+          "timeStamp": {
+            "format": "int64",
+            "type": "integer"
+          },
+          "value": {
+            "type": "object"
+          }
+        },
+        "required": [
+          "quality",
+          "timeStamp"
+        ],
+        "title": "OpenapiVQT",
+        "type": "object"
+      },
+      "OpenapiWriteResult": {
+        "properties": {
+          "error": {
+            "$ref": "#/components/schemas/OpenapiItemError"
+          },
+          "success": {
+            "format": "boolean",
+            "type": "boolean"
+          },
+          "topic": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "success",
+          "topic"
+        ],
+        "title": "OpenapiWriteResult",
+        "type": "object"
+      },
+      "ReadReq": {
+        "properties": {
+          "include_leaf_value": {
+            "description": "Whether leaf nodes should include their latest payload value.",
+            "format": "boolean",
+            "type": "boolean"
+          },
+          "include_metadata": {
+            "description": "Whether each result should include UNS node metadata.",
+            "format": "boolean",
+            "type": "boolean"
+          },
+          "topics": {
+            "description": "UNS topic paths to read.",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "topics"
+        ],
+        "title": "ReadReq",
+        "type": "object"
+      },
+      "ReadResp": {
+        "properties": {
+          "results": {
+            "items": {
+              "$ref": "#/components/schemas/OpenapiReadItem"
+            },
+            "type": "array"
+          },
+          "success": {
+            "format": "boolean",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "success",
+          "results"
+        ],
+        "title": "ReadResp",
+        "type": "object"
+      },
+      "Response": {
+        "properties": {
+          "message": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "message"
+        ],
+        "title": "Response",
+        "type": "object"
+      },
+      "SchemaField": {
+        "properties": {
+          "name": {
+            "description": "Payload field name.",
+            "type": "string"
+          },
+          "type": {
+            "description": "Payload field type. Allowed values: INTEGER, LONG, DOUBLE, FLOAT, STRING, BOOLEAN, DATETIME.",
+            "enum": [
+              "INTEGER",
+              "LONG",
+              "DOUBLE",
+              "FLOAT",
+              "STRING",
+              "BOOLEAN",
+              "DATETIME"
+            ],
+            "type": "string"
+          },
+          "unit": {
+            "description": "Optional engineering unit for the field.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "type"
+        ],
+        "title": "SchemaField",
+        "type": "object"
+      },
+      "SearchReq": {
+        "properties": {
+          "include_leaf_value": {
+            "description": "Whether returned leaf nodes should include latest payload values.",
+            "format": "boolean",
+            "type": "boolean"
+          },
+          "include_metadata": {
+            "description": "Whether returned nodes should include metadata.",
+            "format": "boolean",
+            "type": "boolean"
+          },
+          "keyword": {
+            "description": "Keyword matched against UNS node names, aliases, and paths.",
+            "type": "string"
+          },
+          "page": {
+            "description": "Page number, starting from 1.",
+            "format": "int64",
+            "type": "integer"
+          },
+          "path_prefix": {
+            "description": "Only return nodes under this UNS path prefix.",
+            "type": "string"
+          },
+          "size": {
+            "description": "Page size.",
+            "format": "int64",
+            "type": "integer"
+          },
+          "topicType": {
+            "description": "Topic data category filter. Allowed values: STATE, ACTION, METRIC.",
+            "enum": [
+              "STATE",
+              "ACTION",
+              "METRIC"
+            ],
+            "type": "string"
+          }
+        },
+        "title": "SearchReq",
+        "type": "object"
+      },
+      "SearchResp": {
+        "properties": {
+          "objects": {
+            "items": {
+              "$ref": "#/components/schemas/OpenapiNodeInfo"
+            },
+            "type": "array"
+          },
+          "page": {
+            "format": "int64",
+            "type": "integer"
+          },
+          "size": {
+            "format": "int64",
+            "type": "integer"
+          },
+          "total": {
+            "format": "int64",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "objects",
+          "page",
+          "size",
+          "total"
+        ],
+        "title": "SearchResp",
+        "type": "object"
+      },
+      "UnsAttachmentInfo": {
+        "properties": {
+          "contentType": {
+            "type": "string"
+          },
+          "createdAt": {
+            "format": "int64",
+            "type": "integer"
+          },
+          "fileName": {
+            "type": "string"
+          },
+          "filePath": {
+            "type": "string"
+          },
+          "fileUrl": {
+            "type": "string"
+          },
+          "fileUrlExpiresAt": {
+            "format": "int64",
+            "type": "integer"
+          },
+          "sha256": {
+            "type": "string"
+          },
+          "size": {
+            "format": "int64",
+            "type": "integer"
+          },
+          "unsId": {
+            "format": "int64",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "unsId",
+          "filePath"
+        ],
+        "title": "UnsAttachmentInfo",
+        "type": "object"
+      },
+      "UnsAttachmentListReq": {
+        "properties": {
+          "includeFileUrl": {
+            "format": "boolean",
+            "type": "boolean"
+          },
+          "page": {
+            "format": "int64",
+            "type": "integer"
+          },
+          "size": {
+            "format": "int64",
+            "type": "integer"
+          },
+          "topic": {
+            "type": "string"
+          },
+          "unsId": {
+            "format": "int64",
+            "type": "integer"
+          }
+        },
+        "title": "UnsAttachmentListReq",
+        "type": "object"
+      },
+      "UnsAttachmentListResp": {
+        "properties": {
+          "list": {
+            "items": {
+              "$ref": "#/components/schemas/UnsAttachmentInfo"
+            },
+            "type": "array"
+          },
+          "page": {
+            "format": "int64",
+            "type": "integer"
+          },
+          "size": {
+            "format": "int64",
+            "type": "integer"
+          },
+          "total": {
+            "format": "int64",
+            "type": "integer"
+          },
+          "unsId": {
+            "format": "int64",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "unsId",
+          "list",
+          "total",
+          "page",
+          "size"
+        ],
+        "title": "UnsAttachmentListResp",
+        "type": "object"
+      },
+      "UnsAttachmentUploadReq": {
+        "properties": {
+          "fileName": {
+            "type": "string"
+          },
+          "sha256": {
+            "type": "string"
+          },
+          "topic": {
+            "type": "string"
+          },
+          "unsId": {
+            "format": "int64",
+            "type": "integer"
+          }
+        },
+        "title": "UnsAttachmentUploadReq",
+        "type": "object"
+      },
+      "UnsAttachmentUploadResp": {
+        "properties": {
+          "contentType": {
+            "type": "string"
+          },
+          "createdAt": {
+            "format": "int64",
+            "type": "integer"
+          },
+          "fileName": {
+            "type": "string"
+          },
+          "filePath": {
+            "type": "string"
+          },
+          "fileUrl": {
+            "type": "string"
+          },
+          "fileUrlExpiresAt": {
+            "format": "int64",
+            "type": "integer"
+          },
+          "sha256": {
+            "type": "string"
+          },
+          "size": {
+            "format": "int64",
+            "type": "integer"
+          },
+          "unsId": {
+            "format": "int64",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "unsId",
+          "filePath"
+        ],
+        "title": "UnsAttachmentUploadResp",
+        "type": "object"
+      },
+      "UnsBindFlowReq": {
+        "properties": {
+          "flowId": {
+            "description": "Flow ID to bind to the UNS node.",
+            "format": "int64",
+            "type": "integer"
+          },
+          "unsId": {
+            "description": "UNS node ID to bind.",
+            "format": "int64",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "unsId",
+          "flowId"
+        ],
+        "title": "UnsBindFlowReq",
+        "type": "object"
+      },
+      "UnsBindFlowResp": {
+        "properties": {
+          "flowId": {
+            "format": "int64",
+            "type": "integer"
+          },
+          "success": {
+            "format": "boolean",
+            "type": "boolean"
+          },
+          "unsId": {
+            "format": "int64",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "success",
+          "unsId",
+          "flowId"
+        ],
+        "title": "UnsBindFlowResp",
+        "type": "object"
+      },
+      "WriteItem": {
+        "properties": {
+          "timeStamp": {
+            "description": "Optional payload timestamp in Unix milliseconds. Omit to use server time.",
+            "format": "int64",
+            "type": "integer"
+          },
+          "topic": {
+            "description": "UNS topic path to write.",
+            "type": "string"
+          },
+          "value": {
+            "description": "Payload value to write to the topic.",
+            "type": "object"
+          }
+        },
+        "required": [
+          "topic"
+        ],
+        "title": "WriteItem",
+        "type": "object"
+      },
+      "WriteReq": {
+        "properties": {
+          "qos": {
+            "description": "MQTT QoS level for the write operation. Allowed values: 0, 1, 2.",
+            "enum": [
+              0,
+              1,
+              2
+            ],
+            "format": "int64",
+            "type": "integer"
+          },
+          "retain": {
+            "description": "Whether the MQTT message should be retained.",
+            "format": "boolean",
+            "type": "boolean"
+          },
+          "writes": {
+            "description": "Write operations to apply in this request.",
+            "items": {
+              "$ref": "#/components/schemas/WriteItem"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "writes"
+        ],
+        "title": "WriteReq",
+        "type": "object"
+      },
+      "WriteResp": {
+        "properties": {
+          "results": {
+            "items": {
+              "$ref": "#/components/schemas/OpenapiWriteResult"
+            },
+            "type": "array"
+          },
+          "success": {
+            "format": "boolean",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "success",
+          "results"
+        ],
+        "title": "WriteResp",
+        "type": "object"
+      }
+    },
+    "securitySchemes": {
+      "ApiKeyAuth": {
+        "description": "OpenAPI API Key, for example sk-svc-xxx or sk-agent-xxx",
+        "in": "header",
+        "name": "x-api-key",
+        "type": "apiKey"
+      }
+    }
+  },
+  "info": {
+    "description": "Tier0 UNS OpenAPI",
+    "title": "Tier0 OpenAPI",
+    "version": "v1"
+  },
+  "openapi": "3.0.3",
+  "paths": {
+    "/assets/upload": {
+      "post": {
+        "operationId": "postOpenapiV1AssetsUpload",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AssetUploadReq"
+              }
+            }
+          },
+          "required": true,
+          "x-originalParamName": "body"
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "default": "200",
+                      "title": "返回code",
+                      "type": "integer"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/AssetUploadResp"
+                    },
+                    "msg": {
+                      "title": "返回的消息",
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                }
+              }
+            },
+            "description": "A successful response."
+          }
+        },
+        "tags": [
+          "uns"
+        ]
+      }
+    },
+    "/auth/whoami": {
+      "post": {
+        "operationId": "postOpenapiV1AuthWhoami",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "default": "200",
+                      "title": "返回code",
+                      "type": "integer"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/AuthWhoamiResp"
+                    },
+                    "msg": {
+                      "title": "返回的消息",
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                }
+              }
+            },
+            "description": "A successful response."
+          }
+        },
+        "tags": [
+          "uns"
+        ]
+      }
+    },
+    "/flow/create": {
+      "post": {
+        "operationId": "postOpenapiV1FlowCreate",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FlowCreateReq"
+              }
+            }
+          },
+          "required": true,
+          "x-originalParamName": "body"
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "default": "200",
+                      "title": "返回code",
+                      "type": "integer"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/FlowCreateResp"
+                    },
+                    "msg": {
+                      "title": "返回的消息",
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                }
+              }
+            },
+            "description": "A successful response."
+          }
+        },
+        "tags": [
+          "uns"
+        ]
+      }
+    },
+    "/flow/delete": {
+      "post": {
+        "operationId": "postOpenapiV1FlowDelete",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FlowDeleteReq"
+              }
+            }
+          },
+          "required": true,
+          "x-originalParamName": "body"
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "default": "200",
+                      "title": "返回code",
+                      "type": "integer"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/FlowEmptyResp"
+                    },
+                    "msg": {
+                      "title": "返回的消息",
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                }
+              }
+            },
+            "description": "A successful response."
+          }
+        },
+        "tags": [
+          "uns"
+        ]
+      }
+    },
+    "/flow/deploy": {
+      "post": {
+        "operationId": "postOpenapiV1FlowDeploy",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FlowDeployReq"
+              }
+            }
+          },
+          "required": true,
+          "x-originalParamName": "body"
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "default": "200",
+                      "title": "返回code",
+                      "type": "integer"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/FlowDeployResp"
+                    },
+                    "msg": {
+                      "title": "返回的消息",
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                }
+              }
+            },
+            "description": "A successful response."
+          }
+        },
+        "tags": [
+          "uns"
+        ]
+      }
+    },
+    "/flow/flowdata": {
+      "post": {
+        "operationId": "postOpenapiV1FlowFlowdata",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FlowGetReq"
+              }
+            }
+          },
+          "required": true,
+          "x-originalParamName": "body"
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "default": "200",
+                      "title": "返回code",
+                      "type": "integer"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/FlowDataResp"
+                    },
+                    "msg": {
+                      "title": "返回的消息",
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                }
+              }
+            },
+            "description": "A successful response."
+          }
+        },
+        "tags": [
+          "uns"
+        ]
+      }
+    },
+    "/flow/get": {
+      "post": {
+        "operationId": "postOpenapiV1FlowGet",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FlowGetReq"
+              }
+            }
+          },
+          "required": true,
+          "x-originalParamName": "body"
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "default": "200",
+                      "title": "返回code",
+                      "type": "integer"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/FlowInfo"
+                    },
+                    "msg": {
+                      "title": "返回的消息",
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                }
+              }
+            },
+            "description": "A successful response."
+          }
+        },
+        "tags": [
+          "uns"
+        ]
+      }
+    },
+    "/flow/list": {
+      "post": {
+        "operationId": "postOpenapiV1FlowList",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FlowListReq"
+              }
+            }
+          },
+          "required": true,
+          "x-originalParamName": "body"
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "default": "200",
+                      "title": "返回code",
+                      "type": "integer"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/FlowListResp"
+                    },
+                    "msg": {
+                      "title": "返回的消息",
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                }
+              }
+            },
+            "description": "A successful response."
+          }
+        },
+        "tags": [
+          "uns"
+        ]
+      }
+    },
+    "/flow/nodes": {
+      "post": {
+        "operationId": "postOpenapiV1FlowNodes",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FlowNodesReq"
+              }
+            }
+          },
+          "required": true,
+          "x-originalParamName": "body"
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "default": "200",
+                      "title": "返回code",
+                      "type": "integer"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/FlowNodesResp"
+                    },
+                    "msg": {
+                      "title": "返回的消息",
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                }
+              }
+            },
+            "description": "A successful response."
+          }
+        },
+        "tags": [
+          "uns"
+        ]
+      }
+    },
+    "/flow/update": {
+      "post": {
+        "operationId": "postOpenapiV1FlowUpdate",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FlowUpdateReq"
+              }
+            }
+          },
+          "required": true,
+          "x-originalParamName": "body"
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "default": "200",
+                      "title": "返回code",
+                      "type": "integer"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/FlowEmptyResp"
+                    },
+                    "msg": {
+                      "title": "返回的消息",
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                }
+              }
+            },
+            "description": "A successful response."
+          }
+        },
+        "tags": [
+          "uns"
+        ]
+      }
+    },
+    "/info": {
+      "post": {
+        "operationId": "postOpenapiV1Info",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InfoReq"
+              }
+            }
+          },
+          "required": true,
+          "x-originalParamName": "body"
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "default": "200",
+                      "title": "返回code",
+                      "type": "integer"
+                    },
+                    "msg": {
+                      "title": "返回的消息",
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                }
+              }
+            },
+            "description": "A successful response."
+          }
+        },
+        "security": [],
+        "tags": [
+          "uns"
+        ]
+      }
+    },
+    "/uns/attachments": {
+      "post": {
+        "operationId": "postOpenapiV1UnsAttachments",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UnsAttachmentUploadReq"
+              }
+            }
+          },
+          "required": true,
+          "x-originalParamName": "body"
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "default": "200",
+                      "title": "返回code",
+                      "type": "integer"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/UnsAttachmentUploadResp"
+                    },
+                    "msg": {
+                      "title": "返回的消息",
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                }
+              }
+            },
+            "description": "A successful response."
+          }
+        },
+        "tags": [
+          "uns"
+        ]
+      }
+    },
+    "/uns/attachments/list": {
+      "post": {
+        "operationId": "postOpenapiV1UnsAttachmentsList",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UnsAttachmentListReq"
+              }
+            }
+          },
+          "required": true,
+          "x-originalParamName": "body"
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "default": "200",
+                      "title": "返回code",
+                      "type": "integer"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/UnsAttachmentListResp"
+                    },
+                    "msg": {
+                      "title": "返回的消息",
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                }
+              }
+            },
+            "description": "A successful response."
+          }
+        },
+        "tags": [
+          "uns"
+        ]
+      }
+    },
+    "/uns/browse": {
+      "post": {
+        "operationId": "postOpenapiV1UnsBrowse",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BrowseReq"
+              }
+            }
+          },
+          "required": true,
+          "x-originalParamName": "body"
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "default": "200",
+                      "title": "返回code",
+                      "type": "integer"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/BrowseResp"
+                    },
+                    "msg": {
+                      "title": "返回的消息",
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                }
+              }
+            },
+            "description": "A successful response."
+          }
+        },
+        "tags": [
+          "uns"
+        ]
+      }
+    },
+    "/uns/create": {
+      "post": {
+        "operationId": "postOpenapiV1UnsCreate",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NodeCreateReq"
+              }
+            }
+          },
+          "required": true,
+          "x-originalParamName": "body"
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "default": "200",
+                      "title": "返回code",
+                      "type": "integer"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/CreateResp"
+                    },
+                    "msg": {
+                      "title": "返回的消息",
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                }
+              }
+            },
+            "description": "A successful response."
+          }
+        },
+        "tags": [
+          "uns"
+        ]
+      }
+    },
+    "/uns/delete": {
+      "post": {
+        "operationId": "postOpenapiV1UnsDelete",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NodeDeleteReq"
+              }
+            }
+          },
+          "required": true,
+          "x-originalParamName": "body"
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "default": "200",
+                      "title": "返回code",
+                      "type": "integer"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/OpenapiEmptyResp"
+                    },
+                    "msg": {
+                      "title": "返回的消息",
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                }
+              }
+            },
+            "description": "A successful response."
+          }
+        },
+        "tags": [
+          "uns"
+        ]
+      }
+    },
+    "/uns/history": {
+      "post": {
+        "operationId": "postOpenapiV1UnsHistory",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/HistoryReq"
+              }
+            }
+          },
+          "required": true,
+          "x-originalParamName": "body"
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "default": "200",
+                      "title": "返回code",
+                      "type": "integer"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/HistoryResp"
+                    },
+                    "msg": {
+                      "title": "返回的消息",
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                }
+              }
+            },
+            "description": "A successful response."
+          }
+        },
+        "tags": [
+          "uns"
+        ]
+      }
+    },
+    "/uns/read": {
+      "post": {
+        "operationId": "postOpenapiV1UnsRead",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReadReq"
+              }
+            }
+          },
+          "required": true,
+          "x-originalParamName": "body"
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "default": "200",
+                      "title": "返回code",
+                      "type": "integer"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/ReadResp"
+                    },
+                    "msg": {
+                      "title": "返回的消息",
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                }
+              }
+            },
+            "description": "A successful response."
+          }
+        },
+        "tags": [
+          "uns"
+        ]
+      }
+    },
+    "/uns/restore": {
+      "post": {
+        "operationId": "postOpenapiV1UnsRestore",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NodeRestoreReq"
+              }
+            }
+          },
+          "required": true,
+          "x-originalParamName": "body"
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "default": "200",
+                      "title": "返回code",
+                      "type": "integer"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/OpenapiEmptyResp"
+                    },
+                    "msg": {
+                      "title": "返回的消息",
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                }
+              }
+            },
+            "description": "A successful response."
+          }
+        },
+        "tags": [
+          "uns"
+        ]
+      }
+    },
+    "/uns/search": {
+      "post": {
+        "operationId": "postOpenapiV1UnsSearch",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SearchReq"
+              }
+            }
+          },
+          "required": true,
+          "x-originalParamName": "body"
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "default": "200",
+                      "title": "返回code",
+                      "type": "integer"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/SearchResp"
+                    },
+                    "msg": {
+                      "title": "返回的消息",
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                }
+              }
+            },
+            "description": "A successful response."
+          }
+        },
+        "tags": [
+          "uns"
+        ]
+      }
+    },
+    "/uns/unsBindFlow": {
+      "post": {
+        "operationId": "postOpenapiV1UnsUnsBindFlow",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UnsBindFlowReq"
+              }
+            }
+          },
+          "required": true,
+          "x-originalParamName": "body"
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "default": "200",
+                      "title": "返回code",
+                      "type": "integer"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/UnsBindFlowResp"
+                    },
+                    "msg": {
+                      "title": "返回的消息",
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                }
+              }
+            },
+            "description": "A successful response."
+          }
+        },
+        "tags": [
+          "uns"
+        ]
+      }
+    },
+    "/uns/update": {
+      "post": {
+        "operationId": "postOpenapiV1UnsUpdate",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NodeUpdateReq"
+              }
+            }
+          },
+          "required": true,
+          "x-originalParamName": "body"
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "default": "200",
+                      "title": "返回code",
+                      "type": "integer"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/OpenapiEmptyResp"
+                    },
+                    "msg": {
+                      "title": "返回的消息",
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                }
+              }
+            },
+            "description": "A successful response."
+          }
+        },
+        "tags": [
+          "uns"
+        ]
+      }
+    },
+    "/uns/write": {
+      "post": {
+        "operationId": "postOpenapiV1UnsWrite",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WriteReq"
+              }
+            }
+          },
+          "required": true,
+          "x-originalParamName": "body"
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "default": "200",
+                      "title": "返回code",
+                      "type": "integer"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/WriteResp"
+                    },
+                    "msg": {
+                      "title": "返回的消息",
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                }
+              }
+            },
+            "description": "A successful response."
+          }
+        },
+        "tags": [
+          "uns"
+        ]
+      }
+    }
+  },
+  "security": [
+    {
+      "ApiKeyAuth": []
+    }
+  ],
+  "servers": [
+    {
+      "description": "OpenAPI v1",
+      "url": "/openapi/v1"
+    }
+  ],
+  "tags": [
+    {
+      "description": "UNS OpenAPI",
+      "name": "uns"
+    }
+  ]
+}
