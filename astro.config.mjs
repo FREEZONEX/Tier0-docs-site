@@ -3,6 +3,7 @@ import { defineConfig } from 'astro/config';
 import starlight from '@astrojs/starlight';
 import starlightLlmsTxt from 'starlight-llms-txt';
 import mermaid from 'astro-mermaid';
+import mermaidEdgeLabels from './src/integrations/mermaid-edge-labels.mjs';
 
 // https://astro.build/config
 export default defineConfig({
@@ -15,12 +16,13 @@ export default defineConfig({
 			mermaidConfig: {
 				flowchart: { curve: 'linear' },
 				fontFamily:
-					"-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif",
+					"'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif",
 				themeVariables: {
 					fontSize: '16px',
 				},
 			},
 		}),
+		mermaidEdgeLabels(),
 		starlight({
 			title: 'Tier0 Docs',
 			description:

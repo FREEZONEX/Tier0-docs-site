@@ -2141,8 +2141,26 @@ main:has(.t0-banner) .t0-banner {
 	justify-content: center;
 	padding: 1.5rem 1rem;
 	margin: 1.5rem 0;
-	overflow-x: auto;
+	overflow: visible;
 	border-radius: 4px;
+}
+
+.mermaid svg {
+	overflow: visible;
+}
+
+.mermaid .nodeLabel,
+.mermaid .node .label,
+.mermaid .edgeLabel,
+.mermaid .edgeLabel p,
+.mermaid .edgeLabel span,
+.mermaid .labelBkg,
+.mermaid .cluster-label .nodeLabel,
+.mermaid .cluster-label span {
+	font-family: var(--sl-font) !important;
+	font-size: 16px;
+	font-weight: 400;
+	letter-spacing: 0;
 }
 
 /* Light theme baseline (match /using-tier0/build-apps/) */
@@ -2229,8 +2247,10 @@ main:has(.t0-banner) .t0-banner {
 	stroke: none !important;
 }
 
-:root[data-theme='light'] .mermaid .edgeLabel {
-	background-color: rgb(249 249 249 / 88%) !important;
+:root[data-theme='light'] .mermaid .edgeLabel,
+:root[data-theme='light'] .mermaid .edgeLabel .labelBkg {
+	background: transparent !important;
+	background-color: transparent !important;
 	color: var(--t0-mermaid-edge-label) !important;
 }
 
@@ -2324,8 +2344,10 @@ main:has(.t0-banner) .t0-banner {
 	stroke: none !important;
 }
 
-:root[data-theme='dark'] .mermaid .edgeLabel {
-	background-color: rgb(31 31 31 / 86%) !important;
+:root[data-theme='dark'] .mermaid .edgeLabel,
+:root[data-theme='dark'] .mermaid .edgeLabel .labelBkg {
+	background: transparent !important;
+	background-color: transparent !important;
 	color: var(--t0-mermaid-edge-label) !important;
 }
 
