@@ -105,9 +105,9 @@ Tier0 uses PostgreSQL to store data. Different data types change at different ra
 
 | Data Type | Storage | Description |
 |-----------|---------|-------------|
-| Metric | Time-series database | Optimized for high-frequency measurements such as temperature and pressure. Each topic includes default fields: `timestamp` and `quality`. |
-| State | PostgreSQL | Stores machine or system states in a flexible `JSONB` format. |
-| Action | PostgreSQL | Stores commands or actions in a flexible `JSONB` format. |
+| `METRIC` | Time-series database | Optimized for high-frequency measurements such as temperature and pressure. Each topic includes default fields: `timestamp` and `quality`. |
+| `STATE` | PostgreSQL | Stores machine or system states in a flexible `JSONB` format. |
+| `ACTION` | PostgreSQL | Stores commands or actions in a flexible `JSONB` format. |
 
 ## Next
 
