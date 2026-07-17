@@ -14,7 +14,13 @@ export default defineConfig({
 		mermaid({
 			autoTheme: true,
 			mermaidConfig: {
-				flowchart: { curve: 'linear', nodeSpacing: 16, rankSpacing: 24, padding: 8 },
+				flowchart: {
+					curve: 'linear',
+					nodeSpacing: 16,
+					rankSpacing: 24,
+					padding: 8,
+					subGraphTitleMargin: { top: 8, bottom: 24 },
+				},
 				fontFamily:
 					"'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif",
 				themeVariables: {

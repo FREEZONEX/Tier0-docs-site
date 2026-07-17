@@ -28,12 +28,34 @@ function parseEdgePoints(path) {
 }
 
 function fitSvgViewBox(svg, pad) {
-	const padValue = pad ?? 6;
-	const current = svg.viewBox.baseVal;
-	let minX = current.x;
-	let minY = current.y;
-	let maxX = current.x + current.width;
-	let maxY = current.y + current.height;
+	const padValue = pad ?? 8;
+	// Start from the drawn content — Mermaid's default viewBox often has huge
+	// empty padding (e.g. Connect Data's 2-node chart ~140×130 in a ~290×290 box).
+	let minX = Infinity;
+	let minY = Infinity;
+	let maxX = -Infinity;
+	let maxY = -Infinity;
+
+	const union = (x, y, w, h) => {
+		if (![x, y, w, h].every(Number.isFinite) || w <= 0 || h <= 0) return;
+		minX = Math.min(minX, x);
+		minY = Math.min(minY, y);
+		maxX = Math.max(maxX, x + w);
+		maxY = Math.max(maxY, y + h);
+	};
+
+	try {
+		const root =
+			svg.querySelector('g.root') ||
+			svg.querySelector('g.flowchart') ||
+			svg.querySelector('g');
+		if (root) {
+			const bb = root.getBBox();
+			union(bb.x, bb.y, bb.width, bb.height);
+		}
+	} catch {
+		/* getBBox can throw if the SVG is not rendered yet */
+	}
 
 	for (const edgeLabel of svg.querySelectorAll('g.edgeLabel')) {
 		const outer = edgeLabel.getAttribute('transform')?.match(/translate\\(([-\\d.]+),\\s*([-\\d.]+)\\)/);
@@ -50,14 +72,10 @@ function fitSvgViewBox(svg, pad) {
 		const foreignObject = labelInner.querySelector('foreignObject');
 		const labelWidth = Number(foreignObject?.getAttribute('width')) || 0;
 		const labelHeight = Number(foreignObject?.getAttribute('height')) || 0;
-		const left = anchorX + offsetX;
-		const top = anchorY + offsetY;
-
-		minX = Math.min(minX, left);
-		minY = Math.min(minY, top);
-		maxX = Math.max(maxX, left + labelWidth);
-		maxY = Math.max(maxY, top + labelHeight);
+		union(anchorX + offsetX, anchorY + offsetY, labelWidth, labelHeight);
 	}
+
+	if (!Number.isFinite(minX) || !Number.isFinite(minY)) return;
 
 	svg.setAttribute(
 		'viewBox',
@@ -118,33 +136,33 @@ function adjustMermaidEdgeLabels(root) {
 		}
 	}
 
-	fitSvgViewBox(svg, 6);
+	fitSvgViewBox(svg, 8);
 
-	// Shrink wide diagrams to the content column; keep small ones at natural size
-	// (width:100% was blowing up 2-node charts like Connect Data).
+	// Always size in CSS pixels: min(natural viewBox width, content column).
+	// Never use width:100% — that blows up compact charts (Connect Data) to ~880px.
 	const vb = svg.viewBox.baseVal;
-	const styles = getComputedStyle(root);
-	const padX =
-		(parseFloat(styles.paddingLeft) || 0) + (parseFloat(styles.paddingRight) || 0);
-	const available = Math.max(root.clientWidth - padX, 0);
+	const parent = root.parentElement;
+	const available = Math.max(
+		(parent?.clientWidth || root.clientWidth || 0) -
+			(parseFloat(getComputedStyle(root).paddingLeft) || 0) -
+			(parseFloat(getComputedStyle(root).paddingRight) || 0),
+		0,
+	);
+	const natural = Math.ceil(vb.width || 0);
+	const target =
+		natural > 0 && available > 0 ? Math.min(natural, available) : natural;
 
 	svg.removeAttribute('height');
 	svg.style.setProperty('height', 'auto', 'important');
 	svg.style.setProperty('max-width', '100%', 'important');
 
-	if (vb.width > 0 && available > 0 && vb.width > available) {
-		root.style.width = '100%';
-		svg.setAttribute('width', '100%');
-		svg.style.setProperty('width', '100%', 'important');
+	if (target > 0) {
+		root.style.width = target >= available && available > 0 ? '100%' : '';
+		svg.setAttribute('width', String(target));
+		svg.style.setProperty('width', target + 'px', 'important');
 	} else {
 		root.style.width = '';
-		const natural = Math.ceil(vb.width || 0);
-		if (natural > 0) {
-			svg.setAttribute('width', String(natural));
-			svg.style.setProperty('width', natural + 'px', 'important');
-		} else {
-			svg.style.removeProperty('width');
-		}
+		svg.style.removeProperty('width');
 	}
 	root.style.overflowX = '';
 }

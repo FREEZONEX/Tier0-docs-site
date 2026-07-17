@@ -5,78 +5,94 @@ sidebar:
   order: 3
 ---
 
-Tier0 提供三个版本。每个版本都有不同的功能、套餐和能力边界。
+Tier0 是同一平台的三个版本。命名空间模型、flows、CLI 相同——差别在于谁来运维，以及你能获得多少平台能力。
 
-<section class="t0-board t0-frame not-content">
-	<span class="t0-corners" aria-hidden="true"></span>
+<section class="t0-board not-content">
 	<div class="t0-board-grid">
 		<div class="t0-col">
-			<p class="t0-tag">开源</p>
-			<h3>Edge</h3>
-			<p class="t0-col-tagline">在单机上运行的 UNS 基础能力，完全由你掌控。</p>
-			<p class="t0-col-for">适合技术评估、PoC，以及能够自行运维开源软件的团队。</p>
-			<div class="t0-plans">
-				<div class="t0-plan">
-					<span class="t0-plan-name">Apache-2.0</span>
-					<span class="t0-plan-price">免费</span>
-					<p class="t0-plan-desc">UNS 数据集成、历史存储，单机 Docker 部署。</p>
+			<div class="t0-col-header">
+				<p class="t0-tag">开源</p>
+			</div>
+			<div class="t0-col-body">
+				<div class="t0-col-top">
+					<h3>Edge</h3>
+					<p class="t0-col-tagline">在单机上运行的 UNS 基础能力，完全由你掌控。</p>
+					<p class="t0-col-for">适合技术评估、PoC，以及能够自行运维开源软件的团队。</p>
+				</div>
+				<div class="t0-plans">
+					<div class="t0-plan t0-plan--apache">
+						<span class="t0-plan-name">Apache-2.0</span>
+						<span class="t0-plan-price">免费</span>
+						<p class="t0-plan-desc">UNS 核心、SourceFlows/EventFlows、历史存储——单机 Docker 部署。</p>
+					</div>
+					<a class="t0-col-cta" href="https://github.com/FREEZONEX/Tier0-Edge">在 GitHub 克隆</a>
 				</div>
 			</div>
-			<a class="t0-col-cta" href="https://github.com/FREEZONEX/Tier0-Edge">在 GitHub 克隆</a>
 		</div>
 		<div class="t0-col t0-col--accent">
-			<p class="t0-tag">托管 SaaS</p>
-			<span class="t0-col-flag">大多数团队从这里开始</span>
-			<h3>Cloud</h3>
-			<p class="t0-col-tagline">完整平台，由 Tier0 为你运维。</p>
-			<p class="t0-col-for">第一天即可使用 apps、notebooks 和 launchpad，无需运行基础设施。</p>
-			<div class="t0-plans">
-				<div class="t0-plan">
-					<span class="t0-plan-name">Builder</span>
-					<span class="t0-plan-price">$99/seat/mo</span>
-					<p class="t0-plan-desc">仅用于应用生成。</p>
+			<div class="t0-col-header">
+				<p class="t0-tag">托管 SaaS</p>
+			</div>
+			<div class="t0-col-body">
+				<div class="t0-col-top">
+					<h3>Cloud <span class="t0-col-flag">大多数团队从这里开始</span></h3>
+					<p class="t0-col-tagline">完整平台，由我们为你运维。</p>
+					<p class="t0-col-for">第一天即可使用 apps、notebooks 和 launchpad，无需自行运行基础设施。</p>
 				</div>
-				<div class="t0-plan t0-plan--rec">
-					<span class="t0-plan-name">Growth <span class="t0-pill">推荐</span></span>
-					<span class="t0-plan-price">$20,000/yr</span>
-					<p class="t0-plan-desc">最多 5 个 edges。适合单工厂、少量应用，并希望快速启动的用户。</p>
-				</div>
-				<div class="t0-plan">
-					<span class="t0-plan-name">Scale</span>
-					<span class="t0-plan-price">$38,000/yr</span>
-					<p class="t0-plan-desc">最多 10 个 edges。适合多工厂、多应用的用户。</p>
+				<div class="t0-plans">
+					<div class="t0-plan">
+						<span class="t0-plan-name">Builder</span>
+						<span class="t0-plan-price">$199/seat/mo</span>
+						<p class="t0-plan-desc">仅用于应用生成。</p>
+					</div>
+					<div class="t0-plan t0-plan--growth">
+						<span class="t0-plan-name">Growth <span class="t0-plan-star" aria-hidden="true">★</span></span>
+						<span class="t0-plan-price">$20,000/yr</span>
+						<p class="t0-plan-desc">最多 5 个 edges。适合单工厂、少量应用，并希望快速启动的用户。</p>
+					</div>
+					<div class="t0-plan t0-plan--scale">
+						<span class="t0-plan-name">Scale</span>
+						<span class="t0-plan-price">$38,000/yr</span>
+						<p class="t0-plan-desc">最多 10 个 edges。适合多工厂、多应用的用户。</p>
+					</div>
+					<a class="t0-col-cta" href="https://tier0.dev/login">开始 14 天试用</a>
 				</div>
 			</div>
-			<a class="t0-col-cta t0-cta-btn" href="https://tier0.app/cloud-trial">开始 14 天试用</a>
 		</div>
-		<div class="t0-col">
-			<p class="t0-tag">私有化部署</p>
-			<h3>Enterprise</h3>
-			<p class="t0-col-tagline">完整平台，按你的要求部署。</p>
-			<p class="t0-col-for">适合数据主权、规模化、治理和企业级监管需求。</p>
-			<div class="t0-plans">
-				<div class="t0-plan">
-					<span class="t0-plan-name">Base</span>
-					<span class="t0-plan-price">$10,000/yr</span>
-					<p class="t0-plan-desc">统一数据基础。少量单用途应用。</p>
+		<div class="t0-col t0-col--dark">
+			<div class="t0-col-header">
+				<p class="t0-tag">私有化部署</p>
+			</div>
+			<div class="t0-col-body">
+				<div class="t0-col-top">
+					<h3>Enterprise</h3>
+					<p class="t0-col-tagline">完整平台，按你的要求部署。</p>
+					<p class="t0-col-for">适合数据主权、规模化、治理和企业级监管需求。</p>
 				</div>
-				<div class="t0-plan">
-					<span class="t0-plan-name">Plus</span>
-					<span class="t0-plan-price">$20,000/yr</span>
-					<p class="t0-plan-desc">单实例。单工厂数据集成，支持多个使用场景的应用。</p>
-				</div>
-				<div class="t0-plan t0-plan--rec">
-					<span class="t0-plan-name">Cluster <span class="t0-pill">推荐</span></span>
-					<span class="t0-plan-price">$39,900+/yr</span>
-					<p class="t0-plan-desc">多实例。多工厂、多应用、集中式私有云管理。</p>
+				<div class="t0-plans">
+					<div class="t0-plan t0-plan--base">
+						<span class="t0-plan-name">Base</span>
+						<span class="t0-plan-price">$10,000/yr</span>
+						<p class="t0-plan-desc">统一数据基础。少量单用途应用。</p>
+					</div>
+					<div class="t0-plan t0-plan--plus">
+						<span class="t0-plan-name">Plus</span>
+						<span class="t0-plan-price">$20,000/yr</span>
+						<p class="t0-plan-desc">单实例。单工厂数据集成，支持多个使用场景的应用。</p>
+					</div>
+					<div class="t0-plan t0-plan--cluster">
+						<span class="t0-plan-name">Cluster <span class="t0-plan-star" aria-hidden="true">★</span></span>
+						<span class="t0-plan-price">$39,900+/yr</span>
+						<p class="t0-plan-desc">多实例。多工厂、多应用、集中式私有云管理。</p>
+					</div>
+					<a class="t0-col-cta" href="https://tier0.app/talk-to-team">联系团队</a>
 				</div>
 			</div>
-			<a class="t0-col-cta" href="https://tier0.app/talk-to-team">联系团队</a>
 		</div>
 	</div>
 </section>
 
-**Add-ons**：可以根据需求在已有套餐上增加 edge nodes 和 applications。详情见 [tier0.app/pricing](https://tier0.app/pricing)。
+**Add-ons：** 额外 edge 节点 $2,000 /edge/年 · 额外实例 $10,000 /instance/年。价格仅供参考——以 [tier0.app/pricing](https://tier0.app/pricing) 为准。
 
 :::note[特殊术语说明]
 在 Cloud 套餐中，edge 是与云端 Tier0 通信的连接节点。它可以是 Edge Tier0，也可以是网关或工业 PC。
@@ -117,32 +133,23 @@ Edge 面向技术评估，需要一定的运维经验。
 还不确定选择哪个版本？沿着路径判断。
 
 ```mermaid
-flowchart TD
-  start(("开始")) --> appOnly{"只需要应用<br/>生成吗？"}
-
-  subgraph cloud["Cloud"]
-    appOnly -- "是" --> builder["Builder<br/>$99 / seat / mo"]
-    appOnly -- "否" --> selfHost{"需要私有化<br/>部署吗？"}
-    selfHost -- "否" --> edgeCount{"是否超过<br/>5 个 edges？"}
-    edgeCount -- "否" --> growth["Growth<br/>最多 5 个 edges"]
-    edgeCount -- "是" --> scale["Scale<br/>最多 10 个 edges"]
-  end
-
-  subgraph selfManaged["自托管"]
-    selfHost -- "是" --> multiSite{"多工厂<br/>或需要 HA？"}
-    multiSite -- "否" --> basePlus["Enterprise<br/>Base / Plus"]
-    multiSite -- "是" --> cluster["Enterprise Cluster<br/>多实例"]
-  end
-
-  start -. "开源 PoC<br/>或强内部团队" .-> edge["Edge<br/>Apache-2.0"]
-
-  classDef t0accent fill:#B2ED1D,stroke:#73B200,color:#171717
-  classDef t0muted fill:#2f3338,stroke:#5a626b,color:#f4f4f4
-  class builder,growth,cluster t0accent
-  class edge,scale,basePlus t0muted
+flowchart LR
+  q1{"技术评估<br/>或自托管？"} -- "是" --> edge["Edge（开源）"]
+  q1 -- "否" --> q2{"需要本地部署 /<br/>数据主权？"}
+  q2 -- "否" --> q3{"超过 5 个 edges？"}
+  q2 -- "是" --> q4{"多工厂 / HA？"}
+  q3 -- "否" --> growth["Cloud Growth ★"]
+  q3 -- "是" --> scale["Cloud Scale"]
+  q4 -- "是" --> cluster["Enterprise Cluster ★"]
+  q4 -- "否" --> baseplus["Enterprise Base / Plus"]
+  class growth,cluster t0accent
 ```
+
+## 什么是 “edge”（计量单位）？
+
+在 Cloud 套餐中，*edge* 是靠近设备采集数据的连接点——通常是运行采集 flows 的网关或工业 PC——并将数据发布到命名空间。大致按每个站点或隔离网段计一个。不要与上方的 **Edge 版本**（开源发行版）混淆。
 
 ## 下一步
 
-- [在 UNS 上构建应用](../../using-tier0/build-apps/) - 使用 UNS 数据构建工业应用。
-- [安装](../installation/) - 14 天 Cloud 试用包含完整平台。
+- [在 UNS 上构建应用](../../using-tier0/build-apps/) — 在 Edge 与 Enterprise 上部署容器
+- [安装](../installation/) — 14 天 Cloud 试用包含完整平台

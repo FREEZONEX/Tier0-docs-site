@@ -2680,6 +2680,7 @@ main:has(.t0-banner) .t0-banner {
 	font-size: 16px;
 	font-weight: 400;
 	letter-spacing: 0;
+	white-space: nowrap;
 }
 
 .mermaid:has(+ .t0-mermaid-legend) {

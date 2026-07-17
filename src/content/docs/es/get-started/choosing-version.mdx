@@ -5,78 +5,94 @@ sidebar:
   order: 3
 ---
 
-Tier0 está disponible en tres ediciones. Cada edición tiene sus propias funciones, planes y capacidades.
+Tier0 es una plataforma en tres ediciones. Mismo modelo de namespace, mismos flows, mismo CLI — la diferencia es quién lo opera y cuánta plataforma obtienes.
 
-<section class="t0-board t0-frame not-content">
-	<span class="t0-corners" aria-hidden="true"></span>
+<section class="t0-board not-content">
 	<div class="t0-board-grid">
 		<div class="t0-col">
-			<p class="t0-tag">Open source</p>
-			<h3>Edge</h3>
-			<p class="t0-col-tagline">La base UNS en una sola máquina. Completamente tuya.</p>
-			<p class="t0-col-for">Para evaluación técnica, PoC y equipos cómodos operando software open source por su cuenta.</p>
-			<div class="t0-plans">
-				<div class="t0-plan">
-					<span class="t0-plan-name">Apache-2.0</span>
-					<span class="t0-plan-price">gratis</span>
-					<p class="t0-plan-desc">Integración de datos UNS, almacenamiento histórico y despliegue Docker en una sola máquina.</p>
+			<div class="t0-col-header">
+				<p class="t0-tag">Open source</p>
+			</div>
+			<div class="t0-col-body">
+				<div class="t0-col-top">
+					<h3>Edge</h3>
+					<p class="t0-col-tagline">La base UNS en una sola máquina. Completamente tuya.</p>
+					<p class="t0-col-for">Para evaluación técnica, PoC y equipos cómodos operando software open source por su cuenta.</p>
+				</div>
+				<div class="t0-plans">
+					<div class="t0-plan t0-plan--apache">
+						<span class="t0-plan-name">Apache-2.0</span>
+						<span class="t0-plan-price">gratis</span>
+						<p class="t0-plan-desc">Núcleo UNS, SourceFlows/EventFlows, almacenamiento histórico — despliegue Docker en una sola máquina.</p>
+					</div>
+					<a class="t0-col-cta" href="https://github.com/FREEZONEX/Tier0-Edge">Clonar en GitHub</a>
 				</div>
 			</div>
-			<a class="t0-col-cta" href="https://github.com/FREEZONEX/Tier0-Edge">Clonar en GitHub</a>
 		</div>
 		<div class="t0-col t0-col--accent">
-			<p class="t0-tag">SaaS gestionado</p>
-			<span class="t0-col-flag">La mayoría de los equipos empiezan aquí</span>
-			<h3>Cloud</h3>
-			<p class="t0-col-tagline">La plataforma completa, operada por nosotros.</p>
-			<p class="t0-col-for">Apps, notebooks y launchpad desde el primer día, sin infraestructura que operar.</p>
-			<div class="t0-plans">
-				<div class="t0-plan">
-					<span class="t0-plan-name">Builder</span>
-					<span class="t0-plan-price">$99/seat/mo</span>
-					<p class="t0-plan-desc">Solo generación de apps.</p>
+			<div class="t0-col-header">
+				<p class="t0-tag">SaaS gestionado</p>
+			</div>
+			<div class="t0-col-body">
+				<div class="t0-col-top">
+					<h3>Cloud <span class="t0-col-flag">La mayoría de los equipos empiezan aquí</span></h3>
+					<p class="t0-col-tagline">La plataforma completa, operada por nosotros.</p>
+					<p class="t0-col-for">Apps, notebooks y launchpad desde el primer día, sin infraestructura que operar.</p>
 				</div>
-				<div class="t0-plan t0-plan--rec">
-					<span class="t0-plan-name">Growth <span class="t0-pill">Recomendado</span></span>
-					<span class="t0-plan-price">$20,000/yr</span>
-					<p class="t0-plan-desc">Hasta 5 edges. Para una sola fábrica con pocas apps y necesidad de empezar rápido.</p>
-				</div>
-				<div class="t0-plan">
-					<span class="t0-plan-name">Scale</span>
-					<span class="t0-plan-price">$38,000/yr</span>
-					<p class="t0-plan-desc">Hasta 10 edges. Para usuarios con varias fábricas y muchas apps.</p>
+				<div class="t0-plans">
+					<div class="t0-plan">
+						<span class="t0-plan-name">Builder</span>
+						<span class="t0-plan-price">$199/seat/mo</span>
+						<p class="t0-plan-desc">Solo generación de apps.</p>
+					</div>
+					<div class="t0-plan t0-plan--growth">
+						<span class="t0-plan-name">Growth <span class="t0-plan-star" aria-hidden="true">★</span></span>
+						<span class="t0-plan-price">$20,000/yr</span>
+						<p class="t0-plan-desc">Hasta 5 edges. Para una sola fábrica con pocas apps y necesidad de empezar rápido.</p>
+					</div>
+					<div class="t0-plan t0-plan--scale">
+						<span class="t0-plan-name">Scale</span>
+						<span class="t0-plan-price">$38,000/yr</span>
+						<p class="t0-plan-desc">Hasta 10 edges. Para usuarios con varias fábricas y muchas apps.</p>
+					</div>
+					<a class="t0-col-cta" href="https://tier0.dev/login">Iniciar la prueba de 14 días</a>
 				</div>
 			</div>
-			<a class="t0-col-cta t0-cta-btn" href="https://tier0.app/cloud-trial">Iniciar la prueba de 14 días</a>
 		</div>
-		<div class="t0-col">
-			<p class="t0-tag">Despliegue privado</p>
-			<h3>Enterprise</h3>
-			<p class="t0-col-tagline">La plataforma completa, bajo tus condiciones.</p>
-			<p class="t0-col-for">Para soberanía de datos, escala, gobernanza y supervisión empresarial.</p>
-			<div class="t0-plans">
-				<div class="t0-plan">
-					<span class="t0-plan-name">Base</span>
-					<span class="t0-plan-price">$10,000/yr</span>
-					<p class="t0-plan-desc">Base de datos unificada. Un pequeño número de apps de propósito único.</p>
+		<div class="t0-col t0-col--dark">
+			<div class="t0-col-header">
+				<p class="t0-tag">Despliegue privado</p>
+			</div>
+			<div class="t0-col-body">
+				<div class="t0-col-top">
+					<h3>Enterprise</h3>
+					<p class="t0-col-tagline">La plataforma completa, bajo tus condiciones.</p>
+					<p class="t0-col-for">Para soberanía de datos, escala, gobernanza y supervisión empresarial.</p>
 				</div>
-				<div class="t0-plan">
-					<span class="t0-plan-name">Plus</span>
-					<span class="t0-plan-price">$20,000/yr</span>
-					<p class="t0-plan-desc">Instancia única. Integración de datos para una sola fábrica y apps para varios casos de uso.</p>
-				</div>
-				<div class="t0-plan t0-plan--rec">
-					<span class="t0-plan-name">Cluster <span class="t0-pill">Recomendado</span></span>
-					<span class="t0-plan-price">$39,900+/yr</span>
-					<p class="t0-plan-desc">Multiinstancia. Varias fábricas, muchas apps y gestión centralizada en nube privada.</p>
+				<div class="t0-plans">
+					<div class="t0-plan t0-plan--base">
+						<span class="t0-plan-name">Base</span>
+						<span class="t0-plan-price">$10,000/yr</span>
+						<p class="t0-plan-desc">Base de datos unificada. Un pequeño número de apps de propósito único.</p>
+					</div>
+					<div class="t0-plan t0-plan--plus">
+						<span class="t0-plan-name">Plus</span>
+						<span class="t0-plan-price">$20,000/yr</span>
+						<p class="t0-plan-desc">Instancia única. Integración de datos para una sola fábrica y apps para varios casos de uso.</p>
+					</div>
+					<div class="t0-plan t0-plan--cluster">
+						<span class="t0-plan-name">Cluster <span class="t0-plan-star" aria-hidden="true">★</span></span>
+						<span class="t0-plan-price">$39,900+/yr</span>
+						<p class="t0-plan-desc">Multiinstancia. Varias fábricas, muchas apps y gestión centralizada en nube privada.</p>
+					</div>
+					<a class="t0-col-cta" href="https://tier0.app/talk-to-team">Hablar con el equipo</a>
 				</div>
 			</div>
-			<a class="t0-col-cta" href="https://tier0.app/talk-to-team">Hablar con el equipo</a>
 		</div>
 	</div>
 </section>
 
-**Add-ons**: Se pueden agregar edge nodes y applications a los planes existentes según tus requisitos. Para más detalles, consulta [tier0.app/pricing](https://tier0.app/pricing).
+**Add-ons:** nodos edge adicionales $2,000 /edge/año · instancias adicionales $10,000 /instance/año. Los precios son orientativos — la fuente de verdad es [tier0.app/pricing](https://tier0.app/pricing).
 
 :::note[Explicación de términos especiales]
 En los planes Cloud, un edge es un nodo de conexión que se comunica con tu Tier0 en la nube. Puede ser un Edge Tier0, un gateway o una PC industrial.
@@ -117,32 +133,23 @@ Asegúrate de que tu entorno cumpla los siguientes requisitos de hardware antes 
 ¿Todavía no sabes qué opción elegir? Sigue la ruta para decidir.
 
 ```mermaid
-flowchart TD
-  start(("Inicio")) --> appOnly{"¿Solo necesitas<br/>generar apps?"}
-
-  subgraph cloud["Cloud"]
-    appOnly -- "Sí" --> builder["Builder<br/>$99 / seat / mo"]
-    appOnly -- "No" --> selfHost{"¿Necesitas<br/>despliegue privado?"}
-    selfHost -- "No" --> edgeCount{"¿Más de<br/>5 edges?"}
-    edgeCount -- "No" --> growth["Growth<br/>Hasta 5 edges"]
-    edgeCount -- "Sí" --> scale["Scale<br/>Hasta 10 edges"]
-  end
-
-  subgraph selfManaged["Autogestionado"]
-    selfHost -- "Sí" --> multiSite{"¿Varias fábricas<br/>o HA?"}
-    multiSite -- "No" --> basePlus["Enterprise<br/>Base / Plus"]
-    multiSite -- "Sí" --> cluster["Enterprise Cluster<br/>Multiinstancia"]
-  end
-
-  start -. "PoC open source<br/>o equipo interno fuerte" .-> edge["Edge<br/>Apache-2.0"]
-
-  classDef t0accent fill:#B2ED1D,stroke:#73B200,color:#171717
-  classDef t0muted fill:#2f3338,stroke:#5a626b,color:#f4f4f4
-  class builder,growth,cluster t0accent
-  class edge,scale,basePlus t0muted
+flowchart LR
+  q1{"¿Evaluación técnica<br/>o self-host?"} -- "sí" --> edge["Edge (open source)"]
+  q1 -- "no" --> q2{"¿On-prem /<br/>soberanía?"}
+  q2 -- "no" --> q3{"¿Más de 5 edges?"}
+  q2 -- "sí" --> q4{"¿Multi-fábrica / HA?"}
+  q3 -- "no" --> growth["Cloud Growth ★"]
+  q3 -- "sí" --> scale["Cloud Scale"]
+  q4 -- "sí" --> cluster["Enterprise Cluster ★"]
+  q4 -- "no" --> baseplus["Enterprise Base / Plus"]
+  class growth,cluster t0accent
 ```
+
+## ¿Qué es un “edge” (la unidad)?
+
+En los planes Cloud, un *edge* es un punto de conexión que recoge datos cerca de tus equipos — normalmente un gateway o PC industrial con flows de recolección — y publica en el namespace. Cuenta aproximadamente uno por sitio o segmento de red aislado. No confundir con la **edición Edge** (la distribución open source de arriba).
 
 ## Siguiente
 
-- [Crear apps sobre UNS](../../using-tier0/build-apps/) - Crea aplicaciones industriales con datos UNS.
-- [Instalación](../installation/) - La prueba Cloud de 14 días incluye la plataforma completa.
+- [Crear apps sobre UNS](../../using-tier0/build-apps/) — desplegar contenedores en Edge y Enterprise
+- [Instalación](../installation/) — la prueba Cloud de 14 días incluye la plataforma completa
