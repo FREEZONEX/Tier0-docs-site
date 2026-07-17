@@ -1,0 +1,146 @@
+---
+title: Operar Tier0 con Agents
+description: Qué puede hacer Tier0 Skill y cómo instalarlo.
+editions: [edge, cloud, enterprise]
+sidebar:
+  order: 6
+---
+
+import { Steps } from '@astrojs/starlight/components';
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+
+Tier0 proporciona un conjunto de skills y comandos CLI para que agents operen la plataforma.
+
+## Instalar Tier0 Skills
+
+> Required CLI version: `v0.4.6+`
+
+Elige el instalador que coincida con tu entorno.
+
+### Con Node.js
+
+Si Node.js 16 o posterior está disponible, usa `npx` para instalar el CLI y los skills.
+
+```bash
+npx @tier0/cli@latest
+```
+
+Esto ejecuta el instalador completo y hace dos cosas:
+
+- Instala el binario CLI `tier0` en `~/.tier0/bin/`.
+- Instala Cursor/Claude Agent Skills desde `FREEZONEX/Tier0-skill`.
+:::tip[Si falla el paso de registro de Agent Skills]
+Si falla el paso de registro de Agent Skills, no afecta la instalación del CLI. Ejecuta manualmente el instalador de skills:
+
+```bash
+npx skills add FREEZONEX/Tier0-skill
+```
+:::
+
+### Sin Node.js
+
+<Steps>
+1. Instala el binario CLI `tier0`.
+</Steps>
+
+<Tabs syncKey="tier0-cli-binary-install">
+  <TabItem label="curl">
+
+    ```bash
+    curl -fsSL https://raw.githubusercontent.com/FREEZONEX/Tier0-cli/main/install.sh | bash
+    ```
+
+  </TabItem>
+  <TabItem label="iwr">
+
+    ```powershell
+    iwr https://raw.githubusercontent.com/FREEZONEX/Tier0-cli/main/install.ps1 | iex
+    ```
+
+  </TabItem>
+</Tabs>
+
+<Steps>
+2. Instala Agent Skills.
+
+</Steps>
+
+```bash
+tier0 skills update
+```
+
+## Qué puede hacer Tier0 Skill
+
+Tier0 Skills da a agents una forma estructurada de elegir el comando CLI correcto, leer la referencia correspondiente y operar Tier0 mediante el CLI `tier0`.
+
+### Configurar la instancia operativa
+:::note
+Cloud usa `https://tier0.dev` por defecto y no necesita configuración de base URL.
+:::
+Los despliegues privados deben configurar la base URL antes del login. Una vez configurada, todos los comandos siguientes se ejecutarán sobre esa instancia.
+
+```bash
+tier0 config --base-url https://your-tier0.example.com
+```
+
+### Login
+
+<Tabs syncKey="tier0-login-method">
+  <TabItem label="Con API key">
+
+  <Steps>
+  1. Configura la API key para la instancia operativa.
+
+      ```bash
+      tier0 config --api-key <api-key>
+      ```
+  2. Verifica la identidad y permisos de la API key.
+      ```bash
+      tier0 auth whoami
+      ```
+  3. Realiza otras operaciones con el CLI `tier0`.
+  </Steps>
+
+  </TabItem>
+  <TabItem label="Sin API key">
+
+  <Steps>
+  1. Inicia el login en navegador.
+
+      ```bash
+      tier0 login --no-wait --json
+      ```
+  2. Completa la autenticación en el navegador accediendo al `verification_url` devuelto.
+  3. Consulta el resultado del login con el `setup_code` devuelto.
+      ```bash
+      tier0 login --setup-code <setup_code>
+      ```
+ </Steps>
+  </TabItem>
+</Tabs>
+
+:::caution[Importante]
+Ejecuta `config` para definir la instancia operativa antes de configurar una API key o iniciar el login en navegador; de lo contrario, el CLI puede operar sobre la instancia equivocada.
+:::
+
+## Desinstalar Tier0 Skills
+
+```bash
+# Elimina el CLI de Tier0 y conserva la configuración local.
+npx @tier0/cli@latest uninstall
+
+# Elimina el CLI de Tier0 y borra la configuración local, credenciales, skills y caché.
+npx @tier0/cli@latest uninstall --purge
+```
+
+## Referencia de Skill
+
+[Tier0 Skill Reference](../../reference/tier0-skill/) lista los targets de operación soportados, tareas comunes y comandos CLI correspondientes.
+
+:::tip[Haz que un agent lea el repo]
+Pide a tu agent que lea el [Tier0 Skill repo](https://github.com/FREEZONEX/Tier0-skill) antes de ejecutar comandos.
+:::
+
+## Siguiente
+
+- [Trabajar con datos UNS](../working-with-uns-data/) — Cómo operar sobre tu modelo UNS mediante MQTT y APIs.

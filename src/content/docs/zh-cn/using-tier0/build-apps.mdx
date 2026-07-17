@@ -1,0 +1,48 @@
+---
+title: 在 UNS 上构建应用
+description: 一个 container 就是一个 app；在 Tier0 Edge 和 Enterprise 上部署完整容器，并用 Event Flow 构建逻辑。
+editions: [cloud]
+sidebar:
+  order: 4
+---
+import { Steps } from '@astrojs/starlight/components';
+
+## 什么是 Tier0 App
+
+Tier0 应用具备以下特点：
+- 它是一个 **Docker Container**。
+- 它由你与 **App Builder** 的对话生成，零代码，无需编程。
+- 它使用 **UNS** 中已有的工业数据，并且可以将数据*回写*到 **UNS**。
+- 它可以使用 **Event Flow** 实现逻辑。
+
+## 如何部署 Tier0 App
+
+### 构建 Tier0 App
+<Steps>
+1. 登录 Tier0，进入 **App** > **Projects**，为应用创建一个 project。
+2. 在 project 中创建应用，随后会跳转到应用构建页面。
+3. 在对话框中写下应用需求。
+</Steps>
+:::tip[Prompt 中应包含什么]
+请确保在 prompt 中说明以下信息：
+- 使用 UNS 模型 *[uns_model]* 作为数据源，并使用 *[uns_model]* 作为回写目标。
+- （可选）创建 UNS 模型，并在 Source Flow 中创建 flows 来连接数据源。
+- 在 Event Flow 中创建 flows，用于触发异常报警/低健康分/其他事件。
+:::
+<Steps>
+4. 开始构建应用，并在预览时通过与 LLM 对话按需修改。
+5. 点击 **Deploy** 完成应用构建。
+</Steps>
+
+### 在 Tier0 Enterprise 上部署 App
+<Steps>
+1. 在 project 中找到该应用。
+2. 进入应用，点击 **Active** 版本的 **...** 图标，选择 **Download ZIP**。
+3. 登录 Tier0 Enterprise，进入 **Project**，为应用创建一个 project。
+4. 点击 **Import App** 并上传 ZIP 包。
+</Steps>
+
+## 下一步
+
+- [分析 UNS 数据](../analyze-data/) - 使用 Marimo Notebook 和 Python 分析 UNS 数据。
+- [最佳实践：连接工业协议](../../best-practice/protocol-connections/)

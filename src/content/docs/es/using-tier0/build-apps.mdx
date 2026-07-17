@@ -1,0 +1,48 @@
+---
+title: Crear apps sobre UNS
+description: Un container es una app; despliega containers completos en Tier0 Edge y Enterprise, y construye lógica con Event Flow.
+editions: [cloud]
+sidebar:
+  order: 4
+---
+import { Steps } from '@astrojs/starlight/components';
+
+## Qué es una app de Tier0
+
+Una aplicación Tier0 tiene las siguientes características:
+- Es un **Docker Container**.
+- Se genera a partir de la conversación que tienes con **App Builder**, sin código y sin necesidad de programación.
+- Se alimenta de datos industriales ya existentes en **UNS** y puede *escribir de vuelta* en **UNS**.
+- Puede usar **Event Flow** para implementar lógica.
+
+## Cómo desplegar una app de Tier0
+
+### Crear una app de Tier0
+<Steps>
+1. Inicia sesión en Tier0, ve a **App** > **Projects** y crea un project para la aplicación.
+2. Crea una aplicación dentro del project y serás redirigido a la página de construcción de la aplicación.
+3. Escribe los requisitos de la aplicación en el diálogo.
+</Steps>
+:::tip[Qué incluir en el prompt]
+Asegúrate de indicar la siguiente información en el prompt:
+- Usar el modelo UNS *[uns_model]* como fuente de datos y *[uns_model]* como destino de escritura de retorno.
+- (Opcional) Crear modelo UNS y flows en Source Flow para conectar fuentes de datos.
+- Crear flows en Event Flow para activar alarmas de anomalía/health scores bajos/otros eventos.
+:::
+<Steps>
+4. Comienza a construir la aplicación y cambia lo necesario hablando con el LLM durante la vista previa.
+5. Haz clic en **Deploy** para terminar la construcción de la aplicación.
+</Steps>
+
+### Desplegar app en Tier0 Enterprise
+<Steps>
+1. Encuentra la aplicación dentro de tu project.
+2. Accede a ella y haz clic en el icono **...** de la versión **Active** para **Download ZIP**.
+3. Inicia sesión en Tier0 Enterprise, ve a **Project** y crea un project para la aplicación.
+4. Haz clic en **Import App** y sube el paquete ZIP.
+</Steps>
+
+## Siguiente
+
+- [Analizar datos UNS](../analyze-data/) - Analiza datos UNS con Marimo Notebook y Python.
+- [Mejor práctica: conectar protocolos industriales](../../best-practice/protocol-connections/)

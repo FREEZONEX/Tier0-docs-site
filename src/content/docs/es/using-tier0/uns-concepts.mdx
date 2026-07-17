@@ -1,0 +1,114 @@
+---
+title: Conceptos de UNS en Tier0
+description: "El modelo Unified Namespace: Metric, State, Action y cómo UNS almacena datos."
+editions: [edge, cloud, enterprise]
+sidebar:
+  order: 1
+---
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+
+En Tier0, UNS (Unified Namespace) se organiza alrededor de tres partes: **Model**, **Broker** y **Storage**.
+
+- Los modelos se clasifican en tres tipos, **Metric**, **State** y **Action**, según los datos que se recopilan.
+- El broker recibe y envía datos a través de topics definidos por el modelo.
+- Los datos entrantes y salientes se almacenan en diferentes bases de datos según el tipo de modelo.
+    - **Action/State**: JSONB (PostgreSQL)
+    - **Metric**: Datos en tiempo real (TSDB)
+
+```text
+Data Source / Consumer
+        ^
+        | MQTT / HTTP API
+        v
+Unified Namespace
++-- Broker
+|   +-- Model
+|       +-- Metric  -> TSDB
+|       +-- State   -> JSONB
+|       +-- Action  -> JSONB
++-- Storage
+    +-- TSDB   stores high-frequency Metric data
+    +-- JSONB  stores State and Action payloads
+```
+## Model
+:::tip[¿Qué guía debo seguir al crear un modelo?]
+Elige el enfoque de modelado según lo que representan los datos.
+- **Physical Data**: Datos en tiempo real de máquinas físicas. Se organizan normalmente según el estándar **ISA-95** y dependen mucho de la jerarquía de ubicación.
+- **Business Data**: Datos relacionados con requisitos de producción, programas, tareas y despacho. Normalmente se organizan por **dominio de negocio y objeto**.
+:::
+### Metric, State, Action
+Los datos industriales cambian con distintas frecuencias y sirven para distintos propósitos, por eso Tier0 separa los modelos UNS en tres tipos fijos.
+
+| Tipo | Por qué | Ejemplo |
+|---|---|---|
+| `METRIC` | Diseñado para datos de alta frecuencia que se recopilan continuamente y necesitan almacenamiento de series temporales. | Temperatura/presión/voltaje de máquina |
+| `STATE` | Diseñado para datos que cambian con menor frecuencia y describen la condición o hecho actual de un objeto. | Estado operativo de una máquina |
+| `ACTION` | Diseñado para datos de comando de baja frecuencia que registran lo que debe ejecutar un sistema externo u operador. | Iniciar lote, detener máquina |
+
+### Path/Topic, Payload
+Cada modelo UNS contiene un path, un topic y un payload. Juntos forman una estructura de **árbol** que transporta contexto de negocio y datos industriales.
+- **Path/Topic**: El path representa la propiedad de los datos, y el topic transporta el payload del mensaje. Juntos definen la ***model address***.
+- **Payload**: El payload del mensaje que contiene el topic. Es JSON en formato **key-value** y define los ***model data***.
+
+Por ejemplo, un modelo en UNS se ve como el árbol siguiente:
+<Tabs>
+	<TabItem label="Physical Data">
+```text
+  Factory_A
+  └── Site_01
+      └── SMT_Line_1
+          └── Metric
+              └── Machine_001
+```
+- **Path**: `Factory_A/Site_01/SMT_Line_1/Metric`
+- **Topic**: `/Machine_001`.
+- **Payload**
+    ```json
+    "temperature": 85,
+    "vibration": 2.8,
+
+    ```
+</TabItem>
+<TabItem label="Business Data">
+```text
+  Factory_A
+  └── ERP
+      └── ProductionOrders
+          └── State
+              └── OrderList
+```
+- **Path**: `Factory_A/ERP/ProductionOrders/State`
+- **Topic**: `/OrderList`.
+- **Payload**
+    ```json
+    "orders": "0123569876",
+    "updated_at": 2026-7-13,
+    ```
+</TabItem>
+</Tabs>
+
+:::tip[Para crear un modelo]
+Consulta [Cómo crear un modelo de datos](../connect-data/#how-to-build-a-data-model).
+:::
+
+## Broker
+En Tier0, el broker es el componente de la plataforma que recibe y envía datos por MQTT u OpenAPI según los modelos de datos.
+- **Por MQTT**: El path completo de cada nodo en el árbol del modelo funciona como dirección del topic para pasar el payload del mensaje.
+- **Por Open API**: Ejecuta comandos CRUD sobre modelos de datos mediante solicitudes HTTP.
+:::tip[API Reference]
+Para detalles de API, consulta [API Reference](../../reference/tier0-openapi/).
+:::
+
+## Storage
+Tier0 usa PostgreSQL para almacenar datos. Los distintos tipos de datos cambian a distintas velocidades y tienen distintos requisitos de almacenamiento.
+
+| Tipo de dato | Almacenamiento | Descripción |
+|-----------|---------|-------------|
+| Metric | Time-series database | Optimizado para mediciones de alta frecuencia como temperatura y presión. Cada topic incluye campos predeterminados: `timestamp` y `quality`. |
+| State | PostgreSQL | Almacena estados de máquinas o sistemas en un formato flexible `JSONB`. |
+| Action | PostgreSQL | Almacena comandos o acciones en un formato flexible `JSONB`. |
+
+## Siguiente
+
+- [Conectar datos a UNS](../connect-data/) - Cómo modelar tu planta en UNS y conectar datos al modelo.
+- [Trabajar con datos UNS](../working-with-uns-data/) - Cómo operar sobre tu modelo UNS mediante MQTT y APIs.

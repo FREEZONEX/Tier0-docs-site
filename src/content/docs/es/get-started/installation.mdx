@@ -1,0 +1,141 @@
+---
+title: Instalación
+description: Instala Tier0 según la edición.
+sidebar:
+  order: 1
+---
+
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+import { Steps } from '@astrojs/starlight/components';
+
+Tier0 se ofrece en tres ediciones:
+- **Edge** - Despliegue open source, ejecutado localmente con Docker.
+- **Cloud** - SaaS gestionado, sin infraestructura que preparar.
+- **Enterprise** - Despliegue privado para entornos empresariales.
+
+Consulta [Elegir la mejor versión](../choosing-version/) para encontrar la edición que mejor se ajusta a tus requisitos.
+
+## Instalar Tier0
+
+<Tabs syncKey="edition">
+	<TabItem label="Cloud">
+
+		Solicita una cuenta de prueba antes de explorar Tier0 Cloud.
+		<Steps>
+		1. Registra tu cuenta en [Register Tier0](https://tier0.dev/signup).
+		2. Ingresa en la ventana emergente el código de verificación enviado a tu correo.
+		3. Serás redirigido a la página **Login**. Inicia sesión con la cuenta registrada.
+		4. Ingresa la información correspondiente y haz clic en **Continue**.
+		5. Selecciona **Create a New Workspace**.
+		6. Crea un workspace y comienza la prueba.
+	</Steps>
+	
+	</TabItem>
+	<TabItem label="Edge">
+
+	#### Requisitos
+	- CPU mínimo de 4 núcleos, 8 GB de RAM, 100 GB de disco
+	- Ubuntu 24.04 o Windows 10/11 con Docker y Git
+	#### Operaciones
+	<Steps>
+	1. Clona el repositorio Tier0-Edge desde GitHub y entra al proyecto.
+
+		```bash
+		git clone https://github.com/FREEZONEX/Tier0-Edge
+		cd Tier0-Edge/deploy
+		```
+
+	2. Configura en `.env.default` los parámetros de la tabla según tu entorno.
+	
+		```bash
+		vi .env.default
+		:wq!
+		```
+	3. Ejecuta el script de instalación.
+
+		```bash
+		bash bin/install.sh
+		```
+
+	</Steps>
+
+:::note[Parámetros que deben configurarse]
+
+| Campo | Tipo | Descripción |
+|------|------|-------------|
+| VOLUMES_PATH | string | Ruta de almacenamiento para los datos del proyecto |
+| ENTRANCE_DOMAIN/ENTRANCE_PORT | string | Endpoint de acceso a Tier0 (IP/dominio + puerto) |
+| OS_PLATFORM_TYPE | enum | Sistema operativo donde se instala Tier0. Puede ser **linux** o **windows** |
+| LANGUAGE | enum | zh-CN / en-US |
+
+:::
+		
+
+	</TabItem>
+	<TabItem label="Enterprise">
+#### Requisitos
+- Despliegue estándar
+	- Mínimo: 4 VM
+	- Línea base requerida por tipo de VM:
+		- App: 8C / 32G / 100G
+		- Database: 4C / 8G / 500G
+		- Witness: 2C / 4G / 40G
+- Despliegue de alta disponibilidad
+	- Mínimo: 6 VM
+	- Línea base requerida por tipo de VM:
+		- App (Swarm): 8C / 32G / 100G x 3
+		- Database: 4C / 8G / 500G x 2
+		- Witness: 2C / 4G / 40G
+
+:::tip[Los requisitos de hardware pueden variar]
+Los requisitos de hardware de Enterprise varían según el escenario de despliegue.
+:::
+
+:::note
+La información detallada del despliegue está disponible en el [Plan de despliegue de alta disponibilidad](../../reference/high-availability-deployment/).
+:::
+#### Operaciones
+<Steps>
+1. Obtén el paquete de tu proveedor y verifícalo.
+		```bash
+		sha256sum -c tier0-enterprise-offline-standard-YYYYmmddTHHMMSS.tar.gz.sha256
+		```
+2. Descomprime el paquete.
+		```bash
+		tar -xzf tier0-enterprise-offline-standard-YYYYmmddTHHMMSS.tar.gz
+		cd tier0-enterprise-offline-standard-YYYYmmddTHHMMSS
+		```
+3. Edita `install.env` según los detalles del despliegue y luego inicia el despliegue.
+		```bash
+		vi install.env
+		bash install.sh
+		```
+</Steps>
+
+#### Operaciones comunes de mantenimiento
+- Revisa el entorno de despliegue sin instalar Enterprise.
+		```bash
+		./install.sh --check-only
+		```
+- Limpia todos los nodos después de un despliegue fallido.
+		```bash
+		./full-cleanup.sh --env install.env --yes
+		```
+		> Este comando borra todos los datos de runtime de Tier0 y las copias de seguridad de la base de datos, pero conserva las VM, el sistema operativo y el software Docker instalado.
+- Después de la instalación se genera un reporte de despliegue.
+		```text
+		runtime/install-reports/<timestamp>/deployment-report.md
+		```
+		> No entregues el proyecto si el reporte contiene algún elemento **FAIL**. Contacta primero con soporte.
+#### Referencias de mantenimiento
+- [Lista estándar de puertos](../../reference/standard-port-list/)
+- [Guía de mantenimiento y resolución de problemas](../../reference/operations-runbook/)
+- [Instrucciones sobre límites de HA](../../reference/sla-and-ha-boundaries/)
+
+</TabItem>
+</Tabs>
+
+## Siguiente
+
+- [Probar Demo Factory](../demo-factory/) - Una planta precargada para explorar.
+- [Elegir la mejor versión](../choosing-version/)

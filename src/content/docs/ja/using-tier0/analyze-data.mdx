@@ -1,44 +1,44 @@
----
-title: Analyze UNS Data
-description: Query live namespace data in Tier0 Notebook and build interactive analyses and machine-learning apps. Available in Cloud and Enterprise.
+﻿---
+title: UNS データを分析
+description: "Tier0 Notebook でリアルタイム namespace データをクエリし、インタラクティブ分析と機械学習アプリを構築します。Cloud と Enterprise で利用できます。"
 editions: [cloud, enterprise]
 sidebar:
   order: 5
 ---
 import { Steps } from '@astrojs/starlight/components';
 
-Tier0 uses Marimo Notebook for advanced data analysis with **Python** scripts.
+Tier0 は Marimo Notebook を使用し、**Python** スクリプトで高度なデータ分析を行います。
 
-## Querying Data from UNS
-:::tip[Know Before you start]
-UNS data stored in the database is available as an existing data source in **Notebook**.
+## UNS からデータをクエリする
+:::tip[開始前に知っておくこと]
+データベースに保存された UNS データは、**Notebook** の既存データソースとして利用できます。
 :::
 <Steps>
-1. Create a notebook, click the **VARIABLES** on the left side inside it.
-2. Expand the **PostgreSQL** list, select a table under **tenant_id** > **uns**.
-3. Click the **+** icon next to the table to generate default and SQL statements cells automatically.
+1. notebook を作成し、内部左側の **VARIABLES** をクリックします。
+2. **PostgreSQL** リストを展開し、**tenant_id** > **uns** の下のテーブルを選択します。
+3. テーブル横の **+** アイコンをクリックし、デフォルト cell と SQL statement cell を自動生成します。
 
     ```sql
     SELECT * FROM "uns"."table_name" LIMIT 100
     ```
 
-4. Run all cells and get the query result.
+4. すべての cells を実行し、クエリ結果を取得します。
 </Steps>
 
-## Analyzing UNS Data
+## UNS データを分析する
 
-### Example Background
-- Data source is temperature, pressure, status and vibration of a compressor collected from a factory and sent to Tier0 UNS.
-- Isolation Forest is used to detect abnormal data points in the dataset.
-- Detection sensitivity can be adjusted, and the results are visualized accordingly in a dashboard.
+### サンプル背景
+- データソースは、工場から収集され Tier0 UNS に送信されたコンプレッサーの温度、圧力、状態、振動です。
+- Isolation Forest を使って、データセット内の異常データポイントを検出します。
+- 検出感度を調整でき、結果は dashboard に可視化されます。
 
-### Operations
+### 操作
 <Steps>
-1. Create a notebook and add the following cells in order.
+1. notebook を作成し、次の cells を順番に追加します。
 </Steps>
 
 <details className="notebook-cell">
-<summary>Cell 1: Import dependencies.</summary>
+<summary>Cell 1：依存関係をインポートします。</summary>
 
 ```python
 import marimo as mo
@@ -53,7 +53,7 @@ from sklearn.ensemble import IsolationForest
 </details>
 
 <details className="notebook-cell">
-<summary>Cell 2: Get data from UNS and clean it for analysis.</summary>
+<summary>Cell 2：UNS からデータを取得し、分析用に整形します。</summary>
 
 ```sql
 status_pd = status_data.to_pandas()
@@ -140,7 +140,7 @@ running_data
 </details>
 
 <details className="notebook-cell">
-<summary>Cell 3: Set the slider for anomaly detection threshold.</summary>
+<summary>Cell 3：異常検知しきい値の slider を設定します。</summary>
 
 ```python
 
@@ -169,7 +169,7 @@ A higher threshold applies stricter criteria and identifies more operating recor
 </details>
 
 <details className="notebook-cell">
-<summary>Cell 4: Use the <strong>Isolation Forest</strong> model to detect anomalies.</summary>
+<summary>Cell 4：<strong>Isolation Forest</strong> モデルで異常を検出します。</summary>
 
 ```python
 feature_names = [
@@ -232,7 +232,7 @@ ml_result
 </details>
 
 <details className="notebook-cell">
-<summary>Cell 5: Displays results on a dashboard.</summary>
+<summary>Cell 5：結果を dashboard に表示します。</summary>
 
 ```python
 # Calculate summary metrics
@@ -599,13 +599,13 @@ mo.vstack([
 </details>
 
 <Steps>
-2. Run all cells and view the results.
+2. すべての cells を実行し、結果を確認します。
 </Steps>
-:::tip[Different ways to view the results]
-Change the view style at the upper-right corner among **Vertical**, **Grid** and **Slides**.
+:::tip[結果を表示する別の方法]
+右上で **Vertical**、**Grid**、**Slides** の表示スタイルを切り替えられます。
 :::
 
-## Next
+## 次へ
 
-- [Build Apps on UNS](../build-apps/) — Build industrial applications with UNS data.
-- [UNS Concepts](../uns-concepts/) — Understand data modeling in Unified Namespace.
+- [UNS 上にアプリを構築](../build-apps/) — UNS データで産業アプリケーションを構築します。
+- [UNS の概念](../uns-concepts/) — Understand data modeling in Unified Namespace.

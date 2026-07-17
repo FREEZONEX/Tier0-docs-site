@@ -1,44 +1,44 @@
----
-title: Analyze UNS Data
-description: Query live namespace data in Tier0 Notebook and build interactive analyses and machine-learning apps. Available in Cloud and Enterprise.
+﻿---
+title: Analizar datos UNS
+description: "Consulta datos vivos del namespace en Tier0 Notebook y crea análisis interactivos y apps de machine learning. Disponible en Cloud y Enterprise."
 editions: [cloud, enterprise]
 sidebar:
   order: 5
 ---
 import { Steps } from '@astrojs/starlight/components';
 
-Tier0 uses Marimo Notebook for advanced data analysis with **Python** scripts.
+Tier0 usa Marimo Notebook para análisis avanzado de datos con scripts de **Python**.
 
-## Querying Data from UNS
-:::tip[Know Before you start]
-UNS data stored in the database is available as an existing data source in **Notebook**.
+## Consultar datos desde UNS
+:::tip[Antes de empezar]
+Los datos UNS almacenados en la base de datos están disponibles como una fuente de datos existente en **Notebook**.
 :::
 <Steps>
-1. Create a notebook, click the **VARIABLES** on the left side inside it.
-2. Expand the **PostgreSQL** list, select a table under **tenant_id** > **uns**.
-3. Click the **+** icon next to the table to generate default and SQL statements cells automatically.
+1. Crea un notebook y haz clic en **VARIABLES** en el lado izquierdo.
+2. Expande la lista **PostgreSQL** y selecciona una tabla bajo **tenant_id** > **uns**.
+3. Haz clic en el icono **+** junto a la tabla para generar automáticamente las celdas predeterminadas y SQL statements.
 
     ```sql
     SELECT * FROM "uns"."table_name" LIMIT 100
     ```
 
-4. Run all cells and get the query result.
+4. Ejecuta todas las cells y obtén el resultado de la consulta.
 </Steps>
 
-## Analyzing UNS Data
+## Analizar datos UNS
 
-### Example Background
-- Data source is temperature, pressure, status and vibration of a compressor collected from a factory and sent to Tier0 UNS.
-- Isolation Forest is used to detect abnormal data points in the dataset.
-- Detection sensitivity can be adjusted, and the results are visualized accordingly in a dashboard.
+### Contexto del ejemplo
+- La fuente de datos contiene temperatura, presión, estado y vibración de un compresor recopilados en una fábrica y enviados a Tier0 UNS.
+- Se usa Isolation Forest para detectar puntos de datos anómalos en el dataset.
+- La sensibilidad de detección puede ajustarse y los resultados se visualizan en un dashboard.
 
-### Operations
+### Operaciones
 <Steps>
-1. Create a notebook and add the following cells in order.
+1. Crea un notebook y agrega las siguientes cells en orden.
 </Steps>
 
 <details className="notebook-cell">
-<summary>Cell 1: Import dependencies.</summary>
+<summary>Cell 1: Importar dependencias.</summary>
 
 ```python
 import marimo as mo
@@ -53,7 +53,7 @@ from sklearn.ensemble import IsolationForest
 </details>
 
 <details className="notebook-cell">
-<summary>Cell 2: Get data from UNS and clean it for analysis.</summary>
+<summary>Cell 2: Obtener datos de UNS y limpiarlos para el análisis.</summary>
 
 ```sql
 status_pd = status_data.to_pandas()
@@ -140,7 +140,7 @@ running_data
 </details>
 
 <details className="notebook-cell">
-<summary>Cell 3: Set the slider for anomaly detection threshold.</summary>
+<summary>Cell 3: Configurar el slider del umbral de detección de anomalías.</summary>
 
 ```python
 
@@ -169,7 +169,7 @@ A higher threshold applies stricter criteria and identifies more operating recor
 </details>
 
 <details className="notebook-cell">
-<summary>Cell 4: Use the <strong>Isolation Forest</strong> model to detect anomalies.</summary>
+<summary>Cell 4: Usar el modelo <strong>Isolation Forest</strong> para detectar anomalías.</summary>
 
 ```python
 feature_names = [
@@ -232,7 +232,7 @@ ml_result
 </details>
 
 <details className="notebook-cell">
-<summary>Cell 5: Displays results on a dashboard.</summary>
+<summary>Cell 5: Mostrar resultados en un dashboard.</summary>
 
 ```python
 # Calculate summary metrics
@@ -599,13 +599,13 @@ mo.vstack([
 </details>
 
 <Steps>
-2. Run all cells and view the results.
+2. Ejecuta todas las cells y revisa los resultados.
 </Steps>
-:::tip[Different ways to view the results]
-Change the view style at the upper-right corner among **Vertical**, **Grid** and **Slides**.
+:::tip[Diferentes formas de ver los resultados]
+Cambia el estilo de vista en la esquina superior derecha entre **Vertical**, **Grid** y **Slides**.
 :::
 
-## Next
+## Siguiente
 
-- [Build Apps on UNS](../build-apps/) — Build industrial applications with UNS data.
-- [UNS Concepts](../uns-concepts/) — Understand data modeling in Unified Namespace.
+- [Crear apps sobre UNS](../build-apps/) — Crea aplicaciones industriales con datos UNS.
+- [Conceptos de UNS](../uns-concepts/) — Understand data modeling in Unified Namespace.
