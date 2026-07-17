@@ -17,20 +17,20 @@ Before modeling data, answer the following questions.
 :::
 
 
-### Asset Data
+### Physical Data
 
-Industrial data from machines and equipment, assets that have physical locations, is modeled based on the ISA-95 standard.
+Industrial data from machines and equipment with physical locations is modeled based on the ISA-95 standard.
 
 #### ISA-95 Equipment Hierarchy
-The ISA-95 Equipment Hierarchy outlines how physical assets and control systems are structured within an organization. This structure ensures that each level interacts appropriately with higher and lower levels, creating a clear operational flow from the enterprise systems down to individual machines.  
-The ISA-95 equipment hierarchy is broken into the following levels:  
+The ISA-95 Equipment Hierarchy outlines how physical assets and control systems are structured within an organization.
+It is broken into the following levels:
 - **Enterprise**: The top level, representing the entire organization. This includes overall business processes and decision-making entities, typically supported by ERP systems.  
 - **Site**: Represents a specific geographic location or facility. Each site can have its own management systems and local production control. 
 - **Area**: An operational division within a site, often a functional area such as packaging, assembly, or warehousing. 
 - **Process Cell**: The basic unit of manufacturing within an area. It encompasses all the equipment required to produce a specific product or perform a specific function. 
 - **Unit**: A distinct part of the process cell, responsible for a specific function such as mixing, heating, or assembling. 
 - **Equipment Module**: A modular piece of equipment that performs a specific task within a unit. For example, in a mixing unit, the module could be a heating element.  
-- **Control Module**: The lowest level representing individual devices or controllers such as sensors, pumps, actuators or PID control loops that handle direct control of physical processes.
+- **Control Module**: The lowest level, representing individual devices or controllers such as sensors, pumps, actuators, or PID control loops that handle direct control of physical processes.
 
 #### Demo Model
 <Tabs syncKey="demo-uns-model">
@@ -377,13 +377,13 @@ DemoFactory
 
 ### Business Data
 
-For data related business plan and process objects, such as production orders and order plan in an ERP, model it according to business context.
+For business planning and process objects, such as production orders and work order plans in an ERP, model data according to its business context.
 :::tip[How to recognize business data]
-Data from something that does not have physical locations.
+Data that does not have a physical location.
 :::
 #### Business Data Modeling Guide
 ```
-Factory / Business Domain / Business Object / topic Type / Topic
+Factory / Business Domain / Business Object / Topic Type / Topic
 ```
 - **Business Domain**: Confirm the business process or system the data belongs to.
     ```
@@ -400,7 +400,7 @@ Factory / Business Domain / Business Object / topic Type / Topic
     Logistics
     ...
     ```
-- **Business Object**: Managed core object in the business domain.
+- **Business Object**: The core managed object in the business domain.
     ```
     ProductionOrders
     WorkOrderPlan
@@ -411,7 +411,7 @@ Factory / Business Domain / Business Object / topic Type / Topic
     Shipments
     ...
     ```
-- **Topic Type**: Decide the data type among Metric, Action and State.
+- **Topic Type**: Choose the data type from **Metric**, **Action**, and **State**.
 
     | Topic Type | Used for | Examples |
     | --- | --- | --- |

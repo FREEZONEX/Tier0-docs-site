@@ -1,45 +1,115 @@
 ---
 title: UNS Concepts in Tier0
-description: The Unified Namespace model — Metric, State, Action, and how the UNS stores data.
+description: "The Unified Namespace model: Metric, State, Action, and how the UNS stores data."
 editions: [edge, cloud, enterprise]
 sidebar:
   order: 1
 ---
+import { Tabs, TabItem } from '@astrojs/starlight/components';
 
-Data collected to Tier0 UNS is categorized into 3 types: **Metric**, **State**, and **Action**.
-Different types correspond to different storage methods.
+In Tier0, the UNS (Unified Namespace) is organized around three parts: **Model**, **Broker**, and **Storage**.
 
-## Metric, State, Action
+- Models are categorized into three types, **Metric**, **State**, and **Action**, based on the data being collected.
+- The broker receives and sends data through model-defined topics.
+- Incoming and outgoing data is stored in different databases based on model type.
+    - **Action/State**: JSONB (PostgreSQL)
+    - **Metric**: Real-time data (TSDB)
 
-| Topic type | Carries | Example |
-|---|---|---|
-| `METRIC` | Real-time data | Machine temperature/pressure/voltage |
-| `STATE` | Status data | Machine operational status |
-| `ACTION` | Commands or events | Start batch, stop machine |
-
-
-```mermaid
-flowchart TD
-  plant["Plant/"] --> line1["Line1/"]
-  line1 --> metric["Metric/"]
-  line1 --> state["State/"]
-  line1 --> action["Action/"]
-  metric --> temp(["Temperature"])
-  state --> status(["MachineStatus"])
-  action --> start(["StartBatch"])
-  classDef t0accent fill:#B2ED1D,stroke:#73B200,color:#171717
-  class temp,status,start t0accent
+```text
+Data Source / Consumer
+        ^
+        | MQTT / HTTP API
+        v
+Unified Namespace
++-- Broker
+|   +-- Model
+|       +-- Metric  -> TSDB
+|       +-- State   -> JSONB
+|       +-- Action  -> JSONB
++-- Storage
+    +-- TSDB   stores high-frequency Metric data
+    +-- JSONB  stores State and Action payloads
 ```
+## Model
+:::tip[Which guide should I follow when building a model?]
+Choose the modeling approach based on what the data represents.
+- **Physical Data**: Real-time data from physical machines. It is organized based on the **ISA-95** standard and relies heavily on location hierarchy.
+- **Business Data**: Data related to production requirements, schedules, tasks, and dispatching. It is usually organized by **business domain and object**.
+:::
+### Metric, State, Action
+Industrial data changes at different frequencies and serves different purposes, so Tier0 separates UNS models into three fixed types.
 
-## How the UNS stores data
+| Type | Why | Example |
+|---|---|---|
+| `METRIC` | Designed for high-frequency data that is collected continuously and needs time-series storage. | Machine temperature/pressure/voltage |
+| `STATE` | Designed for data that changes less often and describes the current condition or fact of an object. | Machine operational status |
+| `ACTION` | Designed for lower-frequency command data that records what an external system or operator should execute. | Start batch, stop machine |
+
+
+### Path/Topic, Payload
+Each UNS model contains a path, topic, and payload. Together, they form a **tree** structure that carries business context and transports industrial data.
+- **Path/Topic**: The path represents data ownership, and the topic carries the message payload. Together, they define the ***model address***.
+- **Payload**: The message payload held by the topic. It is JSON in a **key-value** format and defines the ***model data***.
+
+For example, a model in UNS looks like the tree displayed below:
+<Tabs>
+	<TabItem label="Physical Data">
+```
+  Factory_A
+  └── Site_01
+      └── SMT_Line_1
+          └── Metric
+              └── Machine_001
+```
+- **Path**: `Factory_A/Site_01/SMT_Line_1/Metric`
+- **Topic**: `/Machine_001`.
+- **Payload**
+    ```json
+    "temperature": 85,
+    "vibration": 2.8,
+
+    ```
+</TabItem>
+<TabItem label="Business Data">
+```
+  Factory_A
+  └── ERP
+      └── ProductionOrders
+          └── State
+              └── OrderList
+```
+- **Path**: `Factory_A/ERP/ProductionOrders/State`
+- **Topic**: `/OrderList`.
+- **Payload**
+    ```json
+    "orders": "0123569876",
+    "updated_at": 2026-7-13,
+    ```
+</TabItem>
+</Tabs>
+
+:::tip[To build a model]
+See [How to Build a Data Model](../connect-data/#how-to-build-a-data-model).
+:::
+
+## Broker
+In Tier0, the broker is the platform component that receives and sends data through MQTT or OpenAPI based on data models.
+- **By MQTT**: The complete path of each node in the model tree works as the topic address to pass the message payload.
+- **By Open API**: Perform CRUD commands on data models through HTTP requests.
+:::tip[API Reference]
+For API details, see [API Reference](../../reference/tier0-openapi/).
+:::
+
+## Storage
+Tier0 uses PostgreSQL to store data. Different data types change at different rates and have different storage requirements.
 
 | Data Type | Storage | Description |
 |-----------|---------|-------------|
 | Metric | Time-series database | Optimized for high-frequency measurements such as temperature and pressure. Each topic includes default fields: `timestamp` and `quality`. |
-| State | PostgreSQL (JSONB) | Stores machine or system states in a flexible JSON format. |
-| Action | PostgreSQL (JSONB) | Stores commands or actions in a flexible JSON format. |
+| State | PostgreSQL | Stores machine or system states in a flexible `JSONB` format. |
+| Action | PostgreSQL | Stores commands or actions in a flexible `JSONB` format. |
 
 ## Next
 
-- [Connect Data to UNS](/using-tier0/connect-data/) — How to model your plant to UNS and connect data to the model.
-- [Working with UNS Data](/using-tier0/working-with-uns-data/) — How to operate on your UNS model through MQTT and APIs.
+- [Connect Data to UNS](../connect-data/) - How to model your plant to UNS and connect data to the model.
+- [Working with UNS Data](../working-with-uns-data/) - How to operate on your UNS model through MQTT and APIs.

@@ -10,11 +10,39 @@ sidebar:
 import { Steps } from '@astrojs/starlight/components';
 
 The quickest way to *get* Tier0 is to poke at a factory that already works.
+## Factory Business
+The factory in Tier0 gets orders from ERP, splits the order, schedules production based on the orders, sends out the schedule and gets production progress data as it goes.
 
-Your **Cloud trial workspace** (14 days) comes with a preloaded plant: 
-A live namespace, flows feeding it with industrial data, notebooks, and applications working on top of the UNS data foundation.
+## Getting to Know the Business Process
+<Steps>
+1. In Tier0, go to **UNS**, check the details of orders came from ERP.
+    - `DemoFactory/ERP/ProductionOrders/State/UpsertProductionOrder`: Orders.
+    - `DemoFactory/ERP/ProductionOrders/State/OrderList`: Current order list snapshot.
+    :::tip[How these data is collected to UNS?]
+    Go to **Flows** > **Source Flow** > **DemoFactory-Flow** to check the data collection process.
+    :::
+2. (optional) Go to **Launchpad**, access the **Work Order Management** application, and create orders on the **Production Orders** page.
+3. In **Work Order Management**, split orders and schedule production plans for the split workorders on the **Plans** page.
+4. Send the plan to production, and check the plan details on the following topics on **UNS**.
+    - `DemoFactory/ERP/WorkOrderPlan/Metric/SplitCount`: The number of workorders after splitting.
+    - `DemoFactory/ERP/WorkOrderPlan/State/PlanStatus`: Current plan status.
+    - `DemoFactory/ERP/WorkOrderPlan/State/WorkOrderList`: The workorder list after production plan scheduled.
 
+    :::note
+    The application directly sends the plans and workorders to **UNS**.
+    :::
+5. Check the production progress data on the **Plan Details** page in the application.
+    :::tip[Where do the details come from?]
+    The production progress data is collected from **DemoFactory-Flow** in **Source Flow** and published to **UNS**, and displayed on **Plan Details** page.
+    - `DemoFactory/Site_01/Production/Line_01/WorkOrderExecution/State/CurrentWorkOrder`: The order in process.
+    - `DemoFactory/Site_01/Production/Line_01/WorkOrderExecution/State/WorkOrderStatus`: The execution status of the current order.
+    - `DemoFactory/Site_01/Production/Line_01/WorkOrderExecution/Metric/Target_Qty`: The target production amount of the current order.
+    - `DemoFactory/Site_01/Production/Line_01/WorkOrderExecution/Metric/Produced_Qty`: The amount of products already done of the current order.
+    - `DemoFactory/Site_01/Production/Line_01/WorkOrderExecution/Metric/Defect_Qty`: The amount of defects of the current order.
+    - `DemoFactory/Site_01/Production/Line_01/WorkOrderExecution/Metric/Completion_Rate`: The completion rate of the current order.
+    :::
+</Steps>
 ## Next
 
-- [Choosing the Best Version](/get-started/choosing-version/)
-- [UNS Concepts](/using-tier0/uns-concepts/) — Understand what you just browsed.
+- [Choosing the Best Version](../choosing-version/)
+- [UNS Concepts](../../using-tier0/uns-concepts/) — Understand what you just browsed.

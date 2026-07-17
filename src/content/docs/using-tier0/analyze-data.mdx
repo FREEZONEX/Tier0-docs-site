@@ -7,43 +7,34 @@ sidebar:
 ---
 import { Steps } from '@astrojs/starlight/components';
 
-Tier0 adopts Marimo Notebook for advanced data analysis with Python.
-
-## Creating Notebooks
-<Steps>
-1. Log in to Tier0, and select **Notebook**.
-2. Hover over the **+**, click **New Notebook**.
-3. Enter the notebook **Name** and click **Create**.
-4. Click and enter the created notebook to start editing.
-</Steps>
+Tier0 uses Marimo Notebook for advanced data analysis with **Python** scripts.
 
 ## Querying Data from UNS
 :::tip[Know Before you start]
-Data stored in database from UNS acts as an existing data source in **Notebook**.
+UNS data stored in the database is available as an existing data source in **Notebook**.
 :::
 <Steps>
-1. Inside the notebook, click the **VARIABLES** on the left side.
+1. Create a notebook, click the **VARIABLES** on the left side inside it.
 2. Expand the **PostgreSQL** list, select a table under **tenant_id** > **uns**.
-3. Hover over the table, and click the **+** icon next to the table name to generate SQL statements cell automatically.
+3. Click the **+** icon next to the table to generate default and SQL statements cells automatically.
 
     ```sql
     SELECT * FROM "uns"."table_name" LIMIT 100
     ```
 
-4. Click the **Run** icon at the lower-right corner to run all cells and get the query result.
+4. Run all cells and get the query result.
 </Steps>
 
 ## Analyzing UNS Data
 
 ### Example Background
 - Data source is temperature, pressure, status and vibration of a compressor collected from a factory and sent to Tier0 UNS.
-- Isolation Forest is used to recognize abnormal data points in the dataset.
+- Isolation Forest is used to detect abnormal data points in the dataset.
 - Detection sensitivity can be adjusted, and the results are visualized accordingly in a dashboard.
 
 ### Operations
 <Steps>
-1. Create a notebook and access it.
-2. Add the following cells in order.
+1. Create a notebook and add the following cells in order.
 </Steps>
 
 <details className="notebook-cell">
@@ -62,7 +53,7 @@ from sklearn.ensemble import IsolationForest
 </details>
 
 <details className="notebook-cell">
-<summary>Cell 2: Get data from UNS, clean it to get the analysis dataset.</summary>
+<summary>Cell 2: Get data from UNS and clean it for analysis.</summary>
 
 ```sql
 status_pd = status_data.to_pandas()
@@ -608,7 +599,7 @@ mo.vstack([
 </details>
 
 <Steps>
-3. Click **Run all stale cells** at the lower-right corner to run all cells and view the results.
+2. Run all cells and view the results.
 </Steps>
 :::tip[Different ways to view the results]
 Change the view style at the upper-right corner among **Vertical**, **Grid** and **Slides**.
@@ -616,5 +607,5 @@ Change the view style at the upper-right corner among **Vertical**, **Grid** and
 
 ## Next
 
-- [Build Apps on UNS](/using-tier0/build-apps/) — Build industrial applications with UNS data.
-- [UNS Concepts](/using-tier0/uns-concepts/) — Understand the data model you just analyzed.
+- [Build Apps on UNS](../build-apps/) — Build industrial applications with UNS data.
+- [UNS Concepts](../uns-concepts/) — Understand the data model you just analyzed.

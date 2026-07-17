@@ -19,7 +19,7 @@ Choose the installer that matches your environment.
 
 ### With Node.js
 
-Use `npx` when Node.js >= 16 is available to install.
+If Node.js 16 or later is available, use `npx` to install the CLI and skills.
 
 ```bash
 npx @tier0/cli@latest
@@ -73,11 +73,11 @@ tier0 skills update
 
 ## What the Tier0 Skill Can Do
 
-The Tier0 Skill gives agents a structured way to choose the right CLI command, read the matching reference, and operate Tier0 through the `tier0` CLI.
+The Tier0 Skills give agents a structured way to choose the right CLI command, read the matching reference, and operate Tier0 through the `tier0` CLI.
 
 ### Setting Operating Instance
 :::note
-SaaS uses `https://tier0.dev` by default and needs no base URL configuration.
+Cloud uses `https://tier0.dev` by default and needs no base URL configuration.
 :::
 Private deployments must configure the base URL before login. Once it's configured, all the following commands will be executed on that instance.
 
@@ -138,33 +138,13 @@ npx @tier0/cli@latest uninstall --purge
 
 ## Skill Reference
 
-| Target | Task | Commands |
-| --- | --- | --- |
-| Basic operations | Check CLI and service health | `tier0 doctor` |
-| Basic operations | Check service connectivity and gateway info | `tier0 api /openapi/v1/info --body '{}' --json` |
-| Basic operations | Upgrade CLI and skills | `tier0 upgrade` and `tier0 skills update` |
-| UNS | Browse paths | `tier0 uns browse --path /` or `tier0 uns browse --path Plant/Line1 --json` |
-| UNS | Search for topics by keywords | `tier0 uns search --keyword temp --json` or `tier0 uns search --path-prefix Plant/Line1 --size 50 --json` |
-| UNS | Read current values | `tier0 uns read Plant/Line1/Metric/Temperature --json` or `tier0 uns read --topic 'Plant/+/Metric/Temperature' --json` |
-| UNS | Write values | `tier0 uns write --topic Plant/Line1/Metric/Temperature --value '{"temperature":27.5}'` |
-| UNS | Query history | `tier0 uns history -t Plant/Line1/Metric/Temperature --start -1h --json` |
-| UNS | Create paths or topics | `tier0 uns create --topic Plant/Line1 --type path` or `tier0 uns create --file namespace.json --json` |
-| UNS | Update metadata or fields | `tier0 uns update --path Plant/Line1/Metric/Temperature --description "Line 1 temperature" --update-mask description` |
-| UNS | Delete or restore nodes | `tier0 uns delete --path Plant/Line1/Metric/Temperature --yes` or `tier0 uns restore --path Plant/Line1/Metric/Temperature --yes` |
-| Node-RED Flow | List or inspect Flows | `tier0 flow list`, `tier0 flow list --source --json`, or `tier0 flow get --id 1 --json` |
-| Node-RED Flow | Create Source Flow or Event Flow | `tier0 flow create --name "modbus-collector" --source --desc "Modbus TCP collector"` or `tier0 flow create --name "alert-handler" --event --desc "Temperature alarm processor"` |
-| Node-RED Flow | Update Flow metadata | `tier0 flow update --id 1 --name "line1-collector"` or `tier0 flow update --id 1 --favorite` |
-| Node-RED Flow | Export canvas JSON | `tier0 flow data --id 1 --out flows.json` |
-| Node-RED Flow | Deploy canvas JSON | `tier0 flow deploy --id 1 -f flows.json --yes` |
-| Node-RED Flow | Delete Flows | `tier0 flow delete --id 1 --yes` |
-| Node-RED Flow | Check available node types | `tier0 flow nodes --source --json` or `tier0 flow nodes --event --json` |
+[Tier0 Skill Reference](../../reference/tier0-skill/) lists the supported operation targets, common tasks, and matching CLI commands.
 
-
-:::tip[Let an agent read the repo first]
-For complex UNS or Flow work, ask your agent to read the [Tier0 Skill repo](https://github.com/FREEZONEX/Tier0-skill) before running commands. The repo includes task-specific rules, examples, and safety notes for operations such as batch UNS writes and Node-RED Flow deploys.
+:::tip[Let an agent read the repo]
+Ask your agent to read the [Tier0 Skill repo](https://github.com/FREEZONEX/Tier0-skill) before running commands.
 :::
 
 ## Next
 
-- [Working with UNS Data](/using-tier0/working-with-uns-data/) — How to operate on your UNS model through MQTT and APIs.
+- [Working with UNS Data](../working-with-uns-data/) — How to operate on your UNS model through MQTT and APIs.
 

@@ -137,6 +137,36 @@ export default defineConfig({
 						},
 					],
 				},
+				{
+					label: 'Reference',
+					collapsed: false,
+					items: [
+						{
+							label: 'API Reference',
+							slug: 'reference/api-reference',
+						},
+						{
+							label: 'Skill Reference',
+							slug: 'reference/skill-reference',
+						},
+						{
+							label: 'High Availability Deployment Plan',
+							slug: 'reference/high-availability-deployment',
+						},
+						{
+							label: 'SLA and High Availability Boundaries',
+							slug: 'reference/sla-and-ha-boundaries',
+						},
+						{
+							label: 'Standard Port List',
+							slug: 'reference/standard-port-list',
+						},
+						{
+							label: 'Operations Runbook',
+							slug: 'reference/operations-runbook',
+						},
+					],
+				},
 			],
 			plugins: [
 				starlightLlmsTxt({

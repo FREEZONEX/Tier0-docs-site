@@ -8,17 +8,16 @@ sidebar:
 ---
 import { Steps } from '@astrojs/starlight/components';
 
-This section takes common data types, inclulding OPC UA, Modbus and API as examples to demonstrate the process of connecting data sources to **UNS** through **Node-RED**.
+This section takes common data types, inclulding OPC UA, Modbus and API as examples to demonstrate the process of connecting data sources to **UNS** through **Source Flow**.
 
 ## OPC UA
 
 ### Configuring Data Flow
 
 <Steps>
-1. Log in to Tier0, go to **Flow**.
-2. Click **New Flow** at the upper-right corner, enter a name, select **Flow Type** as **Source Flow** and click **Save**.
-3. Access the flow, drag **inject**, **OPC UA Client** and **mqtt out** nodes from the left list to the canvas.
-4. Connect them by order and double-click each node to configure the details.
+1. Log in to Tier0, go to **Flow** and create a new **Source Flow**.
+2. Add **inject**, **OPC UA Client** and **mqtt out** nodes in the flow.
+3. Connect them by order and double-click each node to configure the details.
 </Steps>
 - **inject**
     <Steps>
@@ -31,22 +30,20 @@ This section takes common data types, inclulding OPC UA, Modbus and API as examp
           "msg.topic": "multiple"
         }
         ```
-    3. Click **Done**
     </Steps>
 - **OPC UA Client**
-    <Steps>
-    1. Enter the **Endpoint** with the address and port of the OPC UA server.
-    2. Set the **Action** to be **SUBSCRIBE**.
-    3. Set the **Interval** of collecting the data, and click **Done**.
-    </Steps>
+    ```json
+    "Endpoint": "<OPC UA server address and port>", //e.g. opc.tcp://127.0.0.1:4850
+    "Action": "SUBSCRIBE",
+    "Interval": "<data collecting interval>" //e.g. 10 seconds
+    ```
 - **mqtt out**
-    <Steps>
-    1. Expand the **Server** drop-down list and select **emqx:1883**.
-    2. Copy the **topic** path from **UNS**.
-    3. Click **Done**.
-    </Steps>
+    ```json
+    "Server": "<embedded UNS broker>", //same name as the flow
+    "Topic": "<UNS model>",
+    ```
 <Steps>
-5. Click **Deploy** at the upper-right corner, and trigger the flow by clicking the **inject** node switch.
+4. Deploy and trigger the flow.
 </Steps>
 
 ### Flow Reference
@@ -206,29 +203,26 @@ This section takes common data types, inclulding OPC UA, Modbus and API as examp
 ## Modbus
 ### Configuring Data Flow
 <Steps>
-1. In the flow, drag a **modbus-read** node from the left list to the canvas.
-2. Double-click the node, and configure the required information.
+1. In the flow, add **modbus-read** and **mqtt out** nodes.
+2. Double-click the nodes, and configure the required information.
+    - **modbus-read**
+        - **Settings**
+          - **FC**: Function code that specifies the Modbus action, e.g., FC 3 = Read Holding Registers.
+          - **Address**: The starting register address to read from (usually zero-based).
+          - **Quantity**:  The number of consecutive registers to read.
+          - **Poll Rate**: How often the node polls the Modbus device (e.g., every 10 seconds).
+          - **Server**: Reference to a configured Modbus server (IP, port, protocol, etc.).
+        - **Server**
+          - **Host**: Modbus server IP.
+          - **Port**: Modbus server port.
+    - **mqtt out**
+        ```json
+        "Server": "<embedded UNS broker>", //same name as the flow
+        "Topic": "<UNS model>",
+        ```
+3. Deploy and trigger the flow.
 </Steps>
-  - **Settings**
-    - **FC**: Function code that specifies the Modbus action, e.g., FC 3 = Read Holding Registers.
-    - **Address**: The starting register address to read from (usually zero-based).
-    - **Quantity**:  The number of consecutive registers to read.
-    - **Poll Rate**: How often the node polls the Modbus device (e.g., every 10 seconds).
-    - **Server**: Reference to a configured Modbus server (IP, port, protocol, etc.).
-  - **Server**
-    - **Host**: Modbus server IP.
-    - **Port**: Modbus server port.
-<Steps>
-3. Click **Done** to finish node configuration, and drag in an **mqtt out** node to the canvas.
-4. Double-click **mqtt out**, expand the **Server** drop-down list and select **emqx:1883**.
-5. Copy the **topic** path from **UNS**, click **Done** and click **Deploy** at the upper-right corner.
-6. Click the switch of the **modbus read** node to trigger the flow, and go back to **UNS** to check the result.
-</Steps>
-:::tip[Other things you might want to know]
-- You can drag a **function** node to clean the data as needed before publishing to **UNS**.
-- A **debug** node can be used to check the data on the spot.
-- Details about the nodes, please refer to [Node-RED flows](https://flows.nodered.org/).
-:::
+
 ### Flow Reference
 
 <details>
@@ -391,26 +385,23 @@ This section takes common data types, inclulding OPC UA, Modbus and API as examp
 ## API
 ### Configuring Data Flow
 <Steps>
-1. In the flow, drag a **modbus-read** node from the left list to the canvas.
-2. Double-click the node, and configure the required information.
+1. In the flow, add **inject**, **http request** and **mqtt out** nodes.
+2. Double-click the nodes, and configure the required information.
+    - **http request**
+        ```json
+        "Method": "<API method>",
+        "URL": "<API URL>",
+        "Return": "a parsed JSON object",
+        "Headers": "<API headers>"
+        ```
+    - **mqtt out**
+        ```json
+        "Server": "<embedded UNS broker>", //same name as the flow
+        "Topic": "<UNS model>",
+        ```
+3. Deploy and trigger the flow.
 </Steps>
-  - **Settings**
-    - **FC**: Function code that specifies the Modbus action, e.g., FC 3 = Read Holding Registers.
-    - **Address**: The starting register address to read from (usually zero-based).
-    - **Quantity**:  The number of consecutive registers to read.
-    - **Poll Rate**: How often the node polls the Modbus device (e.g., every 10 seconds).
-    - **Server**: Reference to a configured Modbus server (IP, port, protocol, etc.).
-  - **Server**
-    - **Host**: Modbus server IP.
-    - **Port**: Modbus server port.
-<Steps>
-3. Click **Deploy** at the upper-right corner, and trigger the flow by clicking the **inject** node switch.
-</Steps>
-:::tip[Other things you might want to know]
-- You can drag a **function** node to clean the data as needed before publishing to **UNS**.
-- A **debug** node can be used to check the data on the spot.
-- Details about the nodes, please refer to [Node-RED flows](https://flows.nodered.org/).
-:::
+
 ### Flow Reference
 <details>
 <summary>Show API flow JSON</summary>
@@ -513,3 +504,9 @@ This section takes common data types, inclulding OPC UA, Modbus and API as examp
 ```
 
 </details>
+
+:::tip[Other things you might want to know]
+- You can drag a **function** node to clean the data as needed before publishing to **UNS**.
+- A **debug** node can be used to check the data on the spot.
+- For node details, see [Node-RED flows](https://flows.nodered.org/).
+:::

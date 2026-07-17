@@ -11,6 +11,12 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
+.astro-dev-*.log
+.dev-*.log
+.preview-out.log
+
+# temporary PDF export build
+dist-pdf-build/
 
 
 # environment variables
