@@ -13,18 +13,18 @@ This plan deploys one Tier0 Enterprise environment in an offline or private depl
 - 2 database nodes: form the `PostgreSQL + TimescaleDB` primary-standby cluster.
 - 1 `Witness` node: participates in database monitoring, arbitration, and failover.
 
-:::note Optional
+:::note[Optional]
 - An external `NFS/NAS` shared storage can be added and mounted by the three Swarm nodes. It is used for Tier0 Enterprise shared files across nodes.
 - This shared storage is an external dependency and is not counted as one of the 6 business VMs in this plan.
 :::
 
-:::info
+:::tip[When database resource changes]
 This plan assumes that each database VM has `4C / 8G / 500G`. If the user requirement is `4C / 8G / 500G` for the whole database cluster, performance and capacity must be recalculated before implementation.
 :::
 
 ## Planned IP Addresses
 
-:::info
+:::note
 The following IP addresses are placeholders. Replace them with the actual on-site network addresses before implementation.
 :::
 
@@ -97,9 +97,9 @@ The following IP addresses are placeholders. Replace them with the actual on-sit
 
 ## Overall Topology
 
-<img width={650} src="http://enterpriseimage.oss-cn-hangzhou.aliyuncs.com/image1.png" />
+<img width={650} src="/images/enterprise-ha-topology.png" />
 
-:::info
+:::note
 The diagram only shows the core links.
 :::
 

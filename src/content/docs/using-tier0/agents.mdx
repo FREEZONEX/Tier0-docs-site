@@ -46,16 +46,16 @@ npx skills add FREEZONEX/Tier0-skill
 <Tabs syncKey="tier0-cli-binary-install">
   <TabItem label="curl">
 
-  ```bash
-  curl -fsSL https://raw.githubusercontent.com/FREEZONEX/Tier0-cli/main/install.sh | bash
-  ```
+    ```bash
+    curl -fsSL https://raw.githubusercontent.com/FREEZONEX/Tier0-cli/main/install.sh | bash
+    ```
 
   </TabItem>
   <TabItem label="iwr">
 
-  ```powershell
-  iwr https://raw.githubusercontent.com/FREEZONEX/Tier0-cli/main/install.ps1 | iex
-  ```
+    ```powershell
+    iwr https://raw.githubusercontent.com/FREEZONEX/Tier0-cli/main/install.ps1 | iex
+    ```
 
   </TabItem>
 </Tabs>
@@ -92,21 +92,14 @@ tier0 config --base-url https://your-tier0.example.com
 
   <Steps>
   1. Set the API key for the operating instance.
-  </Steps>
 
-  ```bash
-  tier0 config --api-key <api-key>
-  ```
-
-  <Steps>
+      ```bash
+      tier0 config --api-key <api-key>
+      ```
   2. Verify the API key identity and permissions.
-  </Steps>
-
-  ```bash
-  tier0 auth whoami
-  ```
-
-  <Steps>
+      ```bash
+      tier0 auth whoami
+      ```
   3. Perform other operations with the `tier0` CLI.
   </Steps>
 
@@ -115,21 +108,16 @@ tier0 config --base-url https://your-tier0.example.com
 
   <Steps>
   1. Start the browser login.
-  </Steps>
 
-  ```bash
-  tier0 login --no-wait --json
-  ```
-
-  <Steps>
+      ```bash
+      tier0 login --no-wait --json
+      ```
   2. Go through authentication on the browser by accessing the returned `verification_url`.
   3. Poll for the login result with the returned `setup_code`.
-  </Steps>
-
-  ```bash
-  tier0 login --setup-code <setup_code>
-  ```
-
+      ```bash
+      tier0 login --setup-code <setup_code>
+      ```
+ </Steps>
   </TabItem>
 </Tabs>
 
@@ -158,15 +146,6 @@ Run `config` to set the operating instance before configuring an API key or star
 | Node-RED Flow | Delete Flows | `tier0 flow delete --id 1 --yes` |
 | Node-RED Flow | Check available node types | `tier0 flow nodes --source --json` or `tier0 flow nodes --event --json` |
 
-## Skill Reference
-
-[Tier0 Skill Reference](/reference/tier0-skill/) lists the supported operation targets, common tasks, and matching CLI commands.
-
-:::tip[Let an agent read the repo]
-Ask your agent to read the [Tier0 Skill repo](https://github.com/FREEZONEX/Tier0-skill) before running commands.
-:::
-
-
 ## Uninstalling Tier0 Skills
 
 ```bash
@@ -177,8 +156,15 @@ npx @tier0/cli@latest uninstall
 npx @tier0/cli@latest uninstall --purge
 ```
 
+## Skill Reference
+
+[Tier0 Skill Reference](../../reference/tier0-skill/) lists the supported operation targets, common tasks, and matching CLI commands.
+
+:::tip[Let an agent read the repo]
+Ask your agent to read the [Tier0 Skill repo](https://github.com/FREEZONEX/Tier0-skill) before running commands.
+:::
 
 ## Next
 
-- [Working with UNS Data](/using-tier0/working-with-uns-data/) — How to operate on your UNS model through MQTT and APIs.
+- [Working with UNS Data](../working-with-uns-data/) — How to operate on your UNS model through MQTT and APIs.
 

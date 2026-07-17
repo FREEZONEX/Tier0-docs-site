@@ -123,10 +123,37 @@ try {
 	browser = await launchBrowser();
 	const page = await browser.newPage({ viewport: { width: 1280, height: 1600 } });
 	await page.goto(url, { waitUntil: 'networkidle' });
+	try {
+		await page.waitForFunction(
+			() =>
+				Array.from(document.querySelectorAll('pre.mermaid')).every((diagram) =>
+					diagram.hasAttribute('data-processed')
+				),
+			{ timeout: 15000 }
+		);
+	} catch {
+		console.warn('Timed out waiting for Mermaid diagrams to render; continuing PDF export.');
+	}
 	await page.evaluate((routes) => {
 		const routeToAnchor = new Map(routes);
 		const anchorToRoute = new Map(routes.map(([route, anchor]) => [anchor, route]));
 		const normalizePath = (path) => path.replace(/^\/+|\/+$/g, '').replace(/\/index$/, '');
+
+		for (const panel of document.querySelectorAll('[role="tabpanel"]')) {
+			const labelId = panel.getAttribute('aria-labelledby');
+			const label = labelId ? document.getElementById(labelId)?.textContent?.trim() : '';
+			panel.removeAttribute('hidden');
+			if (!panel.querySelector(':scope > .pdf-tab-label')) {
+				const labelElement = document.createElement('div');
+				labelElement.className = 'pdf-tab-label';
+				labelElement.textContent = label ? `Tab: ${label}` : 'Tab';
+				panel.prepend(labelElement);
+			}
+		}
+
+		for (const details of document.querySelectorAll('details')) {
+			details.open = true;
+		}
 
 		for (const link of document.querySelectorAll('a[href]')) {
 			const rawHref = link.getAttribute('href');

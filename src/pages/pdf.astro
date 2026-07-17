@@ -206,12 +206,47 @@ const renderedDocs = await Promise.all(
 
 			.sl-markdown-content pre {
 				white-space: pre-wrap;
+				overflow: visible;
 				border: 1px solid #dfe6d8;
 				background: #f7f8f4;
 			}
 
+			.sl-markdown-content :global(pre.mermaid) {
+				display: flex;
+				justify-content: center;
+				max-width: 100%;
+				margin: 1.25rem 0;
+				padding: 0;
+				white-space: normal;
+				overflow: visible !important;
+				border: 0;
+				background: transparent;
+				break-inside: avoid;
+			}
+
+			.sl-markdown-content :global(pre.mermaid svg) {
+				max-width: 100%;
+				height: auto;
+			}
+
 			.sl-markdown-content code {
 				font-family: var(--sl-font-mono);
+			}
+
+			.sl-markdown-content :global(.expressive-code),
+			.sl-markdown-content :global(.expressive-code figure),
+			.sl-markdown-content :global(.expressive-code pre) {
+				max-width: 100%;
+				overflow: visible !important;
+			}
+
+			.sl-markdown-content :global(.expressive-code pre),
+			.sl-markdown-content :global(.expressive-code code),
+			.sl-markdown-content :global(.expressive-code .ec-line),
+			.sl-markdown-content :global(.expressive-code .code) {
+				white-space: pre-wrap !important;
+				overflow-wrap: anywhere;
+				word-break: break-word;
 			}
 
 			.sl-markdown-content img {
@@ -219,29 +254,47 @@ const renderedDocs = await Promise.all(
 				height: auto;
 			}
 
-			.sl-markdown-content details {
+			.sl-markdown-content :global(details) {
 				display: block;
+				margin: 0.75rem 0;
 				border: 1px solid #dfe6d8;
 				border-radius: 6px;
 				padding: 0.75rem;
 				background: #fbfcf8;
 			}
 
-			.sl-markdown-content details > summary {
+			.sl-markdown-content :global(details > summary) {
 				font-weight: 700;
+				color: #4a7300;
+				break-after: avoid;
 			}
 
-			.sl-markdown-content [role='tablist'] {
+			.sl-markdown-content :global(.tablist-wrapper),
+			.sl-markdown-content :global([role='tablist']) {
 				display: none;
 			}
 
-			.sl-markdown-content [role='tabpanel'] {
+			.sl-markdown-content :global([role='tabpanel']) {
 				display: block !important;
 				margin: 0.75rem 0;
-				padding: 0.75rem;
+				padding: 0 0.85rem 0.85rem;
 				border: 1px solid #dfe6d8;
 				border-radius: 6px;
 				background: #fff;
+			}
+
+			.sl-markdown-content :global(.pdf-tab-label) {
+				display: block;
+				margin: 0 -0.85rem 0.75rem;
+				padding: 0.45rem 0.85rem;
+				border-bottom: 1px solid #dfe6d8;
+				border-radius: 6px 6px 0 0;
+				background: #f4f8e9;
+				color: #4a7300;
+				font-size: 0.78rem;
+				font-weight: 700;
+				letter-spacing: 0.02em;
+				text-transform: uppercase;
 			}
 
 			.pdf-reference-note {
