@@ -5,7 +5,7 @@ sidebar:
   order: 5
 ---
 
-The following table is based on the Enterprise New six-VM offline deployment. Customer firewalls should allow traffic from the minimum required source ranges only. Do not expose these ports directly to the public internet.
+La siguiente tabla se basa en el despliegue offline Enterprise New de seis VM. Los firewalls del cliente deben permitir tráfico solo desde los rangos de origen mínimos necesarios. No expongas estos puertos directamente a internet público.
 
 | Source | Target | Port | Protocol | Purpose |
 | --- | --- | ---: | --- | --- |
@@ -26,4 +26,4 @@ The following table is based on the Enterprise New six-VM offline deployment. Cu
 | DB1, DB2, and witness | DB1, DB2, and witness | 5432 | TCP | Streaming replication / repmgr |
 | Application nodes | NFS server | 2049 | TCP/UDP | Used when `NFS_ENABLED=true` |
 
-The current compose deployment does not expose Redis, SourceFlow, EventFlow, Marimo, or the EMQX Dashboard externally. These services are only called by the backend inside the Docker runtime network.
+El despliegue compose actual no expone Redis, SourceFlow, EventFlow, Marimo ni el EMQX Dashboard al exterior. Estos servicios solo son llamados por el backend dentro de la red de runtime de Docker.

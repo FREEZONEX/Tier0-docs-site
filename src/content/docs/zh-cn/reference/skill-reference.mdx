@@ -17,17 +17,17 @@ This page is included in the documentation and PDF export. The standalone web re
 | Basic operations | Check service connectivity and gateway info | `tier0 api /openapi/v1/info --body '{}' --json` |
 | Basic operations | Upgrade CLI and skills | `tier0 upgrade` and `tier0 skills update` |
 | UNS | Browse paths | `tier0 uns browse --path /` or `tier0 uns browse --path Plant/Line1 --json` |
-| UNS | Search for topics by keywords | `tier0 uns search --keyword temp --json` or `tier0 uns search --path-prefix Plant/Line1 --size 50 --json` |
-| UNS | Read current values | `tier0 uns read Plant/Line1/Metric/Temperature --json` or `tier0 uns read --topic 'Plant/+/Metric/Temperature' --json` |
+| UNS | 按关键词搜索 topic | `tier0 uns search --keyword temp --json` 或 `tier0 uns search --path-prefix Plant/Line1 --size 50 --json` |
+| UNS | 读取当前值 | `tier0 uns read Plant/Line1/Metric/Temperature --json` 或 `tier0 uns read --topic 'Plant/+/Metric/Temperature' --json` |
 | UNS | Write values | `tier0 uns write --topic Plant/Line1/Metric/Temperature --value '{"temperature":27.5}'` |
 | UNS | Query history | `tier0 uns history -t Plant/Line1/Metric/Temperature --start -1h --json` |
-| UNS | Create paths or topics | `tier0 uns create --topic Plant/Line1 --type path` or `tier0 uns create --file namespace.json --json` |
-| UNS | Update metadata or fields | `tier0 uns update --path Plant/Line1/Metric/Temperature --description "Line 1 temperature" --update-mask description` |
+| UNS | 创建 path 或 topic | `tier0 uns create --topic Plant/Line1 --type path` 或 `tier0 uns create --file namespace.json --json` |
+| UNS | 更新元数据或字段 | `tier0 uns update --path Plant/Line1/Metric/Temperature --description "Line 1 temperature" --update-mask description` |
 | UNS | Delete or restore nodes | `tier0 uns delete --path Plant/Line1/Metric/Temperature --yes` or `tier0 uns restore --path Plant/Line1/Metric/Temperature --yes` |
 | Node-RED Flow | List or inspect Flows | `tier0 flow list`, `tier0 flow list --source --json`, or `tier0 flow get --id 1 --json` |
-| Node-RED Flow | Create Source Flow or Event Flow | `tier0 flow create --name "modbus-collector" --source --desc "Modbus TCP collector"` or `tier0 flow create --name "alert-handler" --event --desc "Temperature alarm processor"` |
+| Node-RED Flow | 创建 Source Flow 或 Event Flow | `tier0 flow create --name "modbus-collector" --source --desc "Modbus TCP collector"` 或 `tier0 flow create --name "alert-handler" --event --desc "Temperature alarm processor"` |
 | Node-RED Flow | Update Flow metadata | `tier0 flow update --id 1 --name "line1-collector"` or `tier0 flow update --id 1 --favorite` |
 | Node-RED Flow | Export canvas JSON | `tier0 flow data --id 1 --out flows.json` |
 | Node-RED Flow | Deploy canvas JSON | `tier0 flow deploy --id 1 -f flows.json --yes` |
 | Node-RED Flow | Delete Flows | `tier0 flow delete --id 1 --yes` |
-| Node-RED Flow | Check available node types | `tier0 flow nodes --source --json` or `tier0 flow nodes --event --json` |
+| Node-RED Flow | 检查可用节点类型 | `tier0 flow nodes --source --json` 或 `tier0 flow nodes --event --json` |

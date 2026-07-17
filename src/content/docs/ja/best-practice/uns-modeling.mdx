@@ -19,18 +19,18 @@ Before modeling data, answer the following questions.
 
 ### 物理データ
 
-Industrial data from machines and equipment with physical locations is modeled based on the ISA-95 standard.
+物理的な場所を持つ機械や設備の産業データは、通常 ISA-95 標準に基づいてモデル化します。
 
 #### ISA-95 設備階層
-The ISA-95 Equipment Hierarchy outlines how physical assets and control systems are structured within an organization.
+ISA-95 の設備階層は、組織内の物理資産と制御システムがどのように構造化されるかを示します。
 It is broken into the following levels:
-- **Enterprise**: The top level, representing the entire organization. This includes overall business processes and decision-making entities, typically supported by ERP systems.  
-- **Site**: Represents a specific geographic location or facility. Each site can have its own management systems and local production control. 
-- **Area**: An operational division within a site, often a functional area such as packaging, assembly, or warehousing. 
-- **Process Cell**: The basic unit of manufacturing within an area. It encompasses all the equipment required to produce a specific product or perform a specific function. 
-- **Unit**: A distinct part of the process cell, responsible for a specific function such as mixing, heating, or assembling. 
-- **Equipment Module**: A modular piece of equipment that performs a specific task within a unit. For example, in a mixing unit, the module could be a heating element.  
-- **Control Module**: The lowest level, representing individual devices or controllers such as sensors, pumps, actuators, or PID control loops that handle direct control of physical processes.
+- **Enterprise**：最上位レベルで、組織全体を表します。全体の業務プロセスや意思決定エンティティを含み、通常は ERP システムに支えられます。  
+- **Site**：特定の地理的位置や施設を表します。各 site は独自の管理システムとローカル生産制御を持つことができます。 
+- **Area**：site 内の運用区分で、包装、組立、倉庫などの機能エリアであることが多いです。 
+- **Process Cell**：area 内の製造の基本単位です。特定の製品を生産したり特定の機能を実行したりするために必要な設備を含みます。 
+- **Unit**：process cell 内の明確な部分で、混合、加熱、組立など特定の機能を担います。 
+- **Equipment Module**：unit 内で特定のタスクを実行するモジュール化された設備です。たとえば混合 unit では、加熱要素がこれに当たります。  
+- **Control Module**：最下位レベルで、センサー、ポンプ、アクチュエーター、PID 制御ループなど、物理プロセスを直接制御する個別のデバイスやコントローラーを表します。
 
 #### デモモデル
 <Tabs syncKey="demo-uns-model">
@@ -377,7 +377,7 @@ DemoFactory
 
 ### 業務データ
 
-For business planning and process objects, such as production orders and work order plans in an ERP, model data according to its business context.
+ERP の生産注文や作業指示計画など、業務計画やプロセスオブジェクトについては、業務コンテキストに沿ってデータをモデル化します。
 :::tip[How to recognize business data]
 Data that does not have a physical location.
 :::
@@ -415,9 +415,9 @@ Factory / Business Domain / Business Object / Topic Type / Topic
 
     | Topic Type | Used for | Examples |
     | --- | --- | --- |
-    | STATE | Current status or current facts | Work order status, order status, equipment status |
-    | METRIC | Continuously changing numeric values | Temperature, speed, output, OEE, energy consumption |
-    | ACTION | Commands for external executors | Start equipment, stop equipment, reset alarm, request work order dispatch |
+    | STATE | 現在の状態または現在の事実 | 作業指示の状態、注文状態、設備状態 |
+    | METRIC | 継続的に変化する数値 | 温度、速度、生産量、OEE、エネルギー消費 |
+    | ACTION | 外部実行者へのコマンド | 設備起動、設備停止、アラームリセット、作業指示の払い出し要求 |
 
 #### デモモデル
 <Tabs syncKey="business-data-model">
@@ -676,7 +676,7 @@ Tier0 uses 3 fixed topic types: `Metric`, `Action`, and `State` to avoid topic e
 
 - **高頻度リアルタイムデータには `Metric` を使う**
 
-  Put high-frequency measurements and telemetry under `Metric` instead of expanding the namespace for every signal detail.
+  高頻度の測定値やテレメトリは、各信号の詳細ごとに namespace を広げるのではなく `Metric` に配置します。
 
   <Tabs syncKey="topic-explosion-metric">
     <TabItem label="Bad">
@@ -717,7 +717,7 @@ Tier0 uses 3 fixed topic types: `Metric`, `Action`, and `State` to avoid topic e
 
 - **低頻度ステータスデータには `State` を使う**
 
-  Put low-frequency status, snapshots, and current business state under `State`. Avoid creating a new topic for every changing entity such as jobs, batches, or orders.
+  低頻度の状態、スナップショット、現在の業務状態は `State` に配置します。ジョブ、バッチ、注文などの変化するエンティティごとに新しい topic を作らないようにします。
 
   <Tabs syncKey="topic-explosion-state">
     <TabItem label="Bad">
@@ -755,7 +755,7 @@ Tier0 uses 3 fixed topic types: `Metric`, `Action`, and `State` to avoid topic e
 
 - **低頻度アクションデータには `Action` を使う**
 
-  Put commands, requests, and operator actions under `Action`. Keep action inputs as fields on a topic rather than creating one topic per parameter.
+  コマンド、リクエスト、オペレーター操作は `Action` に配置します。action の入力はパラメータごとに topic を作るのではなく、topic のフィールドとして保持します。
 
   <Tabs syncKey="topic-explosion-action">
     <TabItem label="Bad">
@@ -794,11 +794,11 @@ Tier0 uses 3 fixed topic types: `Metric`, `Action`, and `State` to avoid topic e
 
 ## Payload 構造
 
-Data to be consumed and written back must both be considered when structuring the topic payload.
+topic payload を設計するときは、消費されるデータと書き戻されるデータの両方を考慮します。
 
 - **Action**
 
-  Action payloads automatically include `_timestamp`, which records when the data is stored in the Tier0 database.
+  Action payload には、データが Tier0 データベースに保存された時刻を記録する `_timestamp` が自動的に含まれます。
 
   <Tabs syncKey="payload-action">
     <TabItem label="start_job">
@@ -827,7 +827,7 @@ Data to be consumed and written back must both be considered when structuring th
 
 - **Metric**
 
-  Metric payloads automatically include `_timestamp`, which records when the data is stored in the Tier0 database, and `_quality`, which maps the data quality.
+  Metric payload には、Tier0 データベースへの保存時刻を記録する `_timestamp` と、データ品質を表す `_quality` が自動的に含まれます。
 
   <Tabs syncKey="payload-metric">
     <TabItem label="ERP / SplitCount">
@@ -866,7 +866,7 @@ Data to be consumed and written back must both be considered when structuring th
 
 - **State**
 
-  State payloads automatically include `_timestamp`, which records when the data is stored in the Tier0 database.
+  State payload には、データが Tier0 データベースに保存された時刻を記録する `_timestamp` が自動的に含まれます。
 
   <Tabs syncKey="payload-state">
     <TabItem label="ERP / UpsertProductionOrder">

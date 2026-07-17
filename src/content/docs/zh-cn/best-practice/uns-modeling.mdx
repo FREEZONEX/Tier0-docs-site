@@ -19,18 +19,18 @@ Before modeling data, answer the following questions.
 
 ### 物理数据
 
-Industrial data from machines and equipment with physical locations is modeled based on the ISA-95 standard.
+来自机器和设备、并具有物理位置的工业数据，通常基于 ISA-95 标准建模。
 
 #### ISA-95 设备层级
-The ISA-95 Equipment Hierarchy outlines how physical assets and control systems are structured within an organization.
+ISA-95 设备层级描述了组织内物理资产和控制系统的结构方式。
 It is broken into the following levels:
-- **Enterprise**: The top level, representing the entire organization. This includes overall business processes and decision-making entities, typically supported by ERP systems.  
-- **Site**: Represents a specific geographic location or facility. Each site can have its own management systems and local production control. 
-- **Area**: An operational division within a site, often a functional area such as packaging, assembly, or warehousing. 
-- **Process Cell**: The basic unit of manufacturing within an area. It encompasses all the equipment required to produce a specific product or perform a specific function. 
-- **Unit**: A distinct part of the process cell, responsible for a specific function such as mixing, heating, or assembling. 
-- **Equipment Module**: A modular piece of equipment that performs a specific task within a unit. For example, in a mixing unit, the module could be a heating element.  
-- **Control Module**: The lowest level, representing individual devices or controllers such as sensors, pumps, actuators, or PID control loops that handle direct control of physical processes.
+- **Enterprise**：最高层级，代表整个组织，包括整体业务流程和决策实体，通常由 ERP 系统支持。  
+- **Site**：代表特定地理位置或设施。每个 site 可以拥有自己的管理系统和本地生产控制。 
+- **Area**：site 内的运营分区，通常是包装、装配或仓储等功能区域。 
+- **Process Cell**：area 内的制造基本单元，包含生产特定产品或执行特定功能所需的全部设备。 
+- **Unit**：process cell 中的独立部分，负责混合、加热或装配等特定功能。 
+- **Equipment Module**：unit 内执行特定任务的模块化设备。例如在混合单元中，该模块可以是加热元件。  
+- **Control Module**：最低层级，代表传感器、泵、执行器或 PID 控制回路等单个设备或控制器，用于直接控制物理过程。
 
 #### 示例模型
 <Tabs syncKey="demo-uns-model">
@@ -377,7 +377,7 @@ DemoFactory
 
 ### 业务数据
 
-For business planning and process objects, such as production orders and work order plans in an ERP, model data according to its business context.
+对于 ERP 中的生产订单、工单计划等业务计划和流程对象，应根据业务上下文进行建模。
 :::tip[How to recognize business data]
 Data that does not have a physical location.
 :::
@@ -415,9 +415,9 @@ Factory / Business Domain / Business Object / Topic Type / Topic
 
     | Topic Type | Used for | Examples |
     | --- | --- | --- |
-    | STATE | Current status or current facts | Work order status, order status, equipment status |
-    | METRIC | Continuously changing numeric values | Temperature, speed, output, OEE, energy consumption |
-    | ACTION | Commands for external executors | Start equipment, stop equipment, reset alarm, request work order dispatch |
+    | STATE | 当前状态或当前事实 | 工单状态、订单状态、设备状态 |
+    | METRIC | 连续变化的数值 | 温度、速度、产量、OEE、能耗 |
+    | ACTION | 给外部执行者的命令 | 启动设备、停止设备、重置报警、请求下发工单 |
 
 #### 示例模型
 <Tabs syncKey="business-data-model">
@@ -676,7 +676,7 @@ Tier0 uses 3 fixed topic types: `Metric`, `Action`, and `State` to avoid topic e
 
 - **将 `Metric` 用于高频实时数据**
 
-  Put high-frequency measurements and telemetry under `Metric` instead of expanding the namespace for every signal detail.
+  将高频测量值和遥测数据放在 `Metric` 下，而不是为每个信号细节继续扩展 namespace。
 
   <Tabs syncKey="topic-explosion-metric">
     <TabItem label="Bad">
@@ -717,7 +717,7 @@ Tier0 uses 3 fixed topic types: `Metric`, `Action`, and `State` to avoid topic e
 
 - **将 `State` 用于低频状态数据**
 
-  Put low-frequency status, snapshots, and current business state under `State`. Avoid creating a new topic for every changing entity such as jobs, batches, or orders.
+  将低频状态、快照和当前业务状态放在 `State` 下。避免为作业、批次或订单等变化实体分别创建新 topic。
 
   <Tabs syncKey="topic-explosion-state">
     <TabItem label="Bad">
@@ -755,7 +755,7 @@ Tier0 uses 3 fixed topic types: `Metric`, `Action`, and `State` to avoid topic e
 
 - **将 `Action` 用于低频动作数据**
 
-  Put commands, requests, and operator actions under `Action`. Keep action inputs as fields on a topic rather than creating one topic per parameter.
+  将命令、请求和操作员动作放在 `Action` 下。动作输入应作为 topic 的字段，而不是为每个参数创建一个 topic。
 
   <Tabs syncKey="topic-explosion-action">
     <TabItem label="Bad">
@@ -794,11 +794,11 @@ Tier0 uses 3 fixed topic types: `Metric`, `Action`, and `State` to avoid topic e
 
 ## Payload 结构
 
-Data to be consumed and written back must both be considered when structuring the topic payload.
+设计 topic payload 时，需要同时考虑要消费的数据和要回写的数据。
 
 - **Action**
 
-  Action payloads automatically include `_timestamp`, which records when the data is stored in the Tier0 database.
+  Action payload 会自动包含 `_timestamp`，用于记录数据存入 Tier0 数据库的时间。
 
   <Tabs syncKey="payload-action">
     <TabItem label="start_job">
@@ -827,7 +827,7 @@ Data to be consumed and written back must both be considered when structuring th
 
 - **Metric**
 
-  Metric payloads automatically include `_timestamp`, which records when the data is stored in the Tier0 database, and `_quality`, which maps the data quality.
+  Metric payload 会自动包含 `_timestamp` 和 `_quality`：前者记录数据存入 Tier0 数据库的时间，后者用于映射数据质量。
 
   <Tabs syncKey="payload-metric">
     <TabItem label="ERP / SplitCount">
@@ -866,7 +866,7 @@ Data to be consumed and written back must both be considered when structuring th
 
 - **State**
 
-  State payloads automatically include `_timestamp`, which records when the data is stored in the Tier0 database.
+  State payload 会自动包含 `_timestamp`，用于记录数据存入 Tier0 数据库的时间。
 
   <Tabs syncKey="payload-state">
     <TabItem label="ERP / UpsertProductionOrder">

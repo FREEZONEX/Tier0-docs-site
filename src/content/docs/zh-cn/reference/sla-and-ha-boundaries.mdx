@@ -5,28 +5,28 @@ sidebar:
   order: 4
 ---
 
-This document applies to the six-VM fully offline deployment: three application / Swarm nodes, two PostgreSQL HA nodes, and one witness node.
+本文档适用于六虚拟机全离线部署：三台应用 / Swarm 节点、两台 PostgreSQL 高可用节点和一台 witness 节点。
 
 ## Architecture Baseline
 
 | Layer | Current Design | High Availability Boundary |
 | --- | --- | --- |
-| Application runtime | Enterprise New compose runs on the fixed `tier0_app_active_node`. | `backend`, `redis`, `EMQX`, `SourceFlow`, `EventFlow`, `Marimo`, and `OPC UA Server` are not automatically multi-replica services yet. |
+| 应用运行时 | Enterprise New compose 在固定的 `tier0_app_active_node` 上运行。 | `backend`、`redis`、`EMQX`、`SourceFlow`、`EventFlow`、`Marimo` 和 `OPC UA Server` 尚未自动多副本化。 |
 | HTTP entry | Three application nodes run keepalived APP VIP + HAProxy. | The VIP can float. HAProxy forwards to the active node on `8088/TCP` and checks `/healthz`. |
-| MQTT / OPC UA | EMQX uses `1883/8883/8083/8084`; OPC UA uses `4840`. | These connect directly to the active node. They are not included in TCP VIP proxying, so protocol-entry HA is not promised. |
-| Database | PostgreSQL / TimescaleDB streaming replication + repmgr + witness + DB VIP. | If the primary fails, the standby can be promoted automatically. Asynchronous replication cannot promise strict zero RPO. |
+| MQTT / OPC UA | EMQX 使用 `1883/8883/8083/8084`；OPC UA 使用 `4840`。 | 这些端口直接连接活动节点，不包含在 TCP VIP 代理中，因此不承诺协议入口高可用。 |
+| 数据库 | PostgreSQL / TimescaleDB 流复制 + repmgr + witness + DB VIP。 | primary 故障时 standby 可自动提升。异步复制不能承诺严格零 RPO。 |
 | Backup and restore | `backup-db.sh` / `restore-db.sh`. | Provides recoverability, but it is not the same as online HA. |
 
 ## Recommended SLA
 
 | Service Object | Recommended Statement | Constraints |
 | --- | --- | --- |
-| Platform HTTP entry | Start from monthly availability of `99.5%`. | VIP failover is not the same as automatic migration of the active application node. |
-| Database access | Operations target: `RTO <= 2 minutes`. | RPO depends on replication lag. Historical failover tests on the same architecture were about 59-64 seconds. |
+| 平台 HTTP 入口 | 从月可用性 `99.5%` 开始。 | VIP 故障切换不等同于活动应用节点自动迁移。 |
+| 数据库访问 | 运维目标：`RTO <= 2 minutes`。 | RPO 取决于复制延迟。同架构历史故障切换测试约为 59-64 秒。 |
 | MQTT / OPC UA | No HA SLA is promised in the current design. | HAProxy TCP proxying, a separate VIP, or service clustering must be added first. |
-| Backup and restore | Daily backups; mandatory backup before major changes. | Restore time depends on data volume and on-site I/O. |
+| 备份与恢复 | 每日备份；重大变更前必须备份。 | 恢复时间取决于数据量和现场 I/O。 |
 
-Before claiming `99.9%` or higher, complete application automatic migration or multi-replica deployment, protocol-entry HA, monitoring alerts, and recovery drills. Do not describe planned capabilities as delivered capabilities.
+在声明 `99.9%` 或更高可用性之前，需要完成应用自动迁移或多副本部署、协议入口高可用、监控告警和恢复演练。不要把规划能力描述为已交付能力。
 
 ## Acceptance Gates
 
@@ -64,7 +64,7 @@ Configure at least the following alerts:
 | --- | --- | --- |
 | APP VIP failover | Before delivery and quarterly. | After stopping keepalived on the current VIP node, `/healthz` and `/readyz` recover. |
 | DB primary failure | Before delivery and every six months. | The standby is promoted, DB VIP recovers, and the old primary is rebuilt as a standby. |
-| Database restore | Monthly sample and before major changes. | The backup is restorable. After restore, `verify`, smoke checks, and login verification pass. |
+| 数据库恢复 | 每月抽样，并在重大变更前执行。 | 备份可恢复。恢复后 `verify`、冒烟检查和登录验证通过。 |
 | Material verification | Every package build. | Source materials, package SHA, and unpacking verification pass. |
 
 ## Incident Handling Principles
@@ -72,7 +72,7 @@ Configure at least the following alerts:
 1. Confirm the impact scope first: HTTP, MQTT, OPC UA, database, and single-node impact.
 2. Prioritize restoring VIP, HAProxy, the active application, and the database primary.
 3. Preserve logs, data directories, and backups. Do not directly clean or overwrite the incident site.
-4. For database incidents, determine the current primary first, then decide whether to fail over, rejoin, or restore.
+4. 对于数据库事件，先确定当前 primary，再决定故障切换、重新加入或恢复。
 5. After recovery, run `verify`, smoke checks, and actual login verification.
 
 ## High-SLA Hardening Items

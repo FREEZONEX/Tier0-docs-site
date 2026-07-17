@@ -5,28 +5,28 @@ sidebar:
   order: 4
 ---
 
-This document applies to the six-VM fully offline deployment: three application / Swarm nodes, two PostgreSQL HA nodes, and one witness node.
+Este documento aplica al despliegue completamente offline de seis VM: tres nodos de aplicación / Swarm, dos nodos HA de PostgreSQL y un nodo witness.
 
 ## Architecture Baseline
 
 | Layer | Current Design | High Availability Boundary |
 | --- | --- | --- |
-| Application runtime | Enterprise New compose runs on the fixed `tier0_app_active_node`. | `backend`, `redis`, `EMQX`, `SourceFlow`, `EventFlow`, `Marimo`, and `OPC UA Server` are not automatically multi-replica services yet. |
+| Runtime de aplicación | Enterprise New compose se ejecuta en el `tier0_app_active_node` fijo. | `backend`, `redis`, `EMQX`, `SourceFlow`, `EventFlow`, `Marimo` y `OPC UA Server` todavía no son servicios multi-réplica automáticos. |
 | HTTP entry | Three application nodes run keepalived APP VIP + HAProxy. | The VIP can float. HAProxy forwards to the active node on `8088/TCP` and checks `/healthz`. |
-| MQTT / OPC UA | EMQX uses `1883/8883/8083/8084`; OPC UA uses `4840`. | These connect directly to the active node. They are not included in TCP VIP proxying, so protocol-entry HA is not promised. |
-| Database | PostgreSQL / TimescaleDB streaming replication + repmgr + witness + DB VIP. | If the primary fails, the standby can be promoted automatically. Asynchronous replication cannot promise strict zero RPO. |
+| MQTT / OPC UA | EMQX usa `1883/8883/8083/8084`; OPC UA usa `4840`. | Se conectan directamente al nodo activo. No están incluidos en proxy TCP VIP, por lo que no se promete HA para entradas de protocolo. |
+| Base de datos | Replicación streaming PostgreSQL / TimescaleDB + repmgr + witness + DB VIP. | Si falla el primary, el standby puede promoverse automáticamente. La replicación asíncrona no puede prometer RPO cero estricto. |
 | Backup and restore | `backup-db.sh` / `restore-db.sh`. | Provides recoverability, but it is not the same as online HA. |
 
 ## Recommended SLA
 
 | Service Object | Recommended Statement | Constraints |
 | --- | --- | --- |
-| Platform HTTP entry | Start from monthly availability of `99.5%`. | VIP failover is not the same as automatic migration of the active application node. |
-| Database access | Operations target: `RTO <= 2 minutes`. | RPO depends on replication lag. Historical failover tests on the same architecture were about 59-64 seconds. |
+| Entrada HTTP de plataforma | Comienza desde disponibilidad mensual de `99.5%`. | El failover de VIP no es lo mismo que migración automática del nodo de aplicación activo. |
+| Acceso a base de datos | Objetivo operativo: `RTO <= 2 minutes`. | El RPO depende del retraso de replicación. Pruebas históricas de failover en la misma arquitectura fueron de unos 59-64 segundos. |
 | MQTT / OPC UA | No HA SLA is promised in the current design. | HAProxy TCP proxying, a separate VIP, or service clustering must be added first. |
-| Backup and restore | Daily backups; mandatory backup before major changes. | Restore time depends on data volume and on-site I/O. |
+| Backup y restauración | Backups diarios; backup obligatorio antes de cambios mayores. | El tiempo de restauración depende del volumen de datos y del I/O en sitio. |
 
-Before claiming `99.9%` or higher, complete application automatic migration or multi-replica deployment, protocol-entry HA, monitoring alerts, and recovery drills. Do not describe planned capabilities as delivered capabilities.
+Antes de declarar `99.9%` o más, completa la migración automática de la aplicación o el despliegue multi-réplica, la HA de entradas de protocolo, las alertas de monitoreo y los simulacros de recuperación. No describas capacidades planificadas como capacidades ya entregadas.
 
 ## Acceptance Gates
 
@@ -64,7 +64,7 @@ Configure at least the following alerts:
 | --- | --- | --- |
 | APP VIP failover | Before delivery and quarterly. | After stopping keepalived on the current VIP node, `/healthz` and `/readyz` recover. |
 | DB primary failure | Before delivery and every six months. | The standby is promoted, DB VIP recovers, and the old primary is rebuilt as a standby. |
-| Database restore | Monthly sample and before major changes. | The backup is restorable. After restore, `verify`, smoke checks, and login verification pass. |
+| Restauración de base de datos | Muestra mensual y antes de cambios mayores. | El backup es restaurable. Después de restaurar, pasan `verify`, smoke checks y verificación de login. |
 | Material verification | Every package build. | Source materials, package SHA, and unpacking verification pass. |
 
 ## Incident Handling Principles
@@ -72,7 +72,7 @@ Configure at least the following alerts:
 1. Confirm the impact scope first: HTTP, MQTT, OPC UA, database, and single-node impact.
 2. Prioritize restoring VIP, HAProxy, the active application, and the database primary.
 3. Preserve logs, data directories, and backups. Do not directly clean or overwrite the incident site.
-4. For database incidents, determine the current primary first, then decide whether to fail over, rejoin, or restore.
+4. Para incidentes de base de datos, determina primero el primary actual y luego decide si hacer failover, reincorporar o restaurar.
 5. After recovery, run `verify`, smoke checks, and actual login verification.
 
 ## High-SLA Hardening Items

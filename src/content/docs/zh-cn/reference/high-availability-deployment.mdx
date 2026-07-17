@@ -7,25 +7,25 @@ sidebar:
 
 ## Plan Objective
 
-This plan deploys one Tier0 Enterprise environment in an offline or private deployment environment. It uses 6 virtual machines in total:
+本方案用于在离线或私有部署环境中部署一套 Tier0 Enterprise 环境，总共使用 6 台虚拟机：
 
 - 3 application nodes: form the `Docker Swarm` cluster base and run the single-replica Tier0 Enterprise service and the stateful **EMQX** service.
 - 2 database nodes: form the `PostgreSQL + TimescaleDB` primary-standby cluster.
 - 1 `Witness` node: participates in database monitoring, arbitration, and failover.
 
 :::note[Optional]
-- An external `NFS/NAS` shared storage can be added and mounted by the three Swarm nodes. It is used for Tier0 Enterprise shared files across nodes.
+- 可以添加外部 `NFS/NAS` 共享存储，并由三台 Swarm 节点挂载。它用于 Tier0 Enterprise 跨节点共享文件。
 - This shared storage is an external dependency and is not counted as one of the 6 business VMs in this plan.
 :::
 
 :::tip[When database resource changes]
-This plan assumes that each database VM has `4C / 8G / 500G`. If the user requirement is `4C / 8G / 500G` for the whole database cluster, performance and capacity must be recalculated before implementation.
+本方案假设每台数据库虚拟机为 `4C / 8G / 500G`。如果用户要求的是整个数据库集群合计 `4C / 8G / 500G`，实施前必须重新评估性能和容量。
 :::
 
 ## Planned IP Addresses
 
 :::note
-The following IP addresses are placeholders. Replace them with the actual on-site network addresses before implementation.
+以下 IP 地址为占位示例。实施前请替换为现场实际网络地址。
 :::
 
 <table>
@@ -104,14 +104,14 @@ The diagram only shows the core links.
 :::
 
 - Business access path: users / on-site systems -> `APP VIP` -> three `Docker Swarm` nodes -> `DB VIP` -> current primary database.
-- The topology is arranged from top to bottom to show request entry, application processing, database access, and high availability monitoring.
-- The topology diagram does not show internal cluster ports, SSH O&M links, or monitoring links. These are described in the <a href="#connection-list">Connection List</a> and <a href="#detailed-port-list">Detailed Port List</a>.
-- `Witness` only participates in database arbitration, primary selection, and health checks. It is not in the business access path.
+- 拓扑自上而下展示请求入口、应用处理、数据库访问和高可用监控。
+- 拓扑图未展示内部集群端口、SSH 运维链路或监控链路。这些内容见 <a href="#connection-list">连接清单</a> 和 <a href="#detailed-port-list">详细端口清单</a>。
+- `Witness` 只参与数据库仲裁、主库选择和健康检查，不在业务访问路径中。
 - `APP VIP` distributes traffic to the three Swarm nodes. The Swarm nodes access the database through `DB VIP`.
-- `APP VIP` can fail over between the three Swarm nodes. `DB VIP` follows the current PostgreSQL Primary role and can fail over between the two database nodes.
-- Tier0 Enterprise runs as a single-replica service. If the current node fails, Swarm reschedules and restarts it on another healthy node.
-- `EMQX` is a stateful service. It should not be randomly rescheduled like a normal stateless service. By default, it should be fixed to one node with persistent storage. If high availability is required for the messaging layer, deploy a three-node EMQX cluster.
-- The optional `NFS/NAS` is only used as shared file storage for the Swarm nodes. It is not part of the main database request path.
+- `APP VIP` 可在三台 Swarm 节点之间故障切换。`DB VIP` 跟随当前 PostgreSQL Primary 角色，可在两台数据库节点之间切换。
+- Tier0 Enterprise 以单副本服务运行。如果当前节点故障，Swarm 会将其重新调度并在另一台健康节点上重启。
+- `EMQX` 是有状态服务，不应像普通无状态服务一样随机重调度。默认应固定在一个节点并使用持久化存储。如果消息层需要高可用，请部署三节点 EMQX 集群。
+- 可选的 `NFS/NAS` 仅作为 Swarm 节点的共享文件存储，不属于主数据库请求路径。
 
 ## Database Monitoring and Failover
 
@@ -166,12 +166,12 @@ The diagram only shows the core links.
 
 #### Key boundaries:
 
-- `Witness` does not store business data, does not handle business read/write traffic, and does not expose database access to applications.
+- `Witness` 不存储业务数据，不处理业务读写流量，也不向应用暴露数据库访问。
 - Business services only connect to `DB VIP:5432`. Direct connections to `ent-db-01/02` are not allowed.
-- `DB VIP` must be bound to the current PostgreSQL Primary node. It must not fail over based only on whether the database process is alive.
+- `DB VIP` 必须绑定到当前 PostgreSQL Primary 节点，不能只根据数据库进程是否存活来切换。
 - `TimescaleDB` is deployed as a PostgreSQL extension on both database nodes. It is not separated into an independent database instance.
 - The recommended design is `PostgreSQL streaming replication + repmgr + repmgr witness + keepalived DB VIP`.
-- Automatic failover only handles primary database unavailability. After the original primary database recovers, it should rejoin as a standby database first. It should not automatically take the primary role back.
+- 自动故障切换只处理主库不可用。原主库恢复后，应先作为 standby 重新加入，不应自动抢回 primary 角色。
 
 ## Node Configuration List
 
@@ -315,7 +315,7 @@ Converted hardware requirements:
 - Total vCPU: 34
 - Total memory: 116G
 - Total storage: 1.34T
-- Optional external shared storage: not counted in the 6 VM total. Capacity should be planned separately based on attachments, reports, import/export files, and log archive retention.
+- 可选外部共享存储：不计入 6 台 VM 总数。容量应根据附件、报表、导入/导出文件和日志归档保留周期单独规划。
 
 ### Swarm Service Runtime Rules
 
@@ -371,13 +371,13 @@ Converted hardware requirements:
 **Key rules:**
 
 - Tier0 Enterprise can run as a single replica. Swarm only provides the cluster base and failover rescheduling capability.
-- `EMQX` cannot use the same random single-replica rescheduling strategy as Tier0 Enterprise, because it has sessions, subscriptions, retained messages, rule engine state, and persistent directories.
-- If `EMQX` is deployed as a single node, it must be treated as a single point of failure in the messaging layer and fixed to one Swarm node with a persistent directory.
-- If the business cannot accept a single point of failure in `EMQX`, deploy a three-node EMQX cluster on the three Swarm nodes. Each node must have a fixed hostname, node name, and persistent directory.
+- `EMQX` 不能使用与 Tier0 Enterprise 相同的随机单副本重调度策略，因为它包含会话、订阅、保留消息、规则引擎状态和持久化目录。
+- 如果 `EMQX` 以单节点部署，必须将其视为消息层单点故障，并固定到一个 Swarm 节点及其持久化目录。
+- 如果业务不能接受 `EMQX` 单点故障，请在三台 Swarm 节点上部署三节点 EMQX 集群。每个节点都必须有固定 hostname、node name 和持久化目录。
 
 ### NFS/NAS Shared Storage Rules
 
-NFS is introduced so that the Tier0 Enterprise single replica can still access the same business files after it is rescheduled between Swarm nodes. It does not change the boundaries of database primary-standby replication or the stateful EMQX service.
+引入 NFS 是为了让 Tier0 Enterprise 单副本在 Swarm 节点之间重新调度后仍能访问同一份业务文件。它不会改变数据库主备复制或有状态 EMQX 服务的边界。
 
 **Suitable content for NFS:**
 
@@ -438,8 +438,8 @@ NFS is introduced so that the Tier0 Enterprise single replica can still access t
 **NFS boundaries:**
 
 - NFS is a shared file dependency. It is not a database high availability component.
-- If NFS itself is a single point of failure, file-related functions will also have a single point of failure. In production, use an existing HA NAS or dual-controller storage.
-- Before the Tier0 Enterprise single replica is rescheduled to another Swarm node, the target node must have NFS mounted and verified for read/write access.
+- 如果 NFS 本身是单点故障，文件相关功能也会存在单点故障。生产环境应使用既有高可用 NAS 或双控制器存储。
+- Tier0 Enterprise 单副本重新调度到另一个 Swarm 节点之前，目标节点必须已挂载 NFS 并通过读写验证。
 - If Tier0 Enterprise does not write local files at all, NFS is not required.
 
 ## Connection List
@@ -677,12 +677,12 @@ NFS is introduced so that the Tier0 Enterprise single replica can still access t
 - Deploy Tier0 Enterprise by using `docker stack deploy`.
 - Tier0 Enterprise uses `replicas: 1` by default. Swarm reschedules it to another healthy node after a node failure.
 - Tier0 Enterprise containers do not store critical persistent data. Business data is stored in PostgreSQL/TimescaleDB.
-- Each Swarm node has only `100G` storage and uses it as a single system disk. The Docker data directory stays on the system disk. No separate data disk is planned.
+- 每台 Swarm 节点只有 `100G` 存储，并作为单系统盘使用。Docker 数据目录保留在系统盘上，未规划独立数据盘。
 - Use `Docker config` for configuration files.
 - Use `Docker secret` for passwords, database credentials, and certificate private keys.
 - Use an on-site internal registry for container images to avoid public network dependencies during deployment.
-- Configure health checks when publishing services to avoid forwarding traffic to containers that are not ready.
-- If the application needs shared files across nodes, mount the shared directory from NFS/NAS. Do not rely on local temporary container directories for critical files.
+- 发布服务时配置健康检查，避免将流量转发到尚未就绪的容器。
+- 如果应用需要跨节点共享文件，请从 NFS/NAS 挂载共享目录。关键文件不要依赖容器本地临时目录。
 - Configure cleanup policies for images, container logs, and build caches to avoid filling `/var/lib/docker`.
 
 **Single-replica deployment example:**
@@ -730,16 +730,16 @@ deploy:
 - Use a Swarm placement constraint to fix the node, for example `node.labels.emqx == true`.
 - Fix the data directory to the host, for example `/data/emqx`.
 - Include configurations, certificates, plugins, and rule engine configurations in backup.
-- If the node fails, restore the original node first. If it cannot be restored, recover to a new node from backup. Do not handle it as a stateless random failover.
+- 如果节点故障，优先恢复原节点；如果无法恢复，再从备份恢复到新节点。不要把它当作无状态随机故障切换处理。
 
 **Minimum requirements for three-node cluster mode:**
 
 - Fix one EMQX instance on each Swarm node.
-- Use a fixed node name for each EMQX node. The node name must not change when the container is recreated.
+- 为每个 EMQX 节点使用固定 node name。容器重建时 node name 不得变化。
 - Open cluster communication ports only between the three Swarm nodes.
 - Expose the Dashboard only to the O&M network segment.
-- MQTT access can be exposed through `APP VIP`, a separate MQTT VIP, or a layer 4 load balancer. Confirm the entry method before implementation.
-- Do not place the EMQX core data directory on NFS. In single-node fixed mode, use the fixed node local disk and backup it properly. In three-node mode, rely on the EMQX cluster mechanism.
+- MQTT 访问可以通过 `APP VIP`、独立 MQTT VIP 或四层负载均衡暴露。实施前需要确认入口方式。
+- 不要把 EMQX 核心数据目录放在 NFS 上。单节点固定模式下使用固定节点本地磁盘并做好备份；三节点模式下依赖 EMQX 集群机制。
 
 ### NFS/NAS Shared Storage
 
@@ -748,8 +748,8 @@ deploy:
 - Use it only for shared files that Tier0 Enterprise needs to access across nodes.
 - Do not use it for PostgreSQL/TimescaleDB data directories.
 - Do not use it for EMQX core runtime data.
-- Configure a pre-start mount check to avoid writing to a local directory after a service moves to a node where NFS is not mounted.
-- If NFS fails, database read/write access is not directly affected, but functions such as uploads, imports, exports, and reports may fail.
+- 配置启动前挂载检查，避免服务迁移到未挂载 NFS 的节点后写入本地目录。
+- 如果 NFS 故障，数据库读写不会直接受影响，但上传、导入、导出和报表等功能可能失败。
 
 ### APP VIP
 
@@ -824,8 +824,8 @@ deploy:
 
 ### Witness
 
-- The `Witness` node only stores `repmgr witness` metadata and helps database failure detection and arbitration.
-- `Witness` does not store business data, does not handle business read/write traffic, and does not expose database access to applications.
+- `Witness` 节点只存储 `repmgr witness` 元数据，并辅助数据库故障检测和仲裁。
+- `Witness` 不存储业务数据，不处理业务读写流量，也不向应用暴露数据库访问。
 - `Witness` needs stable network access. It does not require high storage performance.
 - A `Witness` failure should not stop current business access, but it lowers the reliability of automatic failover.
 - After `Witness` recovers, verify that it has rejoined the database cluster state.
@@ -1299,7 +1299,7 @@ deploy:
 - Enable WAL archiving or incremental backups to meet the on-site RPO.
 - Perform a restore drill every month to verify that backups are usable.
 - Monitor Swarm service health checks, container restart counts, node disk usage, memory, and CPU.
-- Monitor EMQX connections, subscriptions, message throughput, queue backlog, rule engine failures, and persistent directory usage.
+- 监控 EMQX 连接、订阅、消息吞吐、队列积压、规则引擎失败和持久化目录使用情况。
 - Monitor NFS availability, mount status, capacity, inode usage, and read/write latency.
 - Monitor PostgreSQL primary-standby delay, replication slots, WAL backlog, connections, slow SQL, and database bloat.
 - Include the current VIP owner, repmgr cluster status, and Witness status in routine inspections.
@@ -1410,9 +1410,9 @@ ssh ent-db-01 'ip addr show | grep 10.60.20.10'
 
 - The actual on-site network segment, gateway, DNS, NTP, certificates, and image registry address must be confirmed.
 - It is not yet confirmed whether Tier0 Enterprise needs local file persistence. If it does, add a shared storage or object storage solution.
-- It must be confirmed whether NFS/NAS is provided by existing on-site storage. If NFS is a single point of failure, shared file functions will also have a single point of failure.
-- Each Swarm node has only a `100G` single system disk. Control the number of images, container logs, and temporary files. It is not suitable for long-term business data storage.
-- `EMQX` is a stateful service. Before implementation, confirm whether to use single-node fixed mode or three-node cluster mode. In single-node fixed mode, the messaging layer has a single point of failure.
-- Database RPO/RTO has not been confirmed. The current plan uses primary-standby automatic failover and cannot promise zero data loss.
+- 必须确认 NFS/NAS 是否由现场既有存储提供。如果 NFS 是单点故障，共享文件功能也会存在单点故障。
+- 每台 Swarm 节点只有一块 `100G` 系统盘。需要控制镜像、容器日志和临时文件数量，不适合长期存储业务数据。
+- `EMQX` 是有状态服务。实施前需要确认使用单节点固定模式还是三节点集群模式。单节点固定模式下，消息层存在单点故障。
+- 数据库 RPO/RTO 尚未确认。当前方案使用主备自动故障切换，不能承诺零数据丢失。
 - The `DB VIP` failover script must be verified on site, especially whether the virtualization platform allows VRRP.
 - If the on-site network does not allow VRRP, use a load balancer, DNS switch, or virtualization-platform floating IP instead.

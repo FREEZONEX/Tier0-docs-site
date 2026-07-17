@@ -5,28 +5,28 @@ sidebar:
   order: 4
 ---
 
-This document applies to the six-VM fully offline deployment: three application / Swarm nodes, two PostgreSQL HA nodes, and one witness node.
+このドキュメントは、3 台のアプリケーション / Swarm ノード、2 台の PostgreSQL HA ノード、1 台の witness ノードで構成される 6 VM 完全オフラインデプロイに適用されます。
 
 ## Architecture Baseline
 
 | Layer | Current Design | High Availability Boundary |
 | --- | --- | --- |
-| Application runtime | Enterprise New compose runs on the fixed `tier0_app_active_node`. | `backend`, `redis`, `EMQX`, `SourceFlow`, `EventFlow`, `Marimo`, and `OPC UA Server` are not automatically multi-replica services yet. |
+| アプリケーションランタイム | Enterprise New compose は固定の `tier0_app_active_node` 上で実行されます。 | `backend`、`redis`、`EMQX`、`SourceFlow`、`EventFlow`、`Marimo`、`OPC UA Server` はまだ自動マルチレプリカサービスではありません。 |
 | HTTP entry | Three application nodes run keepalived APP VIP + HAProxy. | The VIP can float. HAProxy forwards to the active node on `8088/TCP` and checks `/healthz`. |
-| MQTT / OPC UA | EMQX uses `1883/8883/8083/8084`; OPC UA uses `4840`. | These connect directly to the active node. They are not included in TCP VIP proxying, so protocol-entry HA is not promised. |
-| Database | PostgreSQL / TimescaleDB streaming replication + repmgr + witness + DB VIP. | If the primary fails, the standby can be promoted automatically. Asynchronous replication cannot promise strict zero RPO. |
+| MQTT / OPC UA | EMQX は `1883/8883/8083/8084`、OPC UA は `4840` を使用します。 | これらはアクティブノードへ直接接続します。TCP VIP プロキシには含まれないため、プロトコル入口の HA は保証されません。 |
+| データベース | PostgreSQL / TimescaleDB ストリーミングレプリケーション + repmgr + witness + DB VIP。 | primary 障害時に standby を自動昇格できます。非同期レプリケーションは厳密なゼロ RPO を保証できません。 |
 | Backup and restore | `backup-db.sh` / `restore-db.sh`. | Provides recoverability, but it is not the same as online HA. |
 
 ## Recommended SLA
 
 | Service Object | Recommended Statement | Constraints |
 | --- | --- | --- |
-| Platform HTTP entry | Start from monthly availability of `99.5%`. | VIP failover is not the same as automatic migration of the active application node. |
-| Database access | Operations target: `RTO <= 2 minutes`. | RPO depends on replication lag. Historical failover tests on the same architecture were about 59-64 seconds. |
+| プラットフォーム HTTP 入口 | 月間可用性 `99.5%` から開始します。 | VIP フェイルオーバーはアクティブアプリケーションノードの自動移行と同じではありません。 |
+| データベースアクセス | 運用目標：`RTO <= 2 minutes`。 | RPO はレプリケーション遅延に依存します。同じアーキテクチャでの過去フェイルオーバーテストは約 59-64 秒でした。 |
 | MQTT / OPC UA | No HA SLA is promised in the current design. | HAProxy TCP proxying, a separate VIP, or service clustering must be added first. |
-| Backup and restore | Daily backups; mandatory backup before major changes. | Restore time depends on data volume and on-site I/O. |
+| バックアップと復元 | 毎日バックアップ。大きな変更前は必須。 | 復元時間はデータ量と現地 I/O に依存します。 |
 
-Before claiming `99.9%` or higher, complete application automatic migration or multi-replica deployment, protocol-entry HA, monitoring alerts, and recovery drills. Do not describe planned capabilities as delivered capabilities.
+`99.9%` 以上を主張する前に、アプリケーションの自動移行またはマルチレプリカデプロイ、プロトコル入口の HA、監視アラート、復旧訓練を完了してください。計画中の機能を納品済み機能として記述しないでください。
 
 ## Acceptance Gates
 
@@ -64,7 +64,7 @@ Configure at least the following alerts:
 | --- | --- | --- |
 | APP VIP failover | Before delivery and quarterly. | After stopping keepalived on the current VIP node, `/healthz` and `/readyz` recover. |
 | DB primary failure | Before delivery and every six months. | The standby is promoted, DB VIP recovers, and the old primary is rebuilt as a standby. |
-| Database restore | Monthly sample and before major changes. | The backup is restorable. After restore, `verify`, smoke checks, and login verification pass. |
+| データベース復元 | 毎月のサンプル確認、および大きな変更前。 | バックアップが復元可能であること。復元後に `verify`、スモークチェック、ログイン検証が通過すること。 |
 | Material verification | Every package build. | Source materials, package SHA, and unpacking verification pass. |
 
 ## Incident Handling Principles
@@ -72,7 +72,7 @@ Configure at least the following alerts:
 1. Confirm the impact scope first: HTTP, MQTT, OPC UA, database, and single-node impact.
 2. Prioritize restoring VIP, HAProxy, the active application, and the database primary.
 3. Preserve logs, data directories, and backups. Do not directly clean or overwrite the incident site.
-4. For database incidents, determine the current primary first, then decide whether to fail over, rejoin, or restore.
+4. データベースインシデントでは、まず現在の primary を特定し、その後フェイルオーバー、再参加、復元のいずれを行うか判断します。
 5. After recovery, run `verify`, smoke checks, and actual login verification.
 
 ## High-SLA Hardening Items

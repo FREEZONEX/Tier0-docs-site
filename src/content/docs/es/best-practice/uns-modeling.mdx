@@ -19,18 +19,18 @@ Before modeling data, answer the following questions.
 
 ### Datos físicos
 
-Industrial data from machines and equipment with physical locations is modeled based on the ISA-95 standard.
+Los datos industriales de máquinas y equipos con ubicaciones físicas se modelan normalmente según el estándar ISA-95.
 
 #### Jerarquía de equipos ISA-95
-The ISA-95 Equipment Hierarchy outlines how physical assets and control systems are structured within an organization.
+La jerarquía de equipos ISA-95 describe cómo se estructuran los activos físicos y los sistemas de control dentro de una organización.
 It is broken into the following levels:
-- **Enterprise**: The top level, representing the entire organization. This includes overall business processes and decision-making entities, typically supported by ERP systems.  
-- **Site**: Represents a specific geographic location or facility. Each site can have its own management systems and local production control. 
-- **Area**: An operational division within a site, often a functional area such as packaging, assembly, or warehousing. 
-- **Process Cell**: The basic unit of manufacturing within an area. It encompasses all the equipment required to produce a specific product or perform a specific function. 
-- **Unit**: A distinct part of the process cell, responsible for a specific function such as mixing, heating, or assembling. 
-- **Equipment Module**: A modular piece of equipment that performs a specific task within a unit. For example, in a mixing unit, the module could be a heating element.  
-- **Control Module**: The lowest level, representing individual devices or controllers such as sensors, pumps, actuators, or PID control loops that handle direct control of physical processes.
+- **Enterprise**: El nivel superior, que representa toda la organización. Incluye procesos de negocio generales y entidades de decisión, normalmente soportadas por sistemas ERP.  
+- **Site**: Representa una ubicación geográfica o instalación específica. Cada site puede tener sus propios sistemas de gestión y control local de producción. 
+- **Area**: Una división operativa dentro de un site, a menudo un área funcional como empaque, ensamblaje o almacén. 
+- **Process Cell**: La unidad básica de fabricación dentro de un area. Incluye todos los equipos necesarios para producir un producto específico o realizar una función específica. 
+- **Unit**: Una parte diferenciada del process cell, responsable de una función específica como mezclar, calentar o ensamblar. 
+- **Equipment Module**: Un equipo modular que realiza una tarea específica dentro de un unit. Por ejemplo, en un unit de mezcla, el módulo podría ser un elemento calefactor.  
+- **Control Module**: El nivel más bajo, que representa dispositivos o controladores individuales como sensores, bombas, actuadores o lazos PID que controlan directamente procesos físicos.
 
 #### Modelo demo
 <Tabs syncKey="demo-uns-model">
@@ -377,7 +377,7 @@ DemoFactory
 
 ### Datos de negocio
 
-For business planning and process objects, such as production orders and work order plans in an ERP, model data according to its business context.
+Para objetos de planificación y proceso de negocio, como órdenes de producción y planes de trabajo en un ERP, modela los datos según su contexto de negocio.
 :::tip[How to recognize business data]
 Data that does not have a physical location.
 :::
@@ -415,9 +415,9 @@ Factory / Business Domain / Business Object / Topic Type / Topic
 
     | Topic Type | Used for | Examples |
     | --- | --- | --- |
-    | STATE | Current status or current facts | Work order status, order status, equipment status |
-    | METRIC | Continuously changing numeric values | Temperature, speed, output, OEE, energy consumption |
-    | ACTION | Commands for external executors | Start equipment, stop equipment, reset alarm, request work order dispatch |
+    | STATE | Estado actual o hechos actuales | Estado de orden de trabajo, estado de orden, estado de equipo |
+    | METRIC | Valores numéricos que cambian continuamente | Temperatura, velocidad, producción, OEE, consumo de energía |
+    | ACTION | Comandos para ejecutores externos | Iniciar equipo, detener equipo, restablecer alarma, solicitar despacho de orden de trabajo |
 
 #### Modelo demo
 <Tabs syncKey="business-data-model">
@@ -676,7 +676,7 @@ Tier0 uses 3 fixed topic types: `Metric`, `Action`, and `State` to avoid topic e
 
 - **Usa `Metric` para datos en tiempo real de alta frecuencia**
 
-  Put high-frequency measurements and telemetry under `Metric` instead of expanding the namespace for every signal detail.
+  Coloca mediciones y telemetría de alta frecuencia bajo `Metric` en lugar de ampliar el namespace para cada detalle de señal.
 
   <Tabs syncKey="topic-explosion-metric">
     <TabItem label="Bad">
@@ -717,7 +717,7 @@ Tier0 uses 3 fixed topic types: `Metric`, `Action`, and `State` to avoid topic e
 
 - **Usa `State` para datos de estado de baja frecuencia**
 
-  Put low-frequency status, snapshots, and current business state under `State`. Avoid creating a new topic for every changing entity such as jobs, batches, or orders.
+  Coloca estados de baja frecuencia, snapshots y estado de negocio actual bajo `State`. Evita crear un topic nuevo para cada entidad cambiante, como trabajos, lotes u órdenes.
 
   <Tabs syncKey="topic-explosion-state">
     <TabItem label="Bad">
@@ -755,7 +755,7 @@ Tier0 uses 3 fixed topic types: `Metric`, `Action`, and `State` to avoid topic e
 
 - **Usa `Action` para datos de acción de baja frecuencia**
 
-  Put commands, requests, and operator actions under `Action`. Keep action inputs as fields on a topic rather than creating one topic per parameter.
+  Coloca comandos, solicitudes y acciones de operador bajo `Action`. Mantén las entradas de la acción como campos de un topic en lugar de crear un topic por parámetro.
 
   <Tabs syncKey="topic-explosion-action">
     <TabItem label="Bad">
@@ -794,11 +794,11 @@ Tier0 uses 3 fixed topic types: `Metric`, `Action`, and `State` to avoid topic e
 
 ## Estructura del payload
 
-Data to be consumed and written back must both be considered when structuring the topic payload.
+Al estructurar el topic payload, considera tanto los datos que se consumen como los datos que se escriben de vuelta.
 
 - **Action**
 
-  Action payloads automatically include `_timestamp`, which records when the data is stored in the Tier0 database.
+  Los payloads de Action incluyen automáticamente `_timestamp`, que registra cuándo se almacenan los datos en la base de datos de Tier0.
 
   <Tabs syncKey="payload-action">
     <TabItem label="start_job">
@@ -827,7 +827,7 @@ Data to be consumed and written back must both be considered when structuring th
 
 - **Metric**
 
-  Metric payloads automatically include `_timestamp`, which records when the data is stored in the Tier0 database, and `_quality`, which maps the data quality.
+  Los payloads de Metric incluyen automáticamente `_timestamp`, que registra cuándo se almacenan los datos en la base de datos de Tier0, y `_quality`, que representa la calidad de los datos.
 
   <Tabs syncKey="payload-metric">
     <TabItem label="ERP / SplitCount">
@@ -866,7 +866,7 @@ Data to be consumed and written back must both be considered when structuring th
 
 - **State**
 
-  State payloads automatically include `_timestamp`, which records when the data is stored in the Tier0 database.
+  Los payloads de State incluyen automáticamente `_timestamp`, que registra cuándo se almacenan los datos en la base de datos de Tier0.
 
   <Tabs syncKey="payload-state">
     <TabItem label="ERP / UpsertProductionOrder">
