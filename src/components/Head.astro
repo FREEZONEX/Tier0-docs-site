@@ -1,0 +1,38 @@
+---
+import Default from '@astrojs/starlight/components/Head.astro';
+---
+
+<Default {...Astro.props} />
+<script is:inline>
+	(function () {
+		function bindTable(table) {
+			if (table.dataset.t0WheelBound === '1') return;
+			table.dataset.t0WheelBound = '1';
+			table.addEventListener(
+				'wheel',
+				function (e) {
+					if (table.scrollWidth <= table.clientWidth + 1) return;
+					// Only remap dominant vertical gestures (mouse wheel / trackpad).
+					if (Math.abs(e.deltaY) <= Math.abs(e.deltaX)) return;
+					var max = table.scrollWidth - table.clientWidth;
+					var next = Math.min(max, Math.max(0, table.scrollLeft + e.deltaY));
+					if (next === table.scrollLeft) return;
+					e.preventDefault();
+					table.scrollLeft = next;
+				},
+				{ passive: false },
+			);
+		}
+
+		function scan() {
+			document.querySelectorAll('.sl-markdown-content table').forEach(bindTable);
+		}
+
+		if (document.readyState === 'loading') {
+			document.addEventListener('DOMContentLoaded', scan);
+		} else {
+			scan();
+		}
+		document.addEventListener('astro:page-load', scan);
+	})();
+</script>

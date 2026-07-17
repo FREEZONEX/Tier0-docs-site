@@ -28,10 +28,15 @@ docs.`}</pre>
 		</button>
 	</div>
 	<div class="t0-banner-side">
-		<p>Prefer doing it by hand?</p>
-		<p class="t0-endpoints"><a href="/get-started/installation/">Installation guide</a> · <a href="/get-started/demo-factory/">Demo Factory</a></p>
-		<p>Machine-readable endpoints for agents:</p>
-		<p class="t0-endpoints"><a href="/llms.txt">/llms.txt</a></p>
+		<div class="t0-side-group">
+			<p class="t0-side-label">Prefer doing it by hand?</p>
+			<a class="t0-side-link" href="/get-started/installation/">Installation guide</a>
+			<a class="t0-side-link" href="/get-started/demo-factory/">Demo Factory</a>
+		</div>
+		<div class="t0-side-group">
+			<p class="t0-side-label">Machine-readable endpoints for agents:</p>
+			<a class="t0-side-link" href="/llms.txt">/llms.txt</a>
+		</div>
 	</div>
 </section>
 
@@ -67,26 +72,23 @@ document.getElementById('t0-copy-btn').addEventListener('click', function () {
 	<p>Field-tested patterns from real Tier0 deployments.</p>
 </div>
 
-<section class="t0-grid-wrap t0-frame not-content">
-	<span class="t0-corners" aria-hidden="true"></span>
-	<div class="t0-grid">
-		<a class="t0-cell" href="/best-practice/uns-modeling/">
-			<span class="t0-tag">Modeling</span>
-			<h3>UNS Modeling</h3>
-			<p>How the Demo UNS is designed — hierarchy, avoiding topic explosion, and payload structure that scales.</p>
-			<span class="t0-more">Read more</span>
-		</a>
-		<a class="t0-cell" href="/best-practice/protocol-connections/">
-			<span class="t0-tag">Protocols</span>
-			<h3>Connecting OPC UA / Modbus</h3>
-			<p>Node-RED flows for typical industrial protocols, with real importable flow JSON references.</p>
-			<span class="t0-more">Read more</span>
-		</a>
-		<a class="t0-cell" href="/best-practice/analytics-apps/">
-			<span class="t0-tag">Analytics</span>
-			<h3>Building Analytics Apps</h3>
-			<p>From Notebook query to interactive analysis app — the Aramco Bowtie case, on sanitized data.</p>
-			<span class="t0-more">Read more</span>
-		</a>
-	</div>
+<section class="t0-grid not-content">
+	<a class="t0-cell" href="/best-practice/uns-modeling/">
+		<span class="t0-tag">Modeling</span>
+		<h3>UNS Modeling</h3>
+		<p>How the Demo UNS is designed — hierarchy, avoiding topic explosion, and payload structure that scales.</p>
+		<span class="t0-more">Read more</span>
+	</a>
+	<a class="t0-cell" href="/best-practice/protocol-connections/">
+		<span class="t0-tag">Protocols</span>
+		<h3>Connecting OPC UA / Modbus</h3>
+		<p>Node-RED flows for typical industrial protocols, with real importable flow JSON references.</p>
+		<span class="t0-more">Read more</span>
+	</a>
+	<a class="t0-cell" href="/best-practice/analytics-apps/">
+		<span class="t0-tag">Analytics</span>
+		<h3>Building Analytics Apps</h3>
+		<p>From Notebook query to interactive analysis app — the Aramco Bowtie case, on sanitized data.</p>
+		<span class="t0-more">Read more</span>
+	</a>
 </section>

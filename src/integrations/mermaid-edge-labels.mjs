@@ -74,15 +74,6 @@ function adjustMermaidEdgeLabels(root) {
 	const svg = root.querySelector('svg');
 	if (!svg) return;
 
-	// Prefer intrinsic diagram width so narrow viewports scroll instead of shrinking text.
-	const viewBox = svg.viewBox?.baseVal;
-	if (viewBox && viewBox.width > 0) {
-		svg.setAttribute('width', String(Math.ceil(viewBox.width)));
-		if (viewBox.height > 0) {
-			svg.setAttribute('height', String(Math.ceil(viewBox.height)));
-		}
-	}
-
 	const paths = svg.querySelectorAll('path.flowchart-link[data-id], path.edge-thickness-normal[data-id]');
 	const lineGap = 4;
 	const sideGap = 8;
@@ -128,6 +119,15 @@ function adjustMermaidEdgeLabels(root) {
 	}
 
 	fitSvgViewBox(svg, 6);
+
+	// Keep intrinsic diagram size; narrow viewports scroll instead of shrinking text.
+	const viewBox = svg.viewBox?.baseVal;
+	if (viewBox && viewBox.width > 0) {
+		svg.setAttribute('width', String(Math.ceil(viewBox.width)));
+		if (viewBox.height > 0) {
+			svg.setAttribute('height', String(Math.ceil(viewBox.height)));
+		}
+	}
 }
 
 function adjustAllMermaidEdgeLabels() {
