@@ -1,0 +1,29 @@
+---
+title: Standard Port List
+description: Lista de puertos de firewall para el despliegue offline estándar de Tier0 Enterprise con seis VM.
+sidebar:
+  order: 5
+---
+
+The following table is based on the Enterprise New six-VM offline deployment. Customer firewalls should allow traffic from the minimum required source ranges only. Do not expose these ports directly to the public internet.
+
+| Source | Target | Port | Protocol | Purpose |
+| --- | --- | ---: | --- | --- |
+| Control host | Six target VMs | 22 | TCP | SSH / Ansible |
+| Three application nodes, mutually | Three application nodes | 2377 | TCP | Docker Swarm management plane |
+| Three application nodes, mutually | Three application nodes | 7946 | TCP/UDP | Swarm node discovery |
+| Three application nodes, mutually | Three application nodes | 4789 | UDP | Swarm overlay |
+| Three application nodes | Active application node | 8088 | TCP | HAProxy to Enterprise New backend; application network segment only |
+| Business network segment | APP VIP | 80 | TCP | Platform HTTP entry, `/healthz`, `/readyz` |
+| Business network segment | APP VIP / active application node | 1883 | TCP | MQTT |
+| Business network segment | APP VIP / active application node | 8883 | TCP | MQTT TLS |
+| Business network segment | APP VIP / active application node | 8083 | TCP | MQTT WebSocket |
+| Business network segment | APP VIP / active application node | 8084 | TCP | MQTT WebSocket TLS |
+| Business network segment | APP VIP / active application node | 4840 | TCP | OPC UA Server |
+| Controlled application network segment | Active application node | 8089 | TCP | Launchpad |
+| Dynamic app access network segment | Active application node | 30000-30199 | TCP | App Gateway / dynamic application host ports |
+| Application nodes, DB nodes, and witness | DB VIP / DB nodes | 5432 | TCP | PostgreSQL / TimescaleDB |
+| DB1, DB2, and witness | DB1, DB2, and witness | 5432 | TCP | Streaming replication / repmgr |
+| Application nodes | NFS server | 2049 | TCP/UDP | Used when `NFS_ENABLED=true` |
+
+The current compose deployment does not expose Redis, SourceFlow, EventFlow, Marimo, or the EMQX Dashboard externally. These services are only called by the backend inside the Docker runtime network.

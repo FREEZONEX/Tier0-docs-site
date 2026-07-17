@@ -1,0 +1,87 @@
+---
+title: SLA and High Availability Boundaries
+description: SLA recommendations, high availability boundaries, acceptance gates, drills, and hardening items for the standard Tier0 Enterprise deployment.
+sidebar:
+  order: 4
+---
+
+This document applies to the six-VM fully offline deployment: three application / Swarm nodes, two PostgreSQL HA nodes, and one witness node.
+
+## Architecture Baseline
+
+| Layer | Current Design | High Availability Boundary |
+| --- | --- | --- |
+| Application runtime | Enterprise New compose runs on the fixed `tier0_app_active_node`. | `backend`, `redis`, `EMQX`, `SourceFlow`, `EventFlow`, `Marimo`, and `OPC UA Server` are not automatically multi-replica services yet. |
+| HTTP entry | Three application nodes run keepalived APP VIP + HAProxy. | The VIP can float. HAProxy forwards to the active node on `8088/TCP` and checks `/healthz`. |
+| MQTT / OPC UA | EMQX uses `1883/8883/8083/8084`; OPC UA uses `4840`. | These connect directly to the active node. They are not included in TCP VIP proxying, so protocol-entry HA is not promised. |
+| Database | PostgreSQL / TimescaleDB streaming replication + repmgr + witness + DB VIP. | If the primary fails, the standby can be promoted automatically. Asynchronous replication cannot promise strict zero RPO. |
+| Backup and restore | `backup-db.sh` / `restore-db.sh`. | Provides recoverability, but it is not the same as online HA. |
+
+## Recommended SLA
+
+| Service Object | Recommended Statement | Constraints |
+| --- | --- | --- |
+| Platform HTTP entry | Start from monthly availability of `99.5%`. | VIP failover is not the same as automatic migration of the active application node. |
+| Database access | Operations target: `RTO <= 2 minutes`. | RPO depends on replication lag. Historical failover tests on the same architecture were about 59-64 seconds. |
+| MQTT / OPC UA | No HA SLA is promised in the current design. | HAProxy TCP proxying, a separate VIP, or service clustering must be added first. |
+| Backup and restore | Daily backups; mandatory backup before major changes. | Restore time depends on data volume and on-site I/O. |
+
+Before claiming `99.9%` or higher, complete application automatic migration or multi-replica deployment, protocol-entry HA, monitoring alerts, and recovery drills. Do not describe planned capabilities as delivered capabilities.
+
+## Acceptance Gates
+
+Each deployment or upgrade must satisfy at least the following:
+
+- `verify-materials.sh` passes, and the delivery package SHA256 checks pass.
+- The three Swarm nodes are `Ready`.
+- `APP VIP /healthz` and `/readyz` return `200`, and the home page and `/uns` are accessible.
+- The seven compose services on the active node are running.
+- `DB VIP:5432` is accessible, and the primary, standby, and witness topology is normal.
+- The default account can actually log in. Do not judge IAM initialization success only from ports, containers, or HTTP 200 responses.
+- Smoke checks for HTTP, EMQX ports, WebSocket/WSS, and OPC UA TCP pass.
+
+## Inspection and Alerts
+
+Run the following every day:
+
+```bash
+./bin/verify.sh --site config/site.conf
+./bin/smoke-business-emqx.sh --site config/site.conf
+```
+
+Configure at least the following alerts:
+
+- APP VIP `/healthz` or `/readyz` failure.
+- DB VIP unreachable, no primary, split-brain risk, replication interruption, or replication lag above threshold.
+- keepalived, HAProxy, PostgreSQL, or repmgrd abnormal status.
+- Key containers such as `backend`, `redis`, and `EMQX` exit or restart frequently.
+- Data disk usage exceeds `80% / 90%`.
+- The latest backup failed or was not generated.
+
+## Drill Requirements
+
+| Drill | Frequency | Verification Criteria |
+| --- | --- | --- |
+| APP VIP failover | Before delivery and quarterly. | After stopping keepalived on the current VIP node, `/healthz` and `/readyz` recover. |
+| DB primary failure | Before delivery and every six months. | The standby is promoted, DB VIP recovers, and the old primary is rebuilt as a standby. |
+| Database restore | Monthly sample and before major changes. | The backup is restorable. After restore, `verify`, smoke checks, and login verification pass. |
+| Material verification | Every package build. | Source materials, package SHA, and unpacking verification pass. |
+
+## Incident Handling Principles
+
+1. Confirm the impact scope first: HTTP, MQTT, OPC UA, database, and single-node impact.
+2. Prioritize restoring VIP, HAProxy, the active application, and the database primary.
+3. Preserve logs, data directories, and backups. Do not directly clean or overwrite the incident site.
+4. For database incidents, determine the current primary first, then decide whether to fail over, rejoin, or restore.
+5. After recovery, run `verify`, smoke checks, and actual login verification.
+
+## High-SLA Hardening Items
+
+- Make the application multi-replica, or establish a verifiable automatic migration process for the active node.
+- Cluster EMQX, or route it through HAProxy TCP / TLS with a dedicated VIP.
+- Provide a high-availability entry for OPC UA through HAProxy TCP, a dedicated VIP, or service clustering.
+- Use PostgreSQL synchronous replication, or define acceptable replication lag and RPO clearly.
+- Automate backup scheduling, off-site replication, and regular restore drills.
+- Connect containers, hosts, databases, logs, and black-box probes to unified alerting.
+
+Related procedures: [Operations Runbook](../operations-runbook/) and [Standard Port List](../standard-port-list/).

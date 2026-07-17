@@ -1,0 +1,146 @@
+---
+title: Agents で Tier0 を操作する
+description: Tier0 Skill でできることと、そのインストール方法。
+editions: [edge, cloud, enterprise]
+sidebar:
+  order: 6
+---
+
+import { Steps } from '@astrojs/starlight/components';
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+
+Tier0 は、agents が操作するための skills と CLI コマンドを提供します。
+
+## Tier0 Skills のインストール
+
+> Required CLI version: `v0.4.6+`
+
+環境に合うインストーラーを選択してください。
+
+### Node.js がある場合
+
+Node.js 16 以降が利用できる場合は、`npx` を使って CLI と skills をインストールします。
+
+```bash
+npx @tier0/cli@latest
+```
+
+これはフルインストーラーを実行し、次の 2 つを行います。
+
+- `tier0` CLI binary を `~/.tier0/bin/` にインストールします。
+- `FREEZONEX/Tier0-skill` から Cursor/Claude Agent Skills をインストールします。
+:::tip[Agent Skills の登録ステップが失敗した場合]
+Agent Skills の登録ステップが失敗しても、CLI のインストールには影響しません。skills installer を手動で実行してください。
+
+```bash
+npx skills add FREEZONEX/Tier0-skill
+```
+:::
+
+### Node.js がない場合
+
+<Steps>
+1. `tier0` CLI binary をインストールします。
+</Steps>
+
+<Tabs syncKey="tier0-cli-binary-install">
+  <TabItem label="curl">
+
+    ```bash
+    curl -fsSL https://raw.githubusercontent.com/FREEZONEX/Tier0-cli/main/install.sh | bash
+    ```
+
+  </TabItem>
+  <TabItem label="iwr">
+
+    ```powershell
+    iwr https://raw.githubusercontent.com/FREEZONEX/Tier0-cli/main/install.ps1 | iex
+    ```
+
+  </TabItem>
+</Tabs>
+
+<Steps>
+2. Agent Skills をインストールします。
+
+</Steps>
+
+```bash
+tier0 skills update
+```
+
+## Tier0 Skill でできること
+
+Tier0 Skills は、agents が適切な CLI コマンドを選び、対応する reference を読み、`tier0` CLI を通じて Tier0 を操作するための構造化された方法を提供します。
+
+### 操作インスタンスを設定する
+:::note
+Cloud はデフォルトで `https://tier0.dev` を使用するため、base URL の設定は不要です。
+:::
+プライベートデプロイでは、ログイン前に base URL を設定する必要があります。設定後、以降のコマンドはすべてそのインスタンスで実行されます。
+
+```bash
+tier0 config --base-url https://your-tier0.example.com
+```
+
+### ログイン
+
+<Tabs syncKey="tier0-login-method">
+  <TabItem label="API key あり">
+
+  <Steps>
+  1. 操作インスタンスに API key を設定します。
+
+      ```bash
+      tier0 config --api-key <api-key>
+      ```
+  2. API key の ID と権限を確認します。
+      ```bash
+      tier0 auth whoami
+      ```
+  3. `tier0` CLI で他の操作を実行します。
+  </Steps>
+
+  </TabItem>
+  <TabItem label="API key なし">
+
+  <Steps>
+  1. ブラウザログインを開始します。
+
+      ```bash
+      tier0 login --no-wait --json
+      ```
+  2. 返された `verification_url` にアクセスし、ブラウザで認証を完了します。
+  3. 返された `setup_code` でログイン結果をポーリングします。
+      ```bash
+      tier0 login --setup-code <setup_code>
+      ```
+ </Steps>
+  </TabItem>
+</Tabs>
+
+:::caution[重要]
+API key を設定する前、またはブラウザログインを開始する前に、`config` を実行して操作インスタンスを設定してください。そうしないと、CLI が誤ったインスタンスを操作する可能性があります。
+:::
+
+## Tier0 Skills のアンインストール
+
+```bash
+# ローカル設定を残したまま Tier0 CLI を削除します。
+npx @tier0/cli@latest uninstall
+
+# Tier0 CLI を削除し、ローカル設定、認証情報、skills、キャッシュも削除します。
+npx @tier0/cli@latest uninstall --purge
+```
+
+## Skill リファレンス
+
+[Tier0 Skill Reference](../../reference/tier0-skill/) には、サポートされる操作対象、一般的なタスク、対応する CLI コマンドが一覧化されています。
+
+:::tip[agent に repo を読ませる]
+コマンドを実行する前に、agent に [Tier0 Skill repo](https://github.com/FREEZONEX/Tier0-skill) を読ませてください。
+:::
+
+## 次へ
+
+- [UNS データを扱う](../working-with-uns-data/) — MQTT と API を通じて UNS モデルを操作する方法。

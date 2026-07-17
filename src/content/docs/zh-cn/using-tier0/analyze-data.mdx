@@ -1,44 +1,44 @@
----
-title: Analyze UNS Data
-description: Query live namespace data in Tier0 Notebook and build interactive analyses and machine-learning apps. Available in Cloud and Enterprise.
+﻿---
+title: 分析 UNS 数据
+description: "在 Tier0 Notebook 中查询实时 namespace 数据，并构建交互式分析和机器学习应用。Cloud 和 Enterprise 可用。"
 editions: [cloud, enterprise]
 sidebar:
   order: 5
 ---
 import { Steps } from '@astrojs/starlight/components';
 
-Tier0 uses Marimo Notebook for advanced data analysis with **Python** scripts.
+Tier0 使用 Marimo Notebook，通过 **Python** 脚本进行高级数据分析。
 
-## Querying Data from UNS
-:::tip[Know Before you start]
-UNS data stored in the database is available as an existing data source in **Notebook**.
+## 从 UNS 查询数据
+:::tip[开始前须知]
+存储在数据库中的 UNS 数据会作为 **Notebook** 中已有的数据源使用。
 :::
 <Steps>
-1. Create a notebook, click the **VARIABLES** on the left side inside it.
-2. Expand the **PostgreSQL** list, select a table under **tenant_id** > **uns**.
-3. Click the **+** icon next to the table to generate default and SQL statements cells automatically.
+1. 创建一个 notebook，然后点击内部左侧的 **VARIABLES**。
+2. 展开 **PostgreSQL** 列表，在 **tenant_id** > **uns** 下选择一张表。
+3. 点击表旁边的 **+** 图标，自动生成默认 cell 和 SQL statement cell。
 
     ```sql
     SELECT * FROM "uns"."table_name" LIMIT 100
     ```
 
-4. Run all cells and get the query result.
+4. 运行所有 cells，获取查询结果。
 </Steps>
 
-## Analyzing UNS Data
+## 分析 UNS 数据
 
-### Example Background
-- Data source is temperature, pressure, status and vibration of a compressor collected from a factory and sent to Tier0 UNS.
-- Isolation Forest is used to detect abnormal data points in the dataset.
-- Detection sensitivity can be adjusted, and the results are visualized accordingly in a dashboard.
+### 示例背景
+- 数据源是从工厂采集并发送到 Tier0 UNS 的压缩机温度、压力、状态和振动数据。
+- 使用 Isolation Forest 检测数据集中的异常数据点。
+- 可以调整检测灵敏度，并在 dashboard 中可视化展示结果。
 
-### Operations
+### 操作步骤
 <Steps>
-1. Create a notebook and add the following cells in order.
+1. 创建一个 notebook，并按顺序添加以下 cells。
 </Steps>
 
 <details className="notebook-cell">
-<summary>Cell 1: Import dependencies.</summary>
+<summary>Cell 1：导入依赖。</summary>
 
 ```python
 import marimo as mo
@@ -53,7 +53,7 @@ from sklearn.ensemble import IsolationForest
 </details>
 
 <details className="notebook-cell">
-<summary>Cell 2: Get data from UNS and clean it for analysis.</summary>
+<summary>Cell 2：从 UNS 获取数据，并清洗为可分析数据。</summary>
 
 ```sql
 status_pd = status_data.to_pandas()
@@ -140,7 +140,7 @@ running_data
 </details>
 
 <details className="notebook-cell">
-<summary>Cell 3: Set the slider for anomaly detection threshold.</summary>
+<summary>Cell 3：设置异常检测阈值滑块。</summary>
 
 ```python
 
@@ -169,7 +169,7 @@ A higher threshold applies stricter criteria and identifies more operating recor
 </details>
 
 <details className="notebook-cell">
-<summary>Cell 4: Use the <strong>Isolation Forest</strong> model to detect anomalies.</summary>
+<summary>Cell 4：使用 <strong>Isolation Forest</strong> 模型检测异常。</summary>
 
 ```python
 feature_names = [
@@ -232,7 +232,7 @@ ml_result
 </details>
 
 <details className="notebook-cell">
-<summary>Cell 5: Displays results on a dashboard.</summary>
+<summary>Cell 5：在 dashboard 中展示结果。</summary>
 
 ```python
 # Calculate summary metrics
@@ -599,13 +599,13 @@ mo.vstack([
 </details>
 
 <Steps>
-2. Run all cells and view the results.
+2. 运行所有 cells 并查看结果。
 </Steps>
-:::tip[Different ways to view the results]
-Change the view style at the upper-right corner among **Vertical**, **Grid** and **Slides**.
+:::tip[查看结果的不同方式]
+可以在右上角切换 **Vertical**、**Grid** 和 **Slides** 等视图样式。
 :::
 
-## Next
+## 下一步
 
-- [Build Apps on UNS](../build-apps/) — Build industrial applications with UNS data.
-- [UNS Concepts](../uns-concepts/) — Understand data modeling in Unified Namespace.
+- [在 UNS 上构建应用](../build-apps/) — 使用 UNS 数据构建工业应用。
+- [UNS 概念](../uns-concepts/) — Understand data modeling in Unified Namespace.

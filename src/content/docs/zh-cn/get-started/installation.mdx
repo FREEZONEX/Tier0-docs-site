@@ -1,0 +1,141 @@
+---
+title: 安装
+description: 按版本安装 Tier0。
+sidebar:
+  order: 1
+---
+
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+import { Steps } from '@astrojs/starlight/components';
+
+Tier0 提供三个版本：
+- **Edge** - 开源部署版本，可通过 Docker 在本地运行。
+- **Cloud** - 托管 SaaS，无需准备基础设施。
+- **Enterprise** - 面向企业环境的私有化部署版本。
+
+请参阅 [选择最合适的版本](../choosing-version/) 来判断哪个版本最符合你的需求。
+
+## 安装 Tier0
+
+<Tabs syncKey="edition">
+	<TabItem label="Cloud">
+
+		在体验 Tier0 Cloud 之前，请先申请试用账号。
+		<Steps>
+		1. 在 [注册 Tier0](https://tier0.dev/signup) 页面注册账号。
+		2. 在弹窗中输入发送到邮箱的验证码。
+		3. 页面会跳转到 **Login** 页面，使用刚注册的账号登录。
+		4. 填写相关信息，然后点击 **Continue**。
+		5. 选择 **Create a New Workspace**。
+		6. 创建 workspace 并开始试用。
+	</Steps>
+	
+	</TabItem>
+	<TabItem label="Edge">
+
+	#### 环境要求
+	- 至少 4 核 CPU、8 GB RAM、100 GB 磁盘
+	- Ubuntu 24.04，或安装了 Docker 和 Git 的 Windows 10/11
+	#### 操作步骤
+	<Steps>
+	1. 从 GitHub 克隆 Tier0-Edge 仓库并进入项目目录。
+
+		```bash
+		git clone https://github.com/FREEZONEX/Tier0-Edge
+		cd Tier0-Edge/deploy
+		```
+
+	2. 根据你的环境，在 `.env.default` 中配置下表列出的参数。
+	
+		```bash
+		vi .env.default
+		:wq!
+		```
+	3. 运行安装脚本。
+
+		```bash
+		bash bin/install.sh
+		```
+
+	</Steps>
+
+:::note[需要配置的参数]
+
+| 字段 | 类型 | 说明 |
+|------|------|-------------|
+| VOLUMES_PATH | string | 项目数据的存储路径 |
+| ENTRANCE_DOMAIN/ENTRANCE_PORT | string | Tier0 访问入口（IP/域名 + 端口） |
+| OS_PLATFORM_TYPE | enum | 安装 Tier0 的操作系统。可选 **linux** 或 **windows** |
+| LANGUAGE | enum | zh-CN / en-US |
+
+:::
+		
+
+	</TabItem>
+	<TabItem label="Enterprise">
+#### 环境要求
+- 标准部署
+	- 最少：4 台虚拟机
+	- 各 VM 类型的基线配置：
+		- App：8C / 32G / 100G
+		- Database：4C / 8G / 500G
+		- Witness：2C / 4G / 40G
+- 高可用部署
+	- 最少：6 台虚拟机
+	- 各 VM 类型的基线配置：
+		- App (Swarm)：8C / 32G / 100G x 3
+		- Database：4C / 8G / 500G x 2
+		- Witness：2C / 4G / 40G
+
+:::tip[硬件要求可能会变化]
+Enterprise 的硬件要求会随部署场景变化。
+:::
+
+:::note
+详细部署信息见 [高可用部署方案](../../reference/high-availability-deployment/)。
+:::
+#### 操作步骤
+<Steps>
+1. 从供应商处获取安装包，并完成校验。
+		```bash
+		sha256sum -c tier0-enterprise-offline-standard-YYYYmmddTHHMMSS.tar.gz.sha256
+		```
+2. 解压安装包。
+		```bash
+		tar -xzf tier0-enterprise-offline-standard-YYYYmmddTHHMMSS.tar.gz
+		cd tier0-enterprise-offline-standard-YYYYmmddTHHMMSS
+		```
+3. 根据部署信息编辑 `install.env`，然后开始部署。
+		```bash
+		vi install.env
+		bash install.sh
+		```
+</Steps>
+
+#### 常用维护操作
+- 在不安装 Enterprise 的情况下检查部署环境。
+		```bash
+		./install.sh --check-only
+		```
+- 部署失败后清理所有节点。
+		```bash
+		./full-cleanup.sh --env install.env --yes
+		```
+		> 此命令会清除全部 Tier0 运行时数据和数据库备份，但会保留虚拟机、操作系统以及已安装的 Docker 软件。
+- 安装完成后会生成部署报告。
+		```text
+		runtime/install-reports/<timestamp>/deployment-report.md
+		```
+		> 如果报告中包含任何 **FAIL** 项，请不要交付项目，请先联系支持团队。
+#### 维护参考
+- [标准端口列表](../../reference/standard-port-list/)
+- [维护与故障排查指南](../../reference/operations-runbook/)
+- [高可用边界说明](../../reference/sla-and-ha-boundaries/)
+
+</TabItem>
+</Tabs>
+
+## 下一步
+
+- [体验 Demo Factory](../demo-factory/) - 通过一个预置工厂快速探索。
+- [选择最合适的版本](../choosing-version/)

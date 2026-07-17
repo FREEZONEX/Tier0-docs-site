@@ -1,0 +1,141 @@
+---
+title: インストール
+description: エディション別に Tier0 をインストールします。
+sidebar:
+  order: 1
+---
+
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+import { Steps } from '@astrojs/starlight/components';
+
+Tier0 には 3 つのエディションがあります。
+- **Edge** - オープンソースのデプロイ版で、Docker を使ってローカルで実行します。
+- **Cloud** - マネージド SaaS で、インフラの準備は不要です。
+- **Enterprise** - エンタープライズ環境向けのプライベートデプロイ版です。
+
+要件に最も合うエディションを選ぶには、[最適なバージョンを選ぶ](../choosing-version/) を参照してください。
+
+## Tier0 のインストール
+
+<Tabs syncKey="edition">
+	<TabItem label="Cloud">
+
+		Tier0 Cloud を試す前に、トライアルアカウントを申請してください。
+		<Steps>
+		1. [Tier0 の登録](https://tier0.dev/signup) でアカウントを登録します。
+		2. ポップアップ画面で、メールに送信された確認コードを入力します。
+		3. **Login** ページにリダイレクトされます。登録したアカウントでログインします。
+		4. 関連情報を入力し、**Continue** をクリックします。
+		5. **Create a New Workspace** を選択します。
+		6. workspace を作成してトライアルを開始します。
+	</Steps>
+	
+	</TabItem>
+	<TabItem label="Edge">
+
+	#### 要件
+	- 最低 4 コア CPU、8 GB RAM、100 GB ディスク
+	- Ubuntu 24.04、または Docker と Git をインストールした Windows 10/11
+	#### 操作
+	<Steps>
+	1. GitHub から Tier0-Edge リポジトリをクローンし、プロジェクトに移動します。
+
+		```bash
+		git clone https://github.com/FREEZONEX/Tier0-Edge
+		cd Tier0-Edge/deploy
+		```
+
+	2. 環境に合わせて、下表のパラメータを `.env.default` に設定します。
+	
+		```bash
+		vi .env.default
+		:wq!
+		```
+	3. インストールスクリプトを実行します。
+
+		```bash
+		bash bin/install.sh
+		```
+
+	</Steps>
+
+:::note[設定が必要なパラメータ]
+
+| フィールド | 型 | 説明 |
+|------|------|-------------|
+| VOLUMES_PATH | string | プロジェクトデータの保存パス |
+| ENTRANCE_DOMAIN/ENTRANCE_PORT | string | Tier0 のアクセスエンドポイント（IP/ドメイン + ポート） |
+| OS_PLATFORM_TYPE | enum | Tier0 をインストールする OS。**linux** または **windows** |
+| LANGUAGE | enum | zh-CN / en-US |
+
+:::
+		
+
+	</TabItem>
+	<TabItem label="Enterprise">
+#### 要件
+- 標準デプロイ
+	- 最小：4 台の VM
+	- VM タイプ別の必要ベースライン：
+		- App：8C / 32G / 100G
+		- Database：4C / 8G / 500G
+		- Witness：2C / 4G / 40G
+- 高可用性デプロイ
+	- 最小：6 台の VM
+	- VM タイプ別の必要ベースライン：
+		- App (Swarm)：8C / 32G / 100G x 3
+		- Database：4C / 8G / 500G x 2
+		- Witness：2C / 4G / 40G
+
+:::tip[ハードウェア要件は変わる場合があります]
+Enterprise のハードウェア要件はデプロイシナリオによって変わります。
+:::
+
+:::note
+詳細なデプロイ情報は [高可用性デプロイ計画](../../reference/high-availability-deployment/) を参照してください。
+:::
+#### 操作
+<Steps>
+1. ベンダーからパッケージを入手し、検証します。
+		```bash
+		sha256sum -c tier0-enterprise-offline-standard-YYYYmmddTHHMMSS.tar.gz.sha256
+		```
+2. パッケージを展開します。
+		```bash
+		tar -xzf tier0-enterprise-offline-standard-YYYYmmddTHHMMSS.tar.gz
+		cd tier0-enterprise-offline-standard-YYYYmmddTHHMMSS
+		```
+3. デプロイ内容に合わせて `install.env` を編集し、デプロイを開始します。
+		```bash
+		vi install.env
+		bash install.sh
+		```
+</Steps>
+
+#### よく使うメンテナンス操作
+- Enterprise をインストールせずにデプロイ環境を確認します。
+		```bash
+		./install.sh --check-only
+		```
+- デプロイ失敗後にすべてのノードをクリアします。
+		```bash
+		./full-cleanup.sh --env install.env --yes
+		```
+		> このコマンドは、VM、OS、インストール済み Docker ソフトウェアを残したまま、Tier0 のランタイムデータとデータベースバックアップを削除します。
+- インストール後にデプロイレポートが生成されます。
+		```text
+		runtime/install-reports/<timestamp>/deployment-report.md
+		```
+		> レポートに **FAIL** 項目がある場合は、プロジェクトを引き渡さず、先にサポートに連絡してください。
+#### メンテナンス参照
+- [標準ポート一覧](../../reference/standard-port-list/)
+- [メンテナンスとトラブルシューティングガイド](../../reference/operations-runbook/)
+- [HA 境界の説明](../../reference/sla-and-ha-boundaries/)
+
+</TabItem>
+</Tabs>
+
+## 次へ
+
+- [Demo Factory を試す](../demo-factory/) - 事前ロード済みの工場を探索します。
+- [最適なバージョンを選ぶ](../choosing-version/)

@@ -1,0 +1,380 @@
+﻿---
+title: 使用 UNS 数据
+description: "通过 MQTT 和 API 操作 UNS，并参考 API reference。"
+editions: [edge, cloud, enterprise]
+sidebar:
+  order: 3
+---
+import { Steps } from '@astrojs/starlight/components';
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+
+Tier0 支持通过 MQTT 和 API 操作 UNS。
+
+## MQTT
+Tier0 支持 MQTT clients 使用 credentials 连接到 UNS broker。
+:::note
+你可以使用 **MQTTX**、**MQTT Explorer** 和 **Node-RED** 等 MQTT clients 连接 broker，并 publish/subscribe 消息。
+:::
+### 生成 MQTT Credentials
+在 Tier0 的 **Edge** 页面创建新的 credential，并记录下来。
+
+### 连接 MQTT Clients
+
+:::tip
+以下 clients 作为示例，用来展示如何使用 credentials 连接 UNS broker。
+:::
+
+<Tabs syncKey="mqtt-client">
+  <TabItem label="MQTTX">
+
+1. 安装并打开 <a href="https://mqttx.app/" target="_blank" rel="noopener noreferrer">MQTTX</a>。
+2. 使用 Tier0 UNS broker 信息和生成的 credentials 添加连接。
+    ```json
+    {
+      "Host": "mqtt.tier0.dev",
+      "Port": 8883,
+      "Client ID": "<generated client ID>",
+      "Username": "<generated username>",
+      "Password": "<generated password>"
+    }
+    ``` 
+
+  </TabItem>
+  <TabItem label="MQTT Explorer">
+
+1. 安装并打开 <a href="https://mqtt-explorer.com/" target="_blank" rel="noopener noreferrer">MQTT Explorer</a>。
+2. 使用 broker 信息和生成的 credentials 添加新连接。
+    ```json
+    {
+      "Protocol": "mqtt://",
+      "Host": "mqtt.tier0.dev",
+      "Port": 8883,
+      "Username": "<generated username>",
+      "Password": "<generated password>"
+    }
+    ``` 
+3. 连接前，在 **ADVANCED** 中将 client ID 改为 credential ID。
+
+  </TabItem>
+  <TabItem label="Node-RED">
+      - 使用 **Event Flow** - Tier0 中基于 Node-RED 的数据处理模块。
+          1. 在 **Event Flow** 中创建 flow，并用 `mqtt in` 节点作为起点。
+          2. 在节点中选择 UNS broker 作为 **Server**（与 flow 同名），并将 **Topic** 设置为 UNS model。
+      - 使用**独立 Node-RED 实例**
+          1. 安装并打开 <a href="https://nodered.org/docs/getting-started/local" target="_blank" rel="noopener noreferrer">Node-RED</a> instance。
+          2. 在 `mqtt in` 节点中使用以下信息添加 server。
+          ```json
+          {
+            {/* under Connection */}
+            "Server": "mqtt://mqtt.tier0.dev",
+            "Port": 8883,
+            "Client ID": "<generated clientId>",
+            {/* under Security */}
+            "Username": "<generated username>",
+            "Password": "<generated password>"
+          }
+          ```
+  </TabItem>
+</Tabs>
+
+### 测试连接
+<Steps>
+1. 在 **Edge** 页面，确认 **Clients** tab 下每个 client 的状态正常。
+2. 复制一个 UNS model topic，并通过 client 向它 publish 一条消息。
+3. 回到 **UNS**，检查目标 topic 下的数据。
+</Steps>
+
+## API
+使用 **RestAPI** 操作 UNS 数据、flows 和 authentication。
+:::tip[如何使用 API]
+- OpenAPI base path 是 `/openapi/v1`。将 `TIER0_BASE_URL` 设置为你的 Tier0 host 加上 base path，例如 `https://your-workspace.tier0.app/openapi/v1`，并在 `x-api-key` header 中传入 API key。
+- 点击右上角 account icon，在 **Settings > API Keys** 下生成 API keys。
+:::
+
+- `/flow/create`
+
+  创建 **Source Flow** 或 **Event Flow**。`flowName` 和 `flowType` 是必填项。
+
+  <Tabs syncKey="flow-api-language">
+    <TabItem label="JavaScript">
+
+      ```js
+      const BASE_URL = process.env.TIER0_BASE_URL;
+      const API_KEY = process.env.TIER0_API_KEY;
+
+      const response = await fetch(`${BASE_URL}/flow/create`, {
+        method: 'POST',
+        headers: {
+          'content-type': 'application/json',
+          'x-api-key': API_KEY,
+        },
+        body: JSON.stringify({
+          flowName: 'Manufacturing source flow',
+          flowType: 'SourceFlow',
+          description: 'Collects UNS source data from the plant.',
+          template: '{}',
+        }),
+      });
+
+      const result = await response.json();
+      console.log(result.data.id, result.data.brokerID);
+      ```
+
+    </TabItem>
+    <TabItem label="Python">
+
+      ```python
+      import os
+      import requests
+
+      base_url = os.environ["TIER0_BASE_URL"]
+      api_key = os.environ["TIER0_API_KEY"]
+
+      response = requests.post(
+          f"{base_url}/flow/create",
+          headers={"x-api-key": api_key},
+          json={
+              "flowName": "Manufacturing source flow",
+              "flowType": "SourceFlow",
+              "description": "Collects UNS source data from the plant.",
+              "template": "{}",
+          },
+          timeout=30,
+      )
+      response.raise_for_status()
+
+      result = response.json()
+      print(result["data"]["id"], result["data"]["brokerID"])
+      ```
+
+    </TabItem>
+    <TabItem label="cURL">
+
+      ```bash
+      curl -X POST "$TIER0_BASE_URL/flow/create" \
+        -H "content-type: application/json" \
+        -H "x-api-key: $TIER0_API_KEY" \
+        -d '{
+          "flowName": "Manufacturing source flow",
+          "flowType": "SourceFlow",
+          "description": "Collects UNS source data from the plant.",
+          "template": "{}"
+        }'
+      ```
+
+    </TabItem>
+  </Tabs>
+
+- `/flow/list`
+
+  列出 flows，并可按 `flowType` 或 `keyword` 过滤。执行 UPDATE 或 GET 操作前，可用它查找 flow `id`。
+
+  <Tabs syncKey="flow-api-language">
+    <TabItem label="JavaScript">
+
+      ```js
+      const BASE_URL = process.env.TIER0_BASE_URL;
+      const API_KEY = process.env.TIER0_API_KEY;
+
+      const response = await fetch(`${BASE_URL}/flow/list`, {
+        method: 'POST',
+        headers: {
+          'content-type': 'application/json',
+          'x-api-key': API_KEY,
+        },
+        body: JSON.stringify({
+          flowType: 'SourceFlow',
+          keyword: 'Manufacturing',
+        }),
+      });
+
+      const result = await response.json();
+      console.log(result.data.list);
+      ```
+
+    </TabItem>
+    <TabItem label="Python">
+
+      ```python
+      import os
+      import requests
+
+      base_url = os.environ["TIER0_BASE_URL"]
+      api_key = os.environ["TIER0_API_KEY"]
+
+      response = requests.post(
+          f"{base_url}/flow/list",
+          headers={"x-api-key": api_key},
+          json={
+              "flowType": "SourceFlow",
+              "keyword": "Manufacturing",
+          },
+          timeout=30,
+      )
+      response.raise_for_status()
+
+      result = response.json()
+      print(result["data"]["list"])
+      ```
+
+    </TabItem>
+    <TabItem label="cURL">
+
+      ```bash
+      curl -X POST "$TIER0_BASE_URL/flow/list" \
+        -H "content-type: application/json" \
+        -H "x-api-key: $TIER0_API_KEY" \
+        -d '{
+          "flowType": "SourceFlow",
+          "keyword": "Manufacturing"
+        }'
+      ```
+
+    </TabItem>
+  </Tabs>
+
+- `/flow/update`
+
+  通过 `id` 更新 flow。只发送你想修改的字段。
+
+  <Tabs syncKey="flow-api-language">
+    <TabItem label="JavaScript">
+
+      ```js
+      const BASE_URL = process.env.TIER0_BASE_URL;
+      const API_KEY = process.env.TIER0_API_KEY;
+      const flowId = 123;
+
+      const response = await fetch(`${BASE_URL}/flow/update`, {
+        method: 'POST',
+        headers: {
+          'content-type': 'application/json',
+          'x-api-key': API_KEY,
+        },
+        body: JSON.stringify({
+          id: flowId,
+          flowName: 'Manufacturing source flow v2',
+          description: 'Updated source flow description.',
+          isFavorite: 1,
+        }),
+      });
+
+      const result = await response.json();
+      console.log(result.data.success);
+      ```
+
+    </TabItem>
+    <TabItem label="Python">
+
+      ```python
+      import os
+      import requests
+
+      base_url = os.environ["TIER0_BASE_URL"]
+      api_key = os.environ["TIER0_API_KEY"]
+      flow_id = 123
+
+      response = requests.post(
+          f"{base_url}/flow/update",
+          headers={"x-api-key": api_key},
+          json={
+              "id": flow_id,
+              "flowName": "Manufacturing source flow v2",
+              "description": "Updated source flow description.",
+              "isFavorite": 1,
+          },
+          timeout=30,
+      )
+      response.raise_for_status()
+
+      result = response.json()
+      print(result["data"]["success"])
+      ```
+
+    </TabItem>
+    <TabItem label="cURL">
+
+      ```bash
+      curl -X POST "$TIER0_BASE_URL/flow/update" \
+        -H "content-type: application/json" \
+        -H "x-api-key: $TIER0_API_KEY" \
+        -d '{
+          "id": 123,
+          "flowName": "Manufacturing source flow v2",
+          "description": "Updated source flow description.",
+          "isFavorite": 1
+        }'
+      ```
+
+    </TabItem>
+  </Tabs>
+
+- `/flow/get`
+
+  通过 `id` 获取单个 flow。
+
+  <Tabs syncKey="flow-api-language">
+    <TabItem label="JavaScript">
+
+      ```js
+      const BASE_URL = process.env.TIER0_BASE_URL;
+      const API_KEY = process.env.TIER0_API_KEY;
+      const flowId = 123;
+
+      const response = await fetch(`${BASE_URL}/flow/get`, {
+        method: 'POST',
+        headers: {
+          'content-type': 'application/json',
+          'x-api-key': API_KEY,
+        },
+        body: JSON.stringify({ id: flowId }),
+      });
+
+      const result = await response.json();
+      console.log(result.data);
+      ```
+
+    </TabItem>
+    <TabItem label="Python">
+
+      ```python
+      import os
+      import requests
+
+      base_url = os.environ["TIER0_BASE_URL"]
+      api_key = os.environ["TIER0_API_KEY"]
+      flow_id = 123
+
+      response = requests.post(
+          f"{base_url}/flow/get",
+          headers={"x-api-key": api_key},
+          json={"id": flow_id},
+          timeout=30,
+      )
+      response.raise_for_status()
+
+      result = response.json()
+      print(result["data"])
+      ```
+
+    </TabItem>
+    <TabItem label="cURL">
+
+      ```bash
+      curl -X POST "$TIER0_BASE_URL/flow/get" \
+        -H "content-type: application/json" \
+        -H "x-api-key: $TIER0_API_KEY" \
+        -d '{"id": 123}'
+      ```
+
+    </TabItem>
+  </Tabs>
+
+## API 参考
+
+- [Tier0 OpenAPI Reference](../../reference/tier0-openapi/)
+
+## 下一步
+
+- [在 UNS 上构建应用](../build-apps/) — 使用 UNS 数据构建工业应用。
+- [分析 UNS 数据](../analyze-data/) — 使用 Marimo Notebook 和 Python 分析 UNS 数据。

@@ -13,6 +13,32 @@ The quickest way to *get* Tier0 is to poke at a factory that already works.
 ## Factory Business
 The factory in Tier0 gets orders from ERP, splits the order, schedules production based on the orders, sends out the schedule and gets production progress data as it goes.
 
+```mermaid
+flowchart TB
+  uns["UNS order data<br/>Orders from ERP"]
+  production["Production Department"]
+
+  subgraph app["Work Order Management app"]
+    direction LR
+    orders["<b>Production Orders</b><br/><span style='font-size:13px'>(Optional) Create orders</span>"]
+    plans["<b>Plans</b><br/><span style='font-size:13px'>Split order<br/>Production schedule</span>"]
+    details["<b>Plan Details</b><br/><span style='font-size:13px'>Production progress details</span>"]
+  end
+
+  uns -- "order data" --> orders
+  orders --> plans
+  plans --> details
+  plans -- "production plan" --> production
+  production -- "production progress" --> details
+
+  classDef external fill:#f8fafc,stroke:#b8c4d5,color:#171a22,stroke-width:1px
+  classDef optional fill:#fbfdf4,stroke:#cfe8a3,color:#171a22,stroke-width:1px
+  classDef appNode fill:#f4f8e9,stroke:#9adf11,color:#171a22,stroke-width:1px
+  class uns,production external
+  class orders optional
+  class plans,details appNode
+```
+
 ## Getting to Know the Business Process
 <Steps>
 1. In Tier0, go to **UNS**, check the details of orders came from ERP.
@@ -45,4 +71,4 @@ The factory in Tier0 gets orders from ERP, splits the order, schedules productio
 ## Next
 
 - [Choosing the Best Version](../choosing-version/)
-- [UNS Concepts](../../using-tier0/uns-concepts/) — understand what you just browsed
+- [UNS Concepts](../../using-tier0/uns-concepts/) — Understand data modeling in Unified Namespace.

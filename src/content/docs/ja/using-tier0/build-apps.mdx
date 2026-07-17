@@ -1,0 +1,48 @@
+---
+title: UNS 上にアプリを構築
+description: container は app です。Tier0 Edge と Enterprise にフルコンテナをデプロイし、Event Flow でロジックを構築します。
+editions: [cloud]
+sidebar:
+  order: 4
+---
+import { Steps } from '@astrojs/starlight/components';
+
+## Tier0 App とは
+
+Tier0 アプリケーションには次の特徴があります。
+- **Docker Container** です。
+- **App Builder** との会話から生成され、ゼロコーディングでプログラミング不要です。
+- **UNS** にすでに存在する産業データを使用し、**UNS** に*書き戻す*こともできます。
+- **Event Flow** を使ってロジックを実装できます。
+
+## Tier0 App をデプロイする方法
+
+### Tier0 App を構築する
+<Steps>
+1. Tier0 にログインし、**App** > **Projects** に移動してアプリケーション用の project を作成します。
+2. project 内でアプリケーションを作成すると、アプリケーション構築ページにリダイレクトされます。
+3. ダイアログにアプリケーション要件を書きます。
+</Steps>
+:::tip[Prompt に含めるべき内容]
+prompt には次の情報を必ず記載してください。
+- UNS モデル *[uns_model]* をデータソースとして使用し、*[uns_model]* を書き戻し先として使用する。
+- （任意）UNS モデルと、データソースを接続する Source Flow の flows を作成する。
+- Event Flow に flows を作成し、異常アラーム/低い health score/その他イベントをトリガーする。
+:::
+<Steps>
+4. アプリケーション構築を開始し、プレビュー中に LLM と会話しながら必要に応じて変更します。
+5. **Deploy** をクリックしてアプリケーション構築を完了します。
+</Steps>
+
+### Tier0 Enterprise に App をデプロイする
+<Steps>
+1. project 内でアプリケーションを見つけます。
+2. アプリケーションに入り、**Active** バージョンの **...** アイコンから **Download ZIP** をクリックします。
+3. Tier0 Enterprise にログインし、**Project** に移動してアプリケーション用の project を作成します。
+4. **Import App** をクリックして ZIP パッケージをアップロードします。
+</Steps>
+
+## 次へ
+
+- [UNS データを分析](../analyze-data/) - Marimo Notebook と Python で UNS データを分析します。
+- [ベストプラクティス：産業プロトコルの接続](../../best-practice/protocol-connections/)
