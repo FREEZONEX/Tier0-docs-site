@@ -163,8 +163,87 @@ header site-search button[data-open-modal] kbd {
 	padding: 0 6px;
 }
 
+/* Right cluster — Figma 4410:4481: gap 16px, items-center; icons 16px.
+   Do NOT set display here: Starlight uses `sl-hidden md:sl-flex` so this
+   cluster stays in the header only on desktop; phone/iPad use MobileMenuFooter. */
 header .right-group {
+	align-items: center;
 	gap: 16px;
+}
+
+header .right-group .social-icons {
+	display: flex;
+	align-items: center;
+	gap: 16px;
+}
+
+header .right-group .social-icons a {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	box-sizing: border-box;
+	width: 16px;
+	height: 16px;
+	padding: 0;
+	margin: 0;
+	line-height: 0;
+	color: #343434;
+}
+
+header .right-group .social-icons a svg {
+	display: block;
+	width: 16px;
+	height: 16px;
+	flex-shrink: 0;
+}
+
+/* Social | theme divider — match logo | Documentation hairline height */
+header .right-group .social-icons::after {
+	content: '';
+	display: block;
+	align-self: center;
+	width: 0;
+	height: var(--t0-header-divider-height, 1.0625rem);
+	margin: 0;
+	border: 0;
+	border-inline-end: 1px solid var(--t0-header-divider, #ebebeb);
+}
+
+header .right-group starlight-theme-select,
+header .right-group starlight-lang-select {
+	display: inline-flex;
+	align-items: center;
+}
+
+header .right-group starlight-theme-select label,
+header .right-group starlight-lang-select label {
+	display: inline-flex;
+	align-items: center;
+	gap: 4px;
+	margin: 0;
+}
+
+/* Inner header row — replaces Starlight Header scoped flex once we override Header.astro */
+header.header > .header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: var(--sl-nav-gap, 1rem);
+	height: 100%;
+}
+
+header.header > .header .t0-header-start {
+	display: flex;
+	align-items: center;
+	gap: 0.625rem;
+	min-width: 0;
+}
+
+header.header > .header .title-wrapper {
+	display: flex;
+	align-items: center;
+	min-width: 0;
+	overflow: clip;
 }
 
 /* Header vertical dividers — Figma Primary/Grey/200 (#ebebeb) */
@@ -248,11 +327,6 @@ starlight-menu-button[aria-expanded='true'] button {
 	color: #a0a0a0;
 }
 
-header.header.astro-gqpr5s5a .social-icons::after {
-	height: var(--t0-header-divider-height, 1.0625rem);
-	border-inline-end: 1px solid var(--t0-header-divider, var(--sl-color-gray-5));
-}
-
 header .astro-r2p65idu {
 	color: #878787;
 	font-size: 13px;
@@ -268,11 +342,16 @@ header .astro-r2p65idu {
 		align-items: center;
 	}
 
-	:root[data-has-sidebar] header.header .title-wrapper {
+	:root[data-has-sidebar] header.header .t0-header-start {
 		grid-column: 1;
+		min-width: 0;
+		width: 100%;
+	}
+
+	:root[data-has-sidebar] header.header .title-wrapper {
 		justify-content: flex-start;
 		margin: 0;
-		padding: 0.25rem 0 0.25rem 0.25rem;
+		padding: 0.25rem 0;
 		width: auto;
 		max-width: none;
 	}
@@ -299,6 +378,94 @@ header .astro-r2p65idu {
 	:root[data-has-sidebar] header.header .right-group {
 		grid-column: 3;
 		justify-self: end;
+	}
+}
+
+/* Desktop sidebar collapse (Cursor-docs style). Mobile keeps Starlight menu. */
+.t0-sidebar-toggle {
+	display: none;
+	box-sizing: border-box;
+	flex-shrink: 0;
+	align-items: center;
+	justify-content: center;
+	width: 2.25rem;
+	height: 2.25rem;
+	margin: 0;
+	padding: 0;
+	border: 1px solid #ebebeb;
+	border-radius: 4px;
+	background: #ffffff;
+	color: #343434;
+	cursor: pointer;
+}
+
+.t0-sidebar-toggle:hover {
+	background: #f5f5f5;
+	border-color: #d4d4d4;
+}
+
+.t0-sidebar-toggle:focus-visible {
+	outline: 2px solid #73b200;
+	outline-offset: 2px;
+}
+
+.t0-sidebar-toggle[aria-expanded='false'] {
+	background: #f7f8f4;
+	border-color: #73b200;
+	color: #4a7300;
+}
+
+:root[data-theme='dark'] .t0-sidebar-toggle {
+	background: #1f1f1f;
+	border-color: #3a3a3a;
+	color: #d5d5d5;
+}
+
+:root[data-theme='dark'] .t0-sidebar-toggle:hover {
+	background: #2a2a2a;
+}
+
+:root[data-theme='dark'] .t0-sidebar-toggle[aria-expanded='false'] {
+	background: #243014;
+	border-color: #73b200;
+	color: #b2ed1d;
+}
+
+@media (min-width: 50rem) {
+	:root[data-has-sidebar] .t0-sidebar-toggle {
+		display: inline-flex !important;
+	}
+
+	html.t0-sidebar-collapsed[data-has-sidebar] {
+		--sl-sidebar-width: 0px;
+		--sl-content-inline-start: 0px;
+		--t0-sidebar-width: 0px;
+	}
+
+	html.t0-sidebar-collapsed[data-has-sidebar] .sidebar {
+		display: none !important;
+	}
+
+	html.t0-sidebar-collapsed[data-has-sidebar] header.header .header {
+		grid-template-columns: auto minmax(0, 1fr) auto;
+	}
+
+	html.t0-sidebar-collapsed[data-has-sidebar] header.header .t0-header-start {
+		grid-column: 1;
+		width: auto;
+	}
+
+	html.t0-sidebar-collapsed[data-has-sidebar] .main-frame {
+		padding-inline-start: 0;
+	}
+
+	/* Smooth content shift when collapsing */
+	:root[data-has-sidebar] .main-frame,
+	:root[data-has-sidebar] .sidebar-pane {
+		transition:
+			padding-inline-start 0.2s ease,
+			width 0.2s ease,
+			opacity 0.15s ease;
 	}
 }
 
@@ -538,6 +705,23 @@ site-search button[data-close-modal]:hover {
 }
 
 :root[data-theme='dark'] #starlight__sidebar details ul a[aria-current='page'] {
+	color: #b2ed1d;
+}
+
+/* Mobile menu footer social icons — black (not accent green) */
+#starlight__sidebar .mobile-preferences .social-icons a {
+	color: #343434;
+}
+
+#starlight__sidebar .mobile-preferences .social-icons a:hover {
+	color: #050b14;
+}
+
+:root[data-theme='dark'] #starlight__sidebar .mobile-preferences .social-icons a {
+	color: #e8e8e8;
+}
+
+:root[data-theme='dark'] #starlight__sidebar .mobile-preferences .social-icons a:hover {
 	color: #b2ed1d;
 }
 
@@ -941,17 +1125,16 @@ main:not(:has(.t0-banner)) .content-panel {
 }
 
 :root[data-theme='light'] .sl-markdown-content table {
-	display: block;
+	display: table;
 	border: 1px solid #ebebeb;
 	border-radius: 4px;
 	border-collapse: separate;
 	border-spacing: 0;
 	width: 100%;
 	max-width: 100%;
-	overflow-x: auto;
-	overflow-y: hidden;
-	-webkit-overflow-scrolling: touch;
+	overflow: hidden;
 	background: #fcfcfc;
+	table-layout: fixed;
 }
 
 :root[data-theme='light'] .sl-markdown-content th,
@@ -977,17 +1160,16 @@ main:not(:has(.t0-banner)) .content-panel {
 }
 
 :root[data-theme='dark'] .sl-markdown-content table {
-	display: block;
+	display: table;
 	border: 1px solid #3f3f3f;
 	border-radius: 4px;
 	border-collapse: separate;
 	border-spacing: 0;
 	width: 100%;
 	max-width: 100%;
-	overflow-x: auto;
-	overflow-y: hidden;
-	-webkit-overflow-scrolling: touch;
+	overflow: hidden;
 	background: #1f1f1f;
+	table-layout: fixed;
 }
 
 :root[data-theme='dark'] .sl-markdown-content th,
@@ -1023,15 +1205,11 @@ main:not(:has(.t0-banner)) .content-panel {
 	overflow-wrap: anywhere;
 }
 
-/* Keep table cells on one line so wide tables scroll horizontally
-   (wheel-over-table remaps vertical scroll → horizontal). */
+/* Default tables: wrap inside the content column (no horizontal scrollbar). */
 .sl-markdown-content :is(th, td) {
-	white-space: nowrap;
-	overflow-wrap: normal;
-}
-
-.sl-markdown-content :is(td:first-child, th:first-child) {
-	width: 1%;
+	white-space: normal;
+	overflow-wrap: anywhere;
+	word-break: break-word;
 }
 
 .sl-markdown-content pre {
@@ -1039,22 +1217,27 @@ main:not(:has(.t0-banner)) .content-panel {
 	overflow-x: auto;
 }
 
-@media (max-width: 49.99rem) {
-	:root[data-theme='light'] .sl-markdown-content table,
-	:root[data-theme='dark'] .sl-markdown-content table {
-		display: block;
-		max-width: 100%;
-		overflow-x: auto;
-		-webkit-overflow-scrolling: touch;
-		overflow-y: hidden;
-	}
+/*
+ * Wide reference tables (API Reference + Skill Reference): keep cells on one
+ * line and scroll horizontally. `html.t0-table-scroll` is set in Head.astro.
+ */
+:root.t0-table-scroll[data-theme='light'] .sl-markdown-content table,
+:root.t0-table-scroll[data-theme='dark'] .sl-markdown-content table {
+	display: block;
+	table-layout: auto;
+	overflow-x: auto;
+	overflow-y: hidden;
+	-webkit-overflow-scrolling: touch;
+}
 
-	:root[data-theme='light'] .sl-markdown-content th,
-	:root[data-theme='light'] .sl-markdown-content td,
-	:root[data-theme='dark'] .sl-markdown-content th,
-	:root[data-theme='dark'] .sl-markdown-content td {
-		white-space: nowrap;
-	}
+:root.t0-table-scroll .sl-markdown-content :is(th, td) {
+	white-space: nowrap;
+	overflow-wrap: normal;
+	word-break: normal;
+}
+
+:root.t0-table-scroll .sl-markdown-content :is(td:first-child, th:first-child) {
+	width: 1%;
 }
 
 /* Pagination (Figma 4445:5087) */
@@ -2149,7 +2332,8 @@ main:has(.t0-banner) .t0-banner {
 @container t0-board (min-width: 46.01rem) {
 	/* Align the plan-area start line across all columns */
 	.t0-col-top {
-		height: 12.5rem;
+		min-height: 10.5rem;
+		height: auto;
 	}
 }
 
@@ -2223,6 +2407,9 @@ main:has(.t0-banner) .t0-banner {
 }
 
 .t0-plan-name {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.375rem;
 	font-size: 1rem;
 	font-weight: 500;
 	color: #050b14;
@@ -2270,14 +2457,15 @@ main:has(.t0-banner) .t0-banner {
 
 /* CTA link */
 .t0-col-cta {
-	font-size: 0.875rem;
+	font-size: 1rem;
+	line-height: 1.771875; /* 28.35px */
 	font-weight: 400;
 	color: #050b14;
 	text-decoration: underline;
 	font-family: 'IBM Plex Mono', var(--sl-font-mono);
 	display: inline-block;
-	white-space: normal;
-	overflow-wrap: anywhere;
+	margin-top: 0.25rem;
+	white-space: nowrap;
 }
 
 .t0-col-cta::after {
@@ -2463,20 +2651,20 @@ main:has(.t0-banner) .t0-banner {
 
 .mermaid {
 	display: block;
-	padding: 1.5rem 1rem;
-	margin: 1.5rem 0;
+	width: fit-content;
 	max-width: 100%;
-	overflow-x: auto;
-	overflow-y: hidden;
+	margin: 1.5rem auto;
+	padding: 1.5rem 1rem;
+	overflow-x: visible;
+	overflow-y: visible;
 	border-radius: 4px;
-	-webkit-overflow-scrolling: touch;
+	box-sizing: border-box;
 }
 
 .mermaid svg {
 	display: block;
-	width: auto !important;
-	max-width: none !important;
-	height: auto;
+	max-width: 100% !important;
+	height: auto !important;
 	overflow: visible;
 }
 

@@ -120,14 +120,33 @@ function adjustMermaidEdgeLabels(root) {
 
 	fitSvgViewBox(svg, 6);
 
-	// Keep intrinsic diagram size; narrow viewports scroll instead of shrinking text.
-	const viewBox = svg.viewBox?.baseVal;
-	if (viewBox && viewBox.width > 0) {
-		svg.setAttribute('width', String(Math.ceil(viewBox.width)));
-		if (viewBox.height > 0) {
-			svg.setAttribute('height', String(Math.ceil(viewBox.height)));
+	// Shrink wide diagrams to the content column; keep small ones at natural size
+	// (width:100% was blowing up 2-node charts like Connect Data).
+	const vb = svg.viewBox.baseVal;
+	const styles = getComputedStyle(root);
+	const padX =
+		(parseFloat(styles.paddingLeft) || 0) + (parseFloat(styles.paddingRight) || 0);
+	const available = Math.max(root.clientWidth - padX, 0);
+
+	svg.removeAttribute('height');
+	svg.style.setProperty('height', 'auto', 'important');
+	svg.style.setProperty('max-width', '100%', 'important');
+
+	if (vb.width > 0 && available > 0 && vb.width > available) {
+		root.style.width = '100%';
+		svg.setAttribute('width', '100%');
+		svg.style.setProperty('width', '100%', 'important');
+	} else {
+		root.style.width = '';
+		const natural = Math.ceil(vb.width || 0);
+		if (natural > 0) {
+			svg.setAttribute('width', String(natural));
+			svg.style.setProperty('width', natural + 'px', 'important');
+		} else {
+			svg.style.removeProperty('width');
 		}
 	}
+	root.style.overflowX = '';
 }
 
 function adjustAllMermaidEdgeLabels() {
@@ -138,9 +157,10 @@ function scheduleAdjust() {
 	requestAnimationFrame(() => {
 		requestAnimationFrame(() => {
 			adjustAllMermaidEdgeLabels();
-			// Mermaid can reset svg width="100%" after the first paint.
+			// Mermaid can reset svg width after the first paint.
 			setTimeout(adjustAllMermaidEdgeLabels, 50);
 			setTimeout(adjustAllMermaidEdgeLabels, 250);
+			setTimeout(adjustAllMermaidEdgeLabels, 800);
 		});
 	});
 }

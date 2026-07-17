@@ -3,14 +3,69 @@ import Default from '@astrojs/starlight/components/Head.astro';
 ---
 
 <Default {...Astro.props} />
+{/* Apply sidebar collapse before paint to avoid layout flash. */}
 <script is:inline>
 	(function () {
+		try {
+			if (localStorage.getItem('t0-sidebar-collapsed') === '1') {
+				document.documentElement.classList.add('t0-sidebar-collapsed');
+			}
+		} catch (_) {}
+	})();
+</script>
+<script is:inline>
+	(function () {
+		var STORAGE_KEY = 't0-sidebar-collapsed';
+
+		function isCollapsed() {
+			return document.documentElement.classList.contains('t0-sidebar-collapsed');
+		}
+
+		function setCollapsed(collapsed) {
+			document.documentElement.classList.toggle('t0-sidebar-collapsed', collapsed);
+			try {
+				localStorage.setItem(STORAGE_KEY, collapsed ? '1' : '0');
+			} catch (_) {}
+			syncToggleButtons();
+		}
+
+		function syncToggleButtons() {
+			var expanded = !isCollapsed();
+			document.querySelectorAll('[data-t0-sidebar-toggle]').forEach(function (btn) {
+				btn.setAttribute('aria-expanded', expanded ? 'true' : 'false');
+			});
+		}
+
+		function bindToggle(btn) {
+			if (btn.dataset.t0Bound === '1') return;
+			btn.dataset.t0Bound = '1';
+			btn.addEventListener('click', function () {
+				setCollapsed(!isCollapsed());
+			});
+		}
+
+		function scanSidebarToggle() {
+			syncToggleButtons();
+			document.querySelectorAll('[data-t0-sidebar-toggle]').forEach(bindToggle);
+		}
+
+		function isScrollPage() {
+			return /\/reference\/(api-reference|skill-reference)(?:\/|$)/.test(
+				location.pathname,
+			);
+		}
+
+		function syncScrollClass() {
+			document.documentElement.classList.toggle('t0-table-scroll', isScrollPage());
+		}
+
 		function bindTable(table) {
 			if (table.dataset.t0WheelBound === '1') return;
 			table.dataset.t0WheelBound = '1';
 			table.addEventListener(
 				'wheel',
 				function (e) {
+					if (!document.documentElement.classList.contains('t0-table-scroll')) return;
 					if (table.scrollWidth <= table.clientWidth + 1) return;
 					// Only remap dominant vertical gestures (mouse wheel / trackpad).
 					if (Math.abs(e.deltaY) <= Math.abs(e.deltaX)) return;
@@ -25,6 +80,9 @@ import Default from '@astrojs/starlight/components/Head.astro';
 		}
 
 		function scan() {
+			scanSidebarToggle();
+			syncScrollClass();
+			if (!document.documentElement.classList.contains('t0-table-scroll')) return;
 			document.querySelectorAll('.sl-markdown-content table').forEach(bindTable);
 		}
 

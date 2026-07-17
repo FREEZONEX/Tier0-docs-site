@@ -14,7 +14,7 @@ export default defineConfig({
 		mermaid({
 			autoTheme: true,
 			mermaidConfig: {
-				flowchart: { curve: 'linear' },
+				flowchart: { curve: 'linear', nodeSpacing: 16, rankSpacing: 24, padding: 8 },
 				fontFamily:
 					"'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif",
 				themeVariables: {
@@ -54,6 +54,7 @@ export default defineConfig({
 			},
 			components: {
 				Head: './src/components/Head.astro',
+				Header: './src/components/Header.astro',
 				PageTitle: './src/components/PageTitle.astro',
 				Pagination: './src/components/Pagination.astro',
 			},
