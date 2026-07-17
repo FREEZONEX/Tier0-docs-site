@@ -16,7 +16,7 @@ pnpm-debug.log*
 .preview-out.log
 
 # temporary PDF export build
-dist-pdf-build/
+dist-pdf-build*/
 
 
 # environment variables
