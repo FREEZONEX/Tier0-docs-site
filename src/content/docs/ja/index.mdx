@@ -14,23 +14,43 @@ next: false
 		<p>ひとつのプロンプトで Tier0 CLI + スキルのインストール、ログイン、Unified Namespace の一巡りまで完了します。</p>
 		<pre class="t0-prompt" id="t0-agent-prompt">{`\`npx @tier0/cli@latest\` を実行して tier0 CLI とエージェントスキルをインストール。
 完全なドキュメントは https://docs.tier0.app/llms.txt を参照。`}</pre>
-		<button class="t0-copy" id="t0-copy-btn">プロンプトをコピー</button>
+		<button class="t0-copy" id="t0-copy-btn" type="button">
+			<svg class="t0-copy-icon t0-copy-icon--copy" width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+				<rect x="5" y="5" width="8" height="8" rx="1" stroke="currentColor" stroke-width="1.25" />
+				<path d="M4 11V3.75C4 3.336 4.336 3 4.75 3H11" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" />
+			</svg>
+			<svg class="t0-copy-icon t0-copy-icon--check" width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+				<path d="M3.5 8.5L6.5 11.5L12.5 4.5" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round" />
+			</svg>
+			<span class="t0-copy-label">プロンプトをコピー</span>
+		</button>
 	</div>
 	<div class="t0-banner-side">
-		<p>手動で進めたい場合:</p>
-		<p class="t0-endpoints"><a href="/ja/get-started/installation/">インストールガイド</a> · <a href="/ja/get-started/demo-factory/">デモファクトリー</a></p>
-		<p>エージェント向けエンドポイント:</p>
-		<p class="t0-endpoints"><a href="/llms.txt">/llms.txt</a></p>
+		<div class="t0-side-group">
+			<p class="t0-side-label">手動で進めたい場合:</p>
+			<a class="t0-side-link" href="/ja/get-started/installation/">インストールガイド</a>
+			<a class="t0-side-link" href="/ja/get-started/demo-factory/">デモファクトリー</a>
+		</div>
+		<div class="t0-side-group">
+			<p class="t0-side-label">エージェント向けエンドポイント:</p>
+			<a class="t0-side-link" href="/llms.txt">/llms.txt</a>
+		</div>
 	</div>
 </section>
 
 <script is:inline>{`
 document.getElementById('t0-copy-btn').addEventListener('click', function () {
 	var b = this;
+	var label = b.querySelector('.t0-copy-label');
+	var defaultLabel = label.textContent;
 	var text = document.getElementById('t0-agent-prompt').innerText;
 	var done = function () {
-		b.textContent = 'コピーしました';
-		setTimeout(function () { b.textContent = 'プロンプトをコピー'; }, 1600);
+		b.classList.add('is-copied');
+		label.textContent = 'コピーしました';
+		setTimeout(function () {
+			b.classList.remove('is-copied');
+			label.textContent = defaultLabel;
+		}, 1600);
 	};
 	var fallback = function () {
 		var ta = document.createElement('textarea');
@@ -56,26 +76,29 @@ document.getElementById('t0-copy-btn').addEventListener('click', function () {
 	<p>実際の Tier0 導入で実証されたパターン。</p>
 </div>
 
-<section class="t0-grid-wrap t0-frame not-content">
-	<span class="t0-corners" aria-hidden="true"></span>
-	<div class="t0-grid">
-		<a class="t0-cell" href="/ja/best-practice/uns-modeling/">
-			<span class="t0-tag">モデリング</span>
+<section class="t0-grid not-content">
+	<a class="t0-cell" href="/ja/best-practice/uns-modeling/">
+		<span class="t0-tag">モデリング</span>
+		<div class="t0-cell-body">
 			<h3>UNS モデリング</h3>
 			<p>Demo UNS の設計 — 階層構成、トピック爆発の防止、スケールする payload 構造。</p>
 			<span class="t0-more">続きを読む</span>
-		</a>
-		<a class="t0-cell" href="/ja/best-practice/protocol-connections/">
-			<span class="t0-tag">プロトコル</span>
+		</div>
+	</a>
+	<a class="t0-cell" href="/ja/best-practice/protocol-connections/">
+		<span class="t0-tag">プロトコル</span>
+		<div class="t0-cell-body">
 			<h3>OPC UA / Modbus 接続</h3>
 			<p>代表的な産業プロトコルの Node-RED フロー。そのままインポートできる実フロー JSON 付き。</p>
 			<span class="t0-more">続きを読む</span>
-		</a>
-		<a class="t0-cell" href="/ja/best-practice/analytics-apps/">
-			<span class="t0-tag">分析</span>
+		</div>
+	</a>
+	<a class="t0-cell" href="/ja/best-practice/analytics-apps/">
+		<span class="t0-tag">分析</span>
+		<div class="t0-cell-body">
 			<h3>分析アプリの構築</h3>
 			<p>Notebook のクエリからインタラクティブな分析アプリへ — Aramco Bowtie 事例(匿名化データ)。</p>
 			<span class="t0-more">続きを読む</span>
-		</a>
-	</div>
+		</div>
+	</a>
 </section>

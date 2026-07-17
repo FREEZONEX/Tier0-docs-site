@@ -11,6 +11,7 @@ const LABELS: Record<string, string> = {
 	cloud: 'Cloud',
 	enterprise: 'Enterprise',
 };
+const EDITION_ORDER: Array<'edge' | 'cloud' | 'enterprise'> = ['edge', 'cloud', 'enterprise'];
 
 const AVAILABLE_IN: Record<string, string> = {
 	en: 'Available in',
@@ -19,14 +20,17 @@ const AVAILABLE_IN: Record<string, string> = {
 	es: 'Disponible en',
 };
 const availableIn = AVAILABLE_IN[lang] ?? AVAILABLE_IN.en;
+const orderedEditions = editions
+	? EDITION_ORDER.filter((edition) => editions.includes(edition))
+	: undefined;
 ---
 
 <Default><slot /></Default>
 {
-	editions && editions.length > 0 && (
+	orderedEditions && orderedEditions.length > 0 && (
 		<div class="t0-editions" aria-label={availableIn}>
 			<span class="t0-editions-label">{availableIn}</span>
-			{editions.map((e) => (
+			{orderedEditions.map((e) => (
 				<span class={`t0-edition t0-edition--${e}`}>{LABELS[e]}</span>
 			))}
 		</div>
