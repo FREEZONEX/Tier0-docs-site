@@ -19,7 +19,7 @@ Choose the installer that matches your environment.
 
 ### With Node.js
 
-Use `npx` when Node.js >= 16 is available to install.
+If Node.js 16 or later is available, use `npx` to install the CLI and skills.
 
 ```bash
 npx @tier0/cli@latest
@@ -73,11 +73,11 @@ tier0 skills update
 
 ## What the Tier0 Skill Can Do
 
-The Tier0 Skill gives agents a structured way to choose the right CLI command, read the matching reference, and operate Tier0 through the `tier0` CLI.
+The Tier0 Skills give agents a structured way to choose the right CLI command, read the matching reference, and operate Tier0 through the `tier0` CLI.
 
 ### Setting Operating Instance
 :::note
-SaaS uses `https://tier0.dev` by default and needs no base URL configuration.
+Cloud uses `https://tier0.dev` by default and needs no base URL configuration.
 :::
 Private deployments must configure the base URL before login. Once it's configured, all the following commands will be executed on that instance.
 
@@ -158,9 +158,12 @@ Run `config` to set the operating instance before configuring an API key or star
 | Node-RED Flow | Delete Flows | `tier0 flow delete --id 1 --yes` |
 | Node-RED Flow | Check available node types | `tier0 flow nodes --source --json` or `tier0 flow nodes --event --json` |
 
+## Skill Reference
 
-:::tip[Let an agent read the repo first]
-For complex UNS or Flow work, ask your agent to read the [Tier0 Skill repo](https://github.com/FREEZONEX/Tier0-skill) before running commands. The repo includes task-specific rules, examples, and safety notes for operations such as batch UNS writes and Node-RED Flow deploys.
+[Tier0 Skill Reference](/reference/tier0-skill/) lists the supported operation targets, common tasks, and matching CLI commands.
+
+:::tip[Let an agent read the repo]
+Ask your agent to read the [Tier0 Skill repo](https://github.com/FREEZONEX/Tier0-skill) before running commands.
 :::
 
 
@@ -177,5 +180,5 @@ npx @tier0/cli@latest uninstall --purge
 
 ## Next
 
-- [Working with UNS Data](/using-tier0/working-with-uns-data/) - How to operate on your UNS model through MQTT and APIs.
+- [Working with UNS Data](/using-tier0/working-with-uns-data/) — How to operate on your UNS model through MQTT and APIs.
 

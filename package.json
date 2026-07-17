@@ -6,6 +6,7 @@
     "dev": "astro dev",
     "start": "astro dev",
     "build": "astro build && node scripts/consolidate-llms.mjs",
+    "pdf": "npm run build && node scripts/export-pdf.mjs",
     "preview": "astro preview",
     "astro": "astro"
   },
@@ -20,5 +21,8 @@
     "sharp": "^0.34.5",
     "starlight-llms-txt": "^0.11.0"
   },
-  "description": "Documentation site for Tier0 (tier0.app) — Astro Starlight, agent-readable via llms.txt"
+  "description": "Documentation site for Tier0 (tier0.app) — Astro Starlight, agent-readable via llms.txt",
+  "devDependencies": {
+    "playwright": "^1.61.1"
+  }
 }

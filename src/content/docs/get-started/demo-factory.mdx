@@ -10,43 +10,38 @@ sidebar:
 import { Steps } from '@astrojs/starlight/components';
 
 The quickest way to *get* Tier0 is to poke at a factory that already works.
+## Factory Business
+The factory in Tier0 gets orders from ERP, splits the order, schedules production based on the orders, sends out the schedule and gets production progress data as it goes.
 
-Your **Cloud trial workspace** (14 days) comes with a preloaded plant: 
-A live namespace, flows feeding it with industrial data, notebooks, and applications working on top of the UNS data foundation.
-
+## Getting to Know the Business Process
 <Steps>
+1. In Tier0, go to **UNS**, check the details of orders came from ERP.
+    - `DemoFactory/ERP/ProductionOrders/State/UpsertProductionOrder`: Orders.
+    - `DemoFactory/ERP/ProductionOrders/State/OrderList`: Current order list snapshot.
+    :::tip[How these data is collected to UNS?]
+    Go to **Flows** > **Source Flow** > **DemoFactory-Flow** to check the data collection process.
+    :::
+2. (optional) Go to **Launchpad**, access the **Work Order Management** application, and create orders on the **Production Orders** page.
+3. In **Work Order Management**, split orders and schedule production plans for the split workorders on the **Plans** page.
+4. Send the plan to production, and check the plan details on the following topics on **UNS**.
+    - `DemoFactory/ERP/WorkOrderPlan/Metric/SplitCount`: The number of workorders after splitting.
+    - `DemoFactory/ERP/WorkOrderPlan/State/PlanStatus`: Current plan status.
+    - `DemoFactory/ERP/WorkOrderPlan/State/WorkOrderList`: The workorder list after production plan scheduled.
 
-1. **Browse the namespace.** Open the UNS explorer, or from your terminal:
-
-   ```bash
-   tier0 uns browse
-   tier0 uns browse Plant/Line1 --max-depth 2
-   ```
-
-   Paths are folders (`Plant/Line1`); leaves are topics (`Plant/Line1/Metric/Temperature`). Only topics hold values.
-
-2. **Read live values.** The namespace is MQTT pub/sub underneath — data moves when it changes:
-
-   ```bash
-   tier0 uns read "Plant/+/Metric/Temperature" --json
-   ```
-
-3. **See where data comes from.** Flow names mirror the topic paths they feed (`Line1-Collector` → `Plant/Line1/…`):
-
-   ```bash
-   tier0 flow list --source
-   ```
-
-4. **Open a notebook.** Query the same topics live — group by asset, plot a trend, join metrics with order context. See [Analyze UNS Data](/using-tier0/analyze-data/).
-
-5. **Generate an app.** Describe something small in the App Builder — an inspection checklist, a maintenance form — review the spec, generate, and try it in the sandbox.
-
+    :::note
+    The application directly sends the plans and workorders to **UNS**.
+    :::
+5. Check the production progress data on the **Plan Details** page in the application.
+    :::tip[Where do the details come from?]
+    The production progress data is collected from **DemoFactory-Flow** in **Source Flow** and published to **UNS**, and displayed on **Plan Details** page.
+    - `DemoFactory/Site_01/Production/Line_01/WorkOrderExecution/State/CurrentWorkOrder`: The order in process.
+    - `DemoFactory/Site_01/Production/Line_01/WorkOrderExecution/State/WorkOrderStatus`: The execution status of the current order.
+    - `DemoFactory/Site_01/Production/Line_01/WorkOrderExecution/Metric/Target_Qty`: The target production amount of the current order.
+    - `DemoFactory/Site_01/Production/Line_01/WorkOrderExecution/Metric/Produced_Qty`: The amount of products already done of the current order.
+    - `DemoFactory/Site_01/Production/Line_01/WorkOrderExecution/Metric/Defect_Qty`: The amount of defects of the current order.
+    - `DemoFactory/Site_01/Production/Line_01/WorkOrderExecution/Metric/Completion_Rate`: The completion rate of the current order.
+    :::
 </Steps>
-
-:::note
-The exact demo tree and preloaded apps may differ per trial workspace — substitute what you see in `tier0 uns browse`. On **Edge** there's no preloaded factory: create your first nodes with `tier0 uns create` instead, then follow [Connect Data to UNS](/using-tier0/connect-data/).
-:::
-
 ## Next
 
 - [Choosing the Best Version](/get-started/choosing-version/)

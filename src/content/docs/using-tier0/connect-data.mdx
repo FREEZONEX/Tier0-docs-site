@@ -7,79 +7,101 @@ sidebar:
 ---
 import { Steps } from '@astrojs/starlight/components';
 
+To connect data to Tier0, first build a model in **UNS**, then connect data sources through **Source Flow** with UNS models as destinations.
 
+```mermaid
+flowchart BT
+  uns["UNS Model"]
+  flow["Source Flow"]
+
+
+  flow -->|"send data"| uns
+
+  classDef t0accent fill:#EFFFD2,stroke:#8AC926,stroke-width:1px,color:#18230B
+  classDef t0node fill:#F8FAFC,stroke:#CBD5E1,stroke-width:1px,color:#111827
+  class uns t0accent
+  class flow t0node
+```
 ## How to Build a Data Model
-Based on simple folder-file structure, you can define the data hierarchy to a tree map.
+Define the data hierarchy as a tree map based on a simple folder-file structure.
 
 ### Building Models Manually
 
-:::note
-**factory/equipment/CNC** will be used as an example, in which `factory` and `equipment` are paths and `CNC` is a topic.
+:::note[Example Model]
+**Model**:
+```
+  Factory_A
+  └── Site_01
+      └── SMT_Line_1
+          └── Metric
+              └── Machine_001
+```
+**Payload**:
+```json
+"temperature": 85,
+"vibration": 2.8
+```
 :::
 <Steps>
-1. Log in to Tier0, select **UNS**.
-2. Hover over the upper-right corner icon <img src="http://communityimage2.oss-cn-hangzhou.aliyuncs.com/75.png" /> > **New Path** to add a path `factory`.
-3. Enter the path name `factory`, click **Create**.
-4. Select `factory`, hover over the same icon and add another path `equipment` under it.
-5. Select `equipment`, hover over the same icon > **New Topic**, and add a topic `CNC` under it.
-6. Set the topic **Name**, **Type**, select **Enable History**/**Mock Data***, click the arrow to continue.
-7. Set the payload fields, click **Create** to finish the topic creation.
+1. In **UNS**, add the root path `Factory_A`.
+2. Add the second path `Site_01` under `Factory_A`, and subsequent paths in the hierarchical order shown in the tree map.
+3. Add the topic `Machine_001` under `SMT_Line_1`, and set its **Topic Type** to **Metric**.
+4. Define the topic payload. Add 2 fields `temperature` and `vibration` and set their data types.
+5. Select **Mock Data** to send simulated data to the model, and **Enable History** to store the data to database.
 </Steps>
 
-
-:::tip[Different selections]
-When the **Topic Type** is set to **State** or **Action**:
-- **Mock Data**: Select it to generate mock data flow for testing.
-- **Enable History**: Select it to store the data in Tier0 database.
+:::tip[Additional parameters]
+**Auto Parsing** parses JSON text and converts it into general fields.
 :::
 
 ### Importing Models
-- By JSON text
-  <Steps>
-  1. On the **UNS** page, click the upper-right corner icon **Import**.
-  2. Select the **JSON** tab, wirte JSON text on the window.
-  3. Click **Submit** to import the model.
-  </Steps>
-- By JSON file
-  <Steps>
-  1. On the **Import** window, select the **File** tab.
-  2. Click **Download Template** at the upper-right corner to download a JSON template.
-  3. Enter the model content in the template and save it.
-  4. Upload the file on the **Import** window, and click **Submit** to complete.
-  </Steps>
-
-:::tip[Live template for easier import]
-You can manually add a path and topic, export it and use it as an example for import.
+:::tip
+Use LLMs like ChatGPT to help import models.
 :::
 
-## How to Connect Data to UNS
 <Steps>
-1. Log in to Tier0, go to **Flows**.
-2. Click **New Flow** at the upper-right corner.
-3. Enter a name, set the **Flow Type** to **Source Flow**, and click **Create**.
-4. Click the flow you just added, drag in nodes according to your data source type (e.g.`modbus`) on the canvas.
-5. Drag in an `mqtt out` node, select the **Server** as **emqx**.
-6. Enter the topic name copies from **UNS** (e.g. `factory/equipment/CNC`), click **Done**.
-7. Click **Deploy** at the upper-right corner, trigger the flow and the data will be sent to corresponding model under **UNS**.
+1. Copy the template JSON or download the template file on **Import** window.
+2. Send the template to AI, and use a similar prompt.
+    ```
+    Generate a UNS model used for xx in xx plant, including xx equipment and data sources based on the template.
+    ```
+3. Import the generated result in UNS.
 </Steps>
 
-## Addtional Options
+
+
+## How to Connect Data to UNS
+**Source Flow**, based on **Node-RED**, is used to connect data sources to Tier0.
+:::tip[To understand Source Flow]
+In **Source Flow**:
+- Every flow ends with an **mqtt out** node. It works as an MQTT client to publish data to the broker.
+- The UNS broker is embedded in the **mqtt out** node with the same name as the flow.
+- When a UNS model is used as the topic, data goes directly to the corresponding model in **UNS**.
+:::
+<Steps>
+1. Create a **Source Flow** in **Flows**.
+2. Use nodes based on the data source type, and end the flow with an **mqtt out** node.
+3. Make sure the **Server** of the node is set to the UNS broker.
+4. Use a **UNS** model as MQTT topic (e.g. `Factory_A/Site_01/SMT_Line_1/Metric/Machine_001`).
+</Steps>
+
+## Additional Options
 :::note
-This part states addtional parameters or configurations related to the workflow.
+This section describes additional parameters or configurations related to the workflow.
 :::
 
 | Scope | Parameter | Item | When to use |
 |------|-----------|------|-------------|
 | Path | Extended Attribute/Custom Attributes | - | Use when you need to add additional attributes to the path, such as unit information. |
-| Topic | Topic Type | [Metric, State, Action](/using-tier0/uns-concepts/#metric-state-action) | Select the topic type that matches the data semantics: measurements, current status, or executable operations. |
+| Topic | Topic Type | [Metric, State, Action](../uns-concepts/#metric-state-action) | Select the topic type that matches the data semantics: measurements, current status, or executable operations. |
 | Topic | Attribute Generation Method | Pre-defined | Manually set attributes for the topic one by one. |
-| Topic | Attribute Generation Method | Auto-Parsing | Generates attributes automatically from JSON text in batches. |
+| Topic | Attribute Generation Method | Auto-Parsing | Convert attributes automatically from JSON text in batches. |
 
 
 ## Next
 
-- [Build Apps on UNS](/using-tier0/build-apps/) — Build industrial applications with UNS data.
-- [Analyze UNS Data](/using-tier0/analyze-data/) — Analyze UNS data with Marimo Notebook and Python.
+- [Build Apps on UNS](../build-apps/) — Build industrial applications with UNS data.
+- [Analyze UNS Data](../analyze-data/) — Analyze UNS data with Marimo Notebook and Python.
 
 
 

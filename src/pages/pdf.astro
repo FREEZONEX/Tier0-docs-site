@@ -1,0 +1,308 @@
+---
+import { getCollection, render } from 'astro:content';
+import '../styles/custom.css';
+
+const DOC_ORDER = [
+	{ section: 'Get Started', slug: 'get-started/installation' },
+	{ section: 'Get Started', slug: 'get-started/demo-factory' },
+	{ section: 'Get Started', slug: 'get-started/choosing-version' },
+	{ section: 'Using Tier0', slug: 'using-tier0/uns-concepts' },
+	{ section: 'Using Tier0', slug: 'using-tier0/connect-data' },
+	{ section: 'Using Tier0', slug: 'using-tier0/working-with-uns-data' },
+	{ section: 'Using Tier0', slug: 'using-tier0/build-apps' },
+	{ section: 'Using Tier0', slug: 'using-tier0/analyze-data' },
+	{ section: 'Using Tier0', slug: 'using-tier0/agents' },
+	{ section: 'Best Practice', slug: 'best-practice/uns-modeling' },
+	{ section: 'Best Practice', slug: 'best-practice/protocol-connections' },
+	{ section: 'Best Practice', slug: 'best-practice/analytics-apps' },
+	{ section: 'Reference', slug: 'reference/api-reference' },
+	{ section: 'Reference', slug: 'reference/skill-reference' },
+	{ section: 'Reference', slug: 'reference/high-availability-deployment' },
+	{ section: 'Reference', slug: 'reference/sla-and-ha-boundaries' },
+	{ section: 'Reference', slug: 'reference/standard-port-list' },
+	{ section: 'Reference', slug: 'reference/operations-runbook' },
+];
+
+const allDocs = await getCollection('docs');
+const docsById = new Map(allDocs.map((entry) => [entry.id, entry]));
+const renderedDocs = await Promise.all(
+	DOC_ORDER.map(async (item, index) => {
+		const entry = docsById.get(item.slug);
+		if (!entry) throw new Error(`Missing docs entry for ${item.slug}`);
+		const { Content, headings } = await render(entry);
+		return {
+			...item,
+			index,
+			entry,
+			Content,
+			headings: headings.filter((heading) => heading.depth === 2),
+			anchor: `doc-${index + 1}`,
+		};
+	})
+);
+---
+
+<!doctype html>
+<html lang="en" data-theme="light">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<title>Tier0 Docs PDF</title>
+		<style>
+			@page {
+				size: A4;
+				margin: 18mm 16mm 20mm;
+			}
+
+			:root {
+				color-scheme: light;
+				--sl-font: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica,
+					Arial, sans-serif;
+				--sl-font-mono: 'Source Code Pro', Menlo, Monaco, Consolas, monospace;
+			}
+
+			body {
+				margin: 0;
+				background: #fff;
+				color: #171a22;
+				font-family: var(--sl-font);
+			}
+
+			.pdf-cover {
+				min-height: 82vh;
+				display: flex;
+				flex-direction: column;
+				justify-content: center;
+				border-bottom: 1px solid #dfe6d8;
+			}
+
+			.pdf-cover h1 {
+				max-width: 14cm;
+				margin: 0.75rem 0 1rem;
+				color: #171a22;
+				font-size: 3rem;
+				line-height: 1.05;
+			}
+
+			.pdf-toc {
+				break-after: page;
+				padding-top: 0.5rem;
+			}
+
+			.pdf-toc h2 {
+				margin: 0 0 1rem;
+				font-size: 1.75rem;
+			}
+
+			.pdf-toc-section {
+				margin-top: 1.25rem;
+				break-inside: avoid;
+			}
+
+			.pdf-toc-section h3 {
+				margin: 0 0 0.5rem;
+				color: #4a7300;
+				font-size: 0.875rem;
+				text-transform: uppercase;
+			}
+
+			.pdf-toc ol {
+				margin: 0;
+				padding-left: 1.25rem;
+			}
+
+			.pdf-toc li {
+				margin: 0.35rem 0;
+				color: #454c57;
+			}
+
+			.pdf-toc a {
+				color: #171a22;
+				text-decoration: none;
+			}
+
+			.pdf-doc {
+				break-before: page;
+			}
+
+			.pdf-doc-header {
+				margin-bottom: 1.25rem;
+				padding-bottom: 0.75rem;
+				border-bottom: 1px solid #dfe6d8;
+			}
+
+			.pdf-doc-kicker {
+				color: #4a7300;
+				font-size: 0.75rem;
+				font-weight: 700;
+				text-transform: uppercase;
+			}
+
+			.pdf-doc h1 {
+				margin: 0.35rem 0 0.25rem;
+				color: #171a22;
+				font-size: 2rem;
+				line-height: 1.2;
+			}
+
+			.pdf-doc-description {
+				margin: 0;
+				color: #707780;
+				font-size: 0.9375rem;
+			}
+
+			.sl-markdown-content {
+				max-width: none;
+				color: #2a2f38;
+			}
+
+			.sl-markdown-content h1 {
+				display: none;
+			}
+
+			.sl-markdown-content h2 {
+				margin-top: 1.7rem;
+				padding-top: 0.4rem;
+				color: #171a22;
+				font-size: 1.35rem;
+				break-after: avoid;
+			}
+
+			.sl-markdown-content h3,
+			.sl-markdown-content h4 {
+				break-after: avoid;
+			}
+
+			.sl-markdown-content p,
+			.sl-markdown-content li {
+				font-size: 0.95rem;
+				line-height: 1.62;
+			}
+
+			.sl-markdown-content a {
+				color: #4a7300;
+				text-decoration: none;
+			}
+
+			.sl-markdown-content table {
+				width: 100%;
+				display: table;
+				font-size: 0.82rem;
+				break-inside: auto;
+			}
+
+			.sl-markdown-content th,
+			.sl-markdown-content td {
+				padding: 0.45rem 0.5rem;
+			}
+
+			.sl-markdown-content pre,
+			.sl-markdown-content table,
+			.sl-markdown-content blockquote,
+			.sl-markdown-content .mermaid,
+			.sl-markdown-content img {
+				break-inside: avoid;
+			}
+
+			.sl-markdown-content pre {
+				white-space: pre-wrap;
+				border: 1px solid #dfe6d8;
+				background: #f7f8f4;
+			}
+
+			.sl-markdown-content code {
+				font-family: var(--sl-font-mono);
+			}
+
+			.sl-markdown-content img {
+				max-width: 100%;
+				height: auto;
+			}
+
+			.sl-markdown-content details {
+				display: block;
+				border: 1px solid #dfe6d8;
+				border-radius: 6px;
+				padding: 0.75rem;
+				background: #fbfcf8;
+			}
+
+			.sl-markdown-content details > summary {
+				font-weight: 700;
+			}
+
+			.sl-markdown-content [role='tablist'] {
+				display: none;
+			}
+
+			.sl-markdown-content [role='tabpanel'] {
+				display: block !important;
+				margin: 0.75rem 0;
+				padding: 0.75rem;
+				border: 1px solid #dfe6d8;
+				border-radius: 6px;
+				background: #fff;
+			}
+
+			.pdf-reference-note {
+				margin-top: 2rem;
+				padding: 0.75rem 1rem;
+				border: 1px solid #dfe6d8;
+				border-radius: 6px;
+				background: #fbfcf8;
+				color: #454c57;
+				font-size: 0.875rem;
+			}
+
+			@media print {
+				.pdf-cover {
+					break-after: page;
+				}
+			}
+		</style>
+	</head>
+	<body>
+		<main>
+			<section class="pdf-cover">
+				<h1>Tier0 User's Manual</h1>
+			</section>
+
+			<nav class="pdf-toc" aria-label="Table of contents">
+				<h2>Table of Contents</h2>
+				{
+					['Get Started', 'Using Tier0', 'Best Practice', 'Reference'].map((section) => (
+						<div class="pdf-toc-section">
+							<h3>{section}</h3>
+							<ol>
+								{renderedDocs
+									.filter((doc) => doc.section === section)
+									.map((doc) => (
+										<li>
+											<a href={`#${doc.anchor}`}>{doc.entry.data.title}</a>
+										</li>
+									))}
+							</ol>
+						</div>
+					))
+				}
+			</nav>
+
+			{
+				renderedDocs.map((doc) => (
+					<article id={doc.anchor} class="pdf-doc">
+						<header class="pdf-doc-header">
+							<div class="pdf-doc-kicker">{doc.section}</div>
+							<h1>{doc.entry.data.title}</h1>
+							{doc.entry.data.description && (
+								<p class="pdf-doc-description">{doc.entry.data.description}</p>
+							)}
+						</header>
+						<div class="sl-markdown-content">
+							<doc.Content />
+						</div>
+					</article>
+				))
+			}
+		</main>
+	</body>
+</html>

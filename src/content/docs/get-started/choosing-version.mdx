@@ -89,10 +89,27 @@ Tier0 is one platform in three editions. Same namespace model, same flows, same 
 
 **Add-ons:** extra edge nodes $2,000 /edge/year · additional instances $10,000 /instance/year. Prices are for orientation — the source of truth is [tier0.app/pricing](https://tier0.app/pricing).
 
-## Edge hardware requirements
+## Capability Matrix
 
-:::caution[TODO — 写作线索 (Huize)]
-Edge:适合进行技术测试,或具备充分技术能力的用户。要加入硬件要求。
+| Capability | Edge | Cloud | Enterprise |
+|---|---|---|---|
+| UNS / Data Modeling | <span class="t0-yes">&#10003;</span> single-machine UNS | <span class="t0-yes">&#10003;</span> Growth / Scale | <span class="t0-yes">&#10003;</span> Base / Plus / Cluster |
+| Industrial protocols | <span class="t0-yes">&#10003;</span> MQTT | <span class="t0-yes">&#10003;</span> Growth / Scale: MQTT, REST, i3X, OPC UA | <span class="t0-yes">&#10003;</span> Base: MQTT; Plus / Cluster: MQTT, REST, i3X, OPC UA |
+| UNS Agent | <span class="t0-no">&#215;</span> | <span class="t0-yes">&#10003;</span> Growth / Scale | <span class="t0-no">&#215;</span> |
+| Notebook (Advanced Analysis) | <span class="t0-no">&#215;</span> | <span class="t0-yes">&#10003;</span> Growth / Scale | <span class="t0-yes">&#10003;</span> Plus / Cluster |
+| Vision | <span class="t0-no">&#215;</span> | <span class="t0-yes">&#10003;</span> Scale | <span class="t0-yes">&#10003;</span> Plus / Cluster |
+| Anchor | <span class="t0-no">&#215;</span> | <span class="t0-yes">&#10003;</span> Scale | <span class="t0-yes">&#10003;</span> Cluster |
+| App Builder + Template Library | <span class="t0-no">&#215;</span> | <span class="t0-yes">&#10003;</span> Builder / Growth / Scale | <span class="t0-no">&#215;</span> |
+| LaunchPad / My Apps | <span class="t0-no">&#215;</span> | <span class="t0-yes">&#10003;</span> Builder / Growth / Scale | <span class="t0-yes">&#10003;</span> Base / Plus / Cluster |
+| Audit / app & system logs | <span class="t0-no">&#215;</span> | <span class="t0-yes">&#10003;</span> Growth / Scale | <span class="t0-yes">&#10003;</span> Plus / Cluster; SIEM in Cluster |
+| HA / multi-instance / governance | <span class="t0-no">&#215;</span> | <span class="t0-no">&#215;</span> | <span class="t0-yes">&#10003;</span> Cluster |
+| Operations | You | FREEZONEX | You, with support |
+
+## Edge Hardware Requirements
+
+:::tip[If you want to use Edge]
+Edge is intended for technical evaluation and requires operational experience.
+Make sure your environment meets the following hardware requirements before using it.
 :::
 
 | | Minimum | Recommended |
@@ -116,20 +133,6 @@ flowchart LR
   q4 -- "no" --> baseplus["Enterprise Base / Plus"]
   class growth,cluster t0accent
 ```
-
-## Capability matrix
-
-| Capability | Edge | Cloud | Enterprise |
-|---|---|---|---|
-| UNS core (semantic MQTT namespace) | <span class="t0-yes">✓</span> | <span class="t0-yes">✓</span> | <span class="t0-yes">✓</span> |
-| SourceFlow / EventFlow (Node-RED) | <span class="t0-yes">✓</span> | <span class="t0-yes">✓</span> | <span class="t0-yes">✓</span> |
-| History storage (TimescaleDB / PostgreSQL) | <span class="t0-yes">✓</span> single machine | <span class="t0-yes">✓</span> managed | <span class="t0-yes">✓</span> your infrastructure |
-| `tier0` CLI + agent skills | <span class="t0-yes">✓</span> | <span class="t0-yes">✓</span> | <span class="t0-yes">✓</span> |
-| App Builder + App Library | <span class="t0-no">—</span> | <span class="t0-yes">✓</span> | <span class="t0-yes">✓</span> |
-| Notebook (Advanced Analysis) | <span class="t0-no">—</span> | <span class="t0-yes">✓</span> | <span class="t0-yes">✓</span> |
-| Launchpad (front-line apps) | <span class="t0-no">—</span> | <span class="t0-yes">✓</span> | <span class="t0-yes">✓</span> |
-| HA / multi-instance / governance | <span class="t0-no">—</span> | <span class="t0-no">—</span> | <span class="t0-yes">✓</span> Cluster |
-| Operations | you | FREEZONEX | you, with support |
 
 ## What's an "edge" (the unit)?
 
