@@ -11,10 +11,10 @@ Tier0 usa Marimo Notebook para análisis avanzado de datos con Python. Esta guí
 
 ```mermaid
 flowchart LR
-  collect["Node-RED"] -->|"collected data"| uns[("UNS<br/>modeling")]
-  uns -->|"raw data"| notebook["Notebook"]
-  notebook -->|"analysis results"| uns
-  uns -->|"analysis results"| builder["App Builder"]
+  collect["Node-RED"] -->|"datos recopilados"| uns[("Modelado<br/>UNS")]
+  uns -->|"datos sin procesar"| notebook["Notebook"]
+  notebook -->|"resultados de análisis"| uns
+  uns -->|"resultados de análisis"| builder["App Builder"]
 
   classDef t0accent fill:#EAF8C8,stroke:#A6CF38,stroke-width:1px,color:#171717
   classDef t0soft fill:#F7FAF2,stroke:#D8E6B8,stroke-width:1px,color:#2A2A2A
@@ -32,10 +32,10 @@ La corrosión en refinería es un proceso complejo influido por múltiples facto
 ## Obtener datos raw
 
 <Steps>
-1. In Tier0, go to **UNS**, and import the data model.
+1. En Tier0, ve a **UNS** e importa el modelo de datos.
     
       <details className="notebook-cell">
-      <summary>Show UNS model JSON</summary>
+      <summary>Mostrar JSON del modelo UNS</summary>
 
       ```json
       {
@@ -198,11 +198,11 @@ La corrosión en refinería es un proceso complejo influido por múltiples facto
 
       </details>
     
-2. Go to **Flows**, create **Source Flow** to connect raw data and publish to **UNS**.
+2. Ve a **Flows**, crea un **Source Flow** para conectar los datos sin procesar y publicarlos en **UNS**.
 
-    *(Node-RED connects data and publishes it to UNS.)*
+    *(Node-RED conecta los datos y los publica en UNS.)*
     <details className="notebook-cell">
-    <summary>Show Source Flow JSON</summary>
+    <summary>Mostrar JSON de Source Flow</summary>
 
     ```json
       [
@@ -398,16 +398,16 @@ La corrosión en refinería es un proceso complejo influido por múltiples facto
 
 ## Crear una app de analítica en Notebook
 
-1. In Tier0, go to **Notebook**, and create a new notebook.
+1. En Tier0, ve a **Notebook** y crea un notebook nuevo.
 
-2. Access the notebook, and add the following cells to analyze data from **UNS**.
+2. Abre el notebook y agrega las siguientes celdas para analizar datos de **UNS**.
 
-    - Cell 1 - Import Libraries & Configuration
+    - Celda 1 - Importar librerías y configuración
 
-      Import required libraries and configure the MQTT broker, topics, and runtime settings.
+      Importa las librerías necesarias y configura el broker MQTT, los topics y los ajustes de ejecución.
 
       <details className="notebook-cell">
-      <summary>Show code</summary>
+      <summary>Mostrar código</summary>
 
       ```python
       @app.cell
@@ -489,12 +489,12 @@ La corrosión en refinería es un proceso complejo influido por múltiples facto
 
       </details>
 
-    - Cell 2 - Define Bayesian Network Structure
+    - Celda 2 - Definir la estructura de Bayesian Network
 
-      Define the Bayesian Network topology, state spaces, CPT generators, and probability rules.
+      Define la topology de Bayesian Network, los espacios de estado, los generadores CPT y las reglas de probabilidad.
 
       <details className="notebook-cell">
-      <summary>Show code</summary>
+      <summary>Mostrar código</summary>
 
       ```python
       @app.cell
@@ -694,12 +694,12 @@ La corrosión en refinería es un proceso complejo influido por múltiples facto
 
       </details>
 
-    - Cell 3 - Validate & Discretize Source Data
+    - Celda 3 - Validar y discretizar los datos de origen
 
-      Validate the incoming MQTT payload and convert continuous process values into Bayesian Network states.
+      Valida el payload MQTT entrante y convierte los valores continuos del proceso en estados de Bayesian Network.
 
       <details className="notebook-cell">
-      <summary>Show code</summary>
+      <summary>Mostrar código</summary>
 
       ```python
       @app.cell
@@ -881,12 +881,12 @@ La corrosión en refinería es un proceso complejo influido por múltiples facto
 
       </details>
 
-    - Cell 4 - Build Model & Run Inference
+    - Celda 4 - Construir el modelo y ejecutar inferencia
 
-      Build a Bayesian Network for the current snapshot, execute inference, and generate output payloads.
+      Construye una Bayesian Network para el snapshot actual, ejecuta inferencia y genera payloads de salida.
 
       <details className="notebook-cell">
-      <summary>Show code</summary>
+      <summary>Mostrar código</summary>
 
       ```python
       @app.cell
@@ -1047,12 +1047,12 @@ La corrosión en refinería es un proceso complejo influido por múltiples facto
 
       </details>
 
-    - Cell 5 - Run MQTT Analysis Service
+    - Celda 5 - Ejecutar el servicio de análisis MQTT
 
       Subscribe to the source topic, process each incoming snapshot, run Bayesian analysis, and publish the results.
 
       <details className="notebook-cell">
-      <summary>Show code</summary>
+      <summary>Mostrar código</summary>
 
       ```python
       @app.cell
@@ -1286,12 +1286,12 @@ La corrosión en refinería es un proceso complejo influido por múltiples facto
 
       </details>
 
-    - Cell 6 - Display Service Status
+    - Celda 6 - Mostrar el estado del servicio
 
       Display the MQTT connection status and service statistics.
 
       <details className="notebook-cell">
-      <summary>Show code</summary>
+      <summary>Mostrar código</summary>
 
       ```python
       @app.cell
@@ -1351,12 +1351,12 @@ La corrosión en refinería es un proceso complejo influido por múltiples facto
 
       </details>
 
-    - Cell 7 - Display Latest Analysis Result
+    - Celda 7 - Mostrar el último resultado de análisis
 
       Display the most recent Bayesian analysis result.
 
       <details className="notebook-cell">
-      <summary>Show code</summary>
+      <summary>Mostrar código</summary>
 
       ```python
       @app.cell
@@ -1390,19 +1390,19 @@ La corrosión en refinería es un proceso complejo influido por múltiples facto
 
       </details>
 
-3. Run all cells and go to **UNS** to check the results.
+3. Ejecuta todas las celdas y ve a **UNS** para comprobar los resultados.
 
 ## Crear Bow-tie App
 <Steps>
-1. In Tier0, go to **Builder**.
-2. Enter the application requirements in the dialog, and start building.
+1. En Tier0, ve a **Builder**.
+2. Introduce los requisitos de la aplicación en el cuadro de diálogo y comienza la construcción.
 
-    <Aside type="caution" title="What must be stated">
+    <Aside type="caution" title="Lo que debe indicarse">
       Recuerda indicar al agent que use datos de UNS y proporcionar topic paths específicos. De lo contrario, el agent puede tener problemas para mostrar los datos correctos.
     </Aside>
 
     <details className="notebook-cell">
-    <summary>Show Builder prompt</summary>
+    <summary>Mostrar prompt de Builder</summary>
 
     ```text
     Build a modern industrial Bow-Tie Analysis application for CDU Atmospheric Overhead Corrosion.

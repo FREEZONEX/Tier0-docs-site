@@ -134,14 +134,14 @@ Edge is intended for technical evaluation and requires operational experience.
 
 ```mermaid
 flowchart LR
-  q1{"Technical evaluation<br/>or self-host?"} -- "yes" --> edge["Edge (open source)"]
-  q1 -- "no" --> q2{"Need on-prem /<br/>sovereignty?"}
-  q2 -- "no" --> q3{"More than 5 edges?"}
-  q2 -- "yes" --> q4{"Multi-factory / HA?"}
-  q3 -- "no" --> growth["Cloud Growth ★"]
-  q3 -- "yes" --> scale["Cloud Scale"]
-  q4 -- "yes" --> cluster["Enterprise Cluster ★"]
-  q4 -- "no" --> baseplus["Enterprise Base / Plus"]
+  q1{"기술 평가<br/>또는 self-host?"} -- "예" --> edge["Edge (open source)"]
+  q1 -- "아니오" --> q2{"온프레미스 /<br/>데이터 주권 필요?"}
+  q2 -- "아니오" --> q3{"5개 edge<br/>초과?"}
+  q2 -- "예" --> q4{"다중 공장 / HA<br/>필요?"}
+  q3 -- "아니오" --> growth["Cloud Growth ★"]
+  q3 -- "예" --> scale["Cloud Scale"]
+  q4 -- "예" --> cluster["Enterprise Cluster ★"]
+  q4 -- "아니오" --> baseplus["Enterprise Base / Plus"]
   class growth,cluster t0accent
 ```
 
