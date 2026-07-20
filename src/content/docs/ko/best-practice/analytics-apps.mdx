@@ -1,13 +1,13 @@
 ﻿---
-title: Building Analytics Apps
-description: Building an analytics app with Notebook using the Aramco Bowtie case (sanitized data).
+title: 분석 앱 구축
+description: Aramco Bowtie 사례(비식별 데이터)를 사용해 Notebook 기반 분석 앱을 구축합니다.
 editions: [cloud, enterprise]
 sidebar:
   order: 3
 ---
 import { Aside, Steps } from '@astrojs/starlight/components';
 
-Tier0 uses Marimo Notebook for advanced data analysis with Python. This guide uses a Bowtie application as an example workflow.
+Tier0는 Python 기반 고급 데이터 분석에 Marimo Notebook을 사용합니다. 이 가이드는 Bowtie 애플리케이션을 예제 workflow로 사용합니다.
 
 ```mermaid
 flowchart LR
@@ -25,11 +25,11 @@ flowchart LR
 ```
 
 
-## Example Background
+## 예제 배경
 
-Refinery corrosion is a complex process influenced by multiple operating factors. This example demonstrates a real-time corrosion risk assessment workflow that combines process data to estimate the likelihood of corrosion and support proactive maintenance.
+정유 공정의 부식은 여러 운전 요인의 영향을 받는 복잡한 현상입니다. 이 예제는 공정 데이터를 결합해 부식 발생 가능성을 추정하고 선제 정비를 지원하는 실시간 부식 위험 평가 workflow를 보여줍니다.
 
-## Getting Raw Data
+## 원천 데이터 가져오기
 
 <Steps>
 1. In Tier0, go to **UNS**, and import the data model.
@@ -396,7 +396,7 @@ Refinery corrosion is a complex process influenced by multiple operating factors
 
 </Steps>
 
-## Building an Analytics App in Notebook
+## Building an 분석 App in Notebook
 
 1. In Tier0, go to **Notebook**, and create a new notebook.
 
@@ -488,8 +488,8 @@ Refinery corrosion is a complex process influenced by multiple operating factors
       ```
 
       </details>
-      :::tip[For external connections to UNS broker]
-      Aside from the authentication credentials from Tier0, if you are connecting to the UNS broker through external client, use the following information:
+      :::tip[UNS broker 외부 연결]
+      외부 client로 UNS broker에 연결하는 경우 Tier0 인증 정보 외에 다음 정보를 사용합니다.
         ```json
         "MQTT TCP": "mqtt://enterprise-new-dev.tier0.dev:1883",
         "WSS": "wss://enterprise-new-dev.tier0.dev:8084/mqtt"
@@ -702,7 +702,7 @@ Refinery corrosion is a complex process influenced by multiple operating factors
 
     - Cell 3 - Validate & Discretize Source Data
 
-      Validate the incoming MQTT payload and convert continuous process values into Bayesian Network states.
+      들어오는 MQTT payload를 validate하고 continuous process value를 Bayesian Network state로 변환합니다.
 
       <details className="notebook-cell">
       <summary>Show code</summary>
@@ -889,7 +889,7 @@ Refinery corrosion is a complex process influenced by multiple operating factors
 
     - Cell 4 - Build Model & Run Inference
 
-      Build a Bayesian Network for the current snapshot, execute inference, and generate output payloads.
+      현재 snapshot에 대한 Bayesian Network를 구축하고 추론을 실행한 뒤 출력 payload를 생성합니다.
 
       <details className="notebook-cell">
       <summary>Show code</summary>
@@ -1055,7 +1055,7 @@ Refinery corrosion is a complex process influenced by multiple operating factors
 
     - Cell 5 - Run MQTT Analysis Service
 
-      Subscribe to the source topic, process each incoming snapshot, run Bayesian analysis, and publish the results.
+      source topic을 subscribe하고 각 incoming snapshot을 처리한 뒤 Bayesian analysis를 실행하고 result를 publish합니다.
 
       <details className="notebook-cell">
       <summary>Show code</summary>
@@ -1398,99 +1398,67 @@ Refinery corrosion is a complex process influenced by multiple operating factors
 
 3. Run all cells and go to **UNS** to check the results.
 
-## Building Bow-tie App
+## Bow-tie 앱 구축
 <Steps>
 1. In Tier0, go to **Builder**.
 2. Enter the application requirements in the dialog, and start building.
 
     <Aside type="caution" title="What must be stated">
-      Remember to tell the agent to use data from UNS, specific topic paths are necessary. Otherwise the agent might have trouble displaying the correct data.
+      agent에게 UNS 데이터를 사용하라고 알려주고, 구체적인 topic path를 제공해야 합니다. 그렇지 않으면 agent가 올바른 데이터를 표시하는 데 어려움을 겪을 수 있습니다.
     </Aside>
     <Aside type="tip" title="In case you are building apps on another Tier0">
-      Use a different **clientId** (add a different suffix) to connect to the UNS broker to avoid connection conflict.
+      연결 충돌을 피하려면 서로 다른 **clientId**(다른 suffix 추가)를 사용해 UNS broker에 연결합니다.
     </Aside>
     <details className="notebook-cell">
     <summary>Show Builder prompt</summary>
 
     ```text
-        Build a modern industrial Bow-Tie Analysis application for CDU Atmospheric Overhead Corrosion.
+    Build a modern industrial Bow-Tie Analysis application for CDU Atmospheric Overhead Corrosion.
 
-        Use the following UNS topics as the only data sources:
+    Use the following UNS topics as the only data sources:
 
-        - Refinery/CDU_Plant/Metric/Corrosion_Monitoring
-        - Refinery/CDU_Plant/Metric/Corrosion_Analysis
-        - Refinery/CDU_Plant/State/Corrosion_Risk
+    - Refinery/CDU_Plant/Metric/Corrosion_Monitoring
+    - Refinery/CDU_Plant/Metric/Corrosion_Analysis
+    - Refinery/CDU_Plant/State/Corrosion_Risk
 
-        The application must update automatically when new UNS messages arrive.
+    The application should help operators understand current corrosion risk, contributing threats, barrier conditions, and possible consequences.
 
-        The application should help operators understand current corrosion risk, contributing threats, barrier conditions, and possible consequences.
+    Create a single-page dashboard with:
 
-        Create a single-page dashboard with:
+    1. A Bow-Tie diagram as the main section:
+      - Threats on the left
+      - Preventative barriers between threats and the top event
+      - Corrosion as the central top event
+      - Mitigative barriers after the top event
+      - Consequences on the right
 
-        1. A Bow-Tie diagram as the main section:
-        - Threats on the left
-        - Preventative barriers between threats and the top event
-        - Corrosion as the central top event
-        - Mitigative barriers after the top event
-        - Consequences on the right
+    2. A prominent risk summary showing:
+      - Current risk state
+      - Model confidence
+      - Normal, developing, and confirmed probabilities
+      - Total corrosion risk
 
-        2. A prominent risk summary showing:
-        - Current risk state
-        - Model confidence
-        - Normal, developing, and confirmed probabilities
-        - Total corrosion risk
+    3. A compact live process data panel showing key values from Corrosion_Monitoring, including chloride, pH, wash water flow, desalter performance, wash water rate, total iron, SAP evidence, and injection quill status.
 
-        3. A compact live process data panel showing key values from Corrosion_Monitoring, including chloride, pH, wash water flow, desalter performance, wash water rate, total iron, SAP evidence, and injection quill status.
+    4. Consequence indicators for:
+      - Loss of primary containment
+      - Unplanned shutdown
+      - Escalation risk
 
-        4. Consequence indicators for:
-        - Loss of primary containment
-        - Unplanned shutdown
-        - Escalation risk
+    5. Visual status rules:
+      - Green for normal or healthy conditions
+      - Yellow for developing risk or warning conditions
+      - Red for confirmed risk, failed barriers, or severe consequences
+      - Gray when data is unavailable
 
-        5. Visual status rules:
-        - Green for normal or healthy conditions
-        - Amber/yellow for developing risk or warning conditions
-        - Red for confirmed risk, failed barriers, or severe consequences
-        - Gray when data is unavailable
-        - Blue only for interaction and informational highlights
+    6. Interaction:
+      - Selecting a threat, barrier, or consequence should show its current state, related process values, and a short explanation.
+      - Update the interface automatically when new data arrives.
+      - Show the latest data timestamp and connection status.
 
-        6. Interaction:
-        - Selecting a threat, barrier, or consequence should show its current state, related process values, and a short explanation.
-        - Update the interface automatically when new UNS data arrives.
-        - Show the latest data timestamp and connection/subscription status from the built-in SDK.
+    Use a clean, professional refinery operations style with clear hierarchy, compact cards, readable labels, and responsive layout.
 
-        Design requirements:
-
-        Keep the existing visual design language and styling throughout the application.
-
-        Use a modern industrial operations dashboard style:
-        - Dark blue-gray color palette instead of pure black.
-        - Layered panels with subtle gradients.
-        - Card-based layout with large rounded corners, around 16–20px.
-        - Thin borders used for separation instead of heavy shadows.
-        - Soft depth and restrained glow effects.
-        - Clean spacing with generous padding and consistent alignment.
-        - IBM Plex Sans for body text.
-        - Space Grotesk for headings.
-        - Compact, information-dense cards with clear visual hierarchy.
-        - Uppercase section labels with increased letter spacing.
-        - Professional refinery / SCADA interface rather than business analytics.
-        - Flat illustrations and SVG graphics instead of skeuomorphic elements.
-        - Smooth, subtle transitions and hover effects.
-
-        Overall appearance should feel clean, modern, technical, and operational.
-
-        Avoid:
-        - Pure black backgrounds
-        - Glassmorphism
-        - Cyberpunk styling
-        - Neon lighting
-        - Overly decorative effects
-        - Business analytics dashboard styling
-
-        Use a clean, professional refinery operations style with clear hierarchy, compact cards, readable labels, and responsive layout.
-
-        Use the payload fields exactly as defined in the corresponding UNS models. Do not invent additional fields, calculated values, or mock data.
+    Use the payload fields exactly as defined in the corresponding UNS models. Do not invent additional fields, calculated values, or mock data.
     ```
 
     </details>

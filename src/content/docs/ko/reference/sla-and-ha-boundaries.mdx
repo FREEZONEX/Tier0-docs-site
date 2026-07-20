@@ -1,0 +1,87 @@
+---
+title: SLA 및 고가용성 경계
+description: 표준 Tier0 Enterprise 배포를 위한 SLA 권장사항, 고가용성 경계, 인수 조건, 훈련, 강화 항목입니다.
+sidebar:
+  order: 4
+---
+
+이 문서는 6-VM fully offline deployment에 적용됩니다. 구성은 application / Swarm node 3개, PostgreSQL HA node 2개, witness node 1개입니다.
+
+## 아키텍처 기준
+
+| Layer | Current Design | High Availability Boundary |
+| --- | --- | --- |
+| Application runtime | Enterprise New compose는 고정된 `tier0_app_active_node`에서 실행됩니다. | `backend`, `redis`, `EMQX`, `SourceFlow`, `EventFlow`, `Marimo`, `OPC UA Server`는 아직 자동 multi-replica service가 아닙니다. |
+| HTTP entry | 세 애플리케이션 노드가 keepalived APP VIP + HAProxy를 실행합니다. | VIP는 이동할 수 있습니다. HAProxy는 `8088/TCP`의 활성 노드로 전달하고 `/healthz`를 확인합니다. |
+| MQTT / OPC UA | EMQX는 `1883/8883/8083/8084`를 사용하고 OPC UA는 `4840`을 사용합니다. | 이들은 active node에 직접 연결됩니다. TCP VIP proxying에 포함되지 않으므로 protocol-entry HA는 보장되지 않습니다. |
+| Database | PostgreSQL / TimescaleDB streaming replication + repmgr + witness + DB VIP. | primary 장애 시 standby를 자동 승격할 수 있습니다. asynchronous replication은 엄격한 zero RPO를 보장할 수 없습니다. |
+| Backup and restore | `backup-db.sh` / `restore-db.sh`. | Provides recoverability, but it is not the same as online HA. |
+
+## 권장 SLA
+
+| Service Object | Recommended Statement | Constraints |
+| --- | --- | --- |
+| Platform HTTP entry | 월 가용성 `99.5%`부터 시작합니다. | VIP failover는 active application node의 automatic migration과 같지 않습니다. |
+| Database access | 운영 목표: `RTO <= 2 minutes`. | RPO는 replication lag에 따라 달라집니다. 같은 architecture의 과거 failover test는 약 59-64초였습니다. |
+| MQTT / OPC UA | 현재 설계에서는 HA SLA를 약속하지 않습니다. | 먼저 HAProxy TCP proxying, 별도 VIP 또는 서비스 클러스터링을 추가해야 합니다. |
+| 백업 및 복원 | 일일 백업, 주요 변경 전 백업 필수 | 복원 시간은 데이터 볼륨과 현장 I/O에 따라 달라집니다. |
+
+`99.9%` 이상을 주장하기 전에 애플리케이션 자동 이전 또는 다중 복제본 배포, 프로토콜 진입점 고가용성, 모니터링 알림, 복구 훈련을 완료하세요. 계획된 역량을 이미 제공된 역량처럼 설명하지 마세요.
+
+## 인수 조건
+
+Each deployment or upgrade must satisfy at least the following:
+
+- `verify-materials.sh` passes, and the delivery package SHA256 checks pass.
+- The three Swarm nodes are `Ready`.
+- `APP VIP /healthz` and `/readyz` return `200`, and the home page and `/uns` are accessible.
+- The seven compose services on the active node are running.
+- `DB VIP:5432` is accessible, and the primary, standby, and witness topology is normal.
+- 기본 계정이 실제로 로그인할 수 있어야 합니다. 포트, 컨테이너, HTTP 200 응답만으로 IAM 초기화 성공 여부를 판단하지 마세요.
+- Smoke checks for HTTP, EMQX ports, WebSocket/WSS, and OPC UA TCP pass.
+
+## 점검 및 알림
+
+Run the following every day:
+
+```bash
+./bin/verify.sh --site config/site.conf
+./bin/smoke-business-emqx.sh --site config/site.conf
+```
+
+Configure at least the following alerts:
+
+- APP VIP `/healthz` or `/readyz` failure.
+- DB VIP 접근 불가, primary 없음, split-brain 위험, 복제 중단 또는 임계값을 초과한 복제 지연.
+- keepalived, HAProxy, PostgreSQL, or repmgrd abnormal status.
+- Key containers such as `backend`, `redis`, and `EMQX` exit or restart frequently.
+- Data disk usage exceeds `80% / 90%`.
+- The latest backup failed or was not generated.
+
+## 훈련 요구사항
+
+| Drill | Frequency | Verification Criteria |
+| --- | --- | --- |
+| APP VIP failover | delivery 전 및 분기별 | 현재 VIP node에서 keepalived를 중지한 뒤 `/healthz`와 `/readyz`가 복구됩니다. |
+| DB primary failure | delivery 전 및 6개월마다 | standby가 승격되고 DB VIP가 복구되며 이전 primary는 standby로 rebuild됩니다. |
+| 데이터베이스 복원 | 매월 샘플 및 주요 변경 전 | 백업은 복원 가능해야 합니다. 복원 후 `verify`, 스모크 체크, 로그인 검증을 통과해야 합니다. |
+| 자료 검증 | 모든 패키지 빌드 | source material, package SHA, 압축 해제 검증을 통과해야 합니다. |
+
+## Incident 처리 원칙
+
+1. Confirm the impact scope first: HTTP, MQTT, OPC UA, database, and single-node impact.
+2. Prioritize restoring VIP, HAProxy, the active application, and the database primary.
+3. 로그, 데이터 디렉터리, 백업을 보존하세요. incident 현장을 직접 정리하거나 덮어쓰지 마세요.
+4. database incident에서는 먼저 현재 primary를 확인한 뒤 fail over, rejoin, restore 중 무엇을 할지 결정합니다.
+5. After recovery, run `verify`, smoke checks, and actual login verification.
+
+## High-SLA 강화 항목
+
+- 애플리케이션을 다중 복제본으로 구성하거나 활성 노드에 대한 검증 가능한 자동 이전 프로세스를 마련하세요.
+- Cluster EMQX, or route it through HAProxy TCP / TLS with a dedicated VIP.
+- Provide a high-availability entry for OPC UA through HAProxy TCP, a dedicated VIP, or service clustering.
+- Use PostgreSQL synchronous replication, or define acceptable replication lag and RPO clearly.
+- Automate backup scheduling, off-site replication, and regular restore drills.
+- Connect containers, hosts, databases, logs, and black-box probes to unified alerting.
+
+관련 절차: [작업 Runbook](../operations-runbook/) 및 [표준 포트 목록](../standard-port-list/).

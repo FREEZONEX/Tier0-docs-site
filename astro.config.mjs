@@ -38,6 +38,7 @@ export default defineConfig({
 				'zh-cn': { label: '简体中文', lang: 'zh-CN' },
 				ja: { label: '日本語', lang: 'ja' },
 				es: { label: 'Español', lang: 'es' },
+				ko: { label: '한국어', lang: 'ko' },
 			},
 			social: [
 				{ icon: 'github', label: 'GitHub', href: 'https://github.com/FREEZONEX' },
@@ -71,81 +72,81 @@ export default defineConfig({
 			sidebar: [
 				{
 					label: 'Get Started',
-					translations: { 'zh-CN': '快速开始', ja: 'はじめに', es: 'Primeros pasos' },
+					translations: { 'zh-CN': '快速开始', ja: 'はじめに', es: 'Primeros pasos', ko: '시작하기' },
 					collapsed: false,
 					items: [
 						{
 							label: 'Installation',
-							translations: { 'zh-CN': '安装', ja: 'インストール', es: 'Instalación' },
+							translations: { 'zh-CN': '安装', ja: 'インストール', es: 'Instalación', ko: '설치' },
 							slug: 'get-started/installation',
 						},
 						{
 							label: 'Try the Demo Factory',
-							translations: { 'zh-CN': '体验演示工厂', ja: 'デモファクトリーを試す', es: 'Prueba la fábrica demo' },
+							translations: { 'zh-CN': '体验演示工厂', ja: 'デモファクトリーを試す', es: 'Prueba la fábrica demo', ko: '데모 팩토리 체험' },
 							slug: 'get-started/demo-factory',
 						},
 						{
 							label: 'Choosing the Best Version',
-							translations: { 'zh-CN': '选择合适的版本', ja: '最適なエディションの選択', es: 'Elegir la mejor versión' },
+							translations: { 'zh-CN': '选择合适的版本', ja: '最適なエディションの選択', es: 'Elegir la mejor versión', ko: '최적 버전 선택' },
 							slug: 'get-started/choosing-version',
 						},
 					],
 				},
 				{
 					label: 'Using Tier0',
-					translations: { 'zh-CN': '使用 Tier0', ja: 'Tier0 の使い方', es: 'Uso de Tier0' },
+					translations: { 'zh-CN': '使用 Tier0', ja: 'Tier0 の使い方', es: 'Uso de Tier0', ko: 'Tier0 사용' },
 					collapsed: false,
 					items: [
 						{
 							label: 'UNS Concepts',
-							translations: { 'zh-CN': 'UNS 核心概念', ja: 'UNS の概念', es: 'Conceptos de UNS' },
+							translations: { 'zh-CN': 'UNS 核心概念', ja: 'UNS の概念', es: 'Conceptos de UNS', ko: 'UNS 개념' },
 							slug: 'using-tier0/uns-concepts',
 						},
 						{
 							label: 'Connect Data to UNS',
-							translations: { 'zh-CN': '连接数据到 UNS', ja: 'UNS へのデータ接続', es: 'Conectar datos a UNS' },
+							translations: { 'zh-CN': '连接数据到 UNS', ja: 'UNS へのデータ接続', es: 'Conectar datos a UNS', ko: 'UNS에 데이터 연결' },
 							slug: 'using-tier0/connect-data',
 						},
 						{
 							label: 'Working with UNS Data',
-							translations: { 'zh-CN': '使用 UNS 数据', ja: 'UNS データの操作', es: 'Trabajar con datos de UNS' },
+							translations: { 'zh-CN': '使用 UNS 数据', ja: 'UNS データの操作', es: 'Trabajar con datos de UNS', ko: 'UNS 데이터 작업' },
 							slug: 'using-tier0/working-with-uns-data',
 						},
 						{
 							label: 'Build Apps on UNS',
-							translations: { 'zh-CN': '在 UNS 上构建应用', ja: 'UNS 上でアプリを構築', es: 'Crear apps sobre UNS' },
+							translations: { 'zh-CN': '在 UNS 上构建应用', ja: 'UNS 上でアプリを構築', es: 'Crear apps sobre UNS', ko: 'UNS 기반 앱 구축' },
 							slug: 'using-tier0/build-apps',
 						},
 						{
 							label: 'Analyze UNS Data',
-							translations: { 'zh-CN': '分析 UNS 数据', ja: 'UNS データの分析', es: 'Analizar datos de UNS' },
+							translations: { 'zh-CN': '分析 UNS 数据', ja: 'UNS データの分析', es: 'Analizar datos de UNS', ko: 'UNS 데이터 분석' },
 							slug: 'using-tier0/analyze-data',
 						},
 						{
 							label: 'Operate Tier0 with Agents',
-							translations: { 'zh-CN': '用 Agent 操作 Tier0', ja: 'エージェントで Tier0 を操作', es: 'Operar Tier0 con agentes' },
+							translations: { 'zh-CN': '用 Agent 操作 Tier0', ja: 'エージェントで Tier0 を操作', es: 'Operar Tier0 con agentes', ko: 'Agent로 Tier0 운영' },
 							slug: 'using-tier0/agents',
 						},
 					],
 				},
 				{
 					label: 'Best Practice',
-					translations: { 'zh-CN': '最佳实践', ja: 'ベストプラクティス', es: 'Buenas prácticas' },
+					translations: { 'zh-CN': '最佳实践', ja: 'ベストプラクティス', es: 'Buenas prácticas', ko: '베스트 프랙티스' },
 					collapsed: false,
 					items: [
 						{
 							label: 'UNS Modeling',
-							translations: { 'zh-CN': 'UNS 建模', ja: 'UNS モデリング', es: 'Modelado de UNS' },
+							translations: { 'zh-CN': 'UNS 建模', ja: 'UNS モデリング', es: 'Modelado de UNS', ko: 'UNS 모델링' },
 							slug: 'best-practice/uns-modeling',
 						},
 						{
 							label: 'Connecting OPC UA / Modbus',
-							translations: { 'zh-CN': '连接 OPC UA / Modbus', ja: 'OPC UA / Modbus 接続', es: 'Conexión OPC UA / Modbus' },
+							translations: { 'zh-CN': '连接 OPC UA / Modbus', ja: 'OPC UA / Modbus 接続', es: 'Conexión OPC UA / Modbus', ko: 'OPC UA / Modbus 연결' },
 							slug: 'best-practice/protocol-connections',
 						},
 						{
 							label: 'Building Analytics Apps',
-							translations: { 'zh-CN': '开发数据分析应用', ja: '分析アプリの構築', es: 'Apps de analítica' },
+							translations: { 'zh-CN': '开发数据分析应用', ja: '分析アプリの構築', es: 'Apps de analítica', ko: '분석 앱 구축' },
 							slug: 'best-practice/analytics-apps',
 						},
 					],

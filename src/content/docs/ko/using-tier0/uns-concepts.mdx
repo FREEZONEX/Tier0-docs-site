@@ -1,0 +1,115 @@
+---
+title: UNS 개념 in Tier0
+description: "The Unified Namespace model: Metric, State, Action, and how the UNS stores data."
+editions: [edge, cloud, enterprise]
+sidebar:
+  order: 1
+---
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+
+In Tier0, the UNS (Unified Namespace) is organized around three parts: **Model**, **Broker**, and **Storage**.
+
+- Models are categorized into three types, **Metric**, **State**, and **Action**, based on the data being collected.
+- The broker receives and sends data through model-defined topics.
+- Incoming and outgoing data is stored in different databases based on model type.
+    - **Action/State**: JSONB (PostgreSQL)
+    - **Metric**: Real-time data (TSDB)
+
+```text
+Data Source / Consumer
+        ^
+        | MQTT / HTTP API
+        v
+Unified Namespace
++-- Broker
+|   +-- Model
+|       +-- Metric  -> TSDB
+|       +-- State   -> JSONB
+|       +-- Action  -> JSONB
++-- Storage
+    +-- TSDB   stores high-frequency Metric data
+    +-- JSONB  stores State and Action payloads
+```
+## Model
+:::tip[Which guide should I follow when building a model?]
+Choose the modeling approach based on what the data represents.
+- **Physical Data**: 물리 machine에서 오는 real-time data입니다. **ISA-95** 표준을 기반으로 구성되며 location hierarchy에 크게 의존합니다.
+- **Business Data**: 생산 요구사항, schedule, task, dispatching과 관련된 data입니다. 보통 **business domain과 object** 기준으로 구성됩니다.
+:::
+### Metric, State, Action
+Industrial data는 서로 다른 frequency로 변하고 목적도 다르므로, Tier0는 UNS model을 세 가지 고정 type으로 분리합니다.
+
+| Type | Why | Example |
+|---|---|---|
+| `METRIC` | 지속적으로 수집되고 time-series storage가 필요한 고빈도 data용입니다. | machine 온도/압력/전압 |
+| `STATE` | 덜 자주 변하고 객체의 현재 condition 또는 fact를 설명하는 data용입니다. | machine 운영 상태 |
+| `ACTION` | 외부 system 또는 operator가 실행해야 할 내용을 기록하는 저빈도 command data용입니다. | batch 시작, machine 정지 |
+
+
+### Path/Topic, Payload
+각 UNS model은 path, topic, payload를 포함합니다. 이들은 함께 business context를 담고 industrial data를 전달하는 **tree** 구조를 형성합니다.
+- **Path/Topic**: path는 data ownership을 나타내고 topic은 message payload를 전달합니다. 둘이 함께 ***model address***를 정의합니다.
+- **Payload**: The message payload held by the topic. It is JSON in a **key-value** format and defines the ***model data***.
+
+For example, a model in UNS looks like the tree displayed below:
+<Tabs>
+	<TabItem label="Physical Data">
+```
+  Factory_A
+  └── Site_01
+      └── SMT_Line_1
+          └── Metric
+              └── Machine_001
+```
+- **Path**: `Factory_A/Site_01/SMT_Line_1/Metric`
+- **Topic**: `/Machine_001`.
+- **Payload**
+    ```json
+    "temperature": 85,
+    "vibration": 2.8,
+
+    ```
+</TabItem>
+<TabItem label="Business Data">
+```
+  Factory_A
+  └── ERP
+      └── ProductionOrders
+          └── State
+              └── OrderList
+```
+- **Path**: `Factory_A/ERP/ProductionOrders/State`
+- **Topic**: `/OrderList`.
+- **Payload**
+    ```json
+    "orders": "0123569876",
+    "updated_at": 2026-7-13,
+    ```
+</TabItem>
+</Tabs>
+
+:::tip[To build a model]
+See [How to Build a Data Model](../connect-data/#how-to-build-a-data-model).
+:::
+
+## Broker
+Tier0에서 broker는 데이터 모델을 기반으로 MQTT 또는 OpenAPI를 통해 데이터를 수신하고 전송하는 플랫폼 구성 요소입니다.
+- **By MQTT**: model tree의 각 node 전체 path가 message payload를 전달하는 topic address로 동작합니다.
+- **By Open API**: Perform CRUD commands on data models through HTTP requests.
+:::tip[API Reference]
+For API details, see [API Reference](../../reference/tier0-openapi/).
+:::
+
+## Storage
+Tier0는 data 저장에 PostgreSQL을 사용합니다. data type마다 변화 속도와 storage requirement가 다릅니다.
+
+| Data Type | Storage | Description |
+|-----------|---------|-------------|
+| `METRIC` | Time-series database | 온도와 압력 같은 고빈도 측정값에 최적화되어 있습니다. 각 topic에는 기본 field `timestamp`와 `quality`가 포함됩니다. |
+| `STATE` | PostgreSQL | Stores machine or system states in a flexible `JSONB` format. |
+| `ACTION` | PostgreSQL | Stores commands or actions in a flexible `JSONB` format. |
+
+## 다음 단계
+
+- [UNS에 데이터 연결](../connect-data/) - 플랜트를 UNS로 모델링하고 데이터를 모델에 연결하는 방법입니다.
+- [UNS 데이터 작업](../working-with-uns-data/) - MQTT와 API를 통해 UNS 모델을 운영하는 방법입니다.

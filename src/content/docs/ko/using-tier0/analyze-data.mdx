@@ -1,0 +1,611 @@
+---
+title: UNS 데이터 분석
+description: Tier0 Notebook에서 live namespace data를 query하고 interactive analysis 및 machine-learning app을 구축합니다. Cloud와 Enterprise에서 사용할 수 있습니다.
+editions: [cloud, enterprise]
+sidebar:
+  order: 5
+---
+import { Steps } from '@astrojs/starlight/components';
+
+Tier0 uses Marimo Notebook for advanced data analysis with **Python** scripts.
+
+## Querying Data from UNS
+:::tip[Know Before you start]
+UNS data stored in the database is available as an existing data source in **Notebook**.
+:::
+<Steps>
+1. Create a notebook, click the **VARIABLES** on the left side inside it.
+2. Expand the **PostgreSQL** list, select a table under **tenant_id** > **uns**.
+3. Click the **+** icon next to the table to generate default and SQL statements cells automatically.
+
+    ```sql
+    SELECT * FROM "uns"."table_name" LIMIT 100
+    ```
+
+4. Run all cells and get the query result.
+</Steps>
+
+## Analyzing UNS Data
+
+### 예제 배경
+- 데이터 소스는 공장에서 수집되어 Tier0 UNS로 전송된 압축기의 온도, 압력, 상태, 진동입니다.
+- Isolation Forest is used to detect abnormal data points in the dataset.
+- Detection sensitivity can be adjusted, and the results are visualized accordingly in a dashboard.
+
+### 작업
+<Steps>
+1. Create a notebook and add the following cells in order.
+</Steps>
+
+<details className="notebook-cell">
+<summary>Cell 1: Import dependencies.</summary>
+
+```python
+import marimo as mo
+import pandas as pd
+import numpy as np
+import altair as alt
+
+from sklearn.preprocessing import StandardScaler
+from sklearn.ensemble import IsolationForest
+```
+
+</details>
+
+<details className="notebook-cell">
+<summary>Cell 2: Get data from UNS and clean it for analysis.</summary>
+
+```sql
+status_pd = status_data.to_pandas()
+temperature_pd = temperature_data.to_pandas()
+pressure_pd = pressure_data.to_pandas()
+vibration_pd = vibration_data.to_pandas()
+
+
+# Convert and sort timestamps
+for frame in [
+    status_pd,
+    temperature_pd,
+    pressure_pd,
+    vibration_pd,
+]:
+    frame["_timestamp"] = pd.to_datetime(
+        frame["_timestamp"],
+        utc=True,
+        errors="coerce",
+    )
+
+    frame.dropna(
+        subset=["_timestamp"],
+        inplace=True,
+    )
+
+    frame.sort_values(
+        "_timestamp",
+        inplace=True,
+    )
+
+
+# Use temperature as the main timeline
+sensor_data = pd.merge_asof(
+    temperature_pd,
+    pressure_pd,
+    on="_timestamp",
+    direction="nearest",
+    tolerance=pd.Timedelta(seconds=30),
+)
+
+
+sensor_data = pd.merge_asof(
+    sensor_data,
+    vibration_pd,
+    on="_timestamp",
+    direction="nearest",
+    tolerance=pd.Timedelta(seconds=30),
+)
+
+
+sensor_data = pd.merge_asof(
+    sensor_data,
+    status_pd,
+    on="_timestamp",
+    direction="nearest",
+    tolerance=pd.Timedelta(seconds=30),
+)
+
+
+# Remove incomplete records
+complete_data = sensor_data.dropna(
+    subset=[
+        "temperature",
+        "pressure",
+        "vibration",
+        "status_code",
+    ]
+)
+
+
+# Analyze only active running periods
+running_data = (
+    complete_data[
+        complete_data["status_code"] == 1
+    ]
+    .reset_index(drop=True)
+)
+
+
+running_data
+```
+
+</details>
+
+<details className="notebook-cell">
+<summary>Cell 3: Set the slider for anomaly detection threshold.</summary>
+
+```python
+
+anomaly_threshold = mo.ui.slider(
+    start=-0.15,
+    stop=0.10,
+    step=0.01,
+    value=0.00,
+    label="Anomaly detection threshold",
+)
+
+
+mo.vstack([
+    mo.md("## Model Settings"),
+    mo.md(
+        """
+Adjust the anomaly detection threshold.
+
+A higher threshold applies stricter criteria and identifies more operating records as anomalies.
+        """
+    ),
+    anomaly_threshold,
+])
+```
+
+</details>
+
+<details className="notebook-cell">
+<summary>Cell 4: Use the <strong>Isolation Forest</strong> model to detect anomalies.</summary>
+
+```python
+feature_names = [
+    "temperature",
+    "pressure",
+    "vibration",
+]
+
+
+# Prepare model input
+model_input = running_data[
+    feature_names
+]
+
+
+# Standardize sensor values
+feature_scaler = StandardScaler()
+
+scaled_features = feature_scaler.fit_transform(
+    model_input
+)
+
+
+# Train the anomaly detection model
+anomaly_model = IsolationForest(
+    n_estimators=200,
+    contamination="auto",
+    random_state=42,
+)
+
+
+anomaly_model.fit(
+    scaled_features
+)
+
+
+# Calculate continuous anomaly scores
+anomaly_scores = anomaly_model.decision_function(
+    scaled_features
+)
+
+
+# Prepare analysis results
+ml_result = running_data.copy()
+
+ml_result["anomaly_score"] = anomaly_scores
+
+
+# Classify records using the interactive threshold
+ml_result["condition"] = np.where(
+    ml_result["anomaly_score"] < anomaly_threshold.value,
+    "Anomaly",
+    "Normal",
+)
+
+
+ml_result
+```
+
+</details>
+
+<details className="notebook-cell">
+<summary>Cell 5: Displays results on a dashboard.</summary>
+
+```python
+# Calculate summary metrics
+dashboard_total = len(ml_result)
+
+dashboard_normal = int(
+    (
+        ml_result["condition"] == "Normal"
+    ).sum()
+)
+
+dashboard_anomaly = int(
+    (
+        ml_result["condition"] == "Anomaly"
+    ).sum()
+)
+
+
+dashboard_anomaly_ratio = (
+    dashboard_anomaly / dashboard_total * 100
+    if dashboard_total > 0
+    else 0
+)
+
+
+# Calculate anomaly severity
+anomaly_records = ml_result[
+    ml_result["condition"] == "Anomaly"
+]
+
+
+if len(anomaly_records) > 0:
+    average_anomaly_severity = float(
+        (
+            anomaly_threshold.value
+            - anomaly_records["anomaly_score"]
+        )
+        .clip(lower=0)
+        .mean()
+    )
+else:
+    average_anomaly_severity = 0.0
+
+
+# Illustrative equipment health score
+severity_penalty = min(
+    average_anomaly_severity * 80,
+    20
+)
+
+dashboard_health_score = max(
+    0,
+    100
+    - dashboard_anomaly_ratio * 1.2
+    - severity_penalty
+)
+
+
+# Determine risk level
+if dashboard_health_score < 60:
+    dashboard_risk = "High"
+    dashboard_conclusion = (
+        "The compressor shows a high level of unusual operating behavior. "
+        "Further equipment inspection is recommended."
+    )
+
+elif dashboard_health_score < 80:
+    dashboard_risk = "Medium"
+    dashboard_conclusion = (
+        "Some unusual operating patterns were detected. "
+        "Continue monitoring the equipment and review the abnormal periods."
+    )
+
+else:
+    dashboard_risk = "Low"
+    dashboard_conclusion = (
+        "Most operating records follow the learned normal pattern. "
+        "No significant abnormal behavior was detected."
+    )
+
+
+# Header
+dashboard_header = mo.Html(
+    """
+    <div style="
+        padding: 4px 0 18px 0;
+        font-family: Arial, sans-serif;
+    ">
+        <div style="
+            font-size: 26px;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 6px;
+        ">
+            Air Compressor Anomaly Detection
+        </div>
+
+        <div style="
+            font-size: 14px;
+            color: #6b7280;
+            line-height: 1.5;
+        ">
+            Machine learning analysis based on temperature,
+            pressure, and vibration during active running periods.
+        </div>
+    </div>
+    """
+)
+# Conclusion card
+dashboard_conclusion_card = mo.Html(
+    f"""
+    <div style="
+        background: #f8fafc;
+        border: 1px solid #e5e7eb;
+        border-left: 4px solid #4f46e5;
+        border-radius: 8px;
+        padding: 16px 18px;
+        margin-bottom: 18px;
+        font-family: Arial, sans-serif;
+    ">
+        <div style="
+            font-size: 12px;
+            font-weight: 700;
+            color: #6b7280;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            margin-bottom: 6px;
+        ">
+            Analysis Summary
+        </div>
+
+        <div style="
+            font-size: 15px;
+            color: #1f2937;
+            line-height: 1.6;
+        ">
+            {dashboard_conclusion}
+        </div>
+    </div>
+    """
+)
+# KPI cards
+dashboard_kpis = mo.Html(
+    f"""
+    <div style="
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 14px;
+        margin-bottom: 24px;
+        font-family: Arial, sans-serif;
+    ">
+
+        <div style="
+            border: 1px solid #e5e7eb;
+            border-radius: 10px;
+            padding: 16px 18px;
+            background: white;
+        ">
+            <div style="
+                font-size: 12px;
+                color: #6b7280;
+                margin-bottom: 8px;
+            ">
+                HEALTH SCORE
+            </div>
+
+            <div style="
+                font-size: 28px;
+                font-weight: 700;
+                color: #111827;
+            ">
+                {dashboard_health_score:.1f}
+                <span style="
+                    font-size: 14px;
+                    color: #9ca3af;
+                ">
+                    / 100
+                </span>
+            </div>
+        </div>
+
+
+        <div style="
+            border: 1px solid #e5e7eb;
+            border-radius: 10px;
+            padding: 16px 18px;
+            background: white;
+        ">
+            <div style="
+                font-size: 12px;
+                color: #6b7280;
+                margin-bottom: 8px;
+            ">
+                RISK LEVEL
+            </div>
+
+            <div style="
+                font-size: 28px;
+                font-weight: 700;
+                color: #111827;
+            ">
+                {dashboard_risk}
+            </div>
+        </div>
+
+
+        <div style="
+            border: 1px solid #e5e7eb;
+            border-radius: 10px;
+            padding: 16px 18px;
+            background: white;
+        ">
+            <div style="
+                font-size: 12px;
+                color: #6b7280;
+                margin-bottom: 8px;
+            ">
+                ANALYZED SAMPLES
+            </div>
+
+            <div style="
+                font-size: 28px;
+                font-weight: 700;
+                color: #111827;
+            ">
+                {dashboard_total:,}
+            </div>
+        </div>
+
+
+        <div style="
+            border: 1px solid #e5e7eb;
+            border-radius: 10px;
+            padding: 16px 18px;
+            background: white;
+        ">
+            <div style="
+                font-size: 12px;
+                color: #6b7280;
+                margin-bottom: 8px;
+            ">
+                ANOMALY RATIO
+            </div>
+
+            <div style="
+                font-size: 28px;
+                font-weight: 700;
+                color: #111827;
+            ">
+                {dashboard_anomaly_ratio:.1f}%
+            </div>
+        </div>
+
+    </div>
+    """
+)
+
+
+# Interactive anomaly chart
+dashboard_chart = (
+    alt.Chart(ml_result)
+    .mark_circle(
+        size=58,
+        opacity=0.78,
+    )
+    .encode(
+        x=alt.X(
+            "_timestamp:T",
+            title="Time",
+        ),
+
+        y=alt.Y(
+            "vibration:Q",
+            title="Vibration RMS (mm/s)",
+        ),
+
+        color=alt.Color(
+            "condition:N",
+            title=None,
+            scale=alt.Scale(
+                domain=[
+                    "Normal",
+                    "Anomaly",
+                ],
+                range=[
+                    "#94a3b8",
+                    "#ef4444",
+                ],
+            ),
+        ),
+
+        tooltip=[
+            alt.Tooltip(
+                "_timestamp:T",
+                title="Time",
+            ),
+
+            alt.Tooltip(
+                "temperature:Q",
+                title="Temperature",
+                format=".2f",
+            ),
+
+            alt.Tooltip(
+                "pressure:Q",
+                title="Pressure",
+                format=".4f",
+            ),
+
+            alt.Tooltip(
+                "vibration:Q",
+                title="Vibration",
+                format=".3f",
+            ),
+
+            alt.Tooltip(
+                "anomaly_score:Q",
+                title="Anomaly Score",
+                format=".3f",
+            ),
+
+            alt.Tooltip(
+                "condition:N",
+                title="Condition",
+            ),
+        ],
+    )
+    .properties(
+        width=980,
+        height=380,
+
+        title=alt.TitleParams(
+            text="Detected Operating Anomalies",
+            subtitle=(
+                f"Threshold: {anomaly_threshold.value:.2f} · "
+                f"{dashboard_anomaly:,} anomalies detected"
+            ),
+            anchor="start",
+            fontSize=17,
+            fontWeight=600,
+            subtitleFontSize=12,
+            subtitleColor="#6b7280",
+            offset=14,
+        ),
+    )
+    .configure_view(
+        stroke=None
+    )
+    .interactive()
+)
+
+
+# Final dashboard
+mo.vstack([
+    dashboard_header,
+    dashboard_conclusion_card,
+    dashboard_kpis,
+    mo.ui.altair_chart(
+        dashboard_chart
+    ),
+])
+```
+
+</details>
+
+<Steps>
+2. Run all cells and view the results.
+</Steps>
+:::tip[Different ways to view the results]
+오른쪽 위에서 보기 스타일을 **Vertical**, **Grid**, **Slides** 중 하나로 변경할 수 있습니다.
+:::
+
+## 다음 단계
+
+- [Build Apps on UNS](../build-apps/) — Build industrial applications with UNS data.
+- [UNS Concepts](../uns-concepts/) — Understand data modeling in Unified Namespace.

@@ -1,0 +1,94 @@
+---
+title: Tier0 문서
+description: Tier0 Unified Namespace에서 구축을 시작하세요. 코드 agent에 프롬프트 하나를 붙여 넣고 베스트 프랙티스를 따라가면 됩니다.
+tableOfContents: false
+prev: false
+next: false
+---
+
+<section class="t0-banner t0-frame accent not-content">
+	<span class="t0-corners" aria-hidden="true"></span>
+	<div class="t0-banner-main">
+		<p class="t0-tag">Tier0로 구축 시작</p>
+		<h2>이 내용을 코드 agent에 붙여넣기</h2>
+		<p>프롬프트 하나로 Tier0 CLI와 skill을 설치하고 로그인한 뒤, agent가 Unified Namespace를 처음 둘러볼 수 있게 합니다.</p>
+		<pre class="t0-prompt" id="t0-agent-prompt">{`Run \`npx @tier0/cli@latest install\` to install the tier0
+CLI and agent skill.
+Read https://docs.tier0.app/llms.txt for the full Tier0
+docs.`}</pre>
+		<button class="t0-copy" id="t0-copy-btn" type="button">
+			<svg class="t0-copy-icon t0-copy-icon--copy" width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+				<rect x="5" y="5" width="8" height="8" rx="1" stroke="currentColor" stroke-width="1.25" />
+				<path d="M4 11V3.75C4 3.336 4.336 3 4.75 3H11" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" />
+			</svg>
+			<svg class="t0-copy-icon t0-copy-icon--check" width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+				<path d="M3.5 8.5L6.5 11.5L12.5 4.5" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round" />
+			</svg>
+			<span class="t0-copy-label">프롬프트 복사</span>
+		</button>
+	</div>
+	<div class="t0-banner-side">
+		<div class="t0-side-group">
+			<p class="t0-side-label">직접 진행하고 싶나요?</p>
+			<a class="t0-side-link" href="/get-started/installation/">설치 가이드</a>
+			<a class="t0-side-link" href="/get-started/demo-factory/">데모 팩토리</a>
+		</div>
+		<div class="t0-side-group">
+			<p class="t0-side-label">agent용 machine-readable endpoint:</p>
+			<a class="t0-side-link" href="/llms.txt">/llms.txt</a>
+		</div>
+	</div>
+</section>
+
+<script is:inline>{`
+document.getElementById('t0-copy-btn').addEventListener('click', function () {
+	var b = this;
+	var text = document.getElementById('t0-agent-prompt').innerText;
+	var done = function () {
+		b.textContent = '복사됨';
+		setTimeout(function () { b.textContent = '프롬프트 복사'; }, 1600);
+	};
+	var fallback = function () {
+		var ta = document.createElement('textarea');
+		ta.value = text;
+		ta.style.position = 'fixed';
+		ta.style.opacity = '0';
+		document.body.appendChild(ta);
+		ta.select();
+		try { document.execCommand('copy'); } catch (e) {}
+		document.body.removeChild(ta);
+		done();
+	};
+	if (navigator.clipboard && navigator.clipboard.writeText) {
+		navigator.clipboard.writeText(text).then(done, fallback);
+	} else {
+		fallback();
+	}
+});
+`}</script>
+
+<div class="t0-explore not-content">
+	<h2>베스트 프랙티스</h2>
+	<p>실제 Tier0 배포에서 검증된 패턴입니다.</p>
+</div>
+
+<section class="t0-grid not-content">
+	<a class="t0-cell" href="/best-practice/uns-modeling/">
+		<span class="t0-tag">모델링</span>
+		<h3>UNS 모델링</h3>
+		<p>Demo UNS가 어떻게 설계되는지 설명합니다. 계층 구조, topic 폭증 방지, 확장 가능한 payload 구조를 다룹니다.</p>
+		<span class="t0-more">자세히 보기</span>
+	</a>
+	<a class="t0-cell" href="/best-practice/protocol-connections/">
+		<span class="t0-tag">프로토콜</span>
+		<h3>OPC UA / Modbus 연결</h3>
+		<p>일반 산업 프로토콜용 Node-RED flow와 실제 import 가능한 flow JSON reference입니다.</p>
+		<span class="t0-more">자세히 보기</span>
+	</a>
+	<a class="t0-cell" href="/best-practice/analytics-apps/">
+		<span class="t0-tag">분석</span>
+		<h3>Building 분석 Apps</h3>
+		<p>Notebook query부터 interactive 분석 앱까지, 비식별 데이터 기반 Aramco Bowtie 사례를 다룹니다.</p>
+		<span class="t0-more">자세히 보기</span>
+	</a>
+</section>

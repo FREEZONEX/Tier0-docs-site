@@ -1,0 +1,38 @@
+---
+title: API Reference
+description: PDF 내보내기를 위한 정적 OpenAPI endpoint 요약과 interactive Swagger UI 링크입니다.
+sidebar:
+  order: 1
+---
+
+이 페이지는 문서와 PDF 내보내기에 포함됩니다. interactive request 확인은 Swagger UI 버전을 사용하세요.
+
+[Open Tier0 OpenAPI Swagger UI](../tier0-openapi/)
+
+## Endpoint
+
+| Method | Path | Tag | Operation ID | Request | Response Data |
+|---|---|---|---|---|---|
+| `POST` | `/assets/upload` | uns | `postOpenapiV1AssetsUpload` | `AssetUploadReq` | `AssetUploadResp` |
+| `POST` | `/auth/whoami` | uns | `postOpenapiV1AuthWhoami` | - | `AuthWhoamiResp` |
+| `POST` | `/flow/create` | uns | `postOpenapiV1FlowCreate` | `FlowCreateReq` | `FlowCreateResp` |
+| `POST` | `/flow/delete` | uns | `postOpenapiV1FlowDelete` | `FlowDeleteReq` | `FlowEmptyResp` |
+| `POST` | `/flow/deploy` | uns | `postOpenapiV1FlowDeploy` | `FlowDeployReq` | `FlowDeployResp` |
+| `POST` | `/flow/flowdata` | uns | `postOpenapiV1FlowFlowdata` | `FlowGetReq` | `FlowDataResp` |
+| `POST` | `/flow/get` | uns | `postOpenapiV1FlowGet` | `FlowGetReq` | `FlowInfo` |
+| `POST` | `/flow/list` | uns | `postOpenapiV1FlowList` | `FlowListReq` | `FlowListResp` |
+| `POST` | `/flow/nodes` | uns | `postOpenapiV1FlowNodes` | `FlowNodesReq` | `FlowNodesResp` |
+| `POST` | `/flow/update` | uns | `postOpenapiV1FlowUpdate` | `FlowUpdateReq` | `FlowEmptyResp` |
+| `POST` | `/info` | uns | `postOpenapiV1Info` | `InfoReq` | `object` |
+| `POST` | `/uns/attachments` | uns | `postOpenapiV1UnsAttachments` | `UnsAttachmentUploadReq` | `UnsAttachmentUploadResp` |
+| `POST` | `/uns/attachments/list` | uns | `postOpenapiV1UnsAttachmentsList` | `UnsAttachmentListReq` | `UnsAttachmentListResp` |
+| `POST` | `/uns/browse` | uns | `postOpenapiV1UnsBrowse` | `BrowseReq` | `BrowseResp` |
+| `POST` | `/uns/create` | uns | `postOpenapiV1UnsCreate` | `NodeCreateReq` | `CreateResp` |
+| `POST` | `/uns/delete` | uns | `postOpenapiV1UnsDelete` | `NodeDeleteReq` | `OpenapiEmptyResp` |
+| `POST` | `/uns/history` | uns | `postOpenapiV1UnsHistory` | `HistoryReq` | `HistoryResp` |
+| `POST` | `/uns/read` | uns | `postOpenapiV1UnsRead` | `ReadReq` | `ReadResp` |
+| `POST` | `/uns/restore` | uns | `postOpenapiV1UnsRestore` | `NodeRestoreReq` | `OpenapiEmptyResp` |
+| `POST` | `/uns/search` | uns | `postOpenapiV1UnsSearch` | `SearchReq` | `SearchResp` |
+| `POST` | `/uns/unsBindFlow` | uns | `postOpenapiV1UnsUnsBindFlow` | `UnsBindFlowReq` | `UnsBindFlowResp` |
+| `POST` | `/uns/update` | uns | `postOpenapiV1UnsUpdate` | `NodeUpdateReq` | `OpenapiEmptyResp` |
+| `POST` | `/uns/write` | uns | `postOpenapiV1UnsWrite` | `WriteReq` | `WriteResp` |

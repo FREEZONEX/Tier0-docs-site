@@ -1,0 +1,29 @@
+---
+title: 표준 포트 목록
+description: Firewall port list for the standard six-VM offline Tier0 Enterprise deployment.
+sidebar:
+  order: 5
+---
+
+다음 표는 Enterprise New 6-VM offline deployment를 기준으로 합니다. 고객 firewall은 최소 필요 source range의 traffic만 허용해야 합니다. 이 port들을 public internet에 직접 노출하지 마세요.
+
+| Source | Target | Port | Protocol | Purpose |
+| --- | --- | ---: | --- | --- |
+| Control host | Six target VMs | 22 | TCP | SSH / Ansible |
+| Three application nodes, mutually | Three application nodes | 2377 | TCP | Docker Swarm management plane |
+| Three application nodes, mutually | Three application nodes | 7946 | TCP/UDP | Swarm node discovery |
+| Three application nodes, mutually | Three application nodes | 4789 | UDP | Swarm overlay |
+| 세 애플리케이션 노드 | 활성 애플리케이션 노드 | 8088 | TCP | Enterprise New 백엔드로 HAProxy 전달, 애플리케이션 네트워크 세그먼트 전용 |
+| Business network segment | APP VIP | 80 | TCP | Platform HTTP entry, `/healthz`, `/readyz` |
+| Business network segment | APP VIP / active application node | 1883 | TCP | MQTT |
+| Business network segment | APP VIP / active application node | 8883 | TCP | MQTT TLS |
+| Business network segment | APP VIP / active application node | 8083 | TCP | MQTT WebSocket |
+| Business network segment | APP VIP / active application node | 8084 | TCP | MQTT WebSocket TLS |
+| Business network segment | APP VIP / active application node | 4840 | TCP | OPC UA Server |
+| Controlled application network segment | Active application node | 8089 | TCP | Launchpad |
+| 동적 앱 접근 네트워크 세그먼트 | 활성 애플리케이션 노드 | 30000-30199 | TCP | App Gateway / 동적 애플리케이션 호스트 포트 |
+| Application nodes, DB nodes, and witness | DB VIP / DB nodes | 5432 | TCP | PostgreSQL / TimescaleDB |
+| DB1, DB2, and witness | DB1, DB2, and witness | 5432 | TCP | Streaming replication / repmgr |
+| Application nodes | NFS server | 2049 | TCP/UDP | Used when `NFS_ENABLED=true` |
+
+현재 compose deployment는 Redis, SourceFlow, EventFlow, Marimo, EMQX Dashboard를 외부에 노출하지 않습니다. 이 service들은 Docker runtime network 내부에서 backend가 호출합니다.

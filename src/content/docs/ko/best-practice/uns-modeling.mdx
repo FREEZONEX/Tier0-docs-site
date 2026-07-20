@@ -1,0 +1,908 @@
+﻿---
+title: UNS 모델링
+description: "Demo UNS 설계: topic 폭증 방지와 payload 구조 베스트 프랙티스."
+editions: [edge, cloud, enterprise]
+sidebar:
+  order: 1
+---
+import { Steps } from '@astrojs/starlight/components';
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+
+
+## Demo UNS 구조
+:::tip[먼저 해야 할 일]
+데이터를 모델링하기 전에 다음 질문에 답하세요.
+- What data will be consumed from the UNS?
+- What data will be published back to the UNS?
+:::
+
+
+### 물리 데이터
+
+물리적 위치가 있는 기계와 설비의 산업 데이터는 ISA-95 표준을 기반으로 모델링합니다.
+
+#### ISA-95 Equipment Hierarchy
+ISA-95 설비 계층은 조직 내 물리 자산과 제어 시스템이 어떻게 구조화되는지 설명합니다.
+다음 계층으로 나뉩니다.
+- **Enterprise**: 전체 조직을 나타내는 최상위 계층입니다. ERP system이 보통 지원하는 전체 business process와 decision-making entity를 포함합니다.  
+- **Site**: 특정 지리적 위치나 시설을 나타냅니다. 각 site는 자체 management system과 local production control을 가질 수 있습니다. 
+- **Area**: site 안의 운영 구역으로, packaging, assembly, warehousing 같은 기능 영역인 경우가 많습니다. 
+- **Process Cell**: area 안의 제조 기본 단위입니다. 특정 제품을 생산하거나 특정 기능을 수행하는 데 필요한 모든 equipment를 포함합니다. 
+- **Unit**: process cell의 독립된 부분으로, mixing, heating, assembling 같은 특정 기능을 담당합니다. 
+- **Equipment Module**: unit 안에서 특정 작업을 수행하는 모듈형 장비입니다. 예를 들어 mixing unit에서는 heating element가 module이 될 수 있습니다.
+- **Control Module**: 최하위 계층으로, 물리 공정을 직접 제어하는 sensor, pump, actuator, PID control loop 같은 개별 device나 controller를 나타냅니다.
+
+#### Demo Model
+<Tabs syncKey="demo-uns-model">
+  <TabItem label="ISA-95 Hierarchy">
+
+```text
+Enterprise (Level 4)
+└── Site (Level 3/4)
+    └── Area (Level 3)
+        └── Work Center / Process Cell (Level 2/3)
+            └── Equipment / Unit (Level 1/2)
+                └── Control Module / Device (Level 0/1)
+```
+
+  </TabItem>
+  <TabItem label="Tree Structure">
+```text
+DemoFactory
+└── Site_01
+    └── Production
+        └── Line_01
+            └── WorkOrderExecution
+                ├── Metric
+                │   ├── Target_Qty
+                │   ├── Produced_Qty
+                │   ├── Defect_Qty
+                │   └── Completion_Rate
+                └── State
+                    ├── CurrentWorkOrder
+                    └── WorkOrderStatus
+```
+
+  </TabItem>
+  <TabItem label="JSON">
+
+```json
+{
+  "namespace": [
+    {
+      "name": "DemoFactory",
+      "alias": "DemoFactory_9e50bbcd833d",
+      "type": "PATH",
+      "children": [
+        {
+          "name": "Site_01",
+          "alias": "DemoFactory__6d1fcad14e86",
+          "type": "PATH",
+          "children": [
+            {
+              "name": "Production",
+              "alias": "__Site_01_Pro_91523d2ad304",
+              "type": "PATH",
+              "children": [
+                {
+                  "name": "Line_01",
+                  "alias": "__Production__acd5841c1ada",
+                  "type": "PATH",
+                  "children": [
+                    {
+                      "name": "WorkOrderExecution",
+                      "alias": "__Line_01_Wor_54904ff56e91",
+                      "type": "PATH",
+                      "children": [
+                        {
+                          "name": "Metric",
+                          "alias": "metric_233fd84305c4",
+                          "type": "PATH",
+                          "children": [
+                            {
+                              "name": "Target_Qty",
+                              "alias": "Target_Qty_8646b092e543",
+                              "type": "TOPIC",
+                              "topicType": "METRIC",
+                              "description": "Target quantity for the current Work Order.",
+                              "fields": [
+                                {
+                                  "name": "production_order_id",
+                                  "type": "STRING"
+                                },
+                                {
+                                  "name": "plan_id",
+                                  "type": "STRING"
+                                },
+                                {
+                                  "name": "plan_number",
+                                  "type": "STRING"
+                                },
+                                {
+                                  "name": "work_order_id",
+                                  "type": "STRING"
+                                },
+                                {
+                                  "name": "value",
+                                  "type": "DOUBLE"
+                                },
+                                {
+                                  "name": "unit",
+                                  "type": "STRING"
+                                },
+                                {
+                                  "name": "timestamp",
+                                  "type": "DATETIME"
+                                }
+                              ],
+                              "enableHistory": "TRUE",
+                              "mockData": "FALSE"
+                            },
+                            {
+                              "name": "Produced_Qty",
+                              "alias": "Produced_Qty_1f8cd3e11f77",
+                              "type": "TOPIC",
+                              "topicType": "METRIC",
+                              "description": "Produced quantity for the current Work Order.",
+                              "fields": [
+                                {
+                                  "name": "production_order_id",
+                                  "type": "STRING"
+                                },
+                                {
+                                  "name": "plan_id",
+                                  "type": "STRING"
+                                },
+                                {
+                                  "name": "plan_number",
+                                  "type": "STRING"
+                                },
+                                {
+                                  "name": "work_order_id",
+                                  "type": "STRING"
+                                },
+                                {
+                                  "name": "value",
+                                  "type": "DOUBLE"
+                                },
+                                {
+                                  "name": "unit",
+                                  "type": "STRING"
+                                },
+                                {
+                                  "name": "timestamp",
+                                  "type": "DATETIME"
+                                }
+                              ],
+                              "enableHistory": "TRUE",
+                              "mockData": "FALSE"
+                            },
+                            {
+                              "name": "Defect_Qty",
+                              "alias": "Defect_Qty_b48fb3563ec1",
+                              "type": "TOPIC",
+                              "topicType": "METRIC",
+                              "description": "Defect quantity for the current Work Order.",
+                              "fields": [
+                                {
+                                  "name": "production_order_id",
+                                  "type": "STRING"
+                                },
+                                {
+                                  "name": "plan_id",
+                                  "type": "STRING"
+                                },
+                                {
+                                  "name": "plan_number",
+                                  "type": "STRING"
+                                },
+                                {
+                                  "name": "work_order_id",
+                                  "type": "STRING"
+                                },
+                                {
+                                  "name": "value",
+                                  "type": "DOUBLE"
+                                },
+                                {
+                                  "name": "unit",
+                                  "type": "STRING"
+                                },
+                                {
+                                  "name": "timestamp",
+                                  "type": "DATETIME"
+                                }
+                              ],
+                              "enableHistory": "TRUE",
+                              "mockData": "FALSE"
+                            },
+                            {
+                              "name": "Completion_Rate",
+                              "alias": "Completion_R_7294e38e1530",
+                              "type": "TOPIC",
+                              "topicType": "METRIC",
+                              "description": "Completion percentage for the current Work Order.",
+                              "fields": [
+                                {
+                                  "name": "production_order_id",
+                                  "type": "STRING"
+                                },
+                                {
+                                  "name": "plan_id",
+                                  "type": "STRING"
+                                },
+                                {
+                                  "name": "plan_number",
+                                  "type": "STRING"
+                                },
+                                {
+                                  "name": "work_order_id",
+                                  "type": "STRING"
+                                },
+                                {
+                                  "name": "value",
+                                  "type": "DOUBLE"
+                                },
+                                {
+                                  "name": "unit",
+                                  "type": "STRING"
+                                },
+                                {
+                                  "name": "timestamp",
+                                  "type": "DATETIME"
+                                }
+                              ],
+                              "enableHistory": "TRUE",
+                              "mockData": "FALSE"
+                            }
+                          ]
+                        },
+                        {
+                          "name": "State",
+                          "alias": "state_539a0f331fe0",
+                          "type": "PATH",
+                          "children": [
+                            {
+                              "name": "CurrentWorkOrder",
+                              "alias": "CurrentWorkO_a638320784dd",
+                              "type": "TOPIC",
+                              "topicType": "STATE",
+                              "description": "Current active Work Order on Line_01.",
+                              "fields": [
+                                {
+                                  "name": "production_order_id",
+                                  "type": "STRING"
+                                },
+                                {
+                                  "name": "plan_id",
+                                  "type": "STRING"
+                                },
+                                {
+                                  "name": "plan_number",
+                                  "type": "STRING"
+                                },
+                                {
+                                  "name": "work_order_id",
+                                  "type": "STRING"
+                                },
+                                {
+                                  "name": "target_line",
+                                  "type": "STRING"
+                                },
+                                {
+                                  "name": "workstation",
+                                  "type": "STRING"
+                                },
+                                {
+                                  "name": "product_code",
+                                  "type": "STRING"
+                                },
+                                {
+                                  "name": "target_qty",
+                                  "type": "DOUBLE"
+                                },
+                                {
+                                  "name": "unit",
+                                  "type": "STRING"
+                                },
+                                {
+                                  "name": "started_at",
+                                  "type": "DATETIME"
+                                },
+                                {
+                                  "name": "updated_at",
+                                  "type": "DATETIME"
+                                }
+                              ],
+                              "enableHistory": "TRUE",
+                              "mockData": "FALSE"
+                            },
+                            {
+                              "name": "WorkOrderStatus",
+                              "alias": "WorkOrderSta_e24e3bf113d1",
+                              "type": "TOPIC",
+                              "topicType": "STATE",
+                              "description": "Execution status of the current Work Order.",
+                              "fields": [
+                                {
+                                  "name": "production_order_id",
+                                  "type": "STRING"
+                                },
+                                {
+                                  "name": "plan_id",
+                                  "type": "STRING"
+                                },
+                                {
+                                  "name": "plan_number",
+                                  "type": "STRING"
+                                },
+                                {
+                                  "name": "work_order_id",
+                                  "type": "STRING"
+                                },
+                                {
+                                  "name": "status",
+                                  "type": "STRING"
+                                },
+                                {
+                                  "name": "reason",
+                                  "type": "STRING"
+                                },
+                                {
+                                  "name": "updated_at",
+                                  "type": "DATETIME"
+                                }
+                              ],
+                              "enableHistory": "TRUE",
+                              "mockData": "FALSE"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
+```
+
+  </TabItem>
+</Tabs>
+
+### 비즈니스 데이터
+
+ERP의 생산 주문, 작업 지시 계획 같은 비즈니스 계획 및 프로세스 객체는 비즈니스 context에 맞게 모델링합니다.
+:::tip[비즈니스 데이터를 식별하는 방법]
+물리적 위치가 없는 데이터입니다.
+:::
+#### 비즈니스 데이터 모델링 Guide
+```
+Factory / Business Domain / Business Object / Topic Type / Topic
+```
+- **Business Domain**: Confirm the business process or system the data belongs to.
+    ```
+    ERP
+    MES
+    WMS
+    QMS
+    EAM
+    LIMS
+    Planning
+    Inventory
+    Maintenance
+    Quality
+    Logistics
+    ...
+    ```
+- **Business Object**: The core managed object in the business domain.
+    ```
+    ProductionOrders
+    WorkOrderPlan
+    MaterialInventory
+    QualityInspection
+    MaintenanceOrders
+    PurchaseOrders
+    Shipments
+    ...
+    ```
+- **Topic Type**: Choose the data type from **Metric**, **Action**, and **State**.
+
+    | Topic Type | Used for | Examples |
+    | --- | --- | --- |
+| STATE | 현재 상태 또는 현재 사실 | work order status, order status, equipment status |
+    | METRIC | 지속적으로 변하는 숫자 값 | Temperature, speed, output, OEE, energy consumption |
+    | ACTION | 외부 실행자를 위한 command | 설비 시작, 설비 정지, alarm reset, work order dispatch 요청 |
+
+#### Demo Model
+<Tabs syncKey="business-data-model">
+  <TabItem label="Tree Structure">
+
+```text
+DemoFactory
+└── ERP
+    ├── ProductionOrders
+    │   └── State
+    │       ├── UpsertProductionOrder
+    │       └── OrderList
+    └── WorkOrderPlan
+        ├── Metric
+        │   └── SplitCount
+        └── State
+            ├── PlanStatus
+            └── WorkOrderList
+```
+
+  </TabItem>
+  <TabItem label="JSON">
+
+```json
+{
+  "namespace": [
+    {
+      "name": "DemoFactory",
+      "alias": "DemoFactory_f925c1ec5041",
+      "type": "PATH",
+      "children": [
+        {
+          "name": "ERP",
+          "alias": "DemoFactory__e504805b1973",
+          "type": "PATH",
+          "children": [
+            {
+              "name": "ProductionOrders",
+              "alias": "__ERP_Product_1e7984ac3a1d",
+              "type": "PATH",
+              "children": [
+                {
+                  "name": "State",
+                  "alias": "state_c2616c8698fa",
+                  "type": "PATH",
+                  "children": [
+                    {
+                      "name": "UpsertProductionOrder",
+                      "alias": "UpsertProduc_d5f166da35c6",
+                      "type": "TOPIC",
+                      "topicType": "STATE",
+                      "description": "Event for creating or updating a Production Order from WOM or ERP simulation.",
+                      "fields": [
+                        {
+                          "name": "event_id",
+                          "type": "STRING"
+                        },
+                        {
+                          "name": "event_type",
+                          "type": "STRING"
+                        },
+                        {
+                          "name": "source",
+                          "type": "STRING"
+                        },
+                        {
+                          "name": "production_order_id",
+                          "type": "STRING"
+                        },
+                        {
+                          "name": "order_number",
+                          "type": "STRING"
+                        },
+                        {
+                          "name": "product_code",
+                          "type": "STRING"
+                        },
+                        {
+                          "name": "planned_qty",
+                          "type": "DOUBLE"
+                        },
+                        {
+                          "name": "unit",
+                          "type": "STRING"
+                        },
+                        {
+                          "name": "status",
+                          "type": "STRING"
+                        },
+                        {
+                          "name": "due_date",
+                          "type": "DATETIME"
+                        },
+                        {
+                          "name": "updated_at",
+                          "type": "DATETIME"
+                        }
+                      ],
+                      "enableHistory": "TRUE",
+                      "mockData": "FALSE"
+                    },
+                    {
+                      "name": "OrderList",
+                      "alias": "OrderList_11fbca51a2bd",
+                      "type": "TOPIC",
+                      "topicType": "STATE",
+                      "description": "Retained compatibility snapshot of current Production Orders.",
+                      "fields": [
+                        {
+                          "name": "orders",
+                          "type": "STRING"
+                        },
+                        {
+                          "name": "updated_at",
+                          "type": "DATETIME"
+                        }
+                      ],
+                      "enableHistory": "TRUE",
+                      "mockData": "FALSE"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "WorkOrderPlan",
+              "alias": "__ERP_WorkOrd_19f04960daf5",
+              "type": "PATH",
+              "children": [
+                {
+                  "name": "Metric",
+                  "alias": "metric_17258b809a4f",
+                  "type": "PATH",
+                  "children": [
+                    {
+                      "name": "SplitCount",
+                      "alias": "SplitCount_032e86f5fbfc",
+                      "type": "TOPIC",
+                      "topicType": "METRIC",
+                      "description": "Number of executable Work Orders generated from a Work Order Plan.",
+                      "fields": [
+                        {
+                          "name": "production_order_id",
+                          "type": "STRING"
+                        },
+                        {
+                          "name": "plan_id",
+                          "type": "STRING"
+                        },
+                        {
+                          "name": "plan_number",
+                          "type": "STRING"
+                        },
+                        {
+                          "name": "split_count",
+                          "type": "INTEGER"
+                        },
+                        {
+                          "name": "updated_at",
+                          "type": "DATETIME"
+                        }
+                      ],
+                      "enableHistory": "TRUE",
+                      "mockData": "FALSE"
+                    }
+                  ]
+                },
+                {
+                  "name": "State",
+                  "alias": "state_884cee548bf7",
+                  "type": "PATH",
+                  "children": [
+                    {
+                      "name": "PlanStatus",
+                      "alias": "PlanStatus_2e21c1327c49",
+                      "type": "TOPIC",
+                      "topicType": "STATE",
+                      "description": "Current lifecycle status of a Work Order Plan.",
+                      "fields": [
+                        {
+                          "name": "production_order_id",
+                          "type": "STRING"
+                        },
+                        {
+                          "name": "plan_id",
+                          "type": "STRING"
+                        },
+                        {
+                          "name": "plan_number",
+                          "type": "STRING"
+                        },
+                        {
+                          "name": "status",
+                          "type": "STRING"
+                        },
+                        {
+                          "name": "updated_at",
+                          "type": "DATETIME"
+                        }
+                      ],
+                      "enableHistory": "TRUE",
+                      "mockData": "FALSE"
+                    },
+                    {
+                      "name": "WorkOrderList",
+                      "alias": "WorkOrderLis_887b92f26fc2",
+                      "type": "TOPIC",
+                      "topicType": "STATE",
+                      "description": "Split result list generated from a sent Work Order Plan.",
+                      "fields": [
+                        {
+                          "name": "production_order_id",
+                          "type": "STRING"
+                        },
+                        {
+                          "name": "plan_id",
+                          "type": "STRING"
+                        },
+                        {
+                          "name": "plan_number",
+                          "type": "STRING"
+                        },
+                        {
+                          "name": "split_count",
+                          "type": "INTEGER"
+                        },
+                        {
+                          "name": "lines",
+                          "type": "STRING"
+                        },
+                        {
+                          "name": "updated_at",
+                          "type": "DATETIME"
+                        }
+                      ],
+                      "enableHistory": "TRUE",
+                      "mockData": "FALSE"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
+```
+
+  </TabItem>
+</Tabs>
+
+## Topic 폭증을 피하는 방법
+Tier0는 topic 폭증을 피하기 위해 `Metric`, `Action`, `State` 세 가지 고정 topic type을 사용합니다. 
+
+- **Use `Metric` for high-frequency real-time data**
+
+  각 signal 세부 항목마다 namespace를 확장하지 말고, 고빈도 측정값과 telemetry는 `Metric` 아래에 둡니다.
+
+  <Tabs syncKey="topic-explosion-metric">
+    <TabItem label="Bad">
+
+  ```text
+  Factory_A
+  └── SMT_Line_1
+      └── Machine_001
+          ├── Temperature_Value
+          ├── Temperature_Unit
+          ├── Temperature_Status
+          └── Speed_Value
+  ```
+
+    </TabItem>
+    <TabItem label="Better">
+
+  ```text
+  Factory_A
+  └── SMT_Line_1
+      └── Metric
+          └── Machine_001
+  ```
+
+  Model fields:
+
+  ```json
+  {
+    "temperature": 80,
+    "temperature_unit": "Celsius",
+    "temperature_status": "Normal",
+    "speed": 300
+  }
+  ```
+
+    </TabItem>
+  </Tabs>
+
+- **Use `State` for low-frequency status data**
+
+  저빈도 상태, snapshot, 현재 비즈니스 상태는 `State` 아래에 둡니다. 작업, batch, 주문처럼 변하는 entity마다 새 topic을 만들지 않습니다.
+
+  <Tabs syncKey="topic-explosion-state">
+    <TabItem label="Bad">
+
+  ```text
+  Factory_A
+  └── SMT_Line_1
+      └── State
+          ├── Job_001
+          ├── Job_002
+          └── Job_003
+  ```
+
+    </TabItem>
+    <TabItem label="Better">
+
+  ```text
+  Factory_A
+  └── SMT_Line_1
+      └── State
+          └── Machine_001
+  ```
+
+  Model fields:
+
+  ```json
+  {
+    "current_job": "Job_003",
+    "product": "Product_A"
+  }
+  ```
+
+    </TabItem>
+  </Tabs>
+
+- **Use `Action` for low-frequency action data**
+
+  명령, 요청, operator action은 `Action` 아래에 둡니다. action 입력은 parameter별 topic이 아니라 topic의 field로 유지합니다.
+
+  <Tabs syncKey="topic-explosion-action">
+    <TabItem label="Bad">
+
+  ```text
+  Factory_A
+  └── SMT_Line_1
+      └── Machine_001
+          ├── Start_Command
+          ├── Target_Height
+          └── Light_On
+  ```
+
+    </TabItem>
+    <TabItem label="Better">
+
+  ```text
+  Factory_A
+  └── SMT_Line_1
+      └── Action
+          └── StartJob
+  ```
+
+  Model fields:
+
+  ```json
+  {
+    "target_height": 12.5,
+    "light_on": true,
+    "requested_by": "operator"
+  }
+  ```
+
+    </TabItem>
+  </Tabs>
+
+## Payload 구조
+
+topic payload를 설계할 때는 소비할 데이터와 다시 쓸 데이터를 모두 고려해야 합니다.
+
+- **Action**
+
+  Action payload에는 데이터가 Tier0 데이터베이스에 저장된 시간을 기록하는 `_timestamp`가 자동 포함됩니다.
+
+  <Tabs syncKey="payload-action">
+    <TabItem label="start_job">
+
+  ```json
+  {
+    "light_turn_on": true,
+    "height_adjust": 12.5,
+    "_timestamp": "2026-07-10T10:00:00Z"
+  }
+  ```
+
+    </TabItem>
+    <TabItem label="stop_job">
+
+  ```json
+  {
+    "water_pump_off": true,
+    "window_close": true,
+    "_timestamp": "2026-07-10T10:00:00Z"
+  }
+  ```
+
+    </TabItem>
+  </Tabs>
+
+- **Metric**
+
+  Metric payload에는 데이터가 Tier0 데이터베이스에 저장된 시간을 기록하는 `_timestamp`와 데이터 품질을 나타내는 `_quality`가 자동 포함됩니다.
+
+  <Tabs syncKey="payload-metric">
+    <TabItem label="ERP / SplitCount">
+
+  ```json
+  {
+    "production_order_id": "PO-20260710-001",
+    "plan_id": "PLAN-001",
+    "plan_number": "WOP-20260710-001",
+    "split_count": 3,
+    "updated_at": "2026-07-10T10:00:00Z",
+    "_timestamp": "2026-07-10T10:00:00Z",
+    "_quality": "Good"
+  }
+  ```
+
+    </TabItem>
+    <TabItem label="Site_01 / Target_Qty">
+
+  ```json
+  {
+    "production_order_id": "PO-20260710-001",
+    "plan_id": "PLAN-001",
+    "plan_number": "WOP-20260710-001",
+    "work_order_id": "WO-001",
+    "value": 1200,
+    "unit": "pcs",
+    "timestamp": "2026-07-10T10:00:00Z",
+    "_timestamp": "2026-07-10T10:00:00Z",
+    "_quality": "Good"
+  }
+  ```
+
+    </TabItem>
+  </Tabs>
+
+- **State**
+
+  State payload에는 데이터가 Tier0 데이터베이스에 저장된 시간을 기록하는 `_timestamp`가 자동 포함됩니다.
+
+  <Tabs syncKey="payload-state">
+    <TabItem label="ERP / UpsertProductionOrder">
+
+  ```json
+  {
+    "event_id": "EVT-001",
+    "event_type": "UPSERT",
+    "source": "ERP",
+    "production_order_id": "PO-20260710-001",
+    "order_number": "PO-001",
+    "product_code": "SKU-1001",
+    "planned_qty": 1200,
+    "unit": "pcs",
+    "status": "Released",
+    "due_date": "2026-07-12T00:00:00Z",
+    "updated_at": "2026-07-10T10:00:00Z",
+    "_timestamp": "2026-07-10T10:00:00Z"
+  }
+  ```
+
+    </TabItem>
+    <TabItem label="Site_01 / WorkOrderStatus">
+
+  ```json
+  {
+    "production_order_id": "PO-20260710-001",
+    "plan_id": "PLAN-001",
+    "plan_number": "WOP-20260710-001",
+    "work_order_id": "WO-001",
+    "status": "Running",
+    "reason": "In production",
+    "updated_at": "2026-07-10T10:00:00Z",
+    "_timestamp": "2026-07-10T10:00:00Z"
+  }
+  ```
+
+    </TabItem>
+  </Tabs>

@@ -1,0 +1,145 @@
+---
+title: 설치
+description: 에디션별 Tier0 설치 방법입니다.
+sidebar:
+  order: 1
+---
+
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+import { Steps } from '@astrojs/starlight/components';
+
+Tier0는 세 가지 에디션으로 제공됩니다.
+- **Edge** - Open-source 배포이며 Docker로 로컬에서 실행합니다.
+- **Cloud** - Managed SaaS, no infrastructure required.
+- **Enterprise** - 기업 환경을 위한 private deployment입니다.
+
+요구사항에 가장 적합한 에디션은 [최적 버전 선택](../choosing-version/)에서 확인하세요.
+
+
+## Tier0 설치
+
+<Tabs syncKey="edition">
+	<TabItem label="Cloud">
+
+		Tier0 Cloud를 체험하기 전에 평가판 계정을 신청하세요.
+		<Steps>
+		1. Register your account at [Register Tier0](https://tier0.dev/signup). 
+		2. Enter the verification code sent to your email on the popup window.
+		3. You will be redirected to the **Login** page. Log in with the registered account.
+		4. Enter related information, click **Continue**.
+		5. Select **Create a New Workspace**.
+		6. Create a workspace and start your trial.
+	</Steps>
+	
+	</TabItem>
+	<TabItem label="Edge">
+
+	#### 요구사항
+	- Minimum 4-core CPU, 8 GB RAM, 100 GB disk
+	- Ubuntu 24.04 or Windows 10/11 with Docker and Git
+	#### 작업
+	<Steps>
+	1. Clone the Tier0-Edge repository from GitHub and access the project.
+
+		```bash
+		git clone https://github.com/FREEZONEX/Tier0-Edge
+		cd Tier0-Edge/deploy
+		```
+
+	2. Configure the parameters listed in the table below in `.env.default` according to your environment.
+	
+		```bash
+		vi .env.default
+		:wq!
+		```
+	3. Run the installation script.
+
+		```bash
+		bash bin/install.sh
+		```
+
+	</Steps>
+
+:::note[Parameters to be configured]
+
+| Field | Type | Description |
+|------|------|-------------|
+| VOLUMES_PATH | string | Storage path for project data |
+| ENTRANCE_DOMAIN/ENTRANCE_PORT | string | Tier0 access endpoint (IP/domain + port) |
+| OS_PLATFORM_TYPE | enum | OS where Tier0 is installed. Can be **linux** or **windows** |
+| LANGUAGE | enum | zh-CN / en-US |
+
+:::
+		
+
+	</TabItem>
+	<TabItem label="Enterprise">
+#### 요구사항
+-  Standard Deployment
+	- Minimum: 4 VMs
+	- Required baseline per VM types:
+		- App: 8C / 32G / 100G
+		- Database: 4C / 8G / 500G
+		- Witness: 2C / 4G / 40G
+-  High Availability Deployment
+	- Minimum: 6 VMs
+	- Required baseline per VM types:
+		- App (Swarm): 8C / 32G / 100G x 3
+		- Database: 4C / 8G / 500G x 2
+		- Witness: 2C / 4G / 40G
+
+:::tip[하드웨어 요구사항은 달라질 수 있습니다]
+Enterprise hardware requirements vary by deployment scenario.
+:::
+
+:::note
+자세한 deployment 정보는 [고가용성 배포 계획](../../reference/high-availability-deployment/)에서 확인할 수 있습니다.
+:::
+#### 작업
+<Steps>
+1. Get the package from your vendor, and verify it.
+		```bash
+		sha256sum -c tier0-enterprise-offline-standard-YYYYmmddTHHMMSS.tar.gz.sha256
+		```
+2. Decompress the package.
+		```bash
+		tar -xzf tier0-enterprise-offline-standard-YYYYmmddTHHMMSS.tar.gz
+		cd tier0-enterprise-offline-standard-YYYYmmddTHHMMSS
+		```
+3. Edit `install.env` based on the deployment details, then start the deployment.
+		```bash
+		vi install.env
+		bash install.sh
+		```
+</Steps>
+
+#### Common Maintenance 작업
+- Check the deployment environment without installing Enterprise.
+		```bash
+		./install.sh --check-only
+		```
+- Clear all nodes after a failed deployment.
+		```bash
+		./full-cleanup.sh --env install.env --yes
+		```
+		> 이 command는 VM, operating system, 설치된 Docker software는 유지하면서 모든 Tier0 runtime data와 database backup을 삭제합니다.
+- A deployment report is generated after installation.
+		```text
+		runtime/install-reports/<timestamp>/deployment-report.md
+		```
+		> Do not deliver the project if the report contains any **FAIL** item. Contact support first.
+#### 유지보수 References
+- [Standard Port List](../../reference/standard-port-list/)
+- [Maintenance and Troubleshooting Guide](../../reference/operations-runbook/)
+- [HA Boundaries Instructions](../../reference/sla-and-ha-boundaries/)
+
+
+
+</TabItem>
+</Tabs>
+
+
+## 다음 단계
+
+- [Try the 데모 팩토리](../demo-factory/) — a preloaded plant to explore
+- [Choosing the Best Version](../choosing-version/)

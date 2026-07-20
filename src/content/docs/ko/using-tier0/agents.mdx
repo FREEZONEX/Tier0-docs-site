@@ -1,0 +1,169 @@
+﻿---
+title: Agent로 Tier0 운영
+description: What the Tier0 Skill can do and how to install it.
+editions: [edge, cloud, enterprise]
+sidebar:
+  order: 6
+---
+
+import { Steps } from '@astrojs/starlight/components';
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+
+Tier0 provides a set of skills and CLI commands for agents to operate on it.
+
+## Tier0 설치 Skills
+
+> Required CLI version: `v0.4.6+`
+
+Choose the installer that matches your environment.
+
+### With Node.js
+
+If Node.js 16 or later is available, use `npx` to install the CLI and skills.
+
+```bash
+npx @tier0/cli@latest
+```
+
+This runs the full installer and does two things:
+
+- Installs the `tier0` CLI binary into `~/.tier0/bin/`.
+- Installs Cursor/Claude Agent Skills from `FREEZONEX/Tier0-skill`.
+:::tip[If the Agent Skills registration step fails]
+Agent Skills 등록 단계가 실패해도 CLI 설치에는 영향을 주지 않습니다. skills installer를 수동으로 실행하세요:
+
+```bash
+npx skills add FREEZONEX/Tier0-skill
+```
+:::
+
+### Without Node.js
+
+<Steps>
+1. Install the `tier0` CLI binary.
+</Steps>
+
+<Tabs syncKey="tier0-cli-binary-install">
+  <TabItem label="curl">
+
+    ```bash
+    curl -fsSL https://raw.githubusercontent.com/FREEZONEX/Tier0-cli/main/install.sh | bash
+    ```
+
+  </TabItem>
+  <TabItem label="iwr">
+
+    ```powershell
+    iwr https://raw.githubusercontent.com/FREEZONEX/Tier0-cli/main/install.ps1 | iex
+    ```
+
+  </TabItem>
+</Tabs>
+
+<Steps>
+2. Install the Agent Skills.
+
+</Steps>
+
+
+```bash
+tier0 skills update
+```
+
+
+## What the Tier0 Skill Can Do
+
+Tier0 Skills는 agent가 올바른 CLI 명령을 선택하고, 맞는 reference를 읽고, `tier0` CLI를 통해 Tier0를 운영할 수 있는 구조화된 방법을 제공합니다.
+
+### Setting Operating Instance
+:::note
+Cloud uses `https://tier0.dev` by default and needs no base URL configuration.
+:::
+Private deployment에서는 login 전에 base URL을 구성해야 합니다. 한 번 구성하면 이후 모든 command는 해당 instance에서 실행됩니다.
+
+```bash
+tier0 config --base-url https://your-tier0.example.com
+```
+
+### Logging In
+
+<Tabs syncKey="tier0-login-method">
+  <TabItem label="With an API key">
+
+  <Steps>
+  1. Set the API key for the operating instance.
+
+      ```bash
+      tier0 config --api-key <api-key>
+      ```
+  2. Verify the API key identity and permissions.
+      ```bash
+      tier0 auth whoami
+      ```
+  3. Perform other operations with the `tier0` CLI.
+  </Steps>
+
+  </TabItem>
+  <TabItem label="Without an API key">
+
+  <Steps>
+  1. Start the browser login.
+
+      ```bash
+      tier0 login --no-wait --json
+      ```
+  2. Go through authentication on the browser by accessing the returned `verification_url`.
+  3. Poll for the login result with the returned `setup_code`.
+      ```bash
+      tier0 login --setup-code <setup_code>
+      ```
+ </Steps>
+  </TabItem>
+</Tabs>
+
+:::caution[Important]
+API key를 구성하거나 browser login을 시작하기 전에 `config`를 실행해 operating instance를 설정하세요. 그렇지 않으면 CLI가 잘못된 instance에서 동작할 수 있습니다.
+:::
+
+| Target | Task | Commands |
+| --- | --- | --- |
+| Basic operations | Check CLI and service health | `tier0 doctor` |
+| Basic operations | 서비스 연결성과 gateway 정보를 확인합니다 | `tier0 api /openapi/v1/info --body '{}' --json` |
+| Basic operations | Upgrade CLI and skills | `tier0 upgrade` and `tier0 skills update` |
+| UNS | Browse paths | `tier0 uns browse --path /` or `tier0 uns browse --path Plant/Line1 --json` |
+| UNS | 키워드로 topic 검색 | `tier0 uns search --keyword temp --json` 또는 `tier0 uns search --path-prefix Plant/Line1 --size 50 --json` |
+| UNS | 현재 값 읽기 | `tier0 uns read Plant/Line1/Metric/Temperature --json` 또는 `tier0 uns read --topic 'Plant/+/Metric/Temperature' --json` |
+| UNS | Write values | `tier0 uns write --topic Plant/Line1/Metric/Temperature --value '{"temperature":27.5}'` |
+| UNS | Query history | `tier0 uns history -t Plant/Line1/Metric/Temperature --start -1h --json` |
+| UNS | path 또는 topic 생성 | `tier0 uns create --topic Plant/Line1 --type path` 또는 `tier0 uns create --file namespace.json --json` |
+| UNS | metadata 또는 field 업데이트 | `tier0 uns update --path Plant/Line1/Metric/Temperature --description "Line 1 temperature" --update-mask description` |
+| UNS | 노드를 삭제하거나 복원합니다 | `tier0 uns delete --path Plant/Line1/Metric/Temperature --yes` 또는 `tier0 uns restore --path Plant/Line1/Metric/Temperature --yes` |
+| Node-RED Flow | Flow 목록을 보거나 상세 정보를 확인합니다 | `tier0 flow list`, `tier0 flow list --source --json`, 또는 `tier0 flow get --id 1 --json` |
+| Node-RED Flow | Source Flow 또는 Event Flow를 생성합니다 | `tier0 flow create --name "modbus-collector" --source --desc "Modbus TCP collector"` 또는 `tier0 flow create --name "alert-handler" --event --desc "Temperature alarm processor"` |
+| Node-RED Flow | Update Flow metadata | `tier0 flow update --id 1 --name "line1-collector"` or `tier0 flow update --id 1 --favorite` |
+| Node-RED Flow | Export canvas JSON | `tier0 flow data --id 1 --out flows.json` |
+| Node-RED Flow | Deploy canvas JSON | `tier0 flow deploy --id 1 -f flows.json --yes` |
+| Node-RED Flow | Delete Flows | `tier0 flow delete --id 1 --yes` |
+| Node-RED Flow | 사용 가능한 node type 확인 | `tier0 flow nodes --source --json` 또는 `tier0 flow nodes --event --json` |
+
+## Uninstalling Tier0 Skills
+
+```bash
+# Remove the Tier0 CLI while keeping local configuration.
+npx @tier0/cli@latest uninstall
+
+# Remove the Tier0 CLI and delete local configuration, credentials, skills, and cache.
+npx @tier0/cli@latest uninstall --purge
+```
+
+## Skill Reference
+
+[Tier0 Skill Reference](../../reference/tier0-skill/)에는 지원되는 작업 대상, 일반 작업, 대응하는 CLI 명령이 정리되어 있습니다.
+
+:::tip[Let an agent read the repo]
+명령을 실행하기 전에 agent에게 [Tier0 Skill repo](https://github.com/FREEZONEX/Tier0-skill)를 읽도록 요청하세요.
+:::
+
+## 다음 단계
+
+- [UNS 데이터 작업](../working-with-uns-data/) — MQTT와 API를 통해 UNS 모델을 운영하는 방법입니다.

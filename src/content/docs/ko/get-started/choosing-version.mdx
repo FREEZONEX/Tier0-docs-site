@@ -1,0 +1,155 @@
+---
+title: 최적 버전 선택
+description: Edge, Cloud, Enterprise 중 적합한 Tier0 에디션을 고르기 위한 포지셔닝, 요금제, 기능 매트릭스입니다.
+sidebar:
+  order: 3
+---
+
+Tier0는 세 가지 에디션으로 제공되는 하나의 플랫폼입니다. namespace model, flow, CLI는 같고, 차이는 누가 운영하는지와 사용할 수 있는 플랫폼 범위입니다.
+
+<section class="t0-board not-content">
+	<div class="t0-board-grid">
+		<div class="t0-col">
+			<div class="t0-col-header">
+				<p class="t0-tag">Open source</p>
+			</div>
+			<div class="t0-col-body">
+				<div class="t0-col-top">
+					<h3>Edge</h3>
+					<p class="t0-col-tagline">The UNS foundation, on one machine. Yours entirely.</p>
+					<p class="t0-col-for">For PoCs, technical evaluation, and teams running open source themselves.</p>
+				</div>
+				<div class="t0-plans">
+					<div class="t0-plan t0-plan--apache">
+						<span class="t0-plan-name">Apache-2.0</span>
+						<span class="t0-plan-price">free</span>
+						<p class="t0-plan-desc">UNS core, SourceFlows/EventFlows, history storage — single-machine Docker deployment.</p>
+					</div>
+					<a class="t0-col-cta" href="https://github.com/FREEZONEX/Tier0-Edge">Clone on GitHub</a>
+				</div>
+			</div>
+		</div>
+		<div class="t0-col t0-col--accent">
+			<div class="t0-col-header">
+				<p class="t0-tag">Managed SaaS</p>
+			</div>
+			<div class="t0-col-body">
+				<div class="t0-col-top">
+					<h3>Cloud <span class="t0-col-flag">Most teams start here</span></h3>
+					<p class="t0-col-tagline">The full platform, operated for you.</p>
+					<p class="t0-col-for">Apps, notebooks, and launchpad on day one — no infrastructure to run.</p>
+				</div>
+				<div class="t0-plans">
+					<div class="t0-plan">
+						<span class="t0-plan-name">Builder</span>
+						<span class="t0-plan-price">$199/seat/mo</span>
+						<p class="t0-plan-desc">App generation only.</p>
+					</div>
+					<div class="t0-plan t0-plan--growth">
+						<span class="t0-plan-name">Growth <span class="t0-plan-star" aria-hidden="true">★</span></span>
+						<span class="t0-plan-price">$20,000/yr</span>
+						<p class="t0-plan-desc">Up to 5 edges. For a single factory with a few apps, wanting a quick start.</p>
+					</div>
+					<div class="t0-plan t0-plan--scale">
+						<span class="t0-plan-name">Scale</span>
+						<span class="t0-plan-price">$38,000/yr</span>
+						<p class="t0-plan-desc">Up to 10 edges. For users with multiple factories and many apps.</p>
+					</div>
+					<a class="t0-col-cta" href="https://tier0.dev/login">Start the 14-day trial</a>
+				</div>
+			</div>
+		</div>
+		<div class="t0-col t0-col--dark">
+			<div class="t0-col-header">
+				<p class="t0-tag">Private deployment</p>
+			</div>
+			<div class="t0-col-body">
+				<div class="t0-col-top">
+					<h3>Enterprise</h3>
+					<p class="t0-col-tagline">The full platform, on your terms.</p>
+					<p class="t0-col-for">For data sovereignty, scale, governance, and enterprise-grade oversight.</p>
+				</div>
+				<div class="t0-plans">
+					<div class="t0-plan t0-plan--base">
+						<span class="t0-plan-name">Base</span>
+						<span class="t0-plan-price">$10,000/yr</span>
+						<p class="t0-plan-desc">Unified data foundation. A small number of single-purpose apps.</p>
+					</div>
+					<div class="t0-plan t0-plan--plus">
+						<span class="t0-plan-name">Plus</span>
+						<span class="t0-plan-price">$20,000/yr</span>
+						<p class="t0-plan-desc">Single Instance. Single-factory data integration, apps across multiple use cases.</p>
+					</div>
+					<div class="t0-plan t0-plan--cluster">
+						<span class="t0-plan-name">Cluster <span class="t0-plan-star" aria-hidden="true">★</span></span>
+						<span class="t0-plan-price">$39,900+/yr</span>
+						<p class="t0-plan-desc">Multi-Instance. Multiple factories, many apps, centralized private-cloud management.</p>
+					</div>
+					<a class="t0-col-cta" href="https://tier0.app/talk-to-team">Talk to the team</a>
+				</div>
+			</div>
+		</div>
+	</div>
+</section>
+
+**Add-ons:** 추가 edge node는 $2,000 /edge/year, 추가 instance는 $10,000 /instance/year입니다. 가격은 참고용이며, 공식 기준은 [tier0.app/pricing](https://tier0.app/pricing)입니다.
+
+:::note[용어 설명]
+Cloud 플랜에서 edge는 클라우드 Tier0와 통신하는 연결 노드입니다. Edge Tier0일 수도 있고, 게이트웨이 또는 산업용 PC일 수도 있습니다.
+:::
+
+## 기능 매트릭스
+
+| Capability | Edge | Cloud | Enterprise |
+|---|---|---|---|
+| UNS / Data 모델링 | <span class="t0-yes">&#10003;</span> single-machine UNS | <span class="t0-yes">&#10003;</span> Growth / Scale | <span class="t0-yes">&#10003;</span> Base / Plus / Cluster |
+| Industrial protocols | <span class="t0-yes">&#10003;</span> MQTT | <span class="t0-yes">&#10003;</span> Growth / Scale: MQTT, REST, i3X, OPC UA | <span class="t0-yes">&#10003;</span> Base: MQTT; Plus / Cluster: MQTT, REST, i3X, OPC UA |
+| UNS Agent | <span class="t0-no">&#215;</span> | <span class="t0-yes">&#10003;</span> Growth / Scale | <span class="t0-no">&#215;</span> |
+| Notebook (Advanced Analysis) | <span class="t0-no">&#215;</span> | <span class="t0-yes">&#10003;</span> Growth / Scale | <span class="t0-yes">&#10003;</span> Plus / Cluster |
+| Vision | <span class="t0-no">&#215;</span> | <span class="t0-yes">&#10003;</span> Scale | <span class="t0-yes">&#10003;</span> Plus / Cluster |
+| Anchor | <span class="t0-no">&#215;</span> | <span class="t0-yes">&#10003;</span> Scale | <span class="t0-yes">&#10003;</span> Cluster |
+| App Builder + Template Library | <span class="t0-no">&#215;</span> | <span class="t0-yes">&#10003;</span> Builder / Growth / Scale | <span class="t0-no">&#215;</span> |
+| LaunchPad / My Apps | <span class="t0-no">&#215;</span> | <span class="t0-yes">&#10003;</span> Builder / Growth / Scale | <span class="t0-yes">&#10003;</span> Base / Plus / Cluster |
+| Audit / app & system logs | <span class="t0-no">&#215;</span> | <span class="t0-yes">&#10003;</span> Growth / Scale | <span class="t0-yes">&#10003;</span> Plus / Cluster; SIEM in Cluster |
+| HA / multi-instance / governance | <span class="t0-no">&#215;</span> | <span class="t0-no">&#215;</span> | <span class="t0-yes">&#10003;</span> Cluster |
+| 작업 | You | FREEZONEX | You, with support |
+
+## Edge 하드웨어 요구사항
+
+:::tip[Edge를 사용하려는 경우]
+Edge is intended for technical evaluation and requires operational experience.
+사용하기 전에 환경이 다음 하드웨어 요구 사항을 충족하는지 확인하세요.
+:::
+
+| | Minimum | Recommended |
+|---|---|---|
+| CPU | 4 cores | 8 cores |
+| Memory | 8 GB | 16 GB |
+| Disk | 100 GB (1000 IOPS) | 1 TB |
+| OS | Ubuntu 24.04, Windows 10/11 (Docker) | - |
+
+## 의사결정 트리
+
+아직 어떤 옵션을 선택할지 모르겠다면, 경로를 따라 결정해 보세요.
+
+```mermaid
+flowchart LR
+  q1{"Technical evaluation<br/>or self-host?"} -- "yes" --> edge["Edge (open source)"]
+  q1 -- "no" --> q2{"Need on-prem /<br/>sovereignty?"}
+  q2 -- "no" --> q3{"More than 5 edges?"}
+  q2 -- "yes" --> q4{"Multi-factory / HA?"}
+  q3 -- "no" --> growth["Cloud Growth ★"]
+  q3 -- "yes" --> scale["Cloud Scale"]
+  q4 -- "yes" --> cluster["Enterprise Cluster ★"]
+  q4 -- "no" --> baseplus["Enterprise Base / Plus"]
+  class growth,cluster t0accent
+```
+
+## "edge"(단위)란?
+
+Cloud 플랜에서 *edge*는 설비 가까이에서 데이터를 수집해 네임스페이스로 게시하는 연결 지점입니다. 보통 수집 플로우를 실행하는 게이트웨이 또는 산업용 PC입니다. 사이트 또는 분리된 네트워크 세그먼트마다 대략 하나로 계산합니다. 위의 오픈소스 배포판인 **Edge edition**과 혼동하지 마세요.
+
+## 다음 단계
+
+- [Build Apps on UNS](../../using-tier0/build-apps/) — deploying containers on Edge and Enterprise
+- [Installation](../installation/) — the 14-day Cloud trial is the full platform
