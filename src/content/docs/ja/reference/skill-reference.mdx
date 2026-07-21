@@ -5,29 +5,29 @@ sidebar:
   order: 2
 ---
 
-This page is included in the documentation and PDF export. The standalone web reference is also available here:
+このページはドキュメントと PDF 出力に含まれます。単独の Web reference もここから開けます。
 
-[Open Tier0 Skill Reference](../tier0-skill/)
+[Tier0 Skill Reference を開く](../tier0-skill/)
 
 ## コマンド
 
-| Target | Task | Commands |
+| 対象 | タスク | コマンド |
 |---|---|---|
-| Basic operations | Check CLI and service health | `tier0 doctor` |
-| Basic operations | Check service connectivity and gateway info | `tier0 api /openapi/v1/info --body '{}' --json` |
-| Basic operations | Upgrade CLI and skills | `tier0 upgrade` and `tier0 skills update` |
-| UNS | Browse paths | `tier0 uns browse --path /` or `tier0 uns browse --path Plant/Line1 --json` |
+| 基本操作 | CLI とサービスヘルスを確認 | `tier0 doctor` |
+| 基本操作 | サービス接続性と gateway 情報を確認 | `tier0 api /openapi/v1/info --body '{}' --json` |
+| 基本操作 | CLI と skills をアップグレード | `tier0 upgrade` と `tier0 skills update` |
+| UNS | path を参照 | `tier0 uns browse --path /` または `tier0 uns browse --path Plant/Line1 --json` |
 | UNS | キーワードで topic を検索 | `tier0 uns search --keyword temp --json` または `tier0 uns search --path-prefix Plant/Line1 --size 50 --json` |
 | UNS | 現在値を読み取り | `tier0 uns read Plant/Line1/Metric/Temperature --json` または `tier0 uns read --topic 'Plant/+/Metric/Temperature' --json` |
-| UNS | Write values | `tier0 uns write --topic Plant/Line1/Metric/Temperature --value '{"temperature":27.5}'` |
-| UNS | Query history | `tier0 uns history -t Plant/Line1/Metric/Temperature --start -1h --json` |
+| UNS | 値を書き込み | `tier0 uns write --topic Plant/Line1/Metric/Temperature --value '{"temperature":27.5}'` |
+| UNS | 履歴を照会 | `tier0 uns history -t Plant/Line1/Metric/Temperature --start -1h --json` |
 | UNS | path または topic を作成 | `tier0 uns create --topic Plant/Line1 --type path` または `tier0 uns create --file namespace.json --json` |
 | UNS | メタデータまたはフィールドを更新 | `tier0 uns update --path Plant/Line1/Metric/Temperature --description "Line 1 temperature" --update-mask description` |
-| UNS | Delete or restore nodes | `tier0 uns delete --path Plant/Line1/Metric/Temperature --yes` or `tier0 uns restore --path Plant/Line1/Metric/Temperature --yes` |
-| Node-RED Flow | List or inspect Flows | `tier0 flow list`, `tier0 flow list --source --json`, or `tier0 flow get --id 1 --json` |
+| UNS | node を削除または復元 | `tier0 uns delete --path Plant/Line1/Metric/Temperature --yes` または `tier0 uns restore --path Plant/Line1/Metric/Temperature --yes` |
+| Node-RED Flow | Flow を一覧表示または詳細確認 | `tier0 flow list`, `tier0 flow list --source --json`, または `tier0 flow get --id 1 --json` |
 | Node-RED Flow | Source Flow または Event Flow を作成 | `tier0 flow create --name "modbus-collector" --source --desc "Modbus TCP collector"` または `tier0 flow create --name "alert-handler" --event --desc "Temperature alarm processor"` |
-| Node-RED Flow | Update Flow metadata | `tier0 flow update --id 1 --name "line1-collector"` or `tier0 flow update --id 1 --favorite` |
-| Node-RED Flow | Export canvas JSON | `tier0 flow data --id 1 --out flows.json` |
-| Node-RED Flow | Deploy canvas JSON | `tier0 flow deploy --id 1 -f flows.json --yes` |
-| Node-RED Flow | Delete Flows | `tier0 flow delete --id 1 --yes` |
+| Node-RED Flow | Flow metadata を更新 | `tier0 flow update --id 1 --name "line1-collector"` または `tier0 flow update --id 1 --favorite` |
+| Node-RED Flow | canvas JSON をエクスポート | `tier0 flow data --id 1 --out flows.json` |
+| Node-RED Flow | canvas JSON をデプロイ | `tier0 flow deploy --id 1 -f flows.json --yes` |
+| Node-RED Flow | Flow を削除 | `tier0 flow delete --id 1 --yes` |
 | Node-RED Flow | 利用可能なノードタイプを確認 | `tier0 flow nodes --source --json` または `tier0 flow nodes --event --json` |

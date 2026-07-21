@@ -1,31 +1,31 @@
 ---
-title: Operations Runbook
-description: Daily inspection, failover, backup, restore, cleanup, and troubleshooting procedures for the standard Tier0 Enterprise deployment.
+title: Runbook de operaciones
+description: Procedimientos de inspección diaria, failover, backup, restore, limpieza y troubleshooting para el despliegue estándar de Tier0 Enterprise.
 sidebar:
   order: 6
 ---
 import { Steps } from '@astrojs/starlight/components';
 
-This document is based on the Enterprise New offline application.
+Este documento se basa en la aplicación offline Enterprise New.
 
-## Daily Inspection
+## Inspección diaria
 
 <Steps>
-1. Run the following commands from the deployment package root directory:
+1. Ejecuta los siguientes comandos desde el directorio raíz del paquete de despliegue:
     ```bash
     ./bin/verify.sh --site config/site.conf
     ./bin/smoke-business-emqx.sh --site config/site.conf
     ```
-2. Confirm the following items:
-    - The 3 Swarm nodes are `Ready`.
-    - `APP VIP /healthz` and `/readyz` return `200`.
-    - `DB VIP:5432` is accessible.
-    - The PostgreSQL primary, standby, and witness topology is normal.
+2. Confirma los siguientes elementos:
+    - Los 3 nodos Swarm están en estado `Ready`.
+    - `APP VIP /healthz` y `/readyz` devuelven `200`.
+    - `DB VIP:5432` es accesible.
+    - La topología PostgreSQL primary, standby y witness es normal.
     - `backend`, `redis`, `emqx`, `sourceflow`, `eventflow`, `marimo`, and `opcua-server` are all running on the active application node.
 </Steps>
-## Application Checks
+## Comprobaciones de aplicación
 <Steps>
-1. Run the following commands on the active application node:
+1. Ejecuta los siguientes comandos en el nodo de aplicación activo:
     ```bash
     cd /opt/tier0-enterprise/tier0-deploy
     bash bin/compose.sh ps
@@ -36,12 +36,12 @@ This document is based on the Enterprise New offline application.
     :::note
     No omitas `bin/compose.sh` ni ejecutes comandos `docker compose` sin envolver directamente. El script wrapper carga el entorno de runtime generado por el instalador.
     :::
-2. Health-check interpretation:
-    - `healthz` failure: check the backend process, image, and container logs first.
-    - `readyz` failure: also check DB VIP, Redis, and database migration logs.
+2. Interpretación de health-check:
+    - Fallo de `healthz`: revisa primero el proceso backend, la imagen y los logs del contenedor.
+    - Fallo de `readyz`: revisa también DB VIP, Redis y logs de migración de base de datos.
     - Página inicial accesible pero login no disponible: confirma `ADMIN_INITIAL_PASSWORD` en `.env`, luego revisa los logs de migración IAM del backend y las tablas de usuarios. No juzgues el éxito del despliegue solo por el puerto HTTP.
 </Steps>
-## Protocol Entry Checks
+## Comprobaciones de entrada de protocolo
 
 ```bash
 nc -vz <APP_VIP> 1883
@@ -53,9 +53,9 @@ nc -vz <APP_VIP> 4840
 :::note
 EMQX y OPC UA Server están fijados al nodo de aplicación activo. El failover de APP VIP solo garantiza la entrada HTTP `APP VIP:80`. Los puertos de protocolo no se enrutan mediante proxy TCP de HAProxy, por lo que este diseño no promete alta disponibilidad para entradas de protocolo.
 :::
-## Database Checks
+## Comprobaciones de base de datos
 
-Run the following on database nodes:
+Ejecuta lo siguiente en los nodos de base de datos:
 
 ```bash
 systemctl status tier0-postgresql
@@ -64,14 +64,14 @@ sudo -iu postgres psql -Atqc 'select pg_is_in_recovery();'
 sudo -iu postgres /usr/local/bin/repmgr -f /etc/repmgr.conf cluster show
 ```
 
-- `pg_is_in_recovery=false` means primary.
-- `pg_is_in_recovery=true` means standby.
-- DB VIP must only be located on the current primary.
+- `pg_is_in_recovery=false` significa primary.
+- `pg_is_in_recovery=true` significa standby.
+- DB VIP solo debe ubicarse en el primary actual.
 - Si la replicación standby se interrumpe o el witness reporta errores upstream, preserva primero el sitio. No vuelvas a ejecutar directamente el despliegue completo.
 
-## APP VIP Failover
+## Failover de APP VIP
 <Steps>
-1. Before testing, record the node that currently owns the VIP and verify:
+1. Antes de probar, registra el nodo que posee actualmente el VIP y verifica:
 
     ```bash
     curl -fsS http://<APP_VIP>/healthz
@@ -82,9 +82,9 @@ sudo -iu postgres /usr/local/bin/repmgr -f /etc/repmgr.conf cluster show
 
 3. Después de restaurar `keepalived`, ejecuta de nuevo `verify.sh` y smoke checks. No detengas contenedores de aplicación activos durante el simulacro.
 </Steps>
-## DB Primary Failure Switchover
+## Conmutación por fallo del DB Primary
 
-Before a failure drill, create a backup and confirm replication is healthy:
+Antes de un simulacro de fallo, crea un backup y confirma que la replication está sana:
 
 ```bash
 ./bin/backup-db.sh --site config/site.conf
@@ -95,7 +95,7 @@ Después de detener `tier0-postgresql` en el primary actual, observa cómo `repm
 - El primary anterior no debe iniciarse directamente de vuelta en la topología de producción. Primero detén PostgreSQL, repmgrd y keepalived; elimina cualquier DB VIP restante; después ejecuta basebackup desde el nuevo primary actual, registra el nodo como standby y finalmente reconecta el witness.
 - Después del failover, no vuelvas a ejecutar directamente el instalador completo. Las definiciones estáticas de primary/standby en el inventory pueden alterar la topología actual.
 :::
-## Backup and Restore
+## Backup y restore
 
 - Backup:
 
@@ -111,7 +111,7 @@ Después de detener `tier0-postgresql` en el primary actual, observa cómo `repm
 :::note
 Antes de restaurar, confirma el primary actual. Después de restaurar, ejecuta `verify.sh`, smoke checks y verificación real de login en la plataforma para la ruta de usuario predeterminado.
 :::
-## Cleanup and Retest
+## Limpieza y nueva prueba
 
 ```bash
 ./full-cleanup.sh --env install.env --yes
@@ -120,9 +120,9 @@ Antes de restaurar, confirma el primary actual. Después de restaurar, ejecuta `
 :::caution
 La limpieza completa elimina los datos de runtime de Tier0, los datos de Docker/Swarm y las copias de seguridad de base de datos en los 6 nodos. También realiza una limpieza final en el nodo de control después de que sale el contenedor de control. Usa esta entrada solo en entornos de prueba confirmados como descartables. Si se deben conservar datos del cliente o un sitio de incidente, usa el `--cleanup` normal y completa primero una copia de seguridad.
 :::
-## Common Issues
+## Problemas comunes
 
-### Backend Startup Failure
+### Fallo de arranque de Backend
 
 ```bash
 cd /opt/tier0-enterprise/tier0-deploy
@@ -130,18 +130,18 @@ bash bin/compose.sh logs --tail=300 backend
 bash bin/compose.sh ps
 ```
 :::note
-Focus on DB URL, DB VIP, Redis, migration, and mounted directory permissions.
+Concéntrate en DB URL, DB VIP, Redis, migration y permisos de directorios montados.
 :::
-### EMQX Startup Failure
+### Fallo de arranque de EMQX
 
 ```bash
 cd /opt/tier0-enterprise/tier0-deploy
 bash bin/compose.sh logs --tail=200 emqx
 ```
 :::note
-Check certificates, configuration files, volume permissions, and whether ports `1883/8883/8083/8084` are occupied.
+Comprueba certificados, archivos de configuración, permisos de volumen y si los puertos `1883/8883/8083/8084` están ocupados.
 :::
-### repmgrd Repeated Restarts
+### Reinicios repetidos de repmgrd
 
 ```bash
 systemctl status tier0-repmgrd
@@ -149,9 +149,9 @@ tail -100 /var/log/repmgr/repmgr.log
 sudo -iu postgres psql -Atqc 'show shared_preload_libraries;'
 ```
 :::note
-Confirm that `shared_preload_libraries` includes `repmgr`, and that the systemd unit uses `repmgrd --daemonize=false`.
+Confirma que `shared_preload_libraries` incluye `repmgr` y que la unidad systemd usa `repmgrd --daemonize=false`.
 :::
-### Material Verification Failure
+### Fallo de verificación de materiales
 
 ```bash
 ./bin/verify-materials.sh

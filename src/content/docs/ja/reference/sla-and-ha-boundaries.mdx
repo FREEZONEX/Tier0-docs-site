@@ -1,87 +1,87 @@
 ---
-title: SLA and High Availability Boundaries
-description: SLA recommendations, high availability boundaries, acceptance gates, drills, and hardening items for the standard Tier0 Enterprise deployment.
+title: SLA と高可用性の境界
+description: 標準 Tier0 Enterprise デプロイの SLA 推奨、高可用性境界、受け入れ条件、訓練、強化項目です。
 sidebar:
   order: 4
 ---
 
 このドキュメントは、3 台のアプリケーション / Swarm ノード、2 台の PostgreSQL HA ノード、1 台の witness ノードで構成される 6 VM 完全オフラインデプロイに適用されます。
 
-## Architecture Baseline
+## アーキテクチャ基準
 
-| Layer | Current Design | High Availability Boundary |
+| レイヤー | 現在の設計 | 高可用性の境界 |
 | --- | --- | --- |
 | アプリケーションランタイム | Enterprise New compose は固定の `tier0_app_active_node` 上で実行されます。 | `backend`、`redis`、`EMQX`、`SourceFlow`、`EventFlow`、`Marimo`、`OPC UA Server` はまだ自動マルチレプリカサービスではありません。 |
-| HTTP entry | Three application nodes run keepalived APP VIP + HAProxy. | The VIP can float. HAProxy forwards to the active node on `8088/TCP` and checks `/healthz`. |
+| HTTP 入口 | 3 台のアプリケーションノードで keepalived APP VIP + HAProxy を実行します。 | VIP は浮動できます。HAProxy はアクティブノードの `8088/TCP` に転送し、`/healthz` を確認します。 |
 | MQTT / OPC UA | EMQX は `1883/8883/8083/8084`、OPC UA は `4840` を使用します。 | これらはアクティブノードへ直接接続します。TCP VIP プロキシには含まれないため、プロトコル入口の HA は保証されません。 |
 | データベース | PostgreSQL / TimescaleDB ストリーミングレプリケーション + repmgr + witness + DB VIP。 | primary 障害時に standby を自動昇格できます。非同期レプリケーションは厳密なゼロ RPO を保証できません。 |
-| Backup and restore | `backup-db.sh` / `restore-db.sh`. | Provides recoverability, but it is not the same as online HA. |
+| バックアップと復元 | `backup-db.sh` / `restore-db.sh`。 | 復旧性を提供しますが、オンライン HA と同じではありません。 |
 
-## Recommended SLA
+## 推奨 SLA
 
-| Service Object | Recommended Statement | Constraints |
+| サービス対象 | 推奨表現 | 制約 |
 | --- | --- | --- |
 | プラットフォーム HTTP 入口 | 月間可用性 `99.5%` から開始します。 | VIP フェイルオーバーはアクティブアプリケーションノードの自動移行と同じではありません。 |
 | データベースアクセス | 運用目標：`RTO <= 2 minutes`。 | RPO はレプリケーション遅延に依存します。同じアーキテクチャでの過去フェイルオーバーテストは約 59-64 秒でした。 |
-| MQTT / OPC UA | No HA SLA is promised in the current design. | HAProxy TCP proxying, a separate VIP, or service clustering must be added first. |
+| MQTT / OPC UA | 現在の設計では HA SLA を約束しません。 | 先に HAProxy TCP proxy、専用 VIP、またはサービスクラスタリングを追加する必要があります。 |
 | バックアップと復元 | 毎日バックアップ。大きな変更前は必須。 | 復元時間はデータ量と現地 I/O に依存します。 |
 
 `99.9%` 以上を主張する前に、アプリケーションの自動移行またはマルチレプリカデプロイ、プロトコル入口の HA、監視アラート、復旧訓練を完了してください。計画中の機能を納品済み機能として記述しないでください。
 
-## Acceptance Gates
+## 受け入れ条件
 
-Each deployment or upgrade must satisfy at least the following:
+各デプロイまたはアップグレードでは、少なくとも以下を満たす必要があります。
 
-- `verify-materials.sh` passes, and the delivery package SHA256 checks pass.
-- The three Swarm nodes are `Ready`.
-- `APP VIP /healthz` and `/readyz` return `200`, and the home page and `/uns` are accessible.
-- The seven compose services on the active node are running.
-- `DB VIP:5432` is accessible, and the primary, standby, and witness topology is normal.
-- The default account can actually log in. Do not judge IAM initialization success only from ports, containers, or HTTP 200 responses.
-- Smoke checks for HTTP, EMQX ports, WebSocket/WSS, and OPC UA TCP pass.
+- `verify-materials.sh` が成功し、デリバリーパッケージの SHA256 チェックが通る。
+- 3 台の Swarm ノードが `Ready` である。
+- `APP VIP /healthz` と `/readyz` が `200` を返し、ホームページと `/uns` にアクセスできる。
+- アクティブノード上の 7 つの compose サービスが実行中である。
+- `DB VIP:5432` にアクセスでき、primary、standby、witness の topology が正常である。
+- デフォルトアカウントで実際にログインできる。ポート、コンテナ、HTTP 200 応答だけで IAM 初期化成功を判断しない。
+- HTTP、EMQX ポート、WebSocket/WSS、OPC UA TCP の smoke check が通る。
 
-## Inspection and Alerts
+## 点検とアラート
 
-Run the following every day:
+毎日以下を実行します。
 
 ```bash
 ./bin/verify.sh --site config/site.conf
 ./bin/smoke-business-emqx.sh --site config/site.conf
 ```
 
-Configure at least the following alerts:
+少なくとも以下のアラートを設定します。
 
-- APP VIP `/healthz` or `/readyz` failure.
-- DB VIP unreachable, no primary, split-brain risk, replication interruption, or replication lag above threshold.
-- keepalived, HAProxy, PostgreSQL, or repmgrd abnormal status.
-- Key containers such as `backend`, `redis`, and `EMQX` exit or restart frequently.
-- Data disk usage exceeds `80% / 90%`.
-- The latest backup failed or was not generated.
+- APP VIP `/healthz` または `/readyz` の失敗。
+- DB VIP 到達不可、primary 不在、split-brain リスク、レプリケーション中断、またはしきい値超過の遅延。
+- keepalived、HAProxy、PostgreSQL、repmgrd の異常状態。
+- `backend`、`redis`、`EMQX` などの重要コンテナの終了または頻繁な再起動。
+- データディスク使用率が `80% / 90%` を超過。
+- 最新バックアップが失敗、または生成されていない。
 
-## Drill Requirements
+## 訓練要件
 
-| Drill | Frequency | Verification Criteria |
+| 訓練 | 頻度 | 検証基準 |
 | --- | --- | --- |
-| APP VIP failover | Before delivery and quarterly. | After stopping keepalived on the current VIP node, `/healthz` and `/readyz` recover. |
-| DB primary failure | Before delivery and every six months. | The standby is promoted, DB VIP recovers, and the old primary is rebuilt as a standby. |
+| APP VIP failover | デリバリー前および四半期ごと。 | 現在の VIP ノードで keepalived を停止した後、`/healthz` と `/readyz` が復旧する。 |
+| DB primary 障害 | デリバリー前および半年ごと。 | standby が昇格し、DB VIP が復旧し、旧 primary が standby として再構築される。 |
 | データベース復元 | 毎月のサンプル確認、および大きな変更前。 | バックアップが復元可能であること。復元後に `verify`、スモークチェック、ログイン検証が通過すること。 |
-| Material verification | Every package build. | Source materials, package SHA, and unpacking verification pass. |
+| 資材検証 | すべてのパッケージビルド。 | source material、package SHA、展開検証が通る。 |
 
-## Incident Handling Principles
+## インシデント対応原則
 
-1. Confirm the impact scope first: HTTP, MQTT, OPC UA, database, and single-node impact.
-2. Prioritize restoring VIP, HAProxy, the active application, and the database primary.
-3. Preserve logs, data directories, and backups. Do not directly clean or overwrite the incident site.
+1. まず影響範囲を確認します。HTTP、MQTT、OPC UA、database、単一ノード影響を確認します。
+2. VIP、HAProxy、アクティブアプリケーション、database primary の復旧を優先します。
+3. ログ、データディレクトリ、バックアップを保全します。インシデント現場を直接削除または上書きしないでください。
 4. データベースインシデントでは、まず現在の primary を特定し、その後フェイルオーバー、再参加、復元のいずれを行うか判断します。
-5. After recovery, run `verify`, smoke checks, and actual login verification.
+5. 復旧後、`verify`、smoke check、実ログイン検証を実行します。
 
-## High-SLA Hardening Items
+## 高 SLA 向け強化項目
 
-- Make the application multi-replica, or establish a verifiable automatic migration process for the active node.
-- Cluster EMQX, or route it through HAProxy TCP / TLS with a dedicated VIP.
-- Provide a high-availability entry for OPC UA through HAProxy TCP, a dedicated VIP, or service clustering.
-- Use PostgreSQL synchronous replication, or define acceptable replication lag and RPO clearly.
-- Automate backup scheduling, off-site replication, and regular restore drills.
-- Connect containers, hosts, databases, logs, and black-box probes to unified alerting.
+- アプリケーションを multi-replica 化するか、アクティブノードの検証可能な自動移行プロセスを確立します。
+- EMQX をクラスタ化するか、専用 VIP と HAProxy TCP / TLS でルーティングします。
+- HAProxy TCP、専用 VIP、またはサービスクラスタリングで OPC UA の高可用入口を提供します。
+- PostgreSQL 同期レプリケーションを使用するか、許容できる replication lag と RPO を明確に定義します。
+- バックアップスケジュール、オフサイトレプリケーション、定期復元訓練を自動化します。
+- コンテナ、ホスト、データベース、ログ、black-box probe を統一アラートに接続します。
 
-Related procedures: [Operations Runbook](../operations-runbook/) and [Standard Port List](../standard-port-list/).
+関連手順: [運用 Runbook](../operations-runbook/) と [標準ポート一覧](../standard-port-list/)。

@@ -1,29 +1,29 @@
 ---
-title: Standard Port List
-description: 標準の 6 VM オフライン Tier0 Enterprise デプロイ向けファイアウォールポート一覧。
+title: 標準ポート一覧
+description: 標準的な 6 VM オフライン Tier0 Enterprise デプロイ向けのファイアウォールポート一覧。
 sidebar:
   order: 5
 ---
 
-次の表は Enterprise New の 6 VM オフラインデプロイに基づいています。顧客側ファイアウォールでは、必要最小限の送信元範囲からの通信のみを許可してください。これらのポートを公開インターネットへ直接公開しないでください。
+次の表は Enterprise New の 6 VM オフラインデプロイを前提にしています。顧客側ファイアウォールでは、必要最小限の送信元範囲からの通信のみを許可してください。これらのポートを公開インターネットへ直接公開しないでください。
 
-| Source | Target | Port | Protocol | Purpose |
+| 送信元 | 宛先 | ポート | プロトコル | 用途 |
 | --- | --- | ---: | --- | --- |
-| Control host | Six target VMs | 22 | TCP | SSH / Ansible |
-| Three application nodes, mutually | Three application nodes | 2377 | TCP | Docker Swarm management plane |
-| Three application nodes, mutually | Three application nodes | 7946 | TCP/UDP | Swarm node discovery |
-| Three application nodes, mutually | Three application nodes | 4789 | UDP | Swarm overlay |
-| Three application nodes | Active application node | 8088 | TCP | HAProxy to Enterprise New backend; application network segment only |
-| Business network segment | APP VIP | 80 | TCP | Platform HTTP entry, `/healthz`, `/readyz` |
-| Business network segment | APP VIP / active application node | 1883 | TCP | MQTT |
-| Business network segment | APP VIP / active application node | 8883 | TCP | MQTT TLS |
-| Business network segment | APP VIP / active application node | 8083 | TCP | MQTT WebSocket |
-| Business network segment | APP VIP / active application node | 8084 | TCP | MQTT WebSocket TLS |
-| Business network segment | APP VIP / active application node | 4840 | TCP | OPC UA Server |
-| Controlled application network segment | Active application node | 8089 | TCP | Launchpad |
-| Dynamic app access network segment | Active application node | 30000-30199 | TCP | App Gateway / dynamic application host ports |
-| Application nodes, DB nodes, and witness | DB VIP / DB nodes | 5432 | TCP | PostgreSQL / TimescaleDB |
-| DB1, DB2, and witness | DB1, DB2, and witness | 5432 | TCP | Streaming replication / repmgr |
-| Application nodes | NFS server | 2049 | TCP/UDP | Used when `NFS_ENABLED=true` |
+| 制御ホスト | 6 台の対象 VM | 22 | TCP | SSH / Ansible |
+| 3 台のアプリケーションノード相互 | 3 台のアプリケーションノード | 2377 | TCP | Docker Swarm 管理プレーン |
+| 3 台のアプリケーションノード相互 | 3 台のアプリケーションノード | 7946 | TCP/UDP | Swarm ノード検出 |
+| 3 台のアプリケーションノード相互 | 3 台のアプリケーションノード | 4789 | UDP | Swarm overlay |
+| 3 台のアプリケーションノード | アクティブなアプリケーションノード | 8088 | TCP | HAProxy から Enterprise New バックエンドへ。アプリケーションネットワークセグメントのみ |
+| ビジネスネットワークセグメント | APP VIP | 80 | TCP | プラットフォーム HTTP 入口、`/healthz`、`/readyz` |
+| ビジネスネットワークセグメント | APP VIP / アクティブなアプリケーションノード | 1883 | TCP | MQTT |
+| ビジネスネットワークセグメント | APP VIP / アクティブなアプリケーションノード | 8883 | TCP | MQTT TLS |
+| ビジネスネットワークセグメント | APP VIP / アクティブなアプリケーションノード | 8083 | TCP | MQTT WebSocket |
+| ビジネスネットワークセグメント | APP VIP / アクティブなアプリケーションノード | 8084 | TCP | MQTT WebSocket TLS |
+| ビジネスネットワークセグメント | APP VIP / アクティブなアプリケーションノード | 4840 | TCP | OPC UA Server |
+| 制御されたアプリケーションネットワークセグメント | アクティブなアプリケーションノード | 8089 | TCP | Launchpad |
+| 動的アプリケーションアクセスネットワークセグメント | アクティブなアプリケーションノード | 30000-30199 | TCP | App Gateway / 動的アプリケーションのホストポート |
+| アプリケーションノード、DB ノード、Witness | DB VIP / DB ノード | 5432 | TCP | PostgreSQL / TimescaleDB |
+| DB1、DB2、Witness | DB1、DB2、Witness | 5432 | TCP | Streaming replication / repmgr |
+| アプリケーションノード | NFS server | 2049 | TCP/UDP | `NFS_ENABLED=true` の場合に使用 |
 
-現在の compose デプロイでは、Redis、SourceFlow、EventFlow、Marimo、EMQX Dashboard は外部に公開されません。これらのサービスは Docker ランタイムネットワーク内で backend からのみ呼び出されます。
+現在の compose デプロイでは、Redis、SourceFlow、EventFlow、Marimo、EMQX Dashboard は外部に公開されません。これらのサービスは Docker runtime ネットワーク内の backend からのみ呼び出されます。

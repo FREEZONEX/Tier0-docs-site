@@ -1,31 +1,31 @@
 ---
-title: Operations Runbook
-description: Daily inspection, failover, backup, restore, cleanup, and troubleshooting procedures for the standard Tier0 Enterprise deployment.
+title: 運用 Runbook
+description: 標準 Tier0 Enterprise デプロイの毎日点検、failover、backup、restore、cleanup、troubleshooting 手順。
 sidebar:
   order: 6
 ---
 import { Steps } from '@astrojs/starlight/components';
 
-This document is based on the Enterprise New offline application.
+この文書は Enterprise New オフラインアプリケーションを前提にしています。
 
-## Daily Inspection
+## 毎日点検
 
 <Steps>
-1. Run the following commands from the deployment package root directory:
+1. デプロイパッケージのルートディレクトリで以下のコマンドを実行します。
     ```bash
     ./bin/verify.sh --site config/site.conf
     ./bin/smoke-business-emqx.sh --site config/site.conf
     ```
-2. Confirm the following items:
-    - The 3 Swarm nodes are `Ready`.
-    - `APP VIP /healthz` and `/readyz` return `200`.
-    - `DB VIP:5432` is accessible.
-    - The PostgreSQL primary, standby, and witness topology is normal.
+2. 以下の項目を確認します。
+    - 3 台の Swarm ノードが `Ready` である。
+    - `APP VIP /healthz` と `/readyz` が `200` を返す。
+    - `DB VIP:5432` にアクセスできる。
+    - PostgreSQL primary、standby、witness の topology が正常である。
     - `backend`, `redis`, `emqx`, `sourceflow`, `eventflow`, `marimo`, and `opcua-server` are all running on the active application node.
 </Steps>
-## Application Checks
+## アプリケーション確認
 <Steps>
-1. Run the following commands on the active application node:
+1. アクティブなアプリケーションノードで以下のコマンドを実行します。
     ```bash
     cd /opt/tier0-enterprise/tier0-deploy
     bash bin/compose.sh ps
@@ -36,12 +36,12 @@ This document is based on the Enterprise New offline application.
     :::note
     `bin/compose.sh` を迂回して生の `docker compose` コマンドを直接実行しないでください。このラッパースクリプトは、インストーラーが生成したランタイム環境を読み込みます。
     :::
-2. Health-check interpretation:
-    - `healthz` failure: check the backend process, image, and container logs first.
-    - `readyz` failure: also check DB VIP, Redis, and database migration logs.
+2. Health-check の解釈:
+    - `healthz` 失敗: まず backend process、image、container log を確認します。
+    - `readyz` 失敗: DB VIP、Redis、database migration log も確認します。
     - ホームページには到達できるがログインできない場合：`.env` の `ADMIN_INITIAL_PASSWORD` を確認し、その後 backend IAM migration ログとユーザーテーブルを確認します。HTTP ポートだけでデプロイ成功を判断しないでください。
 </Steps>
-## Protocol Entry Checks
+## プロトコル入口確認
 
 ```bash
 nc -vz <APP_VIP> 1883
@@ -53,9 +53,9 @@ nc -vz <APP_VIP> 4840
 :::note
 EMQX と OPC UA Server はアクティブなアプリケーションノードに固定されています。APP VIP フェイルオーバーが保証するのは `APP VIP:80` の HTTP 入口のみです。プロトコルポートは HAProxy TCP プロキシ経由でルーティングされないため、この設計ではプロトコル入口の高可用性を保証しません。
 :::
-## Database Checks
+## データベース確認
 
-Run the following on database nodes:
+データベースノードで以下を実行します。
 
 ```bash
 systemctl status tier0-postgresql
@@ -64,14 +64,14 @@ sudo -iu postgres psql -Atqc 'select pg_is_in_recovery();'
 sudo -iu postgres /usr/local/bin/repmgr -f /etc/repmgr.conf cluster show
 ```
 
-- `pg_is_in_recovery=false` means primary.
-- `pg_is_in_recovery=true` means standby.
-- DB VIP must only be located on the current primary.
+- `pg_is_in_recovery=false` は primary を意味します。
+- `pg_is_in_recovery=true` は standby を意味します。
+- DB VIP は現在の primary 上にのみ配置されている必要があります。
 - standby 複製が中断されたり witness が upstream エラーを報告した場合は、まず現場を保全してください。完全デプロイを直接再実行しないでください。
 
 ## APP VIP Failover
 <Steps>
-1. Before testing, record the node that currently owns the VIP and verify:
+1. テスト前に、現在 VIP を保持しているノードを記録し、確認します。
 
     ```bash
     curl -fsS http://<APP_VIP>/healthz
@@ -82,9 +82,9 @@ sudo -iu postgres /usr/local/bin/repmgr -f /etc/repmgr.conf cluster show
 
 3. `keepalived` を復元した後、`verify.sh` とスモークチェックを再度実行します。訓練中にアクティブなアプリケーションコンテナを停止しないでください。
 </Steps>
-## DB Primary Failure Switchover
+## DB Primary 障害切り替え
 
-Before a failure drill, create a backup and confirm replication is healthy:
+障害訓練の前に backup を作成し、replication が正常であることを確認します。
 
 ```bash
 ./bin/backup-db.sh --site config/site.conf
@@ -95,7 +95,7 @@ Before a failure drill, create a backup and confirm replication is healthy:
 - 旧 primary を本番トポロジーへ直接戻して起動してはいけません。まず PostgreSQL、repmgrd、keepalived を停止し、残っている DB VIP を削除します。その後、現在の新 primary から basebackup を実行し、ノードを standby として登録し、最後に witness を再接続します。
 - フェイルオーバー後に完全インストーラーを直接再実行しないでください。inventory 内の静的な primary/standby 定義が現在のトポロジーを乱す可能性があります。
 :::
-## Backup and Restore
+## Backup と Restore
 
 - Backup:
 
@@ -111,7 +111,7 @@ Before a failure drill, create a backup and confirm replication is healthy:
 :::note
 復元前に現在のプライマリを確認してください。復元後は `verify.sh`、スモークチェック、デフォルトユーザーパスでの実際のプラットフォームログイン検証を実行します。
 :::
-## Cleanup and Retest
+## Cleanup と再テスト
 
 ```bash
 ./full-cleanup.sh --env install.env --yes
@@ -120,9 +120,9 @@ Before a failure drill, create a backup and confirm replication is healthy:
 :::caution
 完全クリーンアップは、6 ノード上の Tier0 ランタイムデータ、Docker/Swarm データ、データベースバックアップを削除します。また、制御コンテナ終了後に制御ノードの最終クリーンアップも実行します。この入口は破棄可能と確認済みのテスト環境でのみ使用してください。顧客データや障害現場を保持する必要がある場合は、通常の `--cleanup` を使用し、先にバックアップを完了してください。
 :::
-## Common Issues
+## よくある問題
 
-### Backend Startup Failure
+### Backend 起動失敗
 
 ```bash
 cd /opt/tier0-enterprise/tier0-deploy
@@ -130,18 +130,18 @@ bash bin/compose.sh logs --tail=300 backend
 bash bin/compose.sh ps
 ```
 :::note
-Focus on DB URL, DB VIP, Redis, migration, and mounted directory permissions.
+DB URL、DB VIP、Redis、migration、mounted directory permission に注目してください。
 :::
-### EMQX Startup Failure
+### EMQX 起動失敗
 
 ```bash
 cd /opt/tier0-enterprise/tier0-deploy
 bash bin/compose.sh logs --tail=200 emqx
 ```
 :::note
-Check certificates, configuration files, volume permissions, and whether ports `1883/8883/8083/8084` are occupied.
+証明書、設定ファイル、volume permission、ポート `1883/8883/8083/8084` が占有されていないかを確認します。
 :::
-### repmgrd Repeated Restarts
+### repmgrd の繰り返し再起動
 
 ```bash
 systemctl status tier0-repmgrd
@@ -149,9 +149,9 @@ tail -100 /var/log/repmgr/repmgr.log
 sudo -iu postgres psql -Atqc 'show shared_preload_libraries;'
 ```
 :::note
-Confirm that `shared_preload_libraries` includes `repmgr`, and that the systemd unit uses `repmgrd --daemonize=false`.
+`shared_preload_libraries` に `repmgr` が含まれ、systemd unit が `repmgrd --daemonize=false` を使用していることを確認します。
 :::
-### Material Verification Failure
+### 資材検証失敗
 
 ```bash
 ./bin/verify-materials.sh

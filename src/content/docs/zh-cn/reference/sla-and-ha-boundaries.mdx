@@ -1,87 +1,87 @@
 ---
-title: SLA and High Availability Boundaries
-description: SLA recommendations, high availability boundaries, acceptance gates, drills, and hardening items for the standard Tier0 Enterprise deployment.
+title: SLA 与高可用边界
+description: 标准 Tier0 Enterprise 部署的 SLA 建议、高可用边界、验收门槛、演练和加固项。
 sidebar:
   order: 4
 ---
 
 本文档适用于六虚拟机全离线部署：三台应用 / Swarm 节点、两台 PostgreSQL 高可用节点和一台 witness 节点。
 
-## Architecture Baseline
+## 架构基线
 
-| Layer | Current Design | High Availability Boundary |
+| 层级 | 当前设计 | 高可用边界 |
 | --- | --- | --- |
 | 应用运行时 | Enterprise New compose 在固定的 `tier0_app_active_node` 上运行。 | `backend`、`redis`、`EMQX`、`SourceFlow`、`EventFlow`、`Marimo` 和 `OPC UA Server` 尚未自动多副本化。 |
-| HTTP entry | Three application nodes run keepalived APP VIP + HAProxy. | The VIP can float. HAProxy forwards to the active node on `8088/TCP` and checks `/healthz`. |
+| HTTP 入口 | 三台应用节点运行 keepalived APP VIP + HAProxy。 | VIP 可漂移。HAProxy 转发到活动节点的 `8088/TCP`，并检查 `/healthz`。 |
 | MQTT / OPC UA | EMQX 使用 `1883/8883/8083/8084`；OPC UA 使用 `4840`。 | 这些端口直接连接活动节点，不包含在 TCP VIP 代理中，因此不承诺协议入口高可用。 |
 | 数据库 | PostgreSQL / TimescaleDB 流复制 + repmgr + witness + DB VIP。 | primary 故障时 standby 可自动提升。异步复制不能承诺严格零 RPO。 |
-| Backup and restore | `backup-db.sh` / `restore-db.sh`. | Provides recoverability, but it is not the same as online HA. |
+| 备份与恢复 | `backup-db.sh` / `restore-db.sh`。 | 提供可恢复性，但不等同于在线高可用。 |
 
-## Recommended SLA
+## 推荐 SLA
 
-| Service Object | Recommended Statement | Constraints |
+| 服务对象 | 推荐表述 | 约束 |
 | --- | --- | --- |
 | 平台 HTTP 入口 | 从月可用性 `99.5%` 开始。 | VIP 故障切换不等同于活动应用节点自动迁移。 |
 | 数据库访问 | 运维目标：`RTO <= 2 minutes`。 | RPO 取决于复制延迟。同架构历史故障切换测试约为 59-64 秒。 |
-| MQTT / OPC UA | No HA SLA is promised in the current design. | HAProxy TCP proxying, a separate VIP, or service clustering must be added first. |
+| MQTT / OPC UA | 当前设计不承诺 HA SLA。 | 必须先增加 HAProxy TCP 代理、独立 VIP 或服务集群。 |
 | 备份与恢复 | 每日备份；重大变更前必须备份。 | 恢复时间取决于数据量和现场 I/O。 |
 
 在声明 `99.9%` 或更高可用性之前，需要完成应用自动迁移或多副本部署、协议入口高可用、监控告警和恢复演练。不要把规划能力描述为已交付能力。
 
-## Acceptance Gates
+## 验收门槛
 
-Each deployment or upgrade must satisfy at least the following:
+每次部署或升级至少需要满足以下条件：
 
-- `verify-materials.sh` passes, and the delivery package SHA256 checks pass.
-- The three Swarm nodes are `Ready`.
-- `APP VIP /healthz` and `/readyz` return `200`, and the home page and `/uns` are accessible.
-- The seven compose services on the active node are running.
-- `DB VIP:5432` is accessible, and the primary, standby, and witness topology is normal.
-- The default account can actually log in. Do not judge IAM initialization success only from ports, containers, or HTTP 200 responses.
-- Smoke checks for HTTP, EMQX ports, WebSocket/WSS, and OPC UA TCP pass.
+- `verify-materials.sh` 通过，交付包 SHA256 校验通过。
+- 三台 Swarm 节点均为 `Ready`。
+- `APP VIP /healthz` 和 `/readyz` 返回 `200`，首页和 `/uns` 可访问。
+- 活动节点上的七个 compose 服务正在运行。
+- `DB VIP:5432` 可访问，primary、standby 和 witness 拓扑正常。
+- 默认账号可以实际登录。不要只根据端口、容器或 HTTP 200 响应判断 IAM 初始化成功。
+- HTTP、EMQX 端口、WebSocket/WSS 和 OPC UA TCP 冒烟检查通过。
 
-## Inspection and Alerts
+## 巡检与告警
 
-Run the following every day:
+每天运行以下命令：
 
 ```bash
 ./bin/verify.sh --site config/site.conf
 ./bin/smoke-business-emqx.sh --site config/site.conf
 ```
 
-Configure at least the following alerts:
+至少配置以下告警：
 
-- APP VIP `/healthz` or `/readyz` failure.
-- DB VIP unreachable, no primary, split-brain risk, replication interruption, or replication lag above threshold.
-- keepalived, HAProxy, PostgreSQL, or repmgrd abnormal status.
-- Key containers such as `backend`, `redis`, and `EMQX` exit or restart frequently.
-- Data disk usage exceeds `80% / 90%`.
-- The latest backup failed or was not generated.
+- APP VIP `/healthz` 或 `/readyz` 失败。
+- DB VIP 不可达、无 primary、split-brain 风险、复制中断或复制延迟超过阈值。
+- keepalived、HAProxy、PostgreSQL 或 repmgrd 状态异常。
+- `backend`、`redis`、`EMQX` 等关键容器退出或频繁重启。
+- 数据盘使用率超过 `80% / 90%`。
+- 最新备份失败或未生成。
 
-## Drill Requirements
+## 演练要求
 
-| Drill | Frequency | Verification Criteria |
+| 演练 | 频率 | 验证标准 |
 | --- | --- | --- |
-| APP VIP failover | Before delivery and quarterly. | After stopping keepalived on the current VIP node, `/healthz` and `/readyz` recover. |
-| DB primary failure | Before delivery and every six months. | The standby is promoted, DB VIP recovers, and the old primary is rebuilt as a standby. |
+| APP VIP 故障切换 | 交付前和每季度。 | 停止当前 VIP 节点上的 keepalived 后，`/healthz` 和 `/readyz` 恢复。 |
+| DB primary 故障 | 交付前和每半年。 | standby 被提升，DB VIP 恢复，旧 primary 被重建为 standby。 |
 | 数据库恢复 | 每月抽样，并在重大变更前执行。 | 备份可恢复。恢复后 `verify`、冒烟检查和登录验证通过。 |
-| Material verification | Every package build. | Source materials, package SHA, and unpacking verification pass. |
+| 物料验证 | 每次打包构建。 | 源物料、包 SHA 和解包验证通过。 |
 
-## Incident Handling Principles
+## 事件处理原则
 
-1. Confirm the impact scope first: HTTP, MQTT, OPC UA, database, and single-node impact.
-2. Prioritize restoring VIP, HAProxy, the active application, and the database primary.
-3. Preserve logs, data directories, and backups. Do not directly clean or overwrite the incident site.
+1. 先确认影响范围：HTTP、MQTT、OPC UA、数据库以及单节点影响。
+2. 优先恢复 VIP、HAProxy、活动应用和数据库 primary。
+3. 保留日志、数据目录和备份。不要直接清理或覆盖事故现场。
 4. 对于数据库事件，先确定当前 primary，再决定故障切换、重新加入或恢复。
-5. After recovery, run `verify`, smoke checks, and actual login verification.
+5. 恢复后运行 `verify`、冒烟检查和实际登录验证。
 
-## High-SLA Hardening Items
+## 高 SLA 加固项
 
-- Make the application multi-replica, or establish a verifiable automatic migration process for the active node.
-- Cluster EMQX, or route it through HAProxy TCP / TLS with a dedicated VIP.
-- Provide a high-availability entry for OPC UA through HAProxy TCP, a dedicated VIP, or service clustering.
-- Use PostgreSQL synchronous replication, or define acceptable replication lag and RPO clearly.
-- Automate backup scheduling, off-site replication, and regular restore drills.
-- Connect containers, hosts, databases, logs, and black-box probes to unified alerting.
+- 将应用改为多副本，或建立可验证的活动节点自动迁移流程。
+- 将 EMQX 集群化，或通过 HAProxy TCP / TLS 和专用 VIP 路由。
+- 通过 HAProxy TCP、专用 VIP 或服务集群为 OPC UA 提供高可用入口。
+- 使用 PostgreSQL 同步复制，或明确可接受的复制延迟和 RPO。
+- 自动化备份计划、异地复制和定期恢复演练。
+- 将容器、主机、数据库、日志和黑盒探针接入统一告警。
 
-Related procedures: [Operations Runbook](../operations-runbook/) and [Standard Port List](../standard-port-list/).
+相关流程：[运维 Runbook](../operations-runbook/) 和 [标准端口清单](../standard-port-list/)。

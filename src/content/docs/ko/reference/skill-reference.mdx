@@ -1,33 +1,33 @@
 ---
-title: Skill Reference
-description: CLI and agent skill command reference.
+title: Skill 레퍼런스
+description: CLI 및 agent skill 명령 reference입니다.
 sidebar:
   order: 2
 ---
 
-이 페이지는 문서와 PDF 내보내기에 포함됩니다. standalone web reference도 여기에서 사용할 수 있습니다.
+이 페이지는 문서와 PDF 내보내기에 포함됩니다. 독립 web reference도 여기에서 사용할 수 있습니다.
 
-[Open Tier0 Skill Reference](../tier0-skill/)
+[Tier0 Skill Reference 열기](../tier0-skill/)
 
 ## 명령
 
-| Target | Task | Commands |
+| 대상 | 작업 | 명령 |
 |---|---|---|
-| Basic operations | Check CLI and service health | `tier0 doctor` |
+| 기본 작업 | CLI 및 서비스 상태 확인 | `tier0 doctor` |
 | Basic operations | 서비스 연결성과 gateway 정보를 확인합니다 | `tier0 api /openapi/v1/info --body '{}' --json` |
-| Basic operations | Upgrade CLI and skills | `tier0 upgrade` and `tier0 skills update` |
-| UNS | Browse paths | `tier0 uns browse --path /` or `tier0 uns browse --path Plant/Line1 --json` |
+| 기본 작업 | CLI 및 skills 업그레이드 | `tier0 upgrade` 및 `tier0 skills update` |
+| UNS | path 탐색 | `tier0 uns browse --path /` 또는 `tier0 uns browse --path Plant/Line1 --json` |
 | UNS | 키워드로 topic 검색 | `tier0 uns search --keyword temp --json` 또는 `tier0 uns search --path-prefix Plant/Line1 --size 50 --json` |
 | UNS | 현재 값 읽기 | `tier0 uns read Plant/Line1/Metric/Temperature --json` 또는 `tier0 uns read --topic 'Plant/+/Metric/Temperature' --json` |
-| UNS | Write values | `tier0 uns write --topic Plant/Line1/Metric/Temperature --value '{"temperature":27.5}'` |
-| UNS | Query history | `tier0 uns history -t Plant/Line1/Metric/Temperature --start -1h --json` |
+| UNS | 값 쓰기 | `tier0 uns write --topic Plant/Line1/Metric/Temperature --value '{"temperature":27.5}'` |
+| UNS | 이력 조회 | `tier0 uns history -t Plant/Line1/Metric/Temperature --start -1h --json` |
 | UNS | path 또는 topic 생성 | `tier0 uns create --topic Plant/Line1 --type path` 또는 `tier0 uns create --file namespace.json --json` |
 | UNS | metadata 또는 field 업데이트 | `tier0 uns update --path Plant/Line1/Metric/Temperature --description "Line 1 temperature" --update-mask description` |
 | UNS | 노드를 삭제하거나 복원합니다 | `tier0 uns delete --path Plant/Line1/Metric/Temperature --yes` 또는 `tier0 uns restore --path Plant/Line1/Metric/Temperature --yes` |
 | Node-RED Flow | Flow 목록을 보거나 상세 정보를 확인합니다 | `tier0 flow list`, `tier0 flow list --source --json`, 또는 `tier0 flow get --id 1 --json` |
 | Node-RED Flow | Source Flow 또는 Event Flow를 생성합니다 | `tier0 flow create --name "modbus-collector" --source --desc "Modbus TCP collector"` 또는 `tier0 flow create --name "alert-handler" --event --desc "Temperature alarm processor"` |
-| Node-RED Flow | Update Flow metadata | `tier0 flow update --id 1 --name "line1-collector"` or `tier0 flow update --id 1 --favorite` |
-| Node-RED Flow | Export canvas JSON | `tier0 flow data --id 1 --out flows.json` |
-| Node-RED Flow | Deploy canvas JSON | `tier0 flow deploy --id 1 -f flows.json --yes` |
-| Node-RED Flow | Delete Flows | `tier0 flow delete --id 1 --yes` |
+| Node-RED Flow | Flow metadata 업데이트 | `tier0 flow update --id 1 --name "line1-collector"` 또는 `tier0 flow update --id 1 --favorite` |
+| Node-RED Flow | canvas JSON 내보내기 | `tier0 flow data --id 1 --out flows.json` |
+| Node-RED Flow | canvas JSON 배포 | `tier0 flow deploy --id 1 -f flows.json --yes` |
+| Node-RED Flow | Flow 삭제 | `tier0 flow delete --id 1 --yes` |
 | Node-RED Flow | 사용 가능한 node type 확인 | `tier0 flow nodes --source --json` 또는 `tier0 flow nodes --event --json` |

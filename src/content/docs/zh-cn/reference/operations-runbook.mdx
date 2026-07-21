@@ -1,31 +1,31 @@
 ---
-title: Operations Runbook
-description: Daily inspection, failover, backup, restore, cleanup, and troubleshooting procedures for the standard Tier0 Enterprise deployment.
+title: 运维 Runbook
+description: 标准 Tier0 Enterprise 部署的日常巡检、故障切换、备份、恢复、清理和故障排查流程。
 sidebar:
   order: 6
 ---
 import { Steps } from '@astrojs/starlight/components';
 
-This document is based on the Enterprise New offline application.
+本文档基于 Enterprise New 离线应用。
 
-## Daily Inspection
+## 日常巡检
 
 <Steps>
-1. Run the following commands from the deployment package root directory:
+1. 在部署包根目录运行以下命令：
     ```bash
     ./bin/verify.sh --site config/site.conf
     ./bin/smoke-business-emqx.sh --site config/site.conf
     ```
-2. Confirm the following items:
-    - The 3 Swarm nodes are `Ready`.
-    - `APP VIP /healthz` and `/readyz` return `200`.
-    - `DB VIP:5432` is accessible.
-    - The PostgreSQL primary, standby, and witness topology is normal.
+2. 确认以下项目：
+    - 3 台 Swarm 节点均为 `Ready`。
+    - `APP VIP /healthz` 和 `/readyz` 返回 `200`。
+    - `DB VIP:5432` 可访问。
+    - PostgreSQL primary、standby 和 witness 拓扑正常。
     - `backend`, `redis`, `emqx`, `sourceflow`, `eventflow`, `marimo`, and `opcua-server` are all running on the active application node.
 </Steps>
-## Application Checks
+## 应用检查
 <Steps>
-1. Run the following commands on the active application node:
+1. 在活动应用节点运行以下命令：
     ```bash
     cd /opt/tier0-enterprise/tier0-deploy
     bash bin/compose.sh ps
@@ -36,12 +36,12 @@ This document is based on the Enterprise New offline application.
     :::note
     不要绕过 `bin/compose.sh` 直接运行原始 `docker compose` 命令。该封装脚本会加载安装器生成的运行环境。
     :::
-2. Health-check interpretation:
-    - `healthz` failure: check the backend process, image, and container logs first.
-    - `readyz` failure: also check DB VIP, Redis, and database migration logs.
+2. 健康检查解读：
+    - `healthz` 失败：先检查 backend 进程、镜像和容器日志。
+    - `readyz` 失败：还需要检查 DB VIP、Redis 和数据库迁移日志。
     - 首页可访问但无法登录：先确认 `.env` 中的 `ADMIN_INITIAL_PASSWORD`，再检查 backend IAM migration 日志和用户表。不要只根据 HTTP 端口判断部署成功。
 </Steps>
-## Protocol Entry Checks
+## 协议入口检查
 
 ```bash
 nc -vz <APP_VIP> 1883
@@ -53,9 +53,9 @@ nc -vz <APP_VIP> 4840
 :::note
 EMQX 和 OPC UA Server 固定在活动应用节点上。APP VIP 故障切换只保证 `APP VIP:80` HTTP 入口。协议端口没有通过 HAProxy TCP 代理路由，因此该设计不承诺协议入口高可用。
 :::
-## Database Checks
+## 数据库检查
 
-Run the following on database nodes:
+在数据库节点运行以下命令：
 
 ```bash
 systemctl status tier0-postgresql
@@ -64,14 +64,14 @@ sudo -iu postgres psql -Atqc 'select pg_is_in_recovery();'
 sudo -iu postgres /usr/local/bin/repmgr -f /etc/repmgr.conf cluster show
 ```
 
-- `pg_is_in_recovery=false` means primary.
-- `pg_is_in_recovery=true` means standby.
-- DB VIP must only be located on the current primary.
+- `pg_is_in_recovery=false` 表示 primary。
+- `pg_is_in_recovery=true` 表示 standby。
+- DB VIP 必须只位于当前 primary 上。
 - 如果 standby 复制中断或 witness 报告上游错误，先保留现场，不要直接重新运行完整部署。
 
-## APP VIP Failover
+## APP VIP 故障切换
 <Steps>
-1. Before testing, record the node that currently owns the VIP and verify:
+1. 测试前，记录当前持有 VIP 的节点并验证：
 
     ```bash
     curl -fsS http://<APP_VIP>/healthz
@@ -82,9 +82,9 @@ sudo -iu postgres /usr/local/bin/repmgr -f /etc/repmgr.conf cluster show
 
 3. 恢复 `keepalived` 后，再次运行 `verify.sh` 和冒烟检查。演练期间不要停止活动应用容器。
 </Steps>
-## DB Primary Failure Switchover
+## DB Primary 故障切换
 
-Before a failure drill, create a backup and confirm replication is healthy:
+故障演练前，先创建备份并确认复制健康：
 
 ```bash
 ./bin/backup-db.sh --site config/site.conf
@@ -95,15 +95,15 @@ Before a failure drill, create a backup and confirm replication is healthy:
 - 旧主库不能直接启动回生产拓扑。先停止 PostgreSQL、repmgrd 和 keepalived，移除残留 DB VIP；然后从当前新主库执行 basebackup，将该节点注册为 standby，最后重新连接 witness。
 - 故障切换后，不要直接重新运行完整安装器。inventory 中静态的主备定义可能扰乱当前拓扑。
 :::
-## Backup and Restore
+## 备份与恢复
 
-- Backup:
+- 备份：
 
     ```bash
     ./bin/backup-db.sh --site config/site.conf
     ```
 
-- Restore:
+- 恢复：
 
     ```bash
     ./bin/restore-db.sh --site config/site.conf --restore-file /backup/tier0-db/postgres-YYYYmmddTHHMMSS.dump
@@ -111,7 +111,7 @@ Before a failure drill, create a backup and confirm replication is healthy:
 :::note
 恢复前先确认当前主库。恢复后运行 `verify.sh`、冒烟检查，并对默认用户路径执行实际平台登录验证。
 :::
-## Cleanup and Retest
+## 清理与重新测试
 
 ```bash
 ./full-cleanup.sh --env install.env --yes
@@ -120,9 +120,9 @@ Before a failure drill, create a backup and confirm replication is healthy:
 :::caution
 完整清理会删除 6 个节点上的 Tier0 运行数据、Docker/Swarm 数据和数据库备份，并在控制容器退出后对控制节点执行最终清理。该入口仅用于确认可丢弃的测试环境。如果需要保留客户数据或故障现场，请使用普通 `--cleanup` 并先完成备份。
 :::
-## Common Issues
+## 常见问题
 
-### Backend Startup Failure
+### Backend 启动失败
 
 ```bash
 cd /opt/tier0-enterprise/tier0-deploy
@@ -130,18 +130,18 @@ bash bin/compose.sh logs --tail=300 backend
 bash bin/compose.sh ps
 ```
 :::note
-Focus on DB URL, DB VIP, Redis, migration, and mounted directory permissions.
+重点检查 DB URL、DB VIP、Redis、migration 和挂载目录权限。
 :::
-### EMQX Startup Failure
+### EMQX 启动失败
 
 ```bash
 cd /opt/tier0-enterprise/tier0-deploy
 bash bin/compose.sh logs --tail=200 emqx
 ```
 :::note
-Check certificates, configuration files, volume permissions, and whether ports `1883/8883/8083/8084` are occupied.
+检查证书、配置文件、卷权限，以及端口 `1883/8883/8083/8084` 是否被占用。
 :::
-### repmgrd Repeated Restarts
+### repmgrd 反复重启
 
 ```bash
 systemctl status tier0-repmgrd
@@ -149,9 +149,9 @@ tail -100 /var/log/repmgr/repmgr.log
 sudo -iu postgres psql -Atqc 'show shared_preload_libraries;'
 ```
 :::note
-Confirm that `shared_preload_libraries` includes `repmgr`, and that the systemd unit uses `repmgrd --daemonize=false`.
+确认 `shared_preload_libraries` 包含 `repmgr`，且 systemd unit 使用 `repmgrd --daemonize=false`。
 :::
-### Material Verification Failure
+### 物料验证失败
 
 ```bash
 ./bin/verify-materials.sh

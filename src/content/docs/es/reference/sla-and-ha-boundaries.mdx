@@ -1,87 +1,87 @@
 ---
-title: SLA and High Availability Boundaries
-description: SLA recommendations, high availability boundaries, acceptance gates, drills, and hardening items for the standard Tier0 Enterprise deployment.
+title: SLA y límites de alta disponibilidad
+description: Recomendaciones de SLA, límites de alta disponibilidad, criterios de aceptación, simulacros y elementos de refuerzo para el despliegue estándar de Tier0 Enterprise.
 sidebar:
   order: 4
 ---
 
 Este documento aplica al despliegue completamente offline de seis VM: tres nodos de aplicación / Swarm, dos nodos HA de PostgreSQL y un nodo witness.
 
-## Architecture Baseline
+## Línea base de arquitectura
 
-| Layer | Current Design | High Availability Boundary |
+| Capa | Diseño actual | Límite de alta disponibilidad |
 | --- | --- | --- |
 | Runtime de aplicación | Enterprise New compose se ejecuta en el `tier0_app_active_node` fijo. | `backend`, `redis`, `EMQX`, `SourceFlow`, `EventFlow`, `Marimo` y `OPC UA Server` todavía no son servicios multi-réplica automáticos. |
-| HTTP entry | Three application nodes run keepalived APP VIP + HAProxy. | The VIP can float. HAProxy forwards to the active node on `8088/TCP` and checks `/healthz`. |
+| Entrada HTTP | Tres nodos de aplicación ejecutan keepalived APP VIP + HAProxy. | El VIP puede flotar. HAProxy reenvía al nodo activo en `8088/TCP` y comprueba `/healthz`. |
 | MQTT / OPC UA | EMQX usa `1883/8883/8083/8084`; OPC UA usa `4840`. | Se conectan directamente al nodo activo. No están incluidos en proxy TCP VIP, por lo que no se promete HA para entradas de protocolo. |
 | Base de datos | Replicación streaming PostgreSQL / TimescaleDB + repmgr + witness + DB VIP. | Si falla el primary, el standby puede promoverse automáticamente. La replicación asíncrona no puede prometer RPO cero estricto. |
-| Backup and restore | `backup-db.sh` / `restore-db.sh`. | Provides recoverability, but it is not the same as online HA. |
+| Backup y restore | `backup-db.sh` / `restore-db.sh`. | Proporciona recuperabilidad, pero no equivale a HA online. |
 
-## Recommended SLA
+## SLA recomendado
 
-| Service Object | Recommended Statement | Constraints |
+| Objeto de servicio | Declaración recomendada | Restricciones |
 | --- | --- | --- |
 | Entrada HTTP de plataforma | Comienza desde disponibilidad mensual de `99.5%`. | El failover de VIP no es lo mismo que migración automática del nodo de aplicación activo. |
 | Acceso a base de datos | Objetivo operativo: `RTO <= 2 minutes`. | El RPO depende del retraso de replicación. Pruebas históricas de failover en la misma arquitectura fueron de unos 59-64 segundos. |
-| MQTT / OPC UA | No HA SLA is promised in the current design. | HAProxy TCP proxying, a separate VIP, or service clustering must be added first. |
+| MQTT / OPC UA | El diseño actual no promete SLA de HA. | Primero se debe añadir proxy TCP con HAProxy, un VIP separado o clustering del servicio. |
 | Backup y restauración | Backups diarios; backup obligatorio antes de cambios mayores. | El tiempo de restauración depende del volumen de datos y del I/O en sitio. |
 
 Antes de declarar `99.9%` o más, completa la migración automática de la aplicación o el despliegue multi-réplica, la HA de entradas de protocolo, las alertas de monitoreo y los simulacros de recuperación. No describas capacidades planificadas como capacidades ya entregadas.
 
-## Acceptance Gates
+## Criterios de aceptación
 
-Each deployment or upgrade must satisfy at least the following:
+Cada despliegue o actualización debe cumplir al menos lo siguiente:
 
-- `verify-materials.sh` passes, and the delivery package SHA256 checks pass.
-- The three Swarm nodes are `Ready`.
-- `APP VIP /healthz` and `/readyz` return `200`, and the home page and `/uns` are accessible.
-- The seven compose services on the active node are running.
-- `DB VIP:5432` is accessible, and the primary, standby, and witness topology is normal.
-- The default account can actually log in. Do not judge IAM initialization success only from ports, containers, or HTTP 200 responses.
-- Smoke checks for HTTP, EMQX ports, WebSocket/WSS, and OPC UA TCP pass.
+- `verify-materials.sh` pasa y las comprobaciones SHA256 del paquete de entrega pasan.
+- Los tres nodos Swarm están en estado `Ready`.
+- `APP VIP /healthz` y `/readyz` devuelven `200`, y la página de inicio y `/uns` son accesibles.
+- Los siete servicios compose del nodo activo están en ejecución.
+- `DB VIP:5432` es accesible y la topología primary, standby y witness es normal.
+- La cuenta predeterminada puede iniciar sesión realmente. No evalúes la inicialización de IAM solo por puertos, contenedores o respuestas HTTP 200.
+- Pasan las pruebas smoke de HTTP, puertos EMQX, WebSocket/WSS y OPC UA TCP.
 
-## Inspection and Alerts
+## Inspección y alertas
 
-Run the following every day:
+Ejecuta lo siguiente todos los días:
 
 ```bash
 ./bin/verify.sh --site config/site.conf
 ./bin/smoke-business-emqx.sh --site config/site.conf
 ```
 
-Configure at least the following alerts:
+Configura al menos las siguientes alertas:
 
-- APP VIP `/healthz` or `/readyz` failure.
-- DB VIP unreachable, no primary, split-brain risk, replication interruption, or replication lag above threshold.
-- keepalived, HAProxy, PostgreSQL, or repmgrd abnormal status.
-- Key containers such as `backend`, `redis`, and `EMQX` exit or restart frequently.
-- Data disk usage exceeds `80% / 90%`.
-- The latest backup failed or was not generated.
+- Fallo de APP VIP `/healthz` o `/readyz`.
+- DB VIP inaccesible, sin primary, riesgo de split-brain, interrupción de replication o lag por encima del umbral.
+- Estado anormal de keepalived, HAProxy, PostgreSQL o repmgrd.
+- Contenedores clave como `backend`, `redis` y `EMQX` salen o se reinician con frecuencia.
+- El uso del disco de datos supera `80% / 90%`.
+- El backup más reciente falló o no se generó.
 
-## Drill Requirements
+## Requisitos de simulacro
 
-| Drill | Frequency | Verification Criteria |
+| Simulacro | Frecuencia | Criterios de verificación |
 | --- | --- | --- |
-| APP VIP failover | Before delivery and quarterly. | After stopping keepalived on the current VIP node, `/healthz` and `/readyz` recover. |
-| DB primary failure | Before delivery and every six months. | The standby is promoted, DB VIP recovers, and the old primary is rebuilt as a standby. |
+| Failover de APP VIP | Antes de la entrega y trimestralmente. | Tras detener keepalived en el nodo VIP actual, `/healthz` y `/readyz` se recuperan. |
+| Fallo de DB primary | Antes de la entrega y cada seis meses. | El standby se promociona, DB VIP se recupera y el antiguo primary se reconstruye como standby. |
 | Restauración de base de datos | Muestra mensual y antes de cambios mayores. | El backup es restaurable. Después de restaurar, pasan `verify`, smoke checks y verificación de login. |
-| Material verification | Every package build. | Source materials, package SHA, and unpacking verification pass. |
+| Verificación de materiales | Cada build de paquete. | Pasan los materiales fuente, SHA del paquete y verificación de desempaquetado. |
 
-## Incident Handling Principles
+## Principios de gestión de incidentes
 
-1. Confirm the impact scope first: HTTP, MQTT, OPC UA, database, and single-node impact.
-2. Prioritize restoring VIP, HAProxy, the active application, and the database primary.
-3. Preserve logs, data directories, and backups. Do not directly clean or overwrite the incident site.
+1. Confirma primero el alcance del impacto: HTTP, MQTT, OPC UA, base de datos e impacto de nodo único.
+2. Prioriza restaurar VIP, HAProxy, la aplicación activa y el database primary.
+3. Conserva logs, directorios de datos y backups. No limpies ni sobrescribas directamente el sitio del incidente.
 4. Para incidentes de base de datos, determina primero el primary actual y luego decide si hacer failover, reincorporar o restaurar.
-5. After recovery, run `verify`, smoke checks, and actual login verification.
+5. Después de la recuperación, ejecuta `verify`, smoke checks y verificación real de login.
 
-## High-SLA Hardening Items
+## Elementos de refuerzo para SLA alto
 
-- Make the application multi-replica, or establish a verifiable automatic migration process for the active node.
-- Cluster EMQX, or route it through HAProxy TCP / TLS with a dedicated VIP.
-- Provide a high-availability entry for OPC UA through HAProxy TCP, a dedicated VIP, or service clustering.
-- Use PostgreSQL synchronous replication, or define acceptable replication lag and RPO clearly.
-- Automate backup scheduling, off-site replication, and regular restore drills.
-- Connect containers, hosts, databases, logs, and black-box probes to unified alerting.
+- Convierte la aplicación en multi-replica o establece un proceso verificable de migración automática del nodo activo.
+- Crea un cluster EMQX o enrútalo mediante HAProxy TCP / TLS con un VIP dedicado.
+- Proporciona una entrada de alta disponibilidad para OPC UA mediante HAProxy TCP, un VIP dedicado o clustering del servicio.
+- Usa replication síncrona de PostgreSQL o define claramente el lag de replication y RPO aceptables.
+- Automatiza la programación de backups, replication fuera del sitio y simulacros regulares de restore.
+- Conecta contenedores, hosts, bases de datos, logs y probes black-box a alertas unificadas.
 
-Related procedures: [Operations Runbook](../operations-runbook/) and [Standard Port List](../standard-port-list/).
+Procedimientos relacionados: [Runbook de operaciones](../operations-runbook/) y [Lista estándar de puertos](../standard-port-list/).

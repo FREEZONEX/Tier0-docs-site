@@ -1,5 +1,5 @@
 ---
-title: Standard Port List
+title: 标准端口清单
 description: 标准六虚拟机离线 Tier0 Enterprise 部署的防火墙端口清单。
 sidebar:
   order: 5
@@ -7,23 +7,23 @@ sidebar:
 
 下表基于 Enterprise New 六虚拟机离线部署。客户防火墙应只允许来自最小必要源网段的流量，不要将这些端口直接暴露到公网。
 
-| Source | Target | Port | Protocol | Purpose |
+| 来源 | 目标 | 端口 | 协议 | 用途 |
 | --- | --- | ---: | --- | --- |
-| Control host | Six target VMs | 22 | TCP | SSH / Ansible |
-| Three application nodes, mutually | Three application nodes | 2377 | TCP | Docker Swarm management plane |
-| Three application nodes, mutually | Three application nodes | 7946 | TCP/UDP | Swarm node discovery |
-| Three application nodes, mutually | Three application nodes | 4789 | UDP | Swarm overlay |
-| Three application nodes | Active application node | 8088 | TCP | HAProxy to Enterprise New backend; application network segment only |
-| Business network segment | APP VIP | 80 | TCP | Platform HTTP entry, `/healthz`, `/readyz` |
-| Business network segment | APP VIP / active application node | 1883 | TCP | MQTT |
-| Business network segment | APP VIP / active application node | 8883 | TCP | MQTT TLS |
-| Business network segment | APP VIP / active application node | 8083 | TCP | MQTT WebSocket |
-| Business network segment | APP VIP / active application node | 8084 | TCP | MQTT WebSocket TLS |
-| Business network segment | APP VIP / active application node | 4840 | TCP | OPC UA Server |
-| Controlled application network segment | Active application node | 8089 | TCP | Launchpad |
-| Dynamic app access network segment | Active application node | 30000-30199 | TCP | App Gateway / dynamic application host ports |
-| Application nodes, DB nodes, and witness | DB VIP / DB nodes | 5432 | TCP | PostgreSQL / TimescaleDB |
-| DB1, DB2, and witness | DB1, DB2, and witness | 5432 | TCP | Streaming replication / repmgr |
-| Application nodes | NFS server | 2049 | TCP/UDP | Used when `NFS_ENABLED=true` |
+| 控制主机 | 六台目标 VM | 22 | TCP | SSH / Ansible |
+| 三台应用节点互通 | 三台应用节点 | 2377 | TCP | Docker Swarm 管理平面 |
+| 三台应用节点互通 | 三台应用节点 | 7946 | TCP/UDP | Swarm 节点发现 |
+| 三台应用节点互通 | 三台应用节点 | 4789 | UDP | Swarm overlay 网络 |
+| 三台应用节点 | 活动应用节点 | 8088 | TCP | HAProxy 转发到 Enterprise New 后端；仅限应用网段 |
+| 业务网段 | APP VIP | 80 | TCP | 平台 HTTP 入口、`/healthz`、`/readyz` |
+| 业务网段 | APP VIP / 活动应用节点 | 1883 | TCP | MQTT |
+| 业务网段 | APP VIP / 活动应用节点 | 8883 | TCP | MQTT TLS |
+| 业务网段 | APP VIP / 活动应用节点 | 8083 | TCP | MQTT WebSocket |
+| 业务网段 | APP VIP / 活动应用节点 | 8084 | TCP | MQTT WebSocket TLS |
+| 业务网段 | APP VIP / 活动应用节点 | 4840 | TCP | OPC UA Server |
+| 受控应用网段 | 活动应用节点 | 8089 | TCP | Launchpad |
+| 动态应用访问网段 | 活动应用节点 | 30000-30199 | TCP | App Gateway / 动态应用主机端口 |
+| 应用节点、DB 节点和 Witness | DB VIP / DB 节点 | 5432 | TCP | PostgreSQL / TimescaleDB |
+| DB1、DB2 和 Witness | DB1、DB2 和 Witness | 5432 | TCP | Streaming replication / repmgr |
+| 应用节点 | NFS server | 2049 | TCP/UDP | `NFS_ENABLED=true` 时使用 |
 
-当前 compose 部署不会对外暴露 Redis、SourceFlow、EventFlow、Marimo 或 EMQX Dashboard。这些服务仅由 Docker 运行网络内的 backend 调用。
+当前 compose 部署不会对外暴露 Redis、SourceFlow、EventFlow、Marimo 或 EMQX Dashboard。这些服务只由 Docker runtime 网络内的后端调用。

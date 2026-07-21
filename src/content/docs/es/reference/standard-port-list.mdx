@@ -1,5 +1,5 @@
 ---
-title: Standard Port List
+title: Lista estándar de puertos
 description: Lista de puertos de firewall para el despliegue offline estándar de Tier0 Enterprise con seis VM.
 sidebar:
   order: 5
@@ -7,23 +7,23 @@ sidebar:
 
 La siguiente tabla se basa en el despliegue offline Enterprise New de seis VM. Los firewalls del cliente deben permitir tráfico solo desde los rangos de origen mínimos necesarios. No expongas estos puertos directamente a internet público.
 
-| Source | Target | Port | Protocol | Purpose |
+| Origen | Destino | Puerto | Protocolo | Propósito |
 | --- | --- | ---: | --- | --- |
-| Control host | Six target VMs | 22 | TCP | SSH / Ansible |
-| Three application nodes, mutually | Three application nodes | 2377 | TCP | Docker Swarm management plane |
-| Three application nodes, mutually | Three application nodes | 7946 | TCP/UDP | Swarm node discovery |
-| Three application nodes, mutually | Three application nodes | 4789 | UDP | Swarm overlay |
-| Three application nodes | Active application node | 8088 | TCP | HAProxy to Enterprise New backend; application network segment only |
-| Business network segment | APP VIP | 80 | TCP | Platform HTTP entry, `/healthz`, `/readyz` |
-| Business network segment | APP VIP / active application node | 1883 | TCP | MQTT |
-| Business network segment | APP VIP / active application node | 8883 | TCP | MQTT TLS |
-| Business network segment | APP VIP / active application node | 8083 | TCP | MQTT WebSocket |
-| Business network segment | APP VIP / active application node | 8084 | TCP | MQTT WebSocket TLS |
-| Business network segment | APP VIP / active application node | 4840 | TCP | OPC UA Server |
-| Controlled application network segment | Active application node | 8089 | TCP | Launchpad |
-| Dynamic app access network segment | Active application node | 30000-30199 | TCP | App Gateway / dynamic application host ports |
-| Application nodes, DB nodes, and witness | DB VIP / DB nodes | 5432 | TCP | PostgreSQL / TimescaleDB |
-| DB1, DB2, and witness | DB1, DB2, and witness | 5432 | TCP | Streaming replication / repmgr |
-| Application nodes | NFS server | 2049 | TCP/UDP | Used when `NFS_ENABLED=true` |
+| Host de control | Seis VM destino | 22 | TCP | SSH / Ansible |
+| Tres nodos de aplicación, entre sí | Tres nodos de aplicación | 2377 | TCP | Plano de gestión de Docker Swarm |
+| Tres nodos de aplicación, entre sí | Tres nodos de aplicación | 7946 | TCP/UDP | Descubrimiento de nodos Swarm |
+| Tres nodos de aplicación, entre sí | Tres nodos de aplicación | 4789 | UDP | Overlay de Swarm |
+| Tres nodos de aplicación | Nodo de aplicación activo | 8088 | TCP | HAProxy hacia el backend Enterprise New; solo segmento de aplicación |
+| Segmento de red de negocio | APP VIP | 80 | TCP | Entrada HTTP de plataforma, `/healthz`, `/readyz` |
+| Segmento de red de negocio | APP VIP / nodo de aplicación activo | 1883 | TCP | MQTT |
+| Segmento de red de negocio | APP VIP / nodo de aplicación activo | 8883 | TCP | MQTT TLS |
+| Segmento de red de negocio | APP VIP / nodo de aplicación activo | 8083 | TCP | MQTT WebSocket |
+| Segmento de red de negocio | APP VIP / nodo de aplicación activo | 8084 | TCP | MQTT WebSocket TLS |
+| Segmento de red de negocio | APP VIP / nodo de aplicación activo | 4840 | TCP | OPC UA Server |
+| Segmento de aplicación controlado | Nodo de aplicación activo | 8089 | TCP | Launchpad |
+| Segmento de acceso de aplicaciones dinámicas | Nodo de aplicación activo | 30000-30199 | TCP | App Gateway / puertos host de aplicaciones dinámicas |
+| Nodos de aplicación, nodos DB y Witness | DB VIP / nodos DB | 5432 | TCP | PostgreSQL / TimescaleDB |
+| DB1, DB2 y Witness | DB1, DB2 y Witness | 5432 | TCP | Streaming replication / repmgr |
+| Nodos de aplicación | Servidor NFS | 2049 | TCP/UDP | Se usa cuando `NFS_ENABLED=true` |
 
-El despliegue compose actual no expone Redis, SourceFlow, EventFlow, Marimo ni el EMQX Dashboard al exterior. Estos servicios solo son llamados por el backend dentro de la red de runtime de Docker.
+El despliegue compose actual no expone Redis, SourceFlow, EventFlow, Marimo ni EMQX Dashboard al exterior. Estos servicios solo son llamados por el backend dentro de la red de runtime de Docker.

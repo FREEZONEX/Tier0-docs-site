@@ -5,29 +5,29 @@ sidebar:
   order: 2
 ---
 
-This page is included in the documentation and PDF export. The standalone web reference is also available here:
+Esta página se incluye en la documentación y en la exportación a PDF. La referencia web independiente también está disponible aquí:
 
-[Open Tier0 Skill Reference](../tier0-skill/)
+[Abrir Tier0 Skill Reference](../tier0-skill/)
 
 ## Comandos
 
-| Target | Task | Commands |
+| Objeto | Tarea | Comandos |
 |---|---|---|
-| Basic operations | Check CLI and service health | `tier0 doctor` |
-| Basic operations | Check service connectivity and gateway info | `tier0 api /openapi/v1/info --body '{}' --json` |
-| Basic operations | Upgrade CLI and skills | `tier0 upgrade` and `tier0 skills update` |
-| UNS | Browse paths | `tier0 uns browse --path /` or `tier0 uns browse --path Plant/Line1 --json` |
+| Operaciones básicas | Comprobar CLI y salud del servicio | `tier0 doctor` |
+| Operaciones básicas | Comprobar conectividad del servicio e información de gateway | `tier0 api /openapi/v1/info --body '{}' --json` |
+| Operaciones básicas | Actualizar CLI y skills | `tier0 upgrade` y `tier0 skills update` |
+| UNS | Explorar paths | `tier0 uns browse --path /` o `tier0 uns browse --path Plant/Line1 --json` |
 | UNS | Buscar topics por palabras clave | `tier0 uns search --keyword temp --json` o `tier0 uns search --path-prefix Plant/Line1 --size 50 --json` |
 | UNS | Leer valores actuales | `tier0 uns read Plant/Line1/Metric/Temperature --json` o `tier0 uns read --topic 'Plant/+/Metric/Temperature' --json` |
-| UNS | Write values | `tier0 uns write --topic Plant/Line1/Metric/Temperature --value '{"temperature":27.5}'` |
-| UNS | Query history | `tier0 uns history -t Plant/Line1/Metric/Temperature --start -1h --json` |
+| UNS | Escribir valores | `tier0 uns write --topic Plant/Line1/Metric/Temperature --value '{"temperature":27.5}'` |
+| UNS | Consultar historial | `tier0 uns history -t Plant/Line1/Metric/Temperature --start -1h --json` |
 | UNS | Crear paths o topics | `tier0 uns create --topic Plant/Line1 --type path` o `tier0 uns create --file namespace.json --json` |
 | UNS | Actualizar metadata o campos | `tier0 uns update --path Plant/Line1/Metric/Temperature --description "Line 1 temperature" --update-mask description` |
-| UNS | Delete or restore nodes | `tier0 uns delete --path Plant/Line1/Metric/Temperature --yes` or `tier0 uns restore --path Plant/Line1/Metric/Temperature --yes` |
-| Node-RED Flow | List or inspect Flows | `tier0 flow list`, `tier0 flow list --source --json`, or `tier0 flow get --id 1 --json` |
+| UNS | Eliminar o restaurar nodos | `tier0 uns delete --path Plant/Line1/Metric/Temperature --yes` o `tier0 uns restore --path Plant/Line1/Metric/Temperature --yes` |
+| Node-RED Flow | Listar o inspeccionar Flows | `tier0 flow list`, `tier0 flow list --source --json`, o `tier0 flow get --id 1 --json` |
 | Node-RED Flow | Crear Source Flow o Event Flow | `tier0 flow create --name "modbus-collector" --source --desc "Modbus TCP collector"` o `tier0 flow create --name "alert-handler" --event --desc "Temperature alarm processor"` |
-| Node-RED Flow | Update Flow metadata | `tier0 flow update --id 1 --name "line1-collector"` or `tier0 flow update --id 1 --favorite` |
-| Node-RED Flow | Export canvas JSON | `tier0 flow data --id 1 --out flows.json` |
-| Node-RED Flow | Deploy canvas JSON | `tier0 flow deploy --id 1 -f flows.json --yes` |
-| Node-RED Flow | Delete Flows | `tier0 flow delete --id 1 --yes` |
+| Node-RED Flow | Actualizar metadata de Flow | `tier0 flow update --id 1 --name "line1-collector"` o `tier0 flow update --id 1 --favorite` |
+| Node-RED Flow | Exportar canvas JSON | `tier0 flow data --id 1 --out flows.json` |
+| Node-RED Flow | Desplegar canvas JSON | `tier0 flow deploy --id 1 -f flows.json --yes` |
+| Node-RED Flow | Eliminar Flows | `tier0 flow delete --id 1 --yes` |
 | Node-RED Flow | Revisar tipos de nodo disponibles | `tier0 flow nodes --source --json` o `tier0 flow nodes --event --json` |

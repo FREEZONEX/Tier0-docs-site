@@ -1,29 +1,29 @@
 ---
 title: 표준 포트 목록
-description: Firewall port list for the standard six-VM offline Tier0 Enterprise deployment.
+description: 표준 6 VM 오프라인 Tier0 Enterprise 배포를 위한 방화벽 포트 목록입니다.
 sidebar:
   order: 5
 ---
 
-다음 표는 Enterprise New 6-VM offline deployment를 기준으로 합니다. 고객 firewall은 최소 필요 source range의 traffic만 허용해야 합니다. 이 port들을 public internet에 직접 노출하지 마세요.
+다음 표는 Enterprise New 6 VM 오프라인 배포를 기준으로 합니다. 고객 방화벽은 최소한으로 필요한 출발지 범위의 트래픽만 허용해야 합니다. 이 포트들을 공용 인터넷에 직접 노출하지 마세요.
 
-| Source | Target | Port | Protocol | Purpose |
+| 출발지 | 대상 | 포트 | 프로토콜 | 용도 |
 | --- | --- | ---: | --- | --- |
-| Control host | Six target VMs | 22 | TCP | SSH / Ansible |
-| Three application nodes, mutually | Three application nodes | 2377 | TCP | Docker Swarm management plane |
-| Three application nodes, mutually | Three application nodes | 7946 | TCP/UDP | Swarm node discovery |
-| Three application nodes, mutually | Three application nodes | 4789 | UDP | Swarm overlay |
-| 세 애플리케이션 노드 | 활성 애플리케이션 노드 | 8088 | TCP | Enterprise New 백엔드로 HAProxy 전달, 애플리케이션 네트워크 세그먼트 전용 |
-| Business network segment | APP VIP | 80 | TCP | Platform HTTP entry, `/healthz`, `/readyz` |
-| Business network segment | APP VIP / active application node | 1883 | TCP | MQTT |
-| Business network segment | APP VIP / active application node | 8883 | TCP | MQTT TLS |
-| Business network segment | APP VIP / active application node | 8083 | TCP | MQTT WebSocket |
-| Business network segment | APP VIP / active application node | 8084 | TCP | MQTT WebSocket TLS |
-| Business network segment | APP VIP / active application node | 4840 | TCP | OPC UA Server |
-| Controlled application network segment | Active application node | 8089 | TCP | Launchpad |
+| 제어 호스트 | 대상 VM 6대 | 22 | TCP | SSH / Ansible |
+| 애플리케이션 노드 3대 상호 간 | 애플리케이션 노드 3대 | 2377 | TCP | Docker Swarm 관리 플레인 |
+| 애플리케이션 노드 3대 상호 간 | 애플리케이션 노드 3대 | 7946 | TCP/UDP | Swarm 노드 검색 |
+| 애플리케이션 노드 3대 상호 간 | 애플리케이션 노드 3대 | 4789 | UDP | Swarm overlay |
+| 애플리케이션 노드 3대 | 활성 애플리케이션 노드 | 8088 | TCP | HAProxy에서 Enterprise New backend로 전달. 애플리케이션 네트워크 세그먼트만 허용 |
+| 비즈니스 네트워크 세그먼트 | APP VIP | 80 | TCP | 플랫폼 HTTP 진입점, `/healthz`, `/readyz` |
+| 비즈니스 네트워크 세그먼트 | APP VIP / 활성 애플리케이션 노드 | 1883 | TCP | MQTT |
+| 비즈니스 네트워크 세그먼트 | APP VIP / 활성 애플리케이션 노드 | 8883 | TCP | MQTT TLS |
+| 비즈니스 네트워크 세그먼트 | APP VIP / 활성 애플리케이션 노드 | 8083 | TCP | MQTT WebSocket |
+| 비즈니스 네트워크 세그먼트 | APP VIP / 활성 애플리케이션 노드 | 8084 | TCP | MQTT WebSocket TLS |
+| 비즈니스 네트워크 세그먼트 | APP VIP / 활성 애플리케이션 노드 | 4840 | TCP | OPC UA Server |
+| 제어된 애플리케이션 네트워크 세그먼트 | 활성 애플리케이션 노드 | 8089 | TCP | Launchpad |
 | 동적 앱 접근 네트워크 세그먼트 | 활성 애플리케이션 노드 | 30000-30199 | TCP | App Gateway / 동적 애플리케이션 호스트 포트 |
-| Application nodes, DB nodes, and witness | DB VIP / DB nodes | 5432 | TCP | PostgreSQL / TimescaleDB |
-| DB1, DB2, and witness | DB1, DB2, and witness | 5432 | TCP | Streaming replication / repmgr |
-| Application nodes | NFS server | 2049 | TCP/UDP | Used when `NFS_ENABLED=true` |
+| 애플리케이션 노드, DB 노드, Witness | DB VIP / DB 노드 | 5432 | TCP | PostgreSQL / TimescaleDB |
+| DB1, DB2, Witness | DB1, DB2, Witness | 5432 | TCP | Streaming replication / repmgr |
+| 애플리케이션 노드 | NFS server | 2049 | TCP/UDP | `NFS_ENABLED=true`일 때 사용 |
 
-현재 compose deployment는 Redis, SourceFlow, EventFlow, Marimo, EMQX Dashboard를 외부에 노출하지 않습니다. 이 service들은 Docker runtime network 내부에서 backend가 호출합니다.
+현재 compose 배포는 Redis, SourceFlow, EventFlow, Marimo, EMQX Dashboard를 외부에 노출하지 않습니다. 이 서비스들은 Docker runtime 네트워크 내부의 backend에서만 호출됩니다.
