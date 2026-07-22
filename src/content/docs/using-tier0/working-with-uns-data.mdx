@@ -17,11 +17,18 @@ You can use MQTT clients such as **MQTTX**, **MQTT Explorer**, and **Node-RED** 
 :::
 ### Generating MQTT Credentials
 On the **Edge** page in Tier0, create a new credential and make a note of it.
-
+:::note[Exceptions on Tier0 Edge version]
+The Tier0 Edge version does not require credentials for external connections.
+:::
 ### Connecting MQTT Clients
 
 :::tip
-The following clients are used as examples to show how to use the credentials to connect to the UNS broker.
+- The UNS broker can be connected through both TCP and WSS with the following address:
+    - mqtt://host:1883
+    - mqtts://host:8883
+    - ws://host:8083/mqtt
+    - wss://host:8084/mqtt
+- TCP without TLS is used as an example in the following connections.
 :::
 
 <Tabs syncKey="mqtt-client">
@@ -31,8 +38,8 @@ The following clients are used as examples to show how to use the credentials to
 2. Add a connection with the information of the Tier0 UNS broker, and the generated credentials.
     ```json
     {
-      "Host": "mqtt.tier0.dev",
-      "Port": 8883,
+      "Host": "mqtt.tier0.dev", 
+      "Port": 1883,
       "Client ID": "<generated client ID>",
       "Username": "<generated username>",
       "Password": "<generated password>"
@@ -48,7 +55,7 @@ The following clients are used as examples to show how to use the credentials to
     {
       "Protocol": "mqtt://",
       "Host": "mqtt.tier0.dev",
-      "Port": 8883,
+      "Port": 1883,
       "Username": "<generated username>",
       "Password": "<generated password>"
     }
@@ -67,7 +74,7 @@ The following clients are used as examples to show how to use the credentials to
           {
             {/* under Connection */}
             "Server": "mqtt://mqtt.tier0.dev",
-            "Port": 8883,
+            "Port": 1883,
             "Client ID": "<generated clientId>",
             {/* under Security */}
             "Username": "<generated username>",
@@ -85,10 +92,10 @@ The following clients are used as examples to show how to use the credentials to
 </Steps>
 
 ## API
-Use **RestAPI** to operate on UNS data, flows and authentication.
+Use the **REST API** to operate on UNS data, flows, and authentication.
 :::tip[How to use the API]
 - The OpenAPI base path is `/openapi/v1`. Set `TIER0_BASE_URL` to your Tier0 host plus the base path, for example `https://your-workspace.tier0.app/openapi/v1`, and pass your API key in the `x-api-key` header.
-- API keys are generated under **Settings > API Keys** by clicking the account icon at the upper-rigt corner.
+- API keys are generated under **Settings > API Keys** by clicking the account icon in the upper-right corner.
 :::
 
 - `/flow/create`

@@ -1,9 +1,9 @@
 ---
-title: Build Apps on UNS
+title: Building Apps on UNS
 description: A container is an app — deploy full containers on Tier0 Edge and Enterprise; build logic with Event Flow.
 editions: [cloud]
 sidebar:
-  order: 4
+  order: 6
 ---
 import { Steps } from '@astrojs/starlight/components';
 
@@ -11,27 +11,38 @@ import { Steps } from '@astrojs/starlight/components';
 
 A Tier0 application has the following features:
 - It is a **Docker Container**.
-- It is generated from the conversation you have with the **App Builder**, zero-coding, no programming required.
+- It is generated from the conversation you have with the **App Builder**, with no programming required.
 - It feeds on industrial data already in the **UNS**, and can *write back* to the **UNS**.
 - It can use **Event Flow** to implement logic.
 
 ## How to Deploy a Tier0 App
 
-### Building a Tier0 App
+### Building a Tier0 App from Scratch
 <Steps>
 1. Log in to Tier0, go to **App** > **Projects** and create a project for the application.
 2. Create an application inside the project, and you will be redirected to the application building page.
 3. Write the application requirements in the dialog.
+
+    :::tip[What to include in the prompt]
+    Make sure you state the following information in the prompt:
+    - Use the UNS model *[uns_model]* as the data source and *[uns_model]* as the write-back destination.
+    - (optional) Create UNS models and Source Flow flows to connect data sources.
+    - Create flows in Event Flow to trigger anomaly alarms/low health scores/other events.
+    :::
+
+4. Start building the application. After previewing it, ask the LLM to make any changes you need.
+5. Click **Deploy** to finish the application building.
 </Steps>
-:::tip[What to be included in the prompt]
-Make sure you state the following information in the prompt:
-- Use the UNS model *[uns_model]* as the data source and *[uns_model]* as write back destination.
-- (optional) Create UNS model and flows in Source Flow to connect data sources.
-- Create flows in Event Flow to trigger anomaly alarms/low health scores/other events.
+
+### Building a Tier0 App from Templates
+:::note[Why do templates exist]
+- Existing templates are applications that are commonly used in today's industry.
+- Building applications from templates prevents you from doing similar work from scratch.
 :::
 <Steps>
-4. Start building the application, change as you need by talking to the LLM upon preview.
-5. Click **Deploy** to finish the application building.
+1. In Tier0, go to **Library** and select a template as needed.
+2. Use the template as the application base and edit it in **Builder** through natural conversation with the LLM.
+3. Deploy the application.
 </Steps>
 
 ### Deploying App on Tier0 Enterprise

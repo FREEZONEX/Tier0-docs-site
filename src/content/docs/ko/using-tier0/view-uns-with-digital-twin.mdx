@@ -1,0 +1,1257 @@
+---
+title: Digital Twin으로 UNS 데이터 표시하기
+description: 3D 모델과 장면에서 UNS 데이터를 실시간으로 확인합니다.
+editions: [cloud, enterprise]
+sidebar:
+  order: 5
+---
+import { Steps } from '@astrojs/starlight/components';
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+
+Tier0의 digital twin 기능을 사용하면 실제와 같은 3D 장면과 모델에서 UNS 데이터를 실시간으로 볼 수 있습니다.
+
+## 워크숍 Digital Twin
+이 섹션에서는 워크숍을 실시간으로 표현합니다. 포함된 장비는 다음과 같습니다:
+- 선반 2대
+- 두 선반 사이에서 작업하는 로봇암 1대
+- 인바운드 버퍼 스테이션 1개와 아웃바운드 버퍼 1개
+- 품질 검사 장비 1대
+- 통합 제어 시스템 1개
+- 원자재 선반 2개와 제품 선반 2개
+- 1 AGV
+
+## 워크숍 데이터 수집
+기계 동작을 제어하는 데이터, 기계 상태를 나타내는 데이터, 워크숍 환경 데이터를 포함한 모든 데이터를 **UNS**로 수집합니다.
+<Steps>
+1. Tier0에 로그인하고 **UNS**로 이동하여 데이터 모델을 구축합니다.
+        <details className="notebook-cell">
+        <summary>UNS model JSON 보기</summary>
+
+        ```json
+        {
+        "namespace": [
+            {
+            "name": "Metric",
+            "alias": "metric_151a7edd68bf4269a229",
+            "type": "PATH",
+            "children": [
+                {
+                "name": "RobotArm",
+                "alias": "Robot_0_9d5dc450dc1f4c0c9a86",
+                "type": "TOPIC",
+                "topicType": "METRIC",
+                "extendProperties": {
+                    "J0_Cur": "0"
+                },
+                "fields": [
+                    {
+                    "name": "J1_Cur",
+                    "type": "FLOAT"
+                    },
+                    {
+                    "name": "J1_Init",
+                    "type": "FLOAT"
+                    },
+                    {
+                    "name": "J2_Cur",
+                    "type": "FLOAT"
+                    },
+                    {
+                    "name": "J2_Init",
+                    "type": "FLOAT"
+                    },
+                    {
+                    "name": "J3_Cur",
+                    "type": "FLOAT"
+                    },
+                    {
+                    "name": "J3_Init",
+                    "type": "FLOAT"
+                    },
+                    {
+                    "name": "J4_Cur",
+                    "type": "FLOAT"
+                    },
+                    {
+                    "name": "J4_Init",
+                    "type": "FLOAT"
+                    },
+                    {
+                    "name": "J5_Cur",
+                    "type": "FLOAT"
+                    },
+                    {
+                    "name": "J5_Init",
+                    "type": "FLOAT"
+                    },
+                    {
+                    "name": "J6_Cur",
+                    "type": "FLOAT"
+                    },
+                    {
+                    "name": "J6_Init",
+                    "type": "FLOAT"
+                    },
+                    {
+                    "name": "Model_Name",
+                    "type": "STRING"
+                    },
+                    {
+                    "name": "Max_Payload_kg",
+                    "type": "FLOAT"
+                    },
+                    {
+                    "name": "Reach_Radius_mm",
+                    "type": "FLOAT"
+                    },
+                    {
+                    "name": "Gripper_Force_N",
+                    "type": "FLOAT"
+                    }
+                ],
+                "enableHistory": "TRUE",
+                "mockData": "FALSE"
+                },
+                {
+                "name": "ProLathe-01",
+                "alias": "ProLathe_ef325e0a9db047d6abac",
+                "type": "TOPIC",
+                "topicType": "METRIC",
+                "fields": [
+                    {
+                    "name": "J_Changer_Cur",
+                    "type": "FLOAT"
+                    },
+                    {
+                    "name": "J_Door_Cur",
+                    "type": "FLOAT"
+                    },
+                    {
+                    "name": "J_Finger_Cur",
+                    "type": "FLOAT"
+                    },
+                    {
+                    "name": "J_Spindle_Cur",
+                    "type": "FLOAT"
+                    },
+                    {
+                    "name": "J_TailStock_Cur",
+                    "type": "FLOAT"
+                    },
+                    {
+                    "name": "J_X_Cur",
+                    "type": "FLOAT"
+                    },
+                    {
+                    "name": "J_Y_Cur",
+                    "type": "FLOAT"
+                    },
+                    {
+                    "name": "J_Z_Cur",
+                    "type": "FLOAT"
+                    },
+                    {
+                    "name": "Model_Name",
+                    "type": "STRING"
+                    },
+                    {
+                    "name": "Max_Placement_Rate_cph",
+                    "type": "INTEGER"
+                    },
+                    {
+                    "name": "Placement_Speed_cph",
+                    "type": "INTEGER"
+                    },
+                    {
+                    "name": "Feeder_Usage_pct",
+                    "type": "INTEGER"
+                    },
+                    {
+                    "name": "Machine_State_code",
+                    "type": "INTEGER"
+                    }
+                ],
+                "enableHistory": "FALSE",
+                "mockData": "FALSE"
+                },
+                {
+                "name": "ProLathe-02",
+                "alias": "ProLathe2_ef325e0a9db047d6abac",
+                "type": "TOPIC",
+                "topicType": "METRIC",
+                "fields": [
+                    {
+                    "name": "J_Changer_Cur",
+                    "type": "FLOAT"
+                    },
+                    {
+                    "name": "J_Door_Cur",
+                    "type": "FLOAT"
+                    },
+                    {
+                    "name": "J_Finger_Cur",
+                    "type": "FLOAT"
+                    },
+                    {
+                    "name": "J_Spindle_Cur",
+                    "type": "FLOAT"
+                    },
+                    {
+                    "name": "J_TailStock_Cur",
+                    "type": "FLOAT"
+                    },
+                    {
+                    "name": "J_X_Cur",
+                    "type": "FLOAT"
+                    },
+                    {
+                    "name": "J_Y_Cur",
+                    "type": "FLOAT"
+                    },
+                    {
+                    "name": "J_Z_Cur",
+                    "type": "FLOAT"
+                    },
+                    {
+                    "name": "Model_Name",
+                    "type": "STRING"
+                    },
+                    {
+                    "name": "Max_Placement_Rate_cph",
+                    "type": "INTEGER"
+                    },
+                    {
+                    "name": "Placement_Speed_cph",
+                    "type": "INTEGER"
+                    },
+                    {
+                    "name": "Feeder_Usage_pct",
+                    "type": "INTEGER"
+                    },
+                    {
+                    "name": "Machine_State_code",
+                    "type": "INTEGER"
+                    }
+                ],
+                "enableHistory": "FALSE",
+                "mockData": "FALSE"
+                },
+                {
+                "name": "AGV",
+                "alias": "AGV_7eddee0054a0",
+                "type": "TOPIC",
+                "topicType": "METRIC",
+                "fields": [
+                    {
+                    "name": "Position_X_Cur",
+                    "type": "FLOAT"
+                    },
+                    {
+                    "name": "Position_X_Init",
+                    "type": "FLOAT"
+                    },
+                    {
+                    "name": "Position_Y_Cur",
+                    "type": "FLOAT"
+                    },
+                    {
+                    "name": "Position_Y_Init",
+                    "type": "FLOAT"
+                    },
+                    {
+                    "name": "Rotation_Y_Cur",
+                    "type": "FLOAT"
+                    },
+                    {
+                    "name": "Rotation_Y_Init",
+                    "type": "FLOAT"
+                    },
+                    {
+                    "name": "Tray_Height_Cur",
+                    "type": "FLOAT"
+                    },
+                    {
+                    "name": "Tray_Height_Init",
+                    "type": "FLOAT"
+                    },
+                    {
+                    "name": "State_Cur",
+                    "type": "STRING"
+                    },
+                    {
+                    "name": "State_Init",
+                    "type": "STRING"
+                    },
+                    {
+                    "name": "Position_Z_Cur",
+                    "type": "FLOAT"
+                    },
+                    {
+                    "name": "Position_Z_Init",
+                    "type": "FLOAT"
+                    },
+                    {
+                    "name": "Model_Name",
+                    "type": "STRING"
+                    },
+                    {
+                    "name": "Max_Load_kg",
+                    "type": "FLOAT"
+                    },
+                    {
+                    "name": "Task_Progress_pct",
+                    "type": "INTEGER"
+                    },
+                    {
+                    "name": "Remaining_Distance_m",
+                    "type": "FLOAT"
+                    },
+                    {
+                    "name": "AGV_State_code",
+                    "type": "INTEGER"
+                    }
+                ],
+                "enableHistory": "FALSE",
+                "mockData": "FALSE"
+                },
+                {
+                "name": "RobotArm-1",
+                "alias": "RobotArm_1_b9f06e21346d",
+                "type": "TOPIC",
+                "topicType": "METRIC",
+                "fields": [
+                    {
+                    "name": "J1_Cur",
+                    "type": "FLOAT"
+                    },
+                    {
+                    "name": "J1_Init",
+                    "type": "FLOAT"
+                    },
+                    {
+                    "name": "J2_Cur",
+                    "type": "FLOAT"
+                    },
+                    {
+                    "name": "J2_Init",
+                    "type": "FLOAT"
+                    },
+                    {
+                    "name": "J3_Cur",
+                    "type": "FLOAT"
+                    },
+                    {
+                    "name": "J3_Init",
+                    "type": "FLOAT"
+                    },
+                    {
+                    "name": "J4_Cur",
+                    "type": "FLOAT"
+                    },
+                    {
+                    "name": "J4_Init",
+                    "type": "FLOAT"
+                    },
+                    {
+                    "name": "J5_Cur",
+                    "type": "FLOAT"
+                    },
+                    {
+                    "name": "J5_Init",
+                    "type": "FLOAT"
+                    },
+                    {
+                    "name": "J6_Cur",
+                    "type": "FLOAT"
+                    },
+                    {
+                    "name": "J6_Init",
+                    "type": "FLOAT"
+                    }
+                ],
+                "enableHistory": "TRUE",
+                "mockData": "FALSE"
+                }
+            ]
+            },
+            {
+            "name": "State",
+            "alias": "state_3912d0df3fee",
+            "type": "PATH",
+            "children": [
+                {
+                "name": "RawMaterialStorage",
+                "alias": "RawMaterialS_c3307f680405",
+                "type": "TOPIC",
+                "topicType": "STATE",
+                "fields": [
+                    {
+                    "name": "StockAmount",
+                    "type": "INTEGER"
+                    }
+                ],
+                "enableHistory": "FALSE",
+                "mockData": "FALSE"
+                },
+                {
+                "name": "ProductStorage",
+                "alias": "ProductStora_3c145f140bd9",
+                "type": "TOPIC",
+                "topicType": "STATE",
+                "fields": [
+                    {
+                    "name": "StockAmount",
+                    "type": "INTEGER"
+                    }
+                ],
+                "enableHistory": "FALSE",
+                "mockData": "FALSE"
+                },
+                {
+                "name": "InboundBuffer",
+                "alias": "LoaderBuffer_9feece9b3231",
+                "type": "TOPIC",
+                "topicType": "STATE",
+                "fields": [
+                    {
+                    "name": "Amount",
+                    "type": "INTEGER"
+                    }
+                ],
+                "enableHistory": "FALSE",
+                "mockData": "FALSE"
+                },
+                {
+                "name": "OutboundBuffer",
+                "alias": "OutboundBuff_75433b98fde6",
+                "type": "TOPIC",
+                "topicType": "STATE",
+                "fields": [
+                    {
+                    "name": "Amount",
+                    "type": "INTEGER"
+                    }
+                ],
+                "enableHistory": "FALSE",
+                "mockData": "FALSE"
+                }
+            ]
+            }
+        ]
+        }
+        ```
+        </details>
+2. **Flows**로 이동하여 데이터 소스를 UNS 모델에 연결하는 **Source Flow**를 생성합니다.
+        - 로봇암
+        <details className="notebook-cell">
+        <summary>로봇암 flow JSON 보기</summary>
+
+        ```json
+        [
+            {
+                "id": "03933a7eb1a7b992",
+                "type": "function",
+                "z": "8daeb61ebd9e5f52",
+                "name": "Cache Data",
+                "func": "const CONFIG = {\n    fields: ['Joint_1', 'Joint_2', 'Joint_3', 'Joint_4', 'Joint_5', 'Joint_6'],\n    payloadFields: {\n        value: 'CurrentValue',\n        initialValue: 'InitialValue',\n        name: 'Name',\n        timeStamp: 'timeStamp',\n        time_stamp: 'time_stamp',\n        quality: 'quality'\n    }\n};\n\nlet cache = flow.get('dataCache') || { instant: {}, metadata: {} };\n\nconst topicParts = msg.topic.split('/');\nconst fieldName = topicParts[topicParts.length - 1];\n\nlet payload = msg.payload;\nif (typeof payload === 'string') {\n    try {\n        payload = JSON.parse(payload);\n    } catch (e) {\n        return null;\n    }\n}\n\nlet value = payload[CONFIG.payloadFields.value];\nif (value === undefined) return null;\n\nconst metadata = {\n    timeStamp: payload[CONFIG.payloadFields.timeStamp],\n    time_stamp: payload[CONFIG.payloadFields.time_stamp],\n    quality: payload[CONFIG.payloadFields.quality],\n    name: payload[CONFIG.payloadFields.name],\n    initialValue: payload[CONFIG.payloadFields.initialValue]\n};\n\nif (CONFIG.fields.includes(fieldName)) {\n    cache.instant[fieldName] = value;\n    cache.metadata[fieldName] = metadata;\n} else {\n    return null;\n}\n\nflow.set('dataCache', cache);\nreturn null;",
+                "outputs": 0,
+                "timeout": "",
+                "noerr": 0,
+                "initialize": "",
+                "finalize": "",
+                "libs": [],
+                "x": 880,
+                "y": 500,
+                "wires": []
+            },
+            {
+                "id": "0c4dbdcbe5e3db92",
+                "type": "mqtt in",
+                "z": "8daeb61ebd9e5f52",
+                "name": "Subscribe Joint_1~6",
+                "topic": "FactorySim_Supos/Flow_Group__1/MechEquips/Transporter_Kawasaki_BX100N/Motor_Joints/+",
+                "qos": "1",
+                "datatype": "auto",
+                "broker": "c11decb07a68083d",
+                "nl": false,
+                "rap": true,
+                "rh": 0,
+                "inputs": 0,
+                "x": 610,
+                "y": 480,
+                "wires": [
+                    [
+                        "03933a7eb1a7b992"
+                    ]
+                ]
+            },
+            {
+                "id": "ba42bca5aa9dc561",
+                "type": "inject",
+                "z": "8daeb61ebd9e5f52",
+                "name": "100ms Timer",
+                "props": [
+                    {
+                        "p": "payload"
+                    },
+                    {
+                        "vt": "str",
+                        "p": "topic"
+                    }
+                ],
+                "repeat": "0.1",
+                "crontab": "",
+                "once": true,
+                "onceDelay": "0.1",
+                "topic": "",
+                "payload": "",
+                "payloadType": "date",
+                "x": 520,
+                "y": 600,
+                "wires": [
+                    [
+                        "0fc94449c377ad9a"
+                    ]
+                ]
+            },
+            {
+                "id": "0fc94449c377ad9a",
+                "type": "function",
+                "z": "8daeb61ebd9e5f52",
+                "name": "Aggregate & Publish (Flat)",
+                "func": "const CONFIG = {\n    fieldMapping: {\n        'Joint_1': 'J1',\n        'Joint_2': 'J2',\n        'Joint_3': 'J3',\n        'Joint_4': 'J4',\n        'Joint_5': 'J5',\n        'Joint_6': 'J6'\n    },\n    missingStrategy: 'lastValue',\n    outputTopic: 'robot/state',\n    windowMs: 100\n};\n\nconst FIELDS = Object.keys(CONFIG.fieldMapping);\n\nlet cache = flow.get('dataCache') || { instant: {}, metadata: {} };\nlet lastValues = flow.get('lastValues') || {};\nlet lastMetadata = flow.get('lastMetadata') || {};\n\nlet output = {\n    timestamp: new Date().toISOString()\n};\n\nfor (const field of FIELDS) {\n    const shortName = CONFIG.fieldMapping[field];\n    \n    if (cache.instant[field] !== undefined) {\n        output[shortName + '_Cur'] = cache.instant[field];\n        output[shortName + '_Init'] = cache.metadata[field] ? cache.metadata[field].initialValue : 0;\n        output[shortName + '_Qly'] = cache.metadata[field] ? cache.metadata[field].quality : 0;\n        \n        lastValues[field] = cache.instant[field];\n        lastMetadata[field] = cache.metadata[field];\n    } else {\n        let fallbackValue = CONFIG.missingStrategy === 'lastValue' \n            ? (lastValues[field] !== undefined ? lastValues[field] : 0) \n            : 0;\n        \n        output[shortName + '_Cur'] = fallbackValue;\n        output[shortName + '_Init'] = lastMetadata[field] ? lastMetadata[field].initialValue : 0;\n        output[shortName + '_Qly'] = -1;\n    }\n}\n\nmsg.payload = output;\nmsg.topic = CONFIG.outputTopic;\n\nflow.set('dataCache', { instant: {}, metadata: {} });\nflow.set('lastValues', lastValues);\nflow.set('lastMetadata', lastMetadata);\n\nreturn msg;",
+                "outputs": 1,
+                "timeout": "",
+                "noerr": 0,
+                "initialize": "",
+                "finalize": "",
+                "libs": [],
+                "x": 760,
+                "y": 600,
+                "wires": [
+                    [
+                        "c9eee2264fe78846",
+                        "a685279629e73d9a",
+                        "4ce075fda1d3d993",
+                        "8e8779918eab6f89"
+                    ]
+                ]
+            },
+            {
+                "id": "c9eee2264fe78846",
+                "type": "mqtt out",
+                "z": "8daeb61ebd9e5f52",
+                "name": "Publish robot/state",
+                "topic": "Metric/RobotArm",
+                "qos": "1",
+                "retain": "false",
+                "respTopic": "",
+                "contentType": "",
+                "userProps": "",
+                "correl": "",
+                "expiry": "",
+                "broker": "9836929a70c74929",
+                "x": 1070,
+                "y": 540,
+                "wires": []
+            },
+            {
+                "id": "c11decb07a68083d",
+                "type": "mqtt-broker",
+                "name": "supos-demo.supos.app",
+                "broker": "supos-demo.supos.app",
+                "port": 1883,
+                "clientid": "",
+                "autoConnect": true,
+                "usetls": false,
+                "protocolVersion": 4,
+                "keepalive": 60,
+                "cleansession": true,
+                "autoUnsubscribe": true,
+                "birthTopic": "",
+                "birthQos": "0",
+                "birthRetain": "false",
+                "birthPayload": "",
+                "birthMsg": {},
+                "closeTopic": "",
+                "closeQos": "0",
+                "closeRetain": "false",
+                "closePayload": "",
+                "closeMsg": {},
+                "willTopic": "",
+                "willQos": "0",
+                "willRetain": "false",
+                "willPayload": "",
+                "willMsg": {},
+                "userProps": "",
+                "sessionExpiry": ""
+            },
+            {
+                "id": "9836929a70c74929",
+                "type": "mqtt-broker",
+                "z": "8daeb61ebd9e5f52",
+                "name": "emqx",
+                "broker": "mqtt.pre.tier0.dev",
+                "port": "1883",
+                "clientid": "336462685553088&336463047745872",
+                "autoConnect": true,
+                "usetls": false,
+                "protocolVersion": "4",
+                "keepalive": "60",
+                "cleansession": true,
+                "autoUnsubscribe": true,
+                "birthTopic": "",
+                "birthQos": "0",
+                "birthRetain": "false",
+                "birthPayload": "",
+                "birthMsg": {},
+                "closeTopic": "",
+                "closeQos": "0",
+                "closeRetain": "false",
+                "closePayload": "",
+                "closeMsg": {},
+                "willTopic": "",
+                "willQos": "0",
+                "willRetain": "false",
+                "willPayload": "",
+                "willMsg": {},
+                "userProps": "",
+                "sessionExpiry": ""
+            }
+        ]
+        ```
+        </details>
+        - AGV
+        <details className="notebook-cell">
+        <summary>AGV flow JSON 보기</summary>
+
+        ```json
+        [
+            {
+                "id": "fa46cf31be8d751e",
+                "type": "tab",
+                "label": "Metric/AGV",
+                "disabled": false,
+                "info": ""
+            },
+            {
+                "id": "1f0e9d8c7b6a5a41",
+                "type": "mqtt in",
+                "z": "fa46cf31be8d751e",
+                "name": "Subscribe AGV telemetry",
+                "topic": "FactorySim_Supos/Flow_Group__1/MechEquips/AGV_zOnron/Motor_Joints/+",
+                "qos": "1",
+                "datatype": "auto",
+                "broker": "c11decb07a68083d",
+                "nl": false,
+                "rap": true,
+                "rh": 0,
+                "inputs": 0,
+                "x": 190,
+                "y": 380,
+                "wires": [
+                    [
+                        "2a1b3c4d5e6f7081"
+                    ]
+                ]
+            },
+            {
+                "id": "2a1b3c4d5e6f7081",
+                "type": "function",
+                "z": "fa46cf31be8d751e",
+                "name": "Cache AGV telemetry",
+                "func": "const CONFIG = {\n    fields: [\n        'Position_X',\n        'Position_Y',\n        'Position_Z',\n        'Rotation_Y',\n        'Tray_Height',\n        'State'\n    ],\n    payloadFields: {\n        value: 'CurrentValue',\n        initialValue: 'InitialValue',\n        name: 'Name',\n        timeStamp: 'timeStamp',\n        timeStampAlt: 'time_stamp'\n    }\n};\n\nlet cache = flow.get('agvDataCache') || { instant: {}, metadata: {} };\n\nconst topicParts = (msg.topic || '').split('/');\nconst fieldName = topicParts[topicParts.length - 1];\nif (!CONFIG.fields.includes(fieldName)) {\n    return null;\n}\n\nlet payload = msg.payload;\nif (typeof payload === 'string') {\n    try {\n        payload = JSON.parse(payload);\n    } catch (error) {\n        return null;\n    }\n}\n\nif (typeof payload !== 'object' || payload === null) {\n    return null;\n}\n\nconst currentValue = payload[CONFIG.payloadFields.value];\nif (currentValue === undefined) {\n    return null;\n}\n\ncache.instant[fieldName] = currentValue;\ncache.metadata[fieldName] = {\n    name: payload[CONFIG.payloadFields.name] || fieldName,\n    initialValue: payload[CONFIG.payloadFields.initialValue],\n    timeStamp: payload[CONFIG.payloadFields.timeStampAlt] ?? payload[CONFIG.payloadFields.timeStamp] ?? 0\n};\n\nflow.set('agvDataCache', cache);\nreturn null;",
+                "outputs": 0,
+                "timeout": "",
+                "noerr": 0,
+                "initialize": "",
+                "finalize": "",
+                "libs": [],
+                "x": 470,
+                "y": 380,
+                "wires": []
+            },
+            {
+                "id": "3b2c1d0e9f8a7b61",
+                "type": "inject",
+                "z": "fa46cf31be8d751e",
+                "name": "100ms Timer",
+                "props": [
+                    {
+                        "p": "payload"
+                    },
+                    {
+                        "p": "topic",
+                        "vt": "str"
+                    }
+                ],
+                "repeat": "0.1",
+                "crontab": "",
+                "once": true,
+                "onceDelay": "0.1",
+                "topic": "",
+                "payload": "",
+                "payloadType": "date",
+                "x": 150,
+                "y": 500,
+                "wires": [
+                    [
+                        "4c3d2e1f0a9b8c71"
+                    ]
+                ]
+            },
+            {
+                "id": "4c3d2e1f0a9b8c71",
+                "type": "function",
+                "z": "fa46cf31be8d751e",
+                "name": "Aggregate AGV UNS payload",
+                "func": "const CONFIG = {\n    fields: [\n        'Position_X',\n        'Position_Y',\n        'Position_Z',\n        'Rotation_Y',\n        'Tray_Height',\n        'State'\n    ],\n    outputTopic: 'Metric/AGV',\n    defaultNumeric: 0,\n    defaultString: ''\n};\n\nlet cache = flow.get('agvDataCache') || { instant: {}, metadata: {} };\nlet lastValues = flow.get('agvLastValues') || {};\nlet lastMetadata = flow.get('agvLastMetadata') || {};\nlet lastTimestamp = flow.get('agvLastTimestamp') || 0;\n\nlet output = {};\nlet candidateTimestamps = [];\n\nfor (const field of CONFIG.fields) {\n    const hasCurrentFrameValue = Object.prototype.hasOwnProperty.call(cache.instant, field);\n    const metadata = hasCurrentFrameValue ? cache.metadata[field] : lastMetadata[field];\n    const currentValue = hasCurrentFrameValue ? cache.instant[field] : lastValues[field];\n    const isStringField = field === 'State';\n\n    output[field + '_Cur'] = currentValue !== undefined\n        ? currentValue\n        : (isStringField ? CONFIG.defaultString : CONFIG.defaultNumeric);\n    output[field + '_Init'] = metadata && metadata.initialValue !== undefined\n        ? metadata.initialValue\n        : (isStringField ? CONFIG.defaultString : CONFIG.defaultNumeric);\n\n    if (hasCurrentFrameValue) {\n        lastValues[field] = cache.instant[field];\n        lastMetadata[field] = cache.metadata[field];\n\n        const rawTime = cache.metadata[field] ? Number(cache.metadata[field].timeStamp) : NaN;\n        if (!Number.isNaN(rawTime)) {\n            candidateTimestamps.push(rawTime);\n        }\n    }\n}\n\nif (candidateTimestamps.length > 0) {\n    lastTimestamp = Math.max(...candidateTimestamps);\n}\n\noutput.timestamp = lastTimestamp;\n\nmsg.topic = CONFIG.outputTopic;\nmsg.payload = output;\n\nflow.set('agvDataCache', { instant: {}, metadata: {} });\nflow.set('agvLastValues', lastValues);\nflow.set('agvLastMetadata', lastMetadata);\nflow.set('agvLastTimestamp', lastTimestamp);\n\nreturn msg;",
+                "outputs": 1,
+                "timeout": "",
+                "noerr": 0,
+                "initialize": "",
+                "finalize": "",
+                "libs": [],
+                "x": 460,
+                "y": 500,
+                "wires": [
+                    [
+                        "6d5e4f3a2b1c0d91",
+                        "7c6b5a4d3e2f1098"
+                    ]
+                ]
+            },
+            {
+                "id": "6d5e4f3a2b1c0d91",
+                "type": "mqtt out",
+                "z": "fa46cf31be8d751e",
+                "name": "Publish Metric/AGV",
+                "topic": "Metric/AGV",
+                "qos": "1",
+                "retain": "false",
+                "respTopic": "",
+                "contentType": "",
+                "userProps": "",
+                "correl": "",
+                "expiry": "",
+                "broker": "f2d431c2d2264341",
+                "x": 710,
+                "y": 400,
+                "wires": []
+            },
+            {
+                "id": "7c6b5a4d3e2f1098",
+                "type": "debug",
+                "z": "fa46cf31be8d751e",
+                "name": "Debug AGV payload",
+                "active": true,
+                "tosidebar": true,
+                "console": false,
+                "complete": "payload",
+                "targetType": "msg",
+                "statusVal": "",
+                "statusType": "auto",
+                "x": 740,
+                "y": 580,
+                "wires": []
+            },
+            {
+                "id": "c11decb07a68083d",
+                "type": "mqtt-broker",
+                "name": "supos-demo.supos.app",
+                "broker": "supos-demo.supos.app",
+                "port": 1883,
+                "clientid": "",
+                "autoConnect": true,
+                "usetls": false,
+                "protocolVersion": 4,
+                "keepalive": 60,
+                "cleansession": true,
+                "autoUnsubscribe": true,
+                "birthTopic": "",
+                "birthQos": "0",
+                "birthRetain": "false",
+                "birthPayload": "",
+                "birthMsg": {},
+                "closeTopic": "",
+                "closeQos": "0",
+                "closeRetain": "false",
+                "closePayload": "",
+                "closeMsg": {},
+                "willTopic": "",
+                "willQos": "0",
+                "willRetain": "false",
+                "willPayload": "",
+                "willMsg": {},
+                "userProps": "",
+                "sessionExpiry": ""
+            },
+            {
+                "id": "f2d431c2d2264341",
+                "type": "mqtt-broker",
+                "z": "fa46cf31be8d751e",
+                "name": "emqx",
+                "broker": "mqtt.pre.tier0.dev",
+                "port": "1883",
+                "clientid": "336462685553088&341668146888752",
+                "autoConnect": true,
+                "usetls": false,
+                "protocolVersion": "4",
+                "keepalive": "60",
+                "cleansession": true,
+                "autoUnsubscribe": true,
+                "birthTopic": "",
+                "birthQos": "0",
+                "birthRetain": "false",
+                "birthPayload": "",
+                "birthMsg": {},
+                "closeTopic": "",
+                "closeQos": "0",
+                "closeRetain": "false",
+                "closePayload": "",
+                "closeMsg": {},
+                "willTopic": "",
+                "willQos": "0",
+                "willRetain": "false",
+                "willPayload": "",
+                "willMsg": {},
+                "userProps": "",
+                "sessionExpiry": ""
+            }
+        ]
+        ```
+        </details>
+        - 선반 1
+        <details className="notebook-cell">
+        <summary>선반 1 flow JSON 보기</summary>
+
+        ```
+        [
+            {
+                "id": "88fed08889390f28",
+                "type": "tab",
+                "label": "Metric/ProLathe-01",
+                "disabled": false,
+                "info": ""
+            },
+            {
+                "id": "f2bae08de3b55bb0",
+                "type": "mqtt in",
+                "z": "88fed08889390f28",
+                "name": "Subscribe ProLathe joints",
+                "topic": "FactorySim_Supos/Flow_Group__1/MechEquips/porcess_prolathe_gs_260ms_1/Motor_Joints/+",
+                "qos": "1",
+                "datatype": "auto",
+                "broker": "6f8ade8021b85933",
+                "nl": false,
+                "rap": true,
+                "rh": 0,
+                "inputs": 0,
+                "x": 590,
+                "y": 340,
+                "wires": [
+                    [
+                        "ac84eab3cf5bb664",
+                        "8a8a5572465dac5b"
+                    ]
+                ]
+            },
+            {
+                "id": "ac84eab3cf5bb664",
+                "type": "function",
+                "z": "88fed08889390f28",
+                "name": "Cache Data",
+                "func": "const CONFIG = {\n    fields: [\"JointChanger\", \"JointDoors\", \"JointFinger\", \"JointSpindle\", \"JointTailStock\", \"Joint_X\", \"Joint_Y\", \"Joint_Z\"],\n    payloadFields: {\n        value: 'CurrentValue',\n        initialValue: 'InitialValue',\n        name: 'Name',\n        timeStamp: 'timeStamp',\n        time_stamp: 'time_stamp',\n        quality: 'quality'\n    }\n};\n\nlet cache = flow.get('dataCache') || { instant: {}, metadata: {} };\n\nconst topicParts = msg.topic.split('/');\nconst fieldName = topicParts[topicParts.length - 1];\n\nlet payload = msg.payload;\nif (typeof payload === 'string') {\n    try {\n        payload = JSON.parse(payload);\n    } catch (e) {\n        return null;\n    }\n}\n\nlet value = payload[CONFIG.payloadFields.value];\nif (value === undefined) return null;\n\nconst metadata = {\n    timeStamp: payload[CONFIG.payloadFields.timeStamp],\n    time_stamp: payload[CONFIG.payloadFields.time_stamp],\n    quality: payload[CONFIG.payloadFields.quality],\n    name: payload[CONFIG.payloadFields.name],\n    initialValue: payload[CONFIG.payloadFields.initialValue]\n};\n\nif (CONFIG.fields.includes(fieldName)) {\n    cache.instant[fieldName] = value;\n    cache.metadata[fieldName] = metadata;\n} else {\n    return null;\n}\n\nflow.set('dataCache', cache);\nreturn null;",
+                "outputs": 0,
+                "timeout": "",
+                "noerr": 0,
+                "initialize": "",
+                "finalize": "",
+                "libs": [],
+                "x": 860,
+                "y": 360,
+                "wires": []
+            },
+            {
+                "id": "ca4b6b2146df5093",
+                "type": "inject",
+                "z": "88fed08889390f28",
+                "name": "100ms Timer",
+                "props": [
+                    {
+                        "p": "payload"
+                    },
+                    {
+                        "vt": "str",
+                        "p": "topic"
+                    }
+                ],
+                "repeat": "0.1",
+                "crontab": "",
+                "once": true,
+                "onceDelay": "0.1",
+                "topic": "",
+                "payload": "",
+                "payloadType": "date",
+                "x": 500,
+                "y": 460,
+                "wires": [
+                    [
+                        "e47cbdc7b7dae23f"
+                    ]
+                ]
+            },
+            {
+                "id": "e47cbdc7b7dae23f",
+                "type": "function",
+                "z": "88fed08889390f28",
+                "name": "Aggregate & Publish (Flat)",
+                "func": "const CONFIG = {\n    fieldMapping: {\n    \"JointChanger\": \"J_Changer\",\n    \"JointDoors\": \"J_Door\",\n    \"JointFinger\": \"J_Finger\",\n    \"JointSpindle\": \"J_Spindle\",\n    \"JointTailStock\": \"J_TailStock\",\n    \"Joint_X\": \"J_X\",\n    \"Joint_Y\": \"J_Y\",\n    \"Joint_Z\": \"J_Z\"\n},\n    missingStrategy: 'lastValue',\n    outputTopic: \"Metric/porcess_prolathe_gs_260ms_1\",\n    windowMs: 100\n};\n\nconst FIELDS = Object.keys(CONFIG.fieldMapping);\n\nlet cache = flow.get('dataCache') || { instant: {}, metadata: {} };\nlet lastValues = flow.get('lastValues') || {};\nlet lastMetadata = flow.get('lastMetadata') || {};\nlet output = {};\n\noutput.timestamp = new Date().toISOString();\n\nfor (const field of FIELDS) {\n    const shortName = CONFIG.fieldMapping[field];\n\n    if (cache.instant[field] !== undefined) {\n        output[shortName + '_Cur'] = Number(cache.instant[field]);\n        output[shortName + '_Init'] = cache.metadata[field] && cache.metadata[field].initialValue !== undefined\n            ? Number(cache.metadata[field].initialValue)\n            : 0;\n        lastValues[field] = cache.instant[field];\n        lastMetadata[field] = cache.metadata[field] || {};\n    } else {\n        let fallbackValue = CONFIG.missingStrategy === 'lastValue'\n            ? (lastValues[field] !== undefined ? lastValues[field] : 0)\n            : 0;\n        output[shortName + '_Cur'] = Number(fallbackValue);\n        output[shortName + '_Init'] = lastMetadata[field] && lastMetadata[field].initialValue !== undefined\n            ? Number(lastMetadata[field].initialValue)\n            : 0;\n    }\n}\n\nmsg.payload = output;\nmsg.topic = CONFIG.outputTopic;\n\nflow.set('dataCache', { instant: {}, metadata: {} });\nflow.set('lastValues', lastValues);\nflow.set('lastMetadata', lastMetadata);\n\nreturn msg;",
+                "outputs": 1,
+                "timeout": "",
+                "noerr": 0,
+                "initialize": "",
+                "finalize": "",
+                "libs": [],
+                "x": 740,
+                "y": 460,
+                "wires": [
+                    [
+                        "ad22bd2f8b228324"
+                    ]
+                ]
+            },
+            {
+                "id": "ad22bd2f8b228324",
+                "type": "mqtt out",
+                "z": "88fed08889390f28",
+                "name": "Metric/Prolathe",
+                "topic": "Metric/ProLathe-01",
+                "qos": "1",
+                "retain": "false",
+                "respTopic": "",
+                "contentType": "",
+                "userProps": "",
+                "correl": "",
+                "expiry": "",
+                "broker": "c14ef68b0e3b48ac",
+                "x": 1060,
+                "y": 360,
+                "wires": []
+            },
+            {
+                "id": "8a8a5572465dac5b",
+                "type": "debug",
+                "z": "88fed08889390f28",
+                "name": "Debug Output",
+                "active": true,
+                "tosidebar": true,
+                "console": false,
+                "complete": "payload",
+                "statusVal": "",
+                "statusType": "auto",
+                "x": 980,
+                "y": 540,
+                "wires": []
+            },
+            {
+                "id": "6f8ade8021b85933",
+                "type": "mqtt-broker",
+                "name": "supos-demo.supos.app",
+                "broker": "supos-demo.supos.app",
+                "port": 1883,
+                "clientid": "",
+                "autoConnect": true,
+                "usetls": false,
+                "protocolVersion": 4,
+                "keepalive": 60,
+                "cleansession": true,
+                "autoUnsubscribe": true,
+                "birthTopic": "",
+                "birthQos": "0",
+                "birthRetain": "false",
+                "birthPayload": "",
+                "birthMsg": {},
+                "closeTopic": "",
+                "closeQos": "0",
+                "closeRetain": "false",
+                "closePayload": "",
+                "closeMsg": {},
+                "willTopic": "",
+                "willQos": "0",
+                "willRetain": "false",
+                "willPayload": "",
+                "willMsg": {},
+                "userProps": "",
+                "sessionExpiry": ""
+            },
+            {
+                "id": "c14ef68b0e3b48ac",
+                "type": "mqtt-broker",
+                "z": "88fed08889390f28",
+                "name": "emqx",
+                "broker": "mqtt.pre.tier0.dev",
+                "port": "1883",
+                "clientid": "336462685553088&337035452420768",
+                "autoConnect": true,
+                "usetls": false,
+                "protocolVersion": "4",
+                "keepalive": "60",
+                "cleansession": true,
+                "autoUnsubscribe": true,
+                "birthTopic": "",
+                "birthQos": "0",
+                "birthRetain": "false",
+                "birthPayload": "",
+                "birthMsg": {},
+                "closeTopic": "",
+                "closeQos": "0",
+                "closeRetain": "false",
+                "closePayload": "",
+                "closeMsg": {},
+                "willTopic": "",
+                "willQos": "0",
+                "willRetain": "false",
+                "willPayload": "",
+                "willMsg": {},
+                "userProps": "",
+                "sessionExpiry": ""
+            }
+        ]
+        ```
+        </details>
+        - 선반 2
+        <details className="notebook-cell">
+        <summary>선반 2 flow JSON 보기</summary>
+
+        ```json
+        [
+            {
+                "id": "c974bfc5fbc79b0e",
+                "type": "tab",
+                "label": "Metric/ProLathe-02",
+                "disabled": false,
+                "info": ""
+            },
+            {
+                "id": "2ff367f08cbe470f",
+                "type": "mqtt in",
+                "z": "c974bfc5fbc79b0e",
+                "name": "Subscribe ProLathe joints",
+                "topic": "FactorySim_Supos/Flow_Group__1/MechEquips/porcess_prolathe_gs_260ms_2/Motor_Joints/+",
+                "qos": "1",
+                "datatype": "auto",
+                "broker": "6f8ade8021b85933",
+                "nl": false,
+                "rap": true,
+                "rh": 0,
+                "inputs": 0,
+                "x": 590,
+                "y": 340,
+                "wires": [
+                    [
+                        "7c54f7852fb5430e"
+                    ]
+                ]
+            },
+            {
+                "id": "7c54f7852fb5430e",
+                "type": "function",
+                "z": "c974bfc5fbc79b0e",
+                "name": "Cache Data",
+                "func": "const CONFIG = {\n    fields: [\"JointChanger\", \"JointDoors\", \"JointFinger\", \"JointSpindle\", \"JointTailStock\", \"Joint_X\", \"Joint_Y\", \"Joint_Z\"],\n    payloadFields: {\n        value: 'CurrentValue',\n        initialValue: 'InitialValue',\n        name: 'Name',\n        timeStamp: 'timeStamp',\n        time_stamp: 'time_stamp',\n        quality: 'quality'\n    }\n};\n\nlet cache = flow.get('dataCache') || { instant: {}, metadata: {} };\n\nconst topicParts = msg.topic.split('/');\nconst fieldName = topicParts[topicParts.length - 1];\n\nlet payload = msg.payload;\nif (typeof payload === 'string') {\n    try {\n        payload = JSON.parse(payload);\n    } catch (e) {\n        return null;\n    }\n}\n\nlet value = payload[CONFIG.payloadFields.value];\nif (value === undefined) return null;\n\nconst metadata = {\n    timeStamp: payload[CONFIG.payloadFields.timeStamp],\n    time_stamp: payload[CONFIG.payloadFields.time_stamp],\n    quality: payload[CONFIG.payloadFields.quality],\n    name: payload[CONFIG.payloadFields.name],\n    initialValue: payload[CONFIG.payloadFields.initialValue]\n};\n\nif (CONFIG.fields.includes(fieldName)) {\n    cache.instant[fieldName] = value;\n    cache.metadata[fieldName] = metadata;\n} else {\n    return null;\n}\n\nflow.set('dataCache', cache);\nreturn null;",
+                "outputs": 0,
+                "timeout": "",
+                "noerr": 0,
+                "initialize": "",
+                "finalize": "",
+                "libs": [],
+                "x": 860,
+                "y": 360,
+                "wires": []
+            },
+            {
+                "id": "a69b0f994c614213",
+                "type": "inject",
+                "z": "c974bfc5fbc79b0e",
+                "name": "100ms Timer",
+                "props": [
+                    {
+                        "p": "payload"
+                    },
+                    {
+                        "vt": "str",
+                        "p": "topic"
+                    }
+                ],
+                "repeat": "0.1",
+                "crontab": "",
+                "once": true,
+                "onceDelay": "0.1",
+                "topic": "",
+                "payload": "",
+                "payloadType": "date",
+                "x": 500,
+                "y": 460,
+                "wires": [
+                    [
+                        "a182dc40725e4801"
+                    ]
+                ]
+            },
+            {
+                "id": "a182dc40725e4801",
+                "type": "function",
+                "z": "c974bfc5fbc79b0e",
+                "name": "Aggregate & Publish (Flat)",
+                "func": "const CONFIG = {\n    fieldMapping: {\n    \"JointChanger\": \"J_Changer\",\n    \"JointDoors\": \"J_Door\",\n    \"JointFinger\": \"J_Finger\",\n    \"JointSpindle\": \"J_Spindle\",\n    \"JointTailStock\": \"J_TailStock\",\n    \"Joint_X\": \"J_X\",\n    \"Joint_Y\": \"J_Y\",\n    \"Joint_Z\": \"J_Z\"\n},\n    missingStrategy: 'lastValue',\n    outputTopic: \"Metric/porcess_prolathe_gs_260ms_2\",\n    windowMs: 100\n};\n\nconst FIELDS = Object.keys(CONFIG.fieldMapping);\n\nlet cache = flow.get('dataCache') || { instant: {}, metadata: {} };\nlet lastValues = flow.get('lastValues') || {};\nlet lastMetadata = flow.get('lastMetadata') || {};\nlet output = {};\n\noutput.timestamp = new Date().toISOString();\n\nfor (const field of FIELDS) {\n    const shortName = CONFIG.fieldMapping[field];\n\n    if (cache.instant[field] !== undefined) {\n        output[shortName + '_Cur'] = Number(cache.instant[field]);\n        output[shortName + '_Init'] = cache.metadata[field] && cache.metadata[field].initialValue !== undefined\n            ? Number(cache.metadata[field].initialValue)\n            : 0;\n        lastValues[field] = cache.instant[field];\n        lastMetadata[field] = cache.metadata[field] || {};\n    } else {\n        let fallbackValue = CONFIG.missingStrategy === 'lastValue'\n            ? (lastValues[field] !== undefined ? lastValues[field] : 0)\n            : 0;\n        output[shortName + '_Cur'] = Number(fallbackValue);\n        output[shortName + '_Init'] = lastMetadata[field] && lastMetadata[field].initialValue !== undefined\n            ? Number(lastMetadata[field].initialValue)\n            : 0;\n    }\n}\n\nmsg.payload = output;\n\nmsg.payload.Model_Name = \"Turbo\";\nmsg.payload.Max_Carry_Weight_kg = 15.0;\n\nmsg.topic = CONFIG.outputTopic;\n\nflow.set('dataCache', { instant: {}, metadata: {} });\nflow.set('lastValues', lastValues);\nflow.set('lastMetadata', lastMetadata);\n\nreturn msg;",
+                "outputs": 1,
+                "timeout": "",
+                "noerr": 0,
+                "initialize": "",
+                "finalize": "",
+                "libs": [],
+                "x": 740,
+                "y": 460,
+                "wires": [
+                    [
+                        "b4e1817aa3744ab9",
+                        "84c88149d8d24eae"
+                    ]
+                ]
+            },
+            {
+                "id": "b4e1817aa3744ab9",
+                "type": "mqtt out",
+                "z": "c974bfc5fbc79b0e",
+                "name": "Metric/Prolathe2",
+                "topic": "Metric/ProLathe-02",
+                "qos": "1",
+                "retain": "false",
+                "respTopic": "",
+                "contentType": "",
+                "userProps": "",
+                "correl": "",
+                "expiry": "",
+                "broker": "6befe0f78bf64759",
+                "x": 1060,
+                "y": 360,
+                "wires": []
+            },
+            {
+                "id": "84c88149d8d24eae",
+                "type": "debug",
+                "z": "c974bfc5fbc79b0e",
+                "name": "Debug Output",
+                "active": true,
+                "tosidebar": true,
+                "console": false,
+                "complete": "payload",
+                "statusVal": "",
+                "statusType": "auto",
+                "x": 980,
+                "y": 540,
+                "wires": []
+            },
+            {
+                "id": "6f8ade8021b85933",
+                "type": "mqtt-broker",
+                "name": "supos-demo.supos.app",
+                "broker": "supos-demo.supos.app",
+                "port": 1883,
+                "clientid": "",
+                "autoConnect": true,
+                "usetls": false,
+                "protocolVersion": 4,
+                "keepalive": 60,
+                "cleansession": true,
+                "autoUnsubscribe": true,
+                "birthTopic": "",
+                "birthQos": "0",
+                "birthRetain": "false",
+                "birthPayload": "",
+                "birthMsg": {},
+                "closeTopic": "",
+                "closeQos": "0",
+                "closeRetain": "false",
+                "closePayload": "",
+                "closeMsg": {},
+                "willTopic": "",
+                "willQos": "0",
+                "willRetain": "false",
+                "willPayload": "",
+                "willMsg": {},
+                "userProps": "",
+                "sessionExpiry": ""
+            },
+            {
+                "id": "6befe0f78bf64759",
+                "type": "mqtt-broker",
+                "z": "c974bfc5fbc79b0e",
+                "name": "emqx",
+                "broker": "mqtt.pre.tier0.dev",
+                "port": "1883",
+                "clientid": "336462685553088&338098843755632",
+                "autoConnect": true,
+                "usetls": false,
+                "protocolVersion": "4",
+                "keepalive": "60",
+                "cleansession": true,
+                "autoUnsubscribe": true,
+                "birthTopic": "",
+                "birthQos": "0",
+                "birthRetain": "false",
+                "birthPayload": "",
+                "birthMsg": {},
+                "closeTopic": "",
+                "closeQos": "0",
+                "closeRetain": "false",
+                "closePayload": "",
+                "closeMsg": {},
+                "willTopic": "",
+                "willQos": "0",
+                "willRetain": "false",
+                "willPayload": "",
+                "willMsg": {},
+                "userProps": "",
+                "sessionExpiry": ""
+            }
+        ]
+        ```
+        </details>
+</Steps>
+
+## 데이터를 3D 모델에 매핑하기
+<Steps>
+1. Tier0에서 **Model**로 이동합니다.
+2. 모델을 업로드하고 UNS 데이터를 매핑할 모델 노드를 선택합니다.
+3. 인스턴스를 만들고 노드 매핑에 사용할 UNS topic을 선택한 뒤 실제 세계 기준 모델 높이를 설정합니다.
+4. 필요에 따라 topic 필드를 선택한 모델 노드의 **Position** 및 **Rotation** 각 축에 바인딩합니다.
+5. **Data Tagging**에서 모델에 정적 태그를 추가하고 UNS 데이터를 바인딩하여 정적 정보를 표시합니다.
+        :::tip
+        하나의 모델에 여러 인스턴스를 만들어 서로 다른 데이터를 가진 동일 장비 라인을 시뮬레이션할 수 있습니다.
+        :::
+6. 워크숍에 필요한 다른 모델을 추가합니다.
+</Steps>
+
+## 워크숍 장면 시각화
+<Steps>
+1. Tier0에서 **Scene**으로 이동해 새 장면을 추가합니다.
+2. **Instance Library**에서 워크숍에 필요한 모든 인스턴스를 추가합니다.
+3. 인스턴스 모델을 워크숍 내 위치로 이동합니다.
+        :::tip[모델을 올바른 위치로 이동하는 방법]
+        - 상단 도구를 전환하여 모델을 이동, 확대/축소, 회전하고 모델 보기 시점과 좌표 위치를 변경합니다.
+        - 오른쪽의 **Object**를 확인합니다. 여기에 바인딩된 UNS 모델이 표시되어 모델 위치를 확인할 수 있습니다.
+        :::
+4. 모델 하나를 선택하고 viewport와 lighting을 설정합니다.
+5. 설정이 완료되면 이후 표시를 위해 장면을 저장합니다.
+</Steps>
+
+## 외부 공유
+<Steps>
+1. **Model**로 이동하여 워크숍에서 구성된 모델을 선택합니다.
+2. 기존 인스턴스를 선택하고 QR 코드를 생성합니다.
+3. 공유 모드를 선택하고 코드를 외부 관계자에게 보냅니다.
+        - **Share Model**: 실시간 UNS 데이터가 포함된 모델을 표시하는 Tier0 플랫폼 링크를 생성합니다.
+        - **Share Scene**: 모델과 해당 모델이 위치한 장면, 실시간 UNS 데이터 및 환경 설정을 표시하는 Tier0 플랫폼 링크를 생성합니다.
+</Steps>

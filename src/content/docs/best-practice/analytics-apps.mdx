@@ -198,7 +198,7 @@ Refinery corrosion is a complex process influenced by multiple operating factors
 
       </details>
     
-2. Go to **Flows**, create **Source Flow** to connect raw data and publish to **UNS**.
+2. Go to **Flows**, create a **Source Flow** to connect raw data and publish it to **UNS**.
 
     *(Node-RED connects data and publishes it to UNS.)*
     <details className="notebook-cell">
@@ -489,7 +489,7 @@ Refinery corrosion is a complex process influenced by multiple operating factors
 
       </details>
       :::tip[For external connections to UNS broker]
-      Aside from the authentication credentials from Tier0, if you are connecting to the UNS broker through external client, use the following information:
+      In addition to the authentication credentials from Tier0, use the following information when connecting to the UNS broker through an external client:
         ```json
         "MQTT TCP": "mqtt://enterprise-new-dev.tier0.dev:1883",
         "WSS": "wss://enterprise-new-dev.tier0.dev:8084/mqtt"
@@ -1404,10 +1404,10 @@ Refinery corrosion is a complex process influenced by multiple operating factors
 2. Enter the application requirements in the dialog, and start building.
 
     <Aside type="caution" title="What must be stated">
-      Remember to tell the agent to use data from UNS, specific topic paths are necessary. Otherwise the agent might have trouble displaying the correct data.
+      Remember to tell the agent to use data from UNS. Specific topic paths are required; otherwise, the agent might have trouble displaying the correct data.
     </Aside>
     <Aside type="tip" title="In case you are building apps on another Tier0">
-      Use a different **clientId** (add a different suffix) to connect to the UNS broker to avoid connection conflict.
+      Use a different **clientId** (add a different suffix) to connect to the UNS broker and avoid client ID conflicts.
     </Aside>
     <details className="notebook-cell">
     <summary>Show Builder prompt</summary>

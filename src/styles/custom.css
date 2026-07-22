@@ -2668,6 +2668,22 @@ main:has(.t0-banner) .t0-banner {
 	overflow: visible;
 }
 
+.t0-compact-mermaid {
+	display: flex;
+	justify-content: center;
+	margin: 1rem 0 1.25rem;
+}
+
+.t0-compact-mermaid .mermaid {
+	margin: 0 auto;
+	padding: 0.75rem;
+	max-width: 560px;
+}
+
+.t0-compact-mermaid .mermaid svg {
+	max-width: min(100%, 520px) !important;
+}
+
 .mermaid .nodeLabel,
 .mermaid .node .label,
 .mermaid .edgeLabel,

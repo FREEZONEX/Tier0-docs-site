@@ -1,9 +1,22 @@
 // @ts-check
 import { defineConfig } from 'astro/config';
 import starlight from '@astrojs/starlight';
+import starlightDocSearch from '@astrojs/starlight-docsearch';
 import starlightLlmsTxt from 'starlight-llms-txt';
 import mermaid from 'astro-mermaid';
 import mermaidEdgeLabels from './src/integrations/mermaid-edge-labels.mjs';
+
+const algoliaConfig =
+	process.env.ALGOLIA_APP_ID &&
+	process.env.ALGOLIA_SEARCH_API_KEY &&
+	process.env.ALGOLIA_INDEX_NAME
+		? {
+				appId: process.env.ALGOLIA_APP_ID,
+				apiKey: process.env.ALGOLIA_SEARCH_API_KEY,
+				indexName: process.env.ALGOLIA_INDEX_NAME,
+				disableUserPersonalization: true,
+			}
+		: undefined;
 
 // https://astro.build/config
 export default defineConfig({
@@ -14,7 +27,13 @@ export default defineConfig({
 		mermaid({
 			autoTheme: true,
 			mermaidConfig: {
-				flowchart: { curve: 'linear', nodeSpacing: 16, rankSpacing: 24, padding: 8 },
+				flowchart: {
+					curve: 'linear',
+					nodeSpacing: 16,
+					rankSpacing: 24,
+					padding: 8,
+					useMaxWidth: false,
+				},
 				fontFamily:
 					"'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif",
 				themeVariables: {
@@ -103,7 +122,7 @@ export default defineConfig({
 							slug: 'using-tier0/uns-concepts',
 						},
 						{
-							label: 'Connect Data to UNS',
+							label: 'Connecting Data to UNS',
 							translations: { 'zh-CN': '连接数据到 UNS', ja: 'UNS へのデータ接続', es: 'Conectar datos a UNS', ko: 'UNS에 데이터 연결' },
 							slug: 'using-tier0/connect-data',
 						},
@@ -113,17 +132,27 @@ export default defineConfig({
 							slug: 'using-tier0/working-with-uns-data',
 						},
 						{
-							label: 'Build Apps on UNS',
+							label: 'Building Workflow with UNS Agent',
+							translations: { 'zh-CN': '使用 UNS Agent 构建 Workflow', ja: 'UNS Agent で Workflow を構築する', es: 'Crear workflows con UNS Agent', ko: 'UNS Agent로 Workflow 구축하기' },
+							slug: 'using-tier0/monitor-uns-with-agent',
+						},
+						{
+							label: 'Displaying UNS Data with Digital Twin',
+							translations: { 'zh-CN': '使用 Digital Twin 展示 UNS 数据', ja: 'Digital Twin で UNS データを表示する', es: 'Mostrar datos UNS con Digital Twin', ko: 'Digital Twin으로 UNS 데이터 표시하기' },
+							slug: 'using-tier0/view-uns-with-digital-twin',
+						},
+						{
+							label: 'Building Apps on UNS',
 							translations: { 'zh-CN': '在 UNS 上构建应用', ja: 'UNS 上でアプリを構築', es: 'Crear apps sobre UNS', ko: 'UNS 기반 앱 구축' },
 							slug: 'using-tier0/build-apps',
 						},
 						{
-							label: 'Analyze UNS Data',
+							label: 'Analyzing UNS Data',
 							translations: { 'zh-CN': '分析 UNS 数据', ja: 'UNS データの分析', es: 'Analizar datos de UNS', ko: 'UNS 데이터 분석' },
 							slug: 'using-tier0/analyze-data',
 						},
 						{
-							label: 'Operate Tier0 with Agents',
+							label: 'Operating on Tier0 with Agents',
 							translations: { 'zh-CN': '用 Agent 操作 Tier0', ja: 'エージェントで Tier0 を操作', es: 'Operar Tier0 con agentes', ko: 'Agent로 Tier0 운영' },
 							slug: 'using-tier0/agents',
 						},
@@ -183,6 +212,7 @@ export default defineConfig({
 				},
 			],
 			plugins: [
+				...(algoliaConfig ? [starlightDocSearch(algoliaConfig)] : []),
 				starlightLlmsTxt({
 					projectName: 'Tier0',
 					description:

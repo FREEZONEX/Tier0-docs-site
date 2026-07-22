@@ -672,7 +672,7 @@ DemoFactory
 </Tabs>
 
 ## How to Avoid Topic Explosion
-Tier0 uses 3 fixed topic types: `Metric`, `Action`, and `State` to avoid topic explosion. 
+Tier0 uses three fixed topic types, `Metric`, `Action`, and `State`, to avoid topic explosion. 
 
 - **Use `Metric` for high-frequency real-time data**
 
@@ -827,7 +827,7 @@ Data to be consumed and written back must both be considered when structuring th
 
 - **Metric**
 
-  Metric payloads automatically include `_timestamp`, which records when the data is stored in the Tier0 database, and `_quality`, which maps the data quality.
+  Metric payloads automatically include `_timestamp`, which records when the data is stored in the Tier0 database, and `_quality`, which represents data quality.
 
   <Tabs syncKey="payload-metric">
     <TabItem label="ERP / SplitCount">
