@@ -6,17 +6,12 @@ import starlightLlmsTxt from 'starlight-llms-txt';
 import mermaid from 'astro-mermaid';
 import mermaidEdgeLabels from './src/integrations/mermaid-edge-labels.mjs';
 
-const algoliaConfig =
-	process.env.ALGOLIA_APP_ID &&
-	process.env.ALGOLIA_SEARCH_API_KEY &&
-	process.env.ALGOLIA_INDEX_NAME
-		? {
-				appId: process.env.ALGOLIA_APP_ID,
-				apiKey: process.env.ALGOLIA_SEARCH_API_KEY,
-				indexName: process.env.ALGOLIA_INDEX_NAME,
-				disableUserPersonalization: true,
-			}
-		: undefined;
+const algoliaConfig = {
+	appId: process.env.ALGOLIA_APP_ID || 'STRRFG9NMH',
+	apiKey: process.env.ALGOLIA_SEARCH_API_KEY || '4434f0f1f964c1ac1bc40746409ff612',
+	indexName: process.env.ALGOLIA_INDEX_NAME || 'docs_tier0_app_strrfg9nmh_articles',
+	disableUserPersonalization: true,
+};
 
 // https://astro.build/config
 export default defineConfig({
@@ -66,6 +61,7 @@ export default defineConfig({
 			editLink: {
 				baseUrl: 'https://github.com/FREEZONEX/Tier0-docs-site/edit/main/',
 			},
+			pagefind: false,
 			expressiveCode: {
 				themes: ['vitesse-dark', 'vitesse-light'],
 				defaultProps: {
@@ -212,7 +208,7 @@ export default defineConfig({
 				},
 			],
 			plugins: [
-				...(algoliaConfig ? [starlightDocSearch(algoliaConfig)] : []),
+				starlightDocSearch(algoliaConfig),
 				starlightLlmsTxt({
 					projectName: 'Tier0',
 					description:
