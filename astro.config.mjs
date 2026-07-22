@@ -87,7 +87,7 @@ export default defineConfig({
 						},
 						{
 							label: 'Choosing the Best Version',
-							translations: { 'zh-CN': '选择合适的版本', ja: '最適なエディションの選択', es: 'Elegir la mejor versión', ko: '최적 버전 선택' },
+							translations: { 'zh-CN': '选择最合适的版本', ja: '最適なエディションの選択', es: 'Elegir la mejor versión', ko: '최적 버전 선택' },
 							slug: 'get-started/choosing-version',
 						},
 					],

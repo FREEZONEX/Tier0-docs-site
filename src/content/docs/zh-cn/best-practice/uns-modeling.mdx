@@ -11,7 +11,7 @@ import { Tabs, TabItem } from '@astrojs/starlight/components';
 
 ## Demo UNS 如何组织
 :::tip[What needs to be done first]
-Before modeling data, answer the following questions.
+在为数据建模前，先思考以下问题。
 - 哪些数据会从 UNS 被消费？
 - 哪些数据会发布回 UNS？
 :::
@@ -23,7 +23,7 @@ Before modeling data, answer the following questions.
 
 #### ISA-95 设备层级
 ISA-95 设备层级描述了组织内物理资产和控制系统的结构方式。
-It is broken into the following levels:
+它们被分为以下层级:
 - **Enterprise**：最高层级，代表整个组织，包括整体业务流程和决策实体，通常由 ERP 系统支持。  
 - **Site**：代表特定地理位置或设施。每个 site 可以拥有自己的管理系统和本地生产控制。 
 - **Area**：site 内的运营分区，通常是包装、装配或仓储等功能区域。 
@@ -378,8 +378,8 @@ DemoFactory
 ### 业务数据
 
 对于 ERP 中的生产订单、工单计划等业务计划和流程对象，应根据业务上下文进行建模。
-:::tip[How to recognize business data]
-Data that does not have a physical location.
+:::tip[如何识别业务数据]
+业务数据没有物理地址。
 :::
 #### 业务数据 Modeling Guide
 ```
@@ -672,7 +672,7 @@ DemoFactory
 </Tabs>
 
 ## 如何避免 Topic Explosion
-Tier0 uses 3 fixed topic types: `Metric`, `Action`, and `State` to avoid topic explosion. 
+Tier0 使用三种固定的 Topic : `Metric`, `Action`, 和 `State` 以避免 Topic 爆炸。
 
 - **将 `Metric` 用于高频实时数据**
 

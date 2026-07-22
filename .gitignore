@@ -28,3 +28,4 @@ dist-pdf-build*/
 
 # local editor/agent settings
 .claude/settings.local.json
+.idea/
