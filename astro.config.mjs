@@ -7,10 +7,7 @@ import mermaid from 'astro-mermaid';
 import mermaidEdgeLabels from './src/integrations/mermaid-edge-labels.mjs';
 
 const algoliaConfig = {
-	appId: process.env.ALGOLIA_APP_ID || 'STRRFG9NMH',
-	apiKey: process.env.ALGOLIA_SEARCH_API_KEY || '4434f0f1f964c1ac1bc40746409ff612',
-	indexName: process.env.ALGOLIA_INDEX_NAME || 'docs_tier0_app_strrfg9nmh_articles',
-	disableUserPersonalization: true,
+	clientOptionsModule: './src/config/docsearch.ts',
 };
 
 // https://astro.build/config
@@ -41,6 +38,7 @@ export default defineConfig({
 			title: 'Tier0 Docs',
 			description:
 				'Documentation for Tier0 — the agentic industrial platform that unifies industrial signals into one real-time Unified Namespace for apps, analytics, and AI.',
+			favicon: '/favicon.svg?v=t0-20260722',
 			logo: {
 				light: './src/assets/tier0-logo-black.svg',
 				dark: './src/assets/tier0-logo-white.svg',
@@ -124,17 +122,17 @@ export default defineConfig({
 						},
 						{
 							label: 'Working with UNS Data',
-							translations: { 'zh-CN': '使用 UNS 数据', ja: 'UNS データの操作', es: 'Trabajar con datos de UNS', ko: 'UNS 데이터 작업' },
+							translations: { 'zh-CN': '操作 UNS 数据', ja: 'UNS データの操作', es: 'Trabajar con datos de UNS', ko: 'UNS 데이터 작업' },
 							slug: 'using-tier0/working-with-uns-data',
 						},
 						{
 							label: 'Building Workflow with UNS Agent',
-							translations: { 'zh-CN': '使用 UNS Agent 构建 Workflow', ja: 'UNS Agent で Workflow を構築する', es: 'Crear workflows con UNS Agent', ko: 'UNS Agent로 Workflow 구축하기' },
+							translations: { 'zh-CN': '用 UNS Agent 构建 Workflow', ja: 'UNS Agent で Workflow を構築する', es: 'Crear workflows con UNS Agent', ko: 'UNS Agent로 Workflow 구축하기' },
 							slug: 'using-tier0/monitor-uns-with-agent',
 						},
 						{
 							label: 'Displaying UNS Data with Digital Twin',
-							translations: { 'zh-CN': '使用 Digital Twin 展示 UNS 数据', ja: 'Digital Twin で UNS データを表示する', es: 'Mostrar datos UNS con Digital Twin', ko: 'Digital Twin으로 UNS 데이터 표시하기' },
+							translations: { 'zh-CN': '用 Digital Twin 展示 UNS 数据', ja: 'Digital Twin で UNS データを表示する', es: 'Mostrar datos UNS con Digital Twin', ko: 'Digital Twin으로 UNS 데이터 표시하기' },
 							slug: 'using-tier0/view-uns-with-digital-twin',
 						},
 						{
@@ -165,43 +163,50 @@ export default defineConfig({
 							slug: 'best-practice/uns-modeling',
 						},
 						{
-							label: 'Connecting OPC UA / Modbus',
-							translations: { 'zh-CN': '连接 OPC UA / Modbus', ja: 'OPC UA / Modbus 接続', es: 'Conexión OPC UA / Modbus', ko: 'OPC UA / Modbus 연결' },
+							label: 'Connecting OPC UA/Modbus/Rest API',
+							translations: { 'zh-CN': '连接 OPC UA/Modbus/Rest API', ja: 'OPC UA/Modbus/Rest API 接続', es: 'Conexión OPC UA/Modbus/Rest API', ko: 'OPC UA/Modbus/Rest API 연결' },
 							slug: 'best-practice/protocol-connections',
 						},
 						{
 							label: 'Building Analytics Apps',
-							translations: { 'zh-CN': '开发数据分析应用', ja: '分析アプリの構築', es: 'Apps de analítica', ko: '분석 앱 구축' },
+							translations: { 'zh-CN': '构建分析应用', ja: '分析アプリの構築', es: 'Apps de analítica', ko: '분석 앱 구축' },
 							slug: 'best-practice/analytics-apps',
 						},
 					],
 				},
 				{
 					label: 'Reference',
+					translations: { 'zh-CN': '参考资料', ja: 'リファレンス', es: 'Referencia', ko: '참조' },
 					collapsed: false,
 					items: [
 						{
 							label: 'API Reference',
+							translations: { 'zh-CN': 'API 参考', ja: 'API リファレンス', es: 'Referencia de API', ko: 'API 참조' },
 							slug: 'reference/api-reference',
 						},
 						{
 							label: 'Skill Reference',
+							translations: { 'zh-CN': 'Skill 参考', ja: 'Skill リファレンス', es: 'Referencia de Skill', ko: 'Skill 참조' },
 							slug: 'reference/skill-reference',
 						},
 						{
 							label: 'High Availability Deployment Plan',
+							translations: { 'zh-CN': '高可用部署计划', ja: '高可用性デプロイ計画', es: 'Plan de despliegue de alta disponibilidad', ko: '고가용성 배포 계획' },
 							slug: 'reference/high-availability-deployment',
 						},
 						{
 							label: 'SLA and High Availability Boundaries',
+							translations: { 'zh-CN': 'SLA 与高可用边界', ja: 'SLA と高可用性の範囲', es: 'SLA y límites de alta disponibilidad', ko: 'SLA 및 고가용성 범위' },
 							slug: 'reference/sla-and-ha-boundaries',
 						},
 						{
 							label: 'Standard Port List',
+							translations: { 'zh-CN': '标准端口列表', ja: '標準ポート一覧', es: 'Lista estándar de puertos', ko: '표준 포트 목록' },
 							slug: 'reference/standard-port-list',
 						},
 						{
 							label: 'Operations Runbook',
+							translations: { 'zh-CN': '运维 Runbook', ja: '運用 Runbook', es: 'Runbook de operaciones', ko: '운영 Runbook' },
 							slug: 'reference/operations-runbook',
 						},
 					],

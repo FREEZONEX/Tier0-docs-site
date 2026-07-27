@@ -10,8 +10,8 @@ import { Tabs, TabItem } from '@astrojs/starlight/components';
 
 
 ## Cómo está estructurado Demo UNS
-:::tip[What needs to be done first]
-Before modeling data, answer the following questions.
+:::tip[Qu? hacer primero]
+Antes de modelar los datos, responde estas preguntas.
 - ¿Qué datos se consumirán desde UNS?
 - ¿Qué datos se publicarán de vuelta a UNS?
 :::
@@ -23,7 +23,7 @@ Los datos industriales de máquinas y equipos con ubicaciones físicas se modela
 
 #### Jerarquía de equipos ISA-95
 La jerarquía de equipos ISA-95 describe cómo se estructuran los activos físicos y los sistemas de control dentro de una organización.
-It is broken into the following levels:
+Se divide en los siguientes niveles:
 - **Enterprise**: El nivel superior, que representa toda la organización. Incluye procesos de negocio generales y entidades de decisión, normalmente soportadas por sistemas ERP.  
 - **Site**: Representa una ubicación geográfica o instalación específica. Cada site puede tener sus propios sistemas de gestión y control local de producción. 
 - **Area**: Una división operativa dentro de un site, a menudo un área funcional como empaque, ensamblaje o almacén. 
@@ -379,7 +379,7 @@ DemoFactory
 
 Para objetos de planificación y proceso de negocio, como órdenes de producción y planes de trabajo en un ERP, modela los datos según su contexto de negocio.
 :::tip[How to recognize business data]
-Data that does not have a physical location.
+Datos que no tienen una ubicaci?n f?sica.
 :::
 #### Guía de modelado de datos de negocio
 ```

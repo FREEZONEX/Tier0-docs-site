@@ -1,6 +1,6 @@
 ﻿---
-title: 使用 UNS 数据
-description: "通过 MQTT 和 API 操作 UNS，并参考 API reference。"
+title: 操作 UNS 数据
+description: "通过 MQTT 和 API 操作 UNS 数据"
 editions: [edge, cloud, enterprise]
 sidebar:
   order: 3
@@ -8,27 +8,27 @@ sidebar:
 import { Steps } from '@astrojs/starlight/components';
 import { Tabs, TabItem } from '@astrojs/starlight/components';
 
-Tier0 支持通过 MQTT 和 API 操作 UNS。
+Tier0 支持通过 MQTT 和 API 操作 UNS 数据。
 
 ## MQTT
-Tier0 支持 MQTT clients 使用 credentials 连接到 UNS broker。
+MQTT 客户端可使用认证凭据连接到 UNS broker。
 :::note
-你可以使用 **MQTTX**、**MQTT Explorer** 和 **Node-RED** 等 MQTT clients 连接 broker，并 publish/subscribe 消息。
+你可以使用 **MQTTX**、**MQTT Explorer** 和 **Node-RED** 等 MQTT 客户端连接 UNS broker，并发布/订阅消息。
 :::
-### 生成 MQTT Credentials
-在 Tier0 的 **Edge** 页面创建新的 credential，并记录下来。
+### 生成 MQTT 凭据
+在 Tier0 的 **Edge** 页面创建新的凭据，并记录下来。
 
-### 连接 MQTT Clients
+### 连接 MQTT 客户端
 
 :::tip
-以下 clients 作为示例，用来展示如何使用 credentials 连接 UNS broker。
+以下客户端作为示例，用来展示如何使用凭据连接 UNS broker。
 :::
 
 <Tabs syncKey="mqtt-client">
   <TabItem label="MQTTX">
 
 1. 安装并打开 <a href="https://mqttx.app/" target="_blank" rel="noopener noreferrer">MQTTX</a>。
-2. 使用 Tier0 UNS broker 信息和生成的 credentials 添加连接。
+2. 使用 Tier0 UNS broker 信息和生成的凭据添加连接。
     ```json
     {
       "Host": "mqtt.tier0.dev",
@@ -43,7 +43,7 @@ Tier0 支持 MQTT clients 使用 credentials 连接到 UNS broker。
   <TabItem label="MQTT Explorer">
 
 1. 安装并打开 <a href="https://mqtt-explorer.com/" target="_blank" rel="noopener noreferrer">MQTT Explorer</a>。
-2. 使用 broker 信息和生成的 credentials 添加新连接。
+2. 使用 broker 信息和生成的凭据添加新连接。
     ```json
     {
       "Protocol": "mqtt://",
@@ -53,15 +53,15 @@ Tier0 支持 MQTT clients 使用 credentials 连接到 UNS broker。
       "Password": "<generated password>"
     }
     ``` 
-3. 连接前，在 **ADVANCED** 中将 client ID 改为 credential ID。
+3. 连接前，在 **ADVANCED** 中将 client ID 改为凭据 ID。
 
   </TabItem>
   <TabItem label="Node-RED">
-      - 使用 **Event Flow** - Tier0 中基于 Node-RED 的数据处理模块。
-          1. 在 **Event Flow** 中创建 flow，并用 `mqtt in` 节点作为起点。
-          2. 在节点中选择 UNS broker 作为 **Server**（与 flow 同名），并将 **Topic** 设置为 UNS model。
+      - 使用 **事件流程** - Tier0 中基于 Node-RED 的数据处理模块。
+          1. 在 **事件流程** 中创建数据流，并用 `mqtt in` 节点作为起点。
+          2. 在节点中选择 UNS broker 作为 **Server**（与 flow 同名），并将 **Topic** 设置为 UNS 模型。
       - 使用**独立 Node-RED 实例**
-          1. 安装并打开 <a href="https://nodered.org/docs/getting-started/local" target="_blank" rel="noopener noreferrer">Node-RED</a> instance。
+          1. 安装并打开 <a href="https://nodered.org/docs/getting-started/local" target="_blank" rel="noopener noreferrer">Node-RED</a> 实例。
           2. 在 `mqtt in` 节点中使用以下信息添加 server。
           ```json
           {
@@ -79,45 +79,72 @@ Tier0 支持 MQTT clients 使用 credentials 连接到 UNS broker。
 
 ### 测试连接
 <Steps>
-1. 在 **Edge** 页面，确认 **Clients** tab 下每个 client 的状态正常。
-2. 复制一个 UNS model topic，并通过 client 向它 publish 一条消息。
+1. 在 **Edge** 页面，确认 **客户端** 页签下每个客户端的状态正常。
+2. 复制一个 UNS 模型 topic，并通过客户端向它发布一条消息。
 3. 回到 **UNS**，检查目标 topic 下的数据。
 </Steps>
 
 ## API
-使用 **RestAPI** 操作 UNS 数据、flows 和 authentication。
+使用 **REST API** 操作 UNS 数据。
 :::tip[如何使用 API]
-- OpenAPI base path 是 `/openapi/v1`。将 `TIER0_BASE_URL` 设置为你的 Tier0 host 加上 base path，例如 `https://your-workspace.tier0.app/openapi/v1`，并在 `x-api-key` header 中传入 API key。
-- 点击右上角 account icon，在 **Settings > API Keys** 下生成 API keys。
+- OpenAPI base path 是 `/openapi/v1`。将 `TIER0_BASE_URL` 设置为你的 Tier0 host 加上 base path，例如 `https://your-workspace.tier0.app/openapi/v1`，并在 `x-api-key` header 中传入 API 密钥。
+- 单击右上角账号图标，进入 **设置 > API 密钥** 生成 API 密钥。
 :::
 
-- `/flow/create`
+- `/uns/create`
 
-  创建 **Source Flow** 或 **Event Flow**。`flowName` 和 `flowType` 是必填项。
+  创建 UNS path 或 topic。使用 `namespace` 定义树形结构。
 
-  <Tabs syncKey="flow-api-language">
+  <Tabs syncKey="uns-api-language">
     <TabItem label="JavaScript">
 
       ```js
       const BASE_URL = process.env.TIER0_BASE_URL;
       const API_KEY = process.env.TIER0_API_KEY;
 
-      const response = await fetch(`${BASE_URL}/flow/create`, {
+      const response = await fetch(`${BASE_URL}/uns/create`, {
         method: 'POST',
         headers: {
           'content-type': 'application/json',
           'x-api-key': API_KEY,
         },
         body: JSON.stringify({
-          flowName: 'Manufacturing source flow',
-          flowType: 'SourceFlow',
-          description: 'Collects UNS source data from the plant.',
-          template: '{}',
+          namespace: [
+            {
+              name: 'DemoFactory',
+              type: 'PATH',
+              children: [
+                {
+                  name: 'Site_01',
+                  type: 'PATH',
+                  children: [
+                    {
+                      name: 'Production',
+                      type: 'PATH',
+                      children: [
+                        {
+                          name: 'Produced_Qty',
+                          type: 'TOPIC',
+                          topicType: 'METRIC',
+                          displayName: 'Produced Quantity',
+                          description: 'Produced quantity from the production line.',
+                          enableHistory: true,
+                          fields: [
+                            { name: 'value', type: 'DOUBLE', unit: 'pcs' },
+                          ],
+                        },
+                      ],
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
         }),
       });
 
       const result = await response.json();
-      console.log(result.data.id, result.data.brokerID);
+      console.log(result.data.results);
       ```
 
     </TabItem>
@@ -131,65 +158,122 @@ Tier0 支持 MQTT clients 使用 credentials 连接到 UNS broker。
       api_key = os.environ["TIER0_API_KEY"]
 
       response = requests.post(
-          f"{base_url}/flow/create",
+          f"{base_url}/uns/create",
           headers={"x-api-key": api_key},
           json={
-              "flowName": "Manufacturing source flow",
-              "flowType": "SourceFlow",
-              "description": "Collects UNS source data from the plant.",
-              "template": "{}",
+              "namespace": [
+                  {
+                      "name": "DemoFactory",
+                      "type": "PATH",
+                      "children": [
+                          {
+                              "name": "Site_01",
+                              "type": "PATH",
+                              "children": [
+                                  {
+                                      "name": "Production",
+                                      "type": "PATH",
+                                      "children": [
+                                          {
+                                              "name": "Produced_Qty",
+                                              "type": "TOPIC",
+                                              "topicType": "METRIC",
+                                              "displayName": "Produced Quantity",
+                                              "description": "Produced quantity from the production line.",
+                                              "enableHistory": True,
+                                              "fields": [
+                                                  {"name": "value", "type": "DOUBLE", "unit": "pcs"},
+                                              ],
+                                          },
+                                      ],
+                                  },
+                              ],
+                          },
+                      ],
+                  },
+              ],
           },
           timeout=30,
       )
       response.raise_for_status()
 
       result = response.json()
-      print(result["data"]["id"], result["data"]["brokerID"])
+      print(result["data"]["results"])
       ```
 
     </TabItem>
     <TabItem label="cURL">
 
       ```bash
-      curl -X POST "$TIER0_BASE_URL/flow/create" \
+      curl -X POST "$TIER0_BASE_URL/uns/create" \
         -H "content-type: application/json" \
         -H "x-api-key: $TIER0_API_KEY" \
         -d '{
-          "flowName": "Manufacturing source flow",
-          "flowType": "SourceFlow",
-          "description": "Collects UNS source data from the plant.",
-          "template": "{}"
+          "namespace": [
+            {
+              "name": "DemoFactory",
+              "type": "PATH",
+              "children": [
+                {
+                  "name": "Site_01",
+                  "type": "PATH",
+                  "children": [
+                    {
+                      "name": "Production",
+                      "type": "PATH",
+                      "children": [
+                        {
+                          "name": "Produced_Qty",
+                          "type": "TOPIC",
+                          "topicType": "METRIC",
+                          "displayName": "Produced Quantity",
+                          "description": "Produced quantity from the production line.",
+                          "enableHistory": true,
+                          "fields": [
+                            { "name": "value", "type": "DOUBLE", "unit": "pcs" }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
         }'
       ```
 
     </TabItem>
   </Tabs>
 
-- `/flow/list`
+- `/uns/read`
 
-  列出 flows，并可按 `flowType` 或 `keyword` 过滤。执行 UPDATE 或 GET 操作前，可用它查找 flow `id`。
+  读取一个或多个 UNS topics 的最新值和元数据。
 
-  <Tabs syncKey="flow-api-language">
+  <Tabs syncKey="uns-api-language">
     <TabItem label="JavaScript">
 
       ```js
       const BASE_URL = process.env.TIER0_BASE_URL;
       const API_KEY = process.env.TIER0_API_KEY;
 
-      const response = await fetch(`${BASE_URL}/flow/list`, {
+      const response = await fetch(`${BASE_URL}/uns/read`, {
         method: 'POST',
         headers: {
           'content-type': 'application/json',
           'x-api-key': API_KEY,
         },
         body: JSON.stringify({
-          flowType: 'SourceFlow',
-          keyword: 'Manufacturing',
+          topics: [
+            'DemoFactory/Site_01/Production/Produced_Qty',
+          ],
+          include_leaf_value: true,
+          include_metadata: true,
         }),
       });
 
       const result = await response.json();
-      console.log(result.data.list);
+      console.log(result.data.results);
       ```
 
     </TabItem>
@@ -203,131 +287,65 @@ Tier0 支持 MQTT clients 使用 credentials 连接到 UNS broker。
       api_key = os.environ["TIER0_API_KEY"]
 
       response = requests.post(
-          f"{base_url}/flow/list",
+          f"{base_url}/uns/read",
           headers={"x-api-key": api_key},
           json={
-              "flowType": "SourceFlow",
-              "keyword": "Manufacturing",
+              "topics": [
+                  "DemoFactory/Site_01/Production/Produced_Qty",
+              ],
+              "include_leaf_value": True,
+              "include_metadata": True,
           },
           timeout=30,
       )
       response.raise_for_status()
 
       result = response.json()
-      print(result["data"]["list"])
+      print(result["data"]["results"])
       ```
 
     </TabItem>
     <TabItem label="cURL">
 
       ```bash
-      curl -X POST "$TIER0_BASE_URL/flow/list" \
+      curl -X POST "$TIER0_BASE_URL/uns/read" \
         -H "content-type: application/json" \
         -H "x-api-key: $TIER0_API_KEY" \
         -d '{
-          "flowType": "SourceFlow",
-          "keyword": "Manufacturing"
+          "topics": [
+            "DemoFactory/Site_01/Production/Produced_Qty"
+          ],
+          "include_leaf_value": true,
+          "include_metadata": true
         }'
       ```
 
     </TabItem>
   </Tabs>
 
-- `/flow/update`
+- `/uns/update`
 
-  通过 `id` 更新 flow。只发送你想修改的字段。
+  通过 `path` 更新 UNS 节点。使用 `updateMask` 指定需要变更的字段。
 
-  <Tabs syncKey="flow-api-language">
+  <Tabs syncKey="uns-api-language">
     <TabItem label="JavaScript">
 
       ```js
       const BASE_URL = process.env.TIER0_BASE_URL;
       const API_KEY = process.env.TIER0_API_KEY;
-      const flowId = 123;
 
-      const response = await fetch(`${BASE_URL}/flow/update`, {
+      const response = await fetch(`${BASE_URL}/uns/update`, {
         method: 'POST',
         headers: {
           'content-type': 'application/json',
           'x-api-key': API_KEY,
         },
         body: JSON.stringify({
-          id: flowId,
-          flowName: 'Manufacturing source flow v2',
-          description: 'Updated source flow description.',
-          isFavorite: 1,
+          path: 'DemoFactory/Site_01/Production/Produced_Qty',
+          displayName: 'Produced Quantity',
+          description: 'Updated production output quantity.',
+          updateMask: ['displayName', 'description'],
         }),
-      });
-
-      const result = await response.json();
-      console.log(result.data.success);
-      ```
-
-    </TabItem>
-    <TabItem label="Python">
-
-      ```python
-      import os
-      import requests
-
-      base_url = os.environ["TIER0_BASE_URL"]
-      api_key = os.environ["TIER0_API_KEY"]
-      flow_id = 123
-
-      response = requests.post(
-          f"{base_url}/flow/update",
-          headers={"x-api-key": api_key},
-          json={
-              "id": flow_id,
-              "flowName": "Manufacturing source flow v2",
-              "description": "Updated source flow description.",
-              "isFavorite": 1,
-          },
-          timeout=30,
-      )
-      response.raise_for_status()
-
-      result = response.json()
-      print(result["data"]["success"])
-      ```
-
-    </TabItem>
-    <TabItem label="cURL">
-
-      ```bash
-      curl -X POST "$TIER0_BASE_URL/flow/update" \
-        -H "content-type: application/json" \
-        -H "x-api-key: $TIER0_API_KEY" \
-        -d '{
-          "id": 123,
-          "flowName": "Manufacturing source flow v2",
-          "description": "Updated source flow description.",
-          "isFavorite": 1
-        }'
-      ```
-
-    </TabItem>
-  </Tabs>
-
-- `/flow/get`
-
-  通过 `id` 获取单个 flow。
-
-  <Tabs syncKey="flow-api-language">
-    <TabItem label="JavaScript">
-
-      ```js
-      const BASE_URL = process.env.TIER0_BASE_URL;
-      const API_KEY = process.env.TIER0_API_KEY;
-      const flowId = 123;
-
-      const response = await fetch(`${BASE_URL}/flow/get`, {
-        method: 'POST',
-        headers: {
-          'content-type': 'application/json',
-          'x-api-key': API_KEY,
-        },
-        body: JSON.stringify({ id: flowId }),
       });
 
       const result = await response.json();
@@ -343,12 +361,16 @@ Tier0 支持 MQTT clients 使用 credentials 连接到 UNS broker。
 
       base_url = os.environ["TIER0_BASE_URL"]
       api_key = os.environ["TIER0_API_KEY"]
-      flow_id = 123
 
       response = requests.post(
-          f"{base_url}/flow/get",
+          f"{base_url}/uns/update",
           headers={"x-api-key": api_key},
-          json={"id": flow_id},
+          json={
+              "path": "DemoFactory/Site_01/Production/Produced_Qty",
+              "displayName": "Produced Quantity",
+              "description": "Updated production output quantity.",
+              "updateMask": ["displayName", "description"],
+          },
           timeout=30,
       )
       response.raise_for_status()
@@ -361,10 +383,89 @@ Tier0 支持 MQTT clients 使用 credentials 连接到 UNS broker。
     <TabItem label="cURL">
 
       ```bash
-      curl -X POST "$TIER0_BASE_URL/flow/get" \
+      curl -X POST "$TIER0_BASE_URL/uns/update" \
         -H "content-type: application/json" \
         -H "x-api-key: $TIER0_API_KEY" \
-        -d '{"id": 123}'
+        -d '{
+          "path": "DemoFactory/Site_01/Production/Produced_Qty",
+          "displayName": "Produced Quantity",
+          "description": "Updated production output quantity.",
+          "updateMask": ["displayName", "description"]
+        }'
+      ```
+
+    </TabItem>
+  </Tabs>
+
+- `/uns/delete`
+
+  删除一个或多个 UNS 模型。使用 `hard_delete: false` 将模型移到回收站。
+
+  <Tabs syncKey="uns-api-language">
+    <TabItem label="JavaScript">
+
+      ```js
+      const BASE_URL = process.env.TIER0_BASE_URL;
+      const API_KEY = process.env.TIER0_API_KEY;
+
+      const response = await fetch(`${BASE_URL}/uns/delete`, {
+        method: 'POST',
+        headers: {
+          'content-type': 'application/json',
+          'x-api-key': API_KEY,
+        },
+        body: JSON.stringify({
+          topics: [
+            'DemoFactory/Site_01/Production/Produced_Qty',
+          ],
+          hard_delete: false,
+        }),
+      });
+
+      const result = await response.json();
+      console.log(result.data);
+      ```
+
+    </TabItem>
+    <TabItem label="Python">
+
+      ```python
+      import os
+      import requests
+
+      base_url = os.environ["TIER0_BASE_URL"]
+      api_key = os.environ["TIER0_API_KEY"]
+
+      response = requests.post(
+          f"{base_url}/uns/delete",
+          headers={"x-api-key": api_key},
+          json={
+              "topics": [
+                  "DemoFactory/Site_01/Production/Produced_Qty",
+              ],
+              "hard_delete": False,
+          },
+          timeout=30,
+      )
+      response.raise_for_status()
+
+      result = response.json()
+      print(result["data"])
+      ```
+
+    </TabItem>
+    <TabItem label="cURL">
+
+      ```bash
+      curl -X POST "$TIER0_BASE_URL/uns/delete" \
+        -H "content-type: application/json" \
+        -H "x-api-key: $TIER0_API_KEY" \
+        -d '{
+          "topics": [
+            "DemoFactory/Site_01/Production/Produced_Qty"
+          ],
+          "hard_delete": false
+        }'
       ```
 
     </TabItem>
@@ -372,7 +473,7 @@ Tier0 支持 MQTT clients 使用 credentials 连接到 UNS broker。
 
 ## API 参考
 
-- [Tier0 OpenAPI Reference](../../reference/tier0-openapi/)
+- [Tier0 OpenAPI 参考](../../reference/tier0-openapi/)
 
 ## 下一步
 

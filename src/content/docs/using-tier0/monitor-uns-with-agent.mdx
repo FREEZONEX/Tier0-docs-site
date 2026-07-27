@@ -16,9 +16,7 @@ Instead of building data models, connections, and events step by step across dif
 :::
 
 ## Workflow Background
-:::note
-This example workflow demonstrates how the agent can handle the work for you.
-:::
+
 A mixing tank mixes materials while heating them. Build a data model and collect temperature, water level, and heater status to determine whether the tank is overheated and trigger an alarm.
 
 <div className="t0-compact-mermaid">
@@ -51,18 +49,25 @@ flowchart RL
     ```text
     Create a source flow to send data to these 2 topics, simulate reasonable data.
     ```
+
     :::tip[When you have actual data sources]
-    Tell the agent your data source information and have it connect them.
+    Tell the agent your data source information for connection.
     :::
+
 4. Enter the prompt to create an event with the following logic.
     - Low water level warning: Triggered when the water level is below 20% and the heater is on.
     - Dry-heating alarm: Triggered when the water level is below 15%, temperature is above 90°C and the heater is on.
+    
     ```md
     Create an Event Flow for the following alarm logic:
       - Warning: Trigger when level < 20 and heater_status = true.
       - Critical: Trigger when level < 15, temperature > 90, and heater_status = true.
       - Clear the active alarm when level > 25 or heater_status = false.
-    Create a new topic under the existing source path to receive the alarm result. Include the alarm level, message, active status, and timestamp in the output.
+    Create a new topic under the existing UNS model to receive the alarm result. Include the alarm level, message, active status, and timestamp in the output.
     ```
 5. Check the results on **UNS**.
 </Steps>
+
+:::note
+Continue talking to the agent after each step to refine the outcome.
+:::

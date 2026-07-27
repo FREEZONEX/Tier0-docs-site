@@ -1,6 +1,6 @@
 ---
 title: Probar Demo Factory en Tier0
-description: "Explora una planta precargada y funcional en tu workspace de prueba Cloud: namespace, flows, notebooks y apps."
+description: "Explora una fábrica precargada y funcional en tu workspace de prueba Cloud: namespace, flows, notebooks y apps."
 editions: [cloud]
 sidebar:
   order: 2
@@ -10,56 +10,75 @@ sidebar:
 import { Steps } from '@astrojs/starlight/components';
 
 La forma más rápida de entender Tier0 es explorar una fábrica que ya funciona.
-## Negocio de la fábrica
-La fábrica en Tier0 obtiene órdenes desde ERP, divide las órdenes, programa la producción según esas órdenes, envía el programa y obtiene datos de avance de producción durante el proceso.
+
+## Contexto de negocio
+
+La fábrica en Tier0 recibe órdenes desde ERP, divide las órdenes, programa la producción, envía el programa al departamento de producción y recibe datos de avance de producción mientras avanza el trabajo.
+
+<div className="t0-demo-factory-mermaid">
 
 ```mermaid
+%%{init: {"themeVariables": {"fontSize": "18px"}, "themeCSS": ".nodeLabel, .edgeLabel, .cluster-label { font-size: 18px !important; } .nodeLabel b, .nodeLabel strong { font-size: 19px !important; }"}}%%
 flowchart TB
-  uns["Datos de órdenes UNS<br/>Órdenes desde ERP"]
-  production["Departamento de producción"]
+  uns["<span style='font-size:18px;font-weight:700'>Datos de órdenes UNS</span><br/><span style='font-size:16px'>Órdenes desde ERP</span>"]
+  production["<span style='font-size:18px'>Departamento de producción</span>"]
 
   subgraph app["App de gestión de órdenes de trabajo"]
-    direction LR
-    orders["<b>Órdenes de producción</b><br/><span style='font-size:13px'>(Opcional) Crear órdenes</span>"]
-    plans["<b>Planes</b><br/><span style='font-size:13px'>Dividir orden<br/>Programa de producción</span>"]
-    details["<b>Detalles del plan</b><br/><span style='font-size:13px'>Detalles del avance de producción</span>"]
+    direction TB
+    appSpacer[" "]
+    subgraph appPages[" "]
+      direction LR
+      orders["<span style='font-size:18px;font-weight:700'>Órdenes de producción</span><br/><span style='font-size:16px'>(Opcional) Crear órdenes</span>"]
+      plans["<span style='font-size:18px;font-weight:700'>Planes</span><br/><span style='font-size:16px'>Dividir orden<br/>Programa de producción</span>"]
+      details["<span style='font-size:18px;font-weight:700'>Detalles del plan</span><br/><span style='font-size:16px;white-space:nowrap'>Detalles del avance de producción</span>"]
+    end
   end
 
   uns -- "datos de órdenes" --> orders
   orders --> plans
   plans --> details
-  plans -- "plan de producción" --> production
-  production -- "avance de producción" --> details
+  plans --> planLabel["plan de producción"]
+  planLabel --> production
+  production --> progressLabel["avance de producción"]
+  progressLabel --> details
 
-  classDef external fill:#f8fafc,stroke:#b8c4d5,color:#171a22,stroke-width:1px
-  classDef optional fill:#fbfdf4,stroke:#cfe8a3,color:#171a22,stroke-width:1px
-  classDef appNode fill:#f4f8e9,stroke:#9adf11,color:#171a22,stroke-width:1px
+  classDef external fill:#f8fafc,stroke:#b8c4d5,color:#171a22,stroke-width:1px,font-size:18px
+  classDef optional fill:#fbfdf4,stroke:#cfe8a3,color:#171a22,stroke-width:1px,font-size:18px
+  classDef appNode fill:#f4f8e9,stroke:#9adf11,color:#171a22,stroke-width:1px,font-size:18px
+  classDef labelNode fill:transparent,stroke:transparent,color:#4b5563,font-size:17px
+  classDef invisible fill:transparent,stroke:transparent,color:transparent
   class uns,production external
   class orders optional
   class plans,details appNode
+  class planLabel,progressLabel labelNode
+  class appSpacer invisible
+  style appPages fill:transparent,stroke:transparent
 ```
 
-## Conocer el proceso de negocio
+</div>
+
+## Conocer el proceso
+
 <Steps>
 1. En Tier0, ve a **UNS** y revisa los detalles de las órdenes que vienen de ERP.
     - `DemoFactory/ERP/ProductionOrders/State/UpsertProductionOrder`: Órdenes.
     - `DemoFactory/ERP/ProductionOrders/State/OrderList`: Snapshot de la lista actual de órdenes.
     :::tip[¿Cómo se recopilan estos datos en UNS?]
-    Ve a **Flows** > **Source Flow** > **DemoFactory-Flow** para revisar el proceso de recolección de datos.
+    Ve a **Flows** > **Source Flow** > **DemoFactory-Flow** para revisar los detalles de recolección de datos.
     :::
 2. (Opcional) Ve a **Launchpad**, abre la aplicación **Work Order Management** y crea órdenes en la página **Production Orders**.
 3. En **Work Order Management**, divide órdenes y programa planes de producción para las órdenes de trabajo divididas en la página **Plans**.
-4. Envía el plan a producción y revisa los detalles del plan en los siguientes topics de **UNS**.
+4. Envía el plan al departamento de producción y revisa los detalles del plan en los siguientes topics de **UNS**.
     - `DemoFactory/ERP/WorkOrderPlan/Metric/SplitCount`: Número de workorders después de la división.
     - `DemoFactory/ERP/WorkOrderPlan/State/PlanStatus`: Estado actual del plan.
     - `DemoFactory/ERP/WorkOrderPlan/State/WorkOrderList`: Lista de workorders después de programar el plan de producción.
 
     :::note
-    La aplicación envía directamente los plans y workorders a **UNS**.
+    La aplicación escribe directamente los plans y workorders de vuelta en **UNS**.
     :::
 5. Revisa los datos de avance de producción en la página **Plan Details** de la aplicación.
     :::tip[¿De dónde vienen los detalles?]
-    Los datos de avance de producción se recopilan desde **DemoFactory-Flow** en **Source Flow**, se publican en **UNS** y se muestran en la página **Plan Details**.
+    Los datos de avance de producción vienen del departamento de producción, se recopilan mediante **DemoFactory-Flow** en **Source Flow**, se publican en **UNS** y se muestran en la página **Plan Details**.
     - `DemoFactory/Site_01/Production/Line_01/WorkOrderExecution/State/CurrentWorkOrder`: La orden en proceso.
     - `DemoFactory/Site_01/Production/Line_01/WorkOrderExecution/State/WorkOrderStatus`: El estado de ejecución de la orden actual.
     - `DemoFactory/Site_01/Production/Line_01/WorkOrderExecution/Metric/Target_Qty`: La cantidad objetivo de producción de la orden actual.
@@ -68,7 +87,8 @@ flowchart TB
     - `DemoFactory/Site_01/Production/Line_01/WorkOrderExecution/Metric/Completion_Rate`: La tasa de finalización de la orden actual.
     :::
 </Steps>
+
 ## Siguiente
 
-- [Elegir la mejor versión](../choosing-version/)
-- [Conceptos de UNS](../../using-tier0/uns-concepts/) - Understand data modeling in Unified Namespace.
+- [Elegir la mejor versión](../choosing-version/) - Compara cada versión y elige la que mejor se adapta a ti
+- [Conceptos de UNS](../../using-tier0/uns-concepts/) - Comprende el modelado de datos en Unified Namespace

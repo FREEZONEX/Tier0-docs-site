@@ -1,6 +1,6 @@
 ---
 title: 用 Agents 操作 Tier0
-description: Tier0 Skill 能做什么，以及如何安装它。
+description: Tier0 Skill 能做什么，及如何安装。
 editions: [edge, cloud, enterprise]
 sidebar:
   order: 6
@@ -13,7 +13,7 @@ Tier0 提供了一组 skills 和 CLI 命令，供 agents 操作平台。
 
 ## 安装 Tier0 Skills
 
-> Required CLI version: `v0.4.6+`
+> 需求 CLI 版本: `v0.4.6+`
 
 请选择与你的环境匹配的安装方式。
 
@@ -25,12 +25,12 @@ Tier0 提供了一组 skills 和 CLI 命令，供 agents 操作平台。
 npx @tier0/cli@latest
 ```
 
-这会运行完整安装器，并完成两件事：
+该命令会运行完整安装器，并完成两件事：
 
 - 将 `tier0` CLI binary 安装到 `~/.tier0/bin/`。
 - 从 `FREEZONEX/Tier0-skill` 安装 Cursor/Claude Agent Skills。
-:::tip[如果 Agent Skills 注册步骤失败]
-如果 Agent Skills 注册步骤失败，不会影响 CLI 安装。可以手动运行 skills installer：
+:::tip[如果 Agent Skills 注册失败]
+如果 Agent Skills 注册失败，不会影响 CLI 安装。可以手动运行 skills installer：
 
 ```bash
 npx skills add FREEZONEX/Tier0-skill
@@ -71,7 +71,7 @@ tier0 skills update
 
 ## Tier0 Skill 能做什么
 
-Tier0 Skills 为 agents 提供结构化方式，用于选择正确的 CLI 命令、读取对应参考，并通过 `tier0` CLI 操作 Tier0。
+Tier0 Skills 为 agents 提供了结构化的方式选择正确的 CLI 命令、读取对应参考，并通过 `tier0` CLI 操作 Tier0。
 
 ### 设置操作实例
 :::note
@@ -86,15 +86,15 @@ tier0 config --base-url https://your-tier0.example.com
 ### 登录
 
 <Tabs syncKey="tier0-login-method">
-  <TabItem label="已有 API key">
+  <TabItem label="已有 API 密钥">
 
   <Steps>
-  1. 为操作实例设置 API key。
+  1. 为操作实例设置 API 密钥。
 
       ```bash
       tier0 config --api-key <api-key>
       ```
-  2. 验证 API key 身份和权限。
+  2. 验证 API 密钥身份和权限。
       ```bash
       tier0 auth whoami
       ```
@@ -102,7 +102,7 @@ tier0 config --base-url https://your-tier0.example.com
   </Steps>
 
   </TabItem>
-  <TabItem label="没有 API key">
+  <TabItem label="没有 API 密钥">
 
   <Steps>
   1. 启动浏览器登录。
@@ -120,7 +120,7 @@ tier0 config --base-url https://your-tier0.example.com
 </Tabs>
 
 :::caution[重要]
-在配置 API key 或开始浏览器登录前，先运行 `config` 设置操作实例；否则 CLI 可能会操作到错误实例。
+在配置 API 密钥或开始浏览器登录前，先运行 `config` 设置操作实例；否则 CLI 可能会操作到错误实例。
 :::
 
 ## 卸载 Tier0 Skills
@@ -135,7 +135,7 @@ npx @tier0/cli@latest uninstall --purge
 
 ## Skill 参考
 
-[Tier0 Skill Reference](../../reference/tier0-skill/) 列出了支持的操作对象、常见任务和对应 CLI 命令。
+[Tier0 Skill 文档](../../reference/tier0-skill/) 列出了支持的操作对象、常见任务和对应 CLI 命令。
 
 :::tip[让 agent 读取 repo]
 在运行命令前，可以让你的 agent 先读取 [Tier0 Skill repo](https://github.com/FREEZONEX/Tier0-skill)。

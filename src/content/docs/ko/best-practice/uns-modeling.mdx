@@ -12,8 +12,8 @@ import { Tabs, TabItem } from '@astrojs/starlight/components';
 ## Demo UNS 구조
 :::tip[먼저 해야 할 일]
 데이터를 모델링하기 전에 다음 질문에 답하세요.
-- What data will be consumed from the UNS?
-- What data will be published back to the UNS?
+- UNS에서 어떤 data를 consume할 것인가?
+- UNS로 어떤 data를 다시 publish할 것인가?
 :::
 
 
@@ -21,7 +21,7 @@ import { Tabs, TabItem } from '@astrojs/starlight/components';
 
 물리적 위치가 있는 기계와 설비의 산업 데이터는 ISA-95 표준을 기반으로 모델링합니다.
 
-#### ISA-95 Equipment Hierarchy
+#### ISA-95 장비 계층
 ISA-95 설비 계층은 조직 내 물리 자산과 제어 시스템이 어떻게 구조화되는지 설명합니다.
 다음 계층으로 나뉩니다.
 - **Enterprise**: 전체 조직을 나타내는 최상위 계층입니다. ERP system이 보통 지원하는 전체 business process와 decision-making entity를 포함합니다.  
@@ -385,7 +385,7 @@ ERP의 생산 주문, 작업 지시 계획 같은 비즈니스 계획 및 프로
 ```
 Factory / Business Domain / Business Object / Topic Type / Topic
 ```
-- **Business Domain**: Confirm the business process or system the data belongs to.
+- **Business Domain**: data가 속한 business process 또는 system을 확인합니다.
     ```
     ERP
     MES
@@ -400,7 +400,7 @@ Factory / Business Domain / Business Object / Topic Type / Topic
     Logistics
     ...
     ```
-- **Business Object**: The core managed object in the business domain.
+- **Business Object**: business domain에서 관리되는 핵심 object입니다.
     ```
     ProductionOrders
     WorkOrderPlan
@@ -411,7 +411,7 @@ Factory / Business Domain / Business Object / Topic Type / Topic
     Shipments
     ...
     ```
-- **Topic Type**: Choose the data type from **Metric**, **Action**, and **State**.
+- **Topic Type**: **Metric**, **Action**, **State** 중 data type을 선택합니다.
 
     | Topic Type | Used for | Examples |
     | --- | --- | --- |

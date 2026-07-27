@@ -7,11 +7,11 @@ sidebar:
 ---
 import { Aside, Steps } from '@astrojs/starlight/components';
 
-Tier0 使用 Marimo Notebook 通过 Python 进行高级数据分析。本指南以 Bowtie 应用作为示例流程。
+Tier0 使用 Marimo Notebook 通过 Python 进行高级数据分析。本指南以 Bowtie 应用作为示例。
 
 ```mermaid
 flowchart LR
-  collect["Node-RED"] -->|"采集数据"| uns[("UNS<br/>建模")]
+  collect["数据连接"] -->|"采集数据"| uns[("UNS<br/>模型")]
   uns -->|"原始数据"| notebook["Notebook"]
   notebook -->|"分析结果"| uns
   uns -->|"分析结果"| builder["App Builder"]
@@ -27,7 +27,7 @@ flowchart LR
 
 ## 示例背景
 
-炼化腐蚀是一个受多种运行因素影响的复杂过程。本示例展示一个实时腐蚀风险评估流程：结合过程数据估算腐蚀发生概率，并支持主动维护。
+炼化腐蚀是一个受多种运行因素影响的复杂过程。本示例展示一个实时腐蚀风险评估：结合过程数据估算腐蚀发生概率，并支持主动维护。
 
 ## 获取原始数据
 
@@ -198,11 +198,10 @@ flowchart LR
 
       </details>
     
-2. 进入 **Flows**，创建 **Source Flow**，连接原始数据并发布到 **UNS**。
+2. 进入 **数据流程**，创建 **数据连接**，连接原始数据并发布到 **UNS**。
 
-    *(Node-RED 负责连接数据并发布到 UNS。)*
     <details className="notebook-cell">
-    <summary>显示 Source Flow JSON</summary>
+    <summary>显示数据连接 JSON</summary>
 
     ```json
       [
@@ -402,9 +401,7 @@ flowchart LR
 
 2. 打开该 notebook，添加以下 cell 来分析 **UNS** 中的数据。
 
-    - 单元 1 - 导入库并配置
-
-      导入所需库，并配置 MQTT broker、topic 和运行时设置。
+    - 单元 1 - 导入所需依赖，并配置 MQTT broker、topics 和运行时设置。
 
       <details className="notebook-cell">
       <summary>显示代码</summary>
@@ -489,9 +486,7 @@ flowchart LR
 
       </details>
 
-    - 单元 2 - 定义 Bayesian Network 结构
-
-      定义 Bayesian Network topology、状态空间、CPT generator 和概率规则。
+    - 单元 2 - 定义 Bayesian Network 拓扑、状态空间、CPT 生成器和概率规则。
 
       <details className="notebook-cell">
       <summary>显示代码</summary>
@@ -694,9 +689,7 @@ flowchart LR
 
       </details>
 
-    - 单元 3 - 校验并离散化源数据
-
-      校验传入的 MQTT payload，并将连续过程值转换为 Bayesian Network 状态。
+    - 单元 3 - 校验传入的 MQTT 消息内容，并将连续过程值转换为 Bayesian Network 状态。
 
       <details className="notebook-cell">
       <summary>显示代码</summary>
@@ -881,9 +874,7 @@ flowchart LR
 
       </details>
 
-    - 单元 4 - 构建模型并执行推理
-
-      基于当前 snapshot 构建 Bayesian Network，执行推理并生成输出 payload。
+    - 单元 4 - 基于当前快照构建 Bayesian Network，执行推理并生成输出消息内容。
 
       <details className="notebook-cell">
       <summary>显示代码</summary>
@@ -1047,9 +1038,7 @@ flowchart LR
 
       </details>
 
-    - 单元 5 - 运行 MQTT 分析服务
-
-      Subscribe to the source topic, process each incoming snapshot, run Bayesian analysis, and publish the results.
+    - 单元 5 - 订阅源 topic，处理每个传入快照，执行 Bayesian 分析并发布结果。
 
       <details className="notebook-cell">
       <summary>显示代码</summary>
@@ -1286,9 +1275,7 @@ flowchart LR
 
       </details>
 
-    - 单元 6 - 显示服务状态
-
-      Display the MQTT connection status and service statistics.
+    - 单元 6 - 显示 MQTT 连接状态和服务统计信息。
 
       <details className="notebook-cell">
       <summary>显示代码</summary>
@@ -1351,9 +1338,7 @@ flowchart LR
 
       </details>
 
-    - 单元 7 - 显示最新分析结果
-
-      Display the most recent Bayesian analysis result.
+    - 单元 7 - 显示最新的 Bayesian 分析结果。
 
       <details className="notebook-cell">
       <summary>显示代码</summary>
@@ -1392,13 +1377,13 @@ flowchart LR
 
 3. 运行所有单元，然后进入 **UNS** 检查结果。
 
-## 构建 Bow-tie App
+## 构建 Bow-tie 应用
 <Steps>
 1. 在 Tier0 中进入 **Builder**。
 2. 在对话框中输入应用需求，并开始构建。
 
     <Aside type="caution" title="必须说明的内容">
-      记得告诉 agent 使用 UNS 中的数据，并提供具体 topic path。否则 agent 可能难以展示正确的数据。
+      请告诉 agent 使用 UNS 中的数据，并提供具体 topic。否则 agent 可能难以展示正确的数据。
     </Aside>
 
     <details className="notebook-cell">
@@ -1454,6 +1439,6 @@ flowchart LR
     ```
 
     </details>
-3. Once the application is complete after certain rounds of refining, deploy it.
-4. Go to **Launchpad**, open the application and check.
+3. 经过几轮对话，确认应用完成后，部署应用。
+4. 进入 **应用中心**，打开应用并检查。
 </Steps>

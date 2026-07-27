@@ -9,7 +9,7 @@ import { Tabs, TabItem } from '@astrojs/starlight/components';
 import { Steps } from '@astrojs/starlight/components';
 
 Tier0 ships in three editions:
-- **Edge** - Open-source deployment, runs locally with Docker.
+- **Edge** - Open-source, runs locally with Docker.
 - **Cloud** - Managed SaaS, no infrastructure required.
 - **Enterprise** - Private deployment for enterprise environments.
 
@@ -24,11 +24,8 @@ See [Choosing the Best Version](../choosing-version/) to find the edition that b
 		Apply for a trial account before exploring Tier0 Cloud.
 		<Steps>
 		1. Register your account at [Register Tier0](https://tier0.dev/signup). 
-		2. Enter the verification code sent to your email on the popup window.
-		3. You will be redirected to the **Login** page. Log in with the registered account.
-		4. Enter related information, click **Continue**.
-		5. Select **Create a New Workspace**.
-		6. Create a workspace and start your trial.
+		2. Use the verification code sent to your email to verify and then log in with the registered account.
+		3. Create a workspace and start your trial.
 	</Steps>
 	
 	</TabItem>
@@ -46,7 +43,7 @@ See [Choosing the Best Version](../choosing-version/) to find the edition that b
 		cd Tier0-Edge/deploy
 		```
 
-	2. Configure the parameters listed in the table below in `.env.default` according to your environment.
+	2. Configure the parameters listed in the table below in `.env.default` according to your environment, and save the changes.
 	
 		```bash
 		vi .env.default
@@ -89,7 +86,7 @@ See [Choosing the Best Version](../choosing-version/) to find the edition that b
 		- Witness: 2C / 4G / 40G
 
 :::tip[Hardware requirements may vary]
-Enterprise hardware requirements vary by deployment scenario.
+Enterprise hardware requirements vary by deployment scenarios.
 :::
 
 :::note
@@ -122,12 +119,19 @@ Detailed deployment information is available in the [High Availability Deploymen
 		```bash
 		./full-cleanup.sh --env install.env --yes
 		```
-		> This command wipes all Tier0 runtime data and database backups while keeping the VMs, operating system, and installed Docker software.
+		
+		:::caution[What difference it makes]
+		This command wipes all Tier0 runtime data and database backups while keeping the VMs, operating system, and installed Docker software.
+		:::
+
 - A deployment report is generated after installation.
 		```text
 		runtime/install-reports/<timestamp>/deployment-report.md
 		```
-		> Do not deliver the project if the report contains any **FAIL** item. Contact support first.
+		
+		:::caution[What you should do when **FAIL** appears in the report]
+		Do not deliver the project if the report contains any **FAIL** item. Contact support first.
+		:::
 #### Maintenance References
 - [Standard Port List](../../reference/standard-port-list/)
 - [Maintenance and Troubleshooting Guide](../../reference/operations-runbook/)
@@ -141,5 +145,5 @@ Detailed deployment information is available in the [High Availability Deploymen
 
 ## Next
 
-- [Try the Demo Factory](../demo-factory/) — a preloaded plant to explore
-- [Choosing the Best Version](../choosing-version/)
+- [Try the Demo Factory](../demo-factory/) - A preloaded plant to explore
+- [Choosing the Best Version](../choosing-version/) - Compare each version and select the one best fits you

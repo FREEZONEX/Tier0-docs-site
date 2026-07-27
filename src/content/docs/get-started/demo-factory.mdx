@@ -10,42 +10,58 @@ sidebar:
 import { Steps } from '@astrojs/starlight/components';
 
 The quickest way to understand Tier0 is to explore a factory that already works.
-## Factory Business
+## Business Background
 The factory in Tier0 receives orders from ERP, splits them, schedules production, sends the schedule to production, and receives production progress data as work proceeds.
 
+<div className="t0-demo-factory-mermaid">
+
 ```mermaid
+%%{init: {"themeVariables": {"fontSize": "18px"}, "themeCSS": ".nodeLabel, .edgeLabel, .cluster-label { font-size: 18px !important; } .nodeLabel b, .nodeLabel strong { font-size: 19px !important; }"}}%%
 flowchart TB
-  uns["UNS order data<br/>Orders from ERP"]
-  production["Production Department"]
+  uns["<span style='font-size:18px;font-weight:700'>UNS order data</span><br/><span style='font-size:16px'>Orders from ERP</span>"]
+  production["<span style='font-size:18px'>Production Department</span>"]
 
   subgraph app["Work Order Management app"]
-    direction LR
-    orders["<b>Production Orders</b><br/><span style='font-size:13px'>(Optional) Create orders</span>"]
-    plans["<b>Plans</b><br/><span style='font-size:13px'>Split order<br/>Production schedule</span>"]
-    details["<b>Plan Details</b><br/><span style='font-size:13px'>Production progress details</span>"]
+    direction TB
+    appSpacer[" "]
+    subgraph appPages[" "]
+      direction LR
+      orders["<span style='font-size:18px;font-weight:700'>Production Orders</span><br/><span style='font-size:16px'>(Optional) Create orders</span>"]
+      plans["<span style='font-size:18px;font-weight:700'>Plans</span><br/><span style='font-size:16px'>Split order<br/>Production schedule</span>"]
+      details["<span style='font-size:18px;font-weight:700'>Plan Details</span><br/><span style='font-size:16px;white-space:nowrap'>Production progress details</span>"]
+    end
   end
 
   uns -- "order data" --> orders
   orders --> plans
   plans --> details
-  plans -- "production plan" --> production
-  production -- "production progress" --> details
+  plans --> planLabel["production plan"]
+  planLabel --> production
+  production --> progressLabel["production progress"]
+  progressLabel --> details
 
-  classDef external fill:#f8fafc,stroke:#b8c4d5,color:#171a22,stroke-width:1px
-  classDef optional fill:#fbfdf4,stroke:#cfe8a3,color:#171a22,stroke-width:1px
-  classDef appNode fill:#f4f8e9,stroke:#9adf11,color:#171a22,stroke-width:1px
+  classDef external fill:#f8fafc,stroke:#b8c4d5,color:#171a22,stroke-width:1px,font-size:18px
+  classDef optional fill:#fbfdf4,stroke:#cfe8a3,color:#171a22,stroke-width:1px,font-size:18px
+  classDef appNode fill:#f4f8e9,stroke:#9adf11,color:#171a22,stroke-width:1px,font-size:18px
+  classDef labelNode fill:transparent,stroke:transparent,color:#4b5563,font-size:17px
+  classDef invisible fill:transparent,stroke:transparent,color:transparent
   class uns,production external
   class orders optional
   class plans,details appNode
+  class planLabel,progressLabel labelNode
+  class appSpacer invisible
+  style appPages fill:transparent,stroke:transparent
 ```
 
-## Getting to Know the Business Process
+</div>
+
+## Process
 <Steps>
 1. In Tier0, go to **UNS** and check the details of orders that came from ERP.
     - `DemoFactory/ERP/ProductionOrders/State/UpsertProductionOrder`: Orders.
     - `DemoFactory/ERP/ProductionOrders/State/OrderList`: Current order list snapshot.
     :::tip[How is data collected into UNS?]
-    Go to **Flows** > **Source Flow** > **DemoFactory-Flow** to check the data collection process.
+    Go to **Flows** > **Source Flow** > **DemoFactory-Flow** to check the data collection details.
     :::
 2. (optional) Go to **Launchpad**, access the **Work Order Management** application, and create orders on the **Production Orders** page.
 3. In **Work Order Management**, split orders and schedule production plans for the split work orders on the **Plans** page.
@@ -59,7 +75,7 @@ flowchart TB
     :::
 5. Check the production progress data on the **Plan Details** page in the application.
     :::tip[Where do the details come from?]
-    The production progress data is sent from **DemoFactory-Flow** in **Source Flow** to **UNS**, and displayed on the **Plan Details** page.
+    The production progress data is sent from production department and collected by **DemoFactory-Flow** in **Source Flow** to **UNS**, and displayed on the **Plan Details** page.
     - `DemoFactory/Site_01/Production/Line_01/WorkOrderExecution/State/CurrentWorkOrder`: The order in process.
     - `DemoFactory/Site_01/Production/Line_01/WorkOrderExecution/State/WorkOrderStatus`: The execution status of the current order.
     - `DemoFactory/Site_01/Production/Line_01/WorkOrderExecution/Metric/Target_Qty`: The target production amount of the current order.
@@ -70,5 +86,5 @@ flowchart TB
 </Steps>
 ## Next
 
-- [Choosing the Best Version](../choosing-version/)
-- [UNS Concepts](../../using-tier0/uns-concepts/) — Understand data modeling in Unified Namespace.
+- [Choosing the Best Version](../choosing-version/) - Compare each version and select the one best fits you
+- [UNS Concepts](../../using-tier0/uns-concepts/) - Understand data modeling in Unified Namespace

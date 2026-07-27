@@ -12,17 +12,17 @@ import { Steps } from '@astrojs/starlight/components';
 
 ## OPC UA
 
-### Data Flow 구성
+### 데이터 흐름 구성
 
 <Steps>
-1. Log in to Tier0, go to **Flow** and create a new **Source Flow**.
-2. Add **inject**, **OPC UA Client** and **mqtt out** nodes in the flow.
-3. Connect them by order and double-click each node to configure the details.
+1. Tier0에 로그인하고 **Flow**로 이동해 새 **Source Flow**를 만듭니다.
+2. flow에 **inject**, **OPC UA Client**, **mqtt out** node를 추가합니다.
+3. 순서대로 연결한 뒤 각 node를 double-click해 detail을 설정합니다.
 </Steps>
 - **inject**
     <Steps>
-    1. Click **add** at the lower-left corner to add an entry of property.
-    2. Set the properties to be the following items:
+    1. 왼쪽 아래의 **add**를 클릭해 property entry를 추가합니다.
+    2. properties를 아래 항목으로 설정합니다.
 
         ```json
         {
@@ -43,10 +43,10 @@ import { Steps } from '@astrojs/starlight/components';
     "Topic": "<UNS model>",
     ```
 <Steps>
-4. Deploy and trigger the flow.
+4. flow를 deploy하고 trigger합니다.
 </Steps>
 
-### Flow Reference
+### Flow 참조
 
 <details>
 <summary>OPC UA flow JSON 보기</summary>
@@ -201,29 +201,29 @@ import { Steps } from '@astrojs/starlight/components';
 </details>
 
 ## Modbus
-### Data Flow 구성
+### 데이터 흐름 구성
 <Steps>
-1. In the flow, add **modbus-read** and **mqtt out** nodes.
-2. Double-click the nodes, and configure the required information.
+1. flow에 **modbus-read**와 **mqtt out** node를 추가합니다.
+2. node를 double-click하고 필요한 정보를 설정합니다.
     - **modbus-read**
         - **Settings**
-          - **FC**: Function code that specifies the Modbus action, e.g., FC 3 = Read Holding Registers.
-          - **Address**: The starting register address to read from (usually zero-based).
+          - **FC**: Modbus action을 지정하는 function code입니다. 예: FC 3 = holding register 읽기.
+          - **Address**: 읽기를 시작할 register address입니다(보통 0부터 시작).
           - **Quantity**:  The number of consecutive registers to read.
-          - **Poll Rate**: How often the node polls the Modbus device (e.g., every 10 seconds).
-          - **Server**: Reference to a configured Modbus server (IP, port, protocol, etc.).
+          - **Poll Rate**: node가 Modbus device를 polling하는 주기입니다(예: 10초마다).
+          - **Server**: 설정된 Modbus server(IP, port, protocol 등)에 대한 reference입니다.
         - **Server**
-          - **Host**: Modbus server IP.
-          - **Port**: Modbus server port.
+          - **Host**: Modbus server IP입니다.
+          - **Port**: Modbus server port입니다.
     - **mqtt out**
         ```json
         "Server": "<embedded UNS broker>", //same name as the flow
         "Topic": "<UNS model>",
         ```
-3. Deploy and trigger the flow.
+3. flow를 deploy하고 trigger합니다.
 </Steps>
 
-### Flow Reference
+### Flow 참조
 
 <details>
 <summary>Modbus flow JSON 보기</summary>
@@ -383,10 +383,10 @@ import { Steps } from '@astrojs/starlight/components';
 </details>
 
 ## API
-### Data Flow 구성
+### 데이터 흐름 구성
 <Steps>
-1. In the flow, add **inject**, **http request** and **mqtt out** nodes.
-2. Double-click the nodes, and configure the required information.
+1. flow에 **inject**, **http request**, **mqtt out** node를 추가합니다.
+2. node를 double-click하고 필요한 정보를 설정합니다.
     - **http request**
         ```json
         "Method": "<API method>",
@@ -399,10 +399,10 @@ import { Steps } from '@astrojs/starlight/components';
         "Server": "<embedded UNS broker>", //same name as the flow
         "Topic": "<UNS model>",
         ```
-3. Deploy and trigger the flow.
+3. flow를 deploy하고 trigger합니다.
 </Steps>
 
-### Flow Reference
+### Flow 참조
 <details>
 <summary>API flow JSON 보기</summary>
 
@@ -506,7 +506,7 @@ import { Steps } from '@astrojs/starlight/components';
 </details>
 
 :::tip[함께 알아두면 좋은 내용]
-- You can drag a **function** node to clean the data as needed before publishing to **UNS**.
-- A **debug** node can be used to check the data on the spot.
-- For node details, see [Node-RED flows](https://flows.nodered.org/).
+- **UNS**에 publish하기 전에 필요에 따라 **function** node로 data를 정리할 수 있습니다.
+- **debug** node를 사용해 현장에서 data를 확인할 수 있습니다.
+- node detail은 [Node-RED flows](https://flows.nodered.org/)를 확인하세요.
 :::

@@ -9,25 +9,22 @@ import { Tabs, TabItem } from '@astrojs/starlight/components';
 import { Steps } from '@astrojs/starlight/components';
 
 Tier0 提供三个版本：
-- **Edge** - 开源部署版本，可通过 Docker 在本地运行。
-- **Cloud** - 托管 SaaS，无需准备基础设施。
+- **Edge** - 开源版，可通过 Docker 在本地运行。
+- **Cloud** - 云端托管 SaaS。
 - **Enterprise** - 面向企业环境的私有化部署版本。
 
-请参阅 [选择最合适的版本](../choosing-version/) 来判断哪个版本最符合你的需求。
+请参阅 [选择最合适的版本](../choosing-version/) 来判断哪个版本最符合用户需求。
 
 ## 安装 Tier0
 
 <Tabs syncKey="edition">
 	<TabItem label="Cloud">
 
-		在体验 Tier0 Cloud 之前，请先申请试用账号。
+		在体验 Tier0 Cloud 之前，需要申请试用账号。
 		<Steps>
 		1. 在 [注册 Tier0](https://tier0.dev/signup) 页面注册账号。
-		2. 在弹窗中输入发送到邮箱的验证码。
-		3. 页面会跳转到 **Login** 页面，使用刚注册的账号登录。
-		4. 填写相关信息，然后点击 **Continue**。
-		5. 选择 **Create a New Workspace**。
-		6. 创建 workspace 并开始试用。
+		2. 用发到邮箱的验证码进行验证后，使用注册账号登录。
+		3. 创建一个工作空间并开始体验 Tier0.
 	</Steps>
 	
 	</TabItem>
@@ -45,7 +42,7 @@ Tier0 提供三个版本：
 		cd Tier0-Edge/deploy
 		```
 
-	2. 根据你的环境，在 `.env.default` 中配置下表列出的参数。
+	2. 根据你的环境，在 `.env.default` 中按需编辑下表列出的参数。
 	
 		```bash
 		vi .env.default
@@ -137,5 +134,5 @@ Enterprise 的硬件要求会随部署场景变化。
 
 ## 下一步
 
-- [体验 Demo Factory](../demo-factory/) - 通过一个预置工厂快速探索。
-- [选择最合适的版本](../choosing-version/)
+- [体验 Demo Factory](../demo-factory/) - 通过体验一个 demo 工厂快速了解 Tier0。
+- [选择最合适的版本](../choosing-version/) - 比较各个版本并选择最适合你的版本。

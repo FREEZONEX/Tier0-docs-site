@@ -7,11 +7,11 @@ sidebar:
 ---
 import { Aside, Steps } from '@astrojs/starlight/components';
 
-Tier0 は Python による高度なデータ分析に Marimo Notebook を使用します。このガイドでは Bowtie アプリケーションをワークフロー例として使用します。
+Tier0 は Python による高度なデータ分析に Marimo Notebook を使用します。このガイドでは Bowtie アプリケーションを例として使用します。
 
 ```mermaid
 flowchart LR
-  collect["Node-RED"] -->|"収集データ"| uns[("UNS<br/>モデリング")]
+  collect["Source Flow"] -->|"収集データ"| uns[("UNS<br/>モデル")]
   uns -->|"生データ"| notebook["Notebook"]
   notebook -->|"分析結果"| uns
   uns -->|"分析結果"| builder["App Builder"]
@@ -27,7 +27,7 @@ flowchart LR
 
 ## サンプル背景
 
-製油所の腐食は、複数の運転要因に影響される複雑なプロセスです。この例では、プロセスデータを組み合わせて腐食発生確率を推定し、予防保全を支援するリアルタイム腐食リスク評価ワークフローを示します。
+製油所の腐食は、複数の運転要因に影響される複雑なプロセスです。この例では、プロセスデータを組み合わせて腐食発生確率を推定し、予防保全を支援するリアルタイム腐食リスク評価を示します。
 
 ## 生データを取得する
 
@@ -200,7 +200,6 @@ flowchart LR
     
 2. **Flows** に移動し、**Source Flow** を作成して生データを接続し、**UNS** に publish します。
 
-    *(Node-RED がデータを接続し、UNS に publish します。)*
     <details className="notebook-cell">
     <summary>Source Flow JSON を表示</summary>
 
@@ -402,9 +401,7 @@ flowchart LR
 
 2. notebook を開き、**UNS** のデータを分析するために次の cell を追加します。
 
-    - セル 1 - ライブラリのインポートと設定
-
-      必要なライブラリをインポートし、MQTT broker、topic、実行時設定を構成します。
+    - セル 1 - 必要な依存関係をインポートし、MQTT broker、topics、実行時設定を構成します。
 
       <details className="notebook-cell">
       <summary>コードを表示</summary>
@@ -489,9 +486,7 @@ flowchart LR
 
       </details>
 
-    - セル 2 - Bayesian Network 構造の定義
-
-      Bayesian Network の topology、状態空間、CPT generator、確率ルールを定義します。
+    - セル 2 - Bayesian Network の topology、状態空間、CPT generator、確率ルールを定義します。
 
       <details className="notebook-cell">
       <summary>コードを表示</summary>
@@ -694,9 +689,7 @@ flowchart LR
 
       </details>
 
-    - セル 3 - Source data の検証と離散化
-
-      受信した MQTT payload を検証し、連続的な process value を Bayesian Network の状態に変換します。
+    - セル 3 - 受信した MQTT payload を検証し、連続的な process value を Bayesian Network の状態に変換します。
 
       <details className="notebook-cell">
       <summary>コードを表示</summary>
@@ -881,9 +874,7 @@ flowchart LR
 
       </details>
 
-    - セル 4 - モデル構築と推論実行
-
-      現在の snapshot に対して Bayesian Network を構築し、推論を実行して output payload を生成します。
+    - セル 4 - 現在の snapshot に対して Bayesian Network を構築し、推論を実行して output payload を生成します。
 
       <details className="notebook-cell">
       <summary>コードを表示</summary>
@@ -1047,9 +1038,7 @@ flowchart LR
 
       </details>
 
-    - セル 5 - MQTT 分析サービスの実行
-
-      Subscribe to the source topic, process each incoming snapshot, run Bayesian analysis, and publish the results.
+    - セル 5 - source topic を購読し、受信した各 snapshot を処理して Bayesian 分析を実行し、結果を publish します。
 
       <details className="notebook-cell">
       <summary>コードを表示</summary>
@@ -1286,9 +1275,7 @@ flowchart LR
 
       </details>
 
-    - セル 6 - サービス状態の表示
-
-      Display the MQTT connection status and service statistics.
+    - セル 6 - MQTT 接続ステータスとサービス統計を表示します。
 
       <details className="notebook-cell">
       <summary>コードを表示</summary>
@@ -1351,9 +1338,7 @@ flowchart LR
 
       </details>
 
-    - セル 7 - 最新分析結果の表示
-
-      Display the most recent Bayesian analysis result.
+    - セル 7 - 最新の Bayesian 分析結果を表示します。
 
       <details className="notebook-cell">
       <summary>コードを表示</summary>

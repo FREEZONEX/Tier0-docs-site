@@ -7,7 +7,7 @@ sidebar:
 ---
 import { Steps } from '@astrojs/starlight/components';
 
-To connect data to Tier0, first build a model in **UNS**, then connect data sources through **Source Flow** with UNS models as destinations.
+To connect data to Tier0, first build a model in **UNS**, then connect data sources through **Source Flow** to the model.
 
 ```mermaid
 flowchart BT
@@ -60,7 +60,7 @@ Use LLMs like ChatGPT to help import models.
 :::
 
 <Steps>
-1. Copy the template JSON or download the template file on **Import** window.
+1. Copy the template JSON or download the template file on the **Import** window.
 2. Send the template to AI, and use a similar prompt.
     ```
     Generate a UNS model used for xx in xx plant, including xx equipment and data sources based on the template.
@@ -74,7 +74,7 @@ Use LLMs like ChatGPT to help import models.
 **Source Flow**, based on **Node-RED**, is used to connect data sources to Tier0.
 :::tip[To understand Source Flow]
 In **Source Flow**:
-- Every flow ends with an **mqtt out** node. It works as an MQTT client to publish data to the broker.
+- Every flow ends with an **mqtt out** node. It works as an MQTT client to publish data to the UNS broker.
 - The UNS broker is embedded in the **mqtt out** node with the same name as the flow.
 - When a UNS model is used as the topic, data goes directly to the corresponding model in **UNS**.
 :::
@@ -92,10 +92,10 @@ This section describes additional parameters or configurations related to the wo
 
 | Scope | Parameter | Item | When to use |
 |------|-----------|------|-------------|
-| Path | Extended Attribute/Custom Attributes | - | Use when you need to add additional attributes to the path, such as unit information. |
+| Path | Custom Attributes | - | Use when you need to add additional attributes to the path, such as unit information. |
 | Topic | Topic Type | [Metric, State, Action](../uns-concepts/#metric-state-action) | Select the topic type that matches the data semantics: measurements, current status, or executable operations. |
 | Topic | Attribute Generation Method | Pre-defined | Manually set attributes for the topic one by one. |
-| Topic | Attribute Generation Method | Auto-Parsing | Convert attributes automatically from JSON text in batches. |
+| Topic | Attribute Generation Method | Auto Parsing | Convert attributes automatically from JSON text in batches. |
 
 
 ## Next

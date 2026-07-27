@@ -1,6 +1,6 @@
 ﻿---
 title: 分析 UNS 数据
-description: "在 Tier0 Notebook 中查询实时 namespace 数据，并构建交互式分析和机器学习应用。Cloud 和 Enterprise 可用。"
+description: "在 Tier0 Notebook 中查询实时 namespace 数据，并构建交互式分析和机器学习应用。"
 editions: [cloud, enterprise]
 sidebar:
   order: 5
@@ -14,15 +14,15 @@ Tier0 使用 Marimo Notebook，通过 **Python** 脚本进行高级数据分析�
 存储在数据库中的 UNS 数据会作为 **Notebook** 中已有的数据源使用。
 :::
 <Steps>
-1. 创建一个 notebook，然后点击内部左侧的 **VARIABLES**。
+1. 创建一个 notebook，然后单击内部左侧的 **VARIABLES**。
 2. 展开 **PostgreSQL** 列表，在 **tenant_id** > **uns** 下选择一张表。
-3. 点击表旁边的 **+** 图标，自动生成默认 cell 和 SQL statement cell。
+3. 单击表旁边的 **+** 图标，自动生成默认 cell 和 SQL 命令 cell。
 
     ```sql
     SELECT * FROM "uns"."table_name" LIMIT 100
     ```
 
-4. 运行所有 cells，获取查询结果。
+4. 运行所有 cell，获取查询结果。
 </Steps>
 
 ## 分析 UNS 数据
@@ -140,7 +140,7 @@ running_data
 </details>
 
 <details className="notebook-cell">
-<summary>Cell 3：设置异常检测阈值滑块。</summary>
+<summary>Cell 3：设置异常检测灵敏度滑块。</summary>
 
 ```python
 
@@ -599,7 +599,7 @@ mo.vstack([
 </details>
 
 <Steps>
-2. 运行所有 cells 并查看结果。
+2. 运行所有 cell 并查看结果。
 </Steps>
 :::tip[查看结果的不同方式]
 可以在右上角切换 **Vertical**、**Grid** 和 **Slides** 等视图样式。
@@ -608,4 +608,4 @@ mo.vstack([
 ## 下一步
 
 - [在 UNS 上构建应用](../build-apps/) — 使用 UNS 数据构建工业应用。
-- [UNS 概念](../uns-concepts/) — Understand data modeling in Unified Namespace.
+- [UNS 概念](../uns-concepts/) — 理解在统一命名空间中数据建模的概念

@@ -2684,6 +2684,32 @@ main:has(.t0-banner) .t0-banner {
 	max-width: min(100%, 520px) !important;
 }
 
+.t0-demo-factory-mermaid {
+	overflow-x: hidden;
+	margin: 1.5rem 0;
+}
+
+.t0-demo-factory-mermaid .mermaid {
+	width: min(100%, 1000px);
+	max-width: 100%;
+	margin: 0 auto;
+}
+
+.t0-demo-factory-mermaid .mermaid svg {
+	width: 100% !important;
+	max-width: 100% !important;
+}
+
+.t0-demo-factory-mermaid .mermaid .nodeLabel,
+.t0-demo-factory-mermaid .mermaid .node .label,
+.t0-demo-factory-mermaid .mermaid .edgeLabel,
+.t0-demo-factory-mermaid .mermaid .edgeLabel p,
+.t0-demo-factory-mermaid .mermaid .edgeLabel span,
+.t0-demo-factory-mermaid .mermaid .cluster-label .nodeLabel,
+.t0-demo-factory-mermaid .mermaid .cluster-label span {
+	font-size: 18px !important;
+}
+
 .mermaid .nodeLabel,
 .mermaid .node .label,
 .mermaid .edgeLabel,

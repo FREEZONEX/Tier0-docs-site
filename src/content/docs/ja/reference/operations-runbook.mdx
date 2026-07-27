@@ -21,7 +21,7 @@ import { Steps } from '@astrojs/starlight/components';
     - `APP VIP /healthz` と `/readyz` が `200` を返す。
     - `DB VIP:5432` にアクセスできる。
     - PostgreSQL primary、standby、witness の topology が正常である。
-    - `backend`, `redis`, `emqx`, `sourceflow`, `eventflow`, `marimo`, and `opcua-server` are all running on the active application node.
+    - `backend`?`redis`?`emqx`?`sourceflow`?`eventflow`?`marimo`?`opcua-server` ???????????????????????????????
 </Steps>
 ## アプリケーション確認
 <Steps>
@@ -37,8 +37,8 @@ import { Steps } from '@astrojs/starlight/components';
     `bin/compose.sh` を迂回して生の `docker compose` コマンドを直接実行しないでください。このラッパースクリプトは、インストーラーが生成したランタイム環境を読み込みます。
     :::
 2. Health-check の解釈:
-    - `healthz` 失敗: まず backend process、image、container log を確認します。
-    - `readyz` 失敗: DB VIP、Redis、database migration log も確認します。
+    - `healthz` ??: ?? backend ???????????????????????
+    - `readyz` 失敗: DB VIP、Redis、?????????? も確認します。
     - ホームページには到達できるがログインできない場合：`.env` の `ADMIN_INITIAL_PASSWORD` を確認し、その後 backend IAM migration ログとユーザーテーブルを確認します。HTTP ポートだけでデプロイ成功を判断しないでください。
 </Steps>
 ## プロトコル入口確認

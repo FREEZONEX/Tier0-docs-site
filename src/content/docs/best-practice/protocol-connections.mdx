@@ -16,28 +16,40 @@ This section uses common data source types, including OPC UA, Modbus, and APIs, 
 
 <Steps>
 1. Log in to Tier0, go to **Flow** and create a new **Source Flow**.
-2. Add **inject**, **OPC UA Client** and **mqtt out** nodes in the flow.
+2. Add `inject`, `OPC UA Client` and `mqtt out` nodes in the flow.
 3. Connect them in order and double-click each node to configure the details.
 </Steps>
-- **inject**
+- `inject`
     <Steps>
     1. Click **add** at the lower-left corner to add a property entry.
     2. Set the properties to be the following items:
 
         ```json
         {
-          "msg.payload": "[multiple data tags]",
+          "msg.payload": "[
+                            {
+                                "name": "D103_CHLORIDE",
+                                "nodeId": "ns=2;i=3",
+                                "datatype": "Float"
+                            },
+                            {
+                                "name": "D103_PH",
+                                "nodeId": "ns=2;i=4",
+                                "datatype": "Float"
+                            },
+                            ...
+                        ]",
           "msg.topic": "multiple"
         }
         ```
     </Steps>
-- **OPC UA Client**
+- `OPC UA Client`
     ```json
     "Endpoint": "<OPC UA server address and port>", //e.g. opc.tcp://127.0.0.1:4850
     "Action": "SUBSCRIBE",
     "Interval": "<data collecting interval>" //e.g. 10 seconds
     ```
-- **mqtt out**
+- `mqtt out`
     ```json
     "Server": "<embedded UNS broker>", //same name as the flow
     "Topic": "<UNS model>",
@@ -203,9 +215,9 @@ This section uses common data source types, including OPC UA, Modbus, and APIs, 
 ## Modbus
 ### Configuring Data Flow
 <Steps>
-1. In the flow, add **modbus-read** and **mqtt out** nodes.
+1. In the flow, add `modbus-read` and `mqtt out` nodes.
 2. Double-click the nodes, and configure the required information.
-    - **modbus-read**
+    - `modbus-read`
         - **Settings**
           - **FC**: Function code that specifies the Modbus action, e.g., FC 3 = Read Holding Registers.
           - **Address**: The starting register address to read from (usually zero-based).
@@ -215,7 +227,7 @@ This section uses common data source types, including OPC UA, Modbus, and APIs, 
         - **Server**
           - **Host**: Modbus server IP.
           - **Port**: Modbus server port.
-    - **mqtt out**
+    - `mqtt out`
         ```json
         "Server": "<embedded UNS broker>", //same name as the flow
         "Topic": "<UNS model>",
@@ -385,16 +397,16 @@ This section uses common data source types, including OPC UA, Modbus, and APIs, 
 ## API
 ### Configuring Data Flow
 <Steps>
-1. In the flow, add **inject**, **http request** and **mqtt out** nodes.
+1. In the flow, add `inject`, `http request` and `mqtt out` nodes.
 2. Double-click the nodes, and configure the required information.
-    - **http request**
+    - `http request`
         ```json
         "Method": "<API method>",
         "URL": "<API URL>",
         "Return": "a parsed JSON object",
         "Headers": "<API headers>"
         ```
-    - **mqtt out**
+    - `mqtt out`
         ```json
         "Server": "<embedded UNS broker>", //same name as the flow
         "Topic": "<UNS model>",
@@ -506,7 +518,7 @@ This section uses common data source types, including OPC UA, Modbus, and APIs, 
 </details>
 
 :::tip[Other things you might want to know]
-- You can drag a **function** node to clean the data as needed before publishing to **UNS**.
-- A **debug** node can be used to check the data on the spot.
+- You can drag a `function` node to clean the data as needed before publishing to **UNS**.
+- A `debug` node can be used to check the data on the spot.
 - For node details, see [Node-RED flows](https://flows.nodered.org/).
 :::

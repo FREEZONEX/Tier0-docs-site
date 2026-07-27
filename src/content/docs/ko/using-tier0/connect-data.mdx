@@ -1,17 +1,17 @@
 ---
 title: UNS에 데이터 연결
-description: Model your namespace and bring data in with Source Flows. Available in all editions.
+description: namespace를 모델링하고 Source Flow로 데이터를 가져옵니다. 모든 edition에서 사용할 수 있습니다.
 editions: [edge, cloud, enterprise]
 sidebar:
   order: 2
 ---
 import { Steps } from '@astrojs/starlight/components';
 
-Tier0에 데이터를 연결하려면 먼저 **UNS**에서 model을 만들고, UNS model을 destination으로 사용해 **Source Flow**를 통해 data source를 연결합니다.
+Tier0에 데이터를 연결하려면 먼저 **UNS**에서 model을 만들고, 그 다음 **Source Flow**를 통해 데이터 소스를 UNS model destination으로 연결합니다.
 
 ```mermaid
 flowchart BT
-  uns["UNS 모델"]
+  uns["UNS Model"]
   flow["Source Flow"]
 
 
@@ -22,12 +22,12 @@ flowchart BT
   class uns t0accent
   class flow t0node
 ```
-## How to Build a Data Model
-Define the data hierarchy as a tree map based on a simple folder-file structure.
+## 데이터 모델 구축 방법
+간단한 folder-file 구조를 기반으로 데이터 계층을 tree map으로 정의합니다.
 
-### Building Models Manually
+### Model을 수동으로 만들기
 
-:::note[Example Model]
+:::note[예시 Model]
 **Model**:
 ```
   Factory_A
@@ -43,64 +43,59 @@ Define the data hierarchy as a tree map based on a simple folder-file structure.
 ```
 :::
 <Steps>
-1. In **UNS**, add the root path `Factory_A`.
-2. Add the second path `Site_01` under `Factory_A`, and subsequent paths in the hierarchical order shown in the tree map.
-3. Add the topic `Machine_001` under `SMT_Line_1`, and set its **Topic Type** to **Metric**.
-4. Define the topic payload. Add 2 fields `temperature` and `vibration` and set their data types.
-5. **Mock Data**를 선택해 simulated data를 model로 보내고, **Enable History**를 선택해 data를 database에 저장합니다.
+1. **UNS**에서 root path `Factory_A`를 추가합니다.
+2. `Factory_A` 아래에 두 번째 path `Site_01`를 추가하고, tree map에 표시된 계층 순서대로 나머지 path를 추가합니다.
+3. `SMT_Line_1` 아래에 topic `Machine_001`를 추가하고 **Topic Type**을 **Metric**으로 설정합니다.
+4. topic payload를 정의합니다. `temperature`와 `vibration` 두 field를 추가하고 data type을 설정합니다.
+5. **Mock Data**를 선택해 model로 simulated data를 보내고, **Enable History**를 선택해 데이터를 database에 저장합니다.
 </Steps>
 
-:::tip[Additional parameters]
-**Auto Parsing** parses JSON text and converts it into general fields.
+:::tip[추가 parameter]
+**Auto Parsing**은 JSON text를 parsing해 일반 field로 변환합니다.
 :::
 
-### Importing Models
+### Model 가져오기
 :::tip
-Use LLMs like ChatGPT to help import models.
+ChatGPT 같은 LLM을 사용해 model import를 도울 수 있습니다.
 :::
 
 <Steps>
-1. Copy the template JSON or download the template file on **Import** window.
-2. Send the template to AI, and use a similar prompt.
+1. **Import** window에서 template JSON을 복사하거나 template file을 다운로드합니다.
+2. template을 AI에 보내고 다음과 비슷한 prompt를 사용합니다.
     ```
     Generate a UNS model used for xx in xx plant, including xx equipment and data sources based on the template.
     ```
-3. Import the generated result in UNS.
+3. 생성된 결과를 UNS로 import합니다.
 </Steps>
 
-
-
-## How to Connect Data to UNS
-**Source Flow**, based on **Node-RED**, is used to connect data sources to Tier0.
-:::tip[To understand Source Flow]
-In **Source Flow**:
-- 모든 flow는 **mqtt out** 노드로 끝납니다. 이 노드는 MQTT client로 동작해 broker에 데이터를 게시합니다.
-- The UNS broker is embedded in the **mqtt out** node with the same name as the flow.
-- When a UNS model is used as the topic, data goes directly to the corresponding model in **UNS**.
+## UNS에 데이터 연결하기
+**Source Flow**는 **Node-RED**를 기반으로 하며, 데이터 소스를 Tier0에 연결하는 데 사용됩니다.
+:::tip[Source Flow 이해하기]
+**Source Flow**에서는:
+- 모든 flow가 **mqtt out** node로 끝납니다. 이 node는 MQTT client로 동작해 broker에 데이터를 publish합니다.
+- UNS broker는 flow와 같은 이름의 **mqtt out** node 안에 포함되어 있습니다.
+- UNS model을 topic으로 사용하면 데이터가 **UNS**의 해당 model로 직접 들어갑니다.
 :::
 <Steps>
-1. Create a **Source Flow** in **Flows**.
-2. Use nodes based on the data source type, and end the flow with an **mqtt out** node.
-3. Make sure the **Server** of the node is set to the UNS broker.
-4. Use a **UNS** model as MQTT topic (e.g. `Factory_A/Site_01/SMT_Line_1/Metric/Machine_001`).
+1. **Flows**에서 **Source Flow**를 만듭니다.
+2. 데이터 소스 유형에 맞는 node를 사용하고, flow의 끝에 **mqtt out** node를 배치합니다.
+3. node의 **Server**가 UNS broker로 설정되어 있는지 확인합니다.
+4. MQTT topic으로 **UNS** model을 사용합니다. 예: `Factory_A/Site_01/SMT_Line_1/Metric/Machine_001`.
 </Steps>
 
-## Additional Options
+## 추가 옵션
 :::note
-This section describes additional parameters or configurations related to the workflow.
+이 섹션은 workflow와 관련된 추가 parameter 또는 configuration을 설명합니다.
 :::
 
 | Scope | Parameter | Item | When to use |
 |------|-----------|------|-------------|
-| Path | Extended Attribute/Custom Attributes | - | unit information처럼 path에 추가 attribute를 넣어야 할 때 사용합니다. |
-| Topic | Topic Type | [Metric, State, Action](../uns-concepts/#metric-state-action) | 측정값, 현재 상태, 실행 가능한 작업 등 데이터 의미에 맞는 topic type을 선택합니다. |
-| Topic | Attribute Generation Method | Pre-defined | Manually set attributes for the topic one by one. |
-| Topic | Attribute Generation Method | Auto-Parsing | JSON 텍스트에서 attribute를 일괄 자동 변환합니다. |
-
+| Path | Extended Attribute/Custom Attributes | - | path에 unit 정보 같은 추가 attribute를 넣어야 할 때 사용합니다. |
+| Topic | Topic Type | [Metric, State, Action](../uns-concepts/#metric-state-action) | 측정값, 현재 상태, 실행 작업처럼 데이터 의미에 맞는 topic type을 선택합니다. |
+| Topic | Attribute Generation Method | Pre-defined | topic attribute를 하나씩 직접 설정합니다. |
+| Topic | Attribute Generation Method | Auto-Parsing | JSON text에서 attribute를 batch로 자동 변환합니다. |
 
 ## 다음 단계
 
-- [Build Apps on UNS](../build-apps/) — Build industrial applications with UNS data.
-- [Analyze UNS Data](../analyze-data/) — Analyze UNS data with Marimo Notebook and Python.
-
-
+- [UNS에서 앱 구축](../build-apps/) - UNS 데이터로 산업 애플리케이션을 구축합니다.
+- [UNS 데이터 분석](../analyze-data/) - Marimo Notebook과 Python으로 UNS 데이터를 분석합니다.

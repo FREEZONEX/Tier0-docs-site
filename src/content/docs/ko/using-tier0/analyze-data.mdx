@@ -1,44 +1,44 @@
 ---
 title: UNS 데이터 분석
-description: Tier0 Notebook에서 live namespace data를 query하고 interactive analysis 및 machine-learning app을 구축합니다. Cloud와 Enterprise에서 사용할 수 있습니다.
+description: Tier0 Notebook에서 live namespace data를 query하고 interactive analysis와 machine-learning app을 구축합니다. Cloud와 Enterprise에서 사용할 수 있습니다.
 editions: [cloud, enterprise]
 sidebar:
-  order: 5
+  order: 7
 ---
 import { Steps } from '@astrojs/starlight/components';
 
-Tier0 uses Marimo Notebook for advanced data analysis with **Python** scripts.
+Tier0는 **Python** script를 사용한 고급 data analysis를 위해 Marimo Notebook을 제공합니다.
 
-## Querying Data from UNS
-:::tip[Know Before you start]
-UNS data stored in the database is available as an existing data source in **Notebook**.
+## UNS에서 데이터 Query
+:::tip[시작하기 전에 알아둘 점]
+database에 저장된 UNS data는 **Notebook**에서 기존 data source로 사용할 수 있습니다.
 :::
 <Steps>
-1. Create a notebook, click the **VARIABLES** on the left side inside it.
-2. Expand the **PostgreSQL** list, select a table under **tenant_id** > **uns**.
-3. Click the **+** icon next to the table to generate default and SQL statements cells automatically.
+1. notebook을 만들고 왼쪽의 **VARIABLES**를 클릭합니다.
+2. **PostgreSQL** list를 펼친 뒤 **tenant_id** > **uns** 아래의 table을 선택합니다.
+3. table 옆의 **+** icon을 클릭하면 default cell과 SQL statement cell이 자동으로 생성됩니다.
 
     ```sql
     SELECT * FROM "uns"."table_name" LIMIT 100
     ```
 
-4. 모든 cell을 실행하고 query 결과를 확인합니다.
+4. 모든 cell을 실행하고 query result를 확인합니다.
 </Steps>
 
-## Analyzing UNS Data
+## UNS 데이터 분석
 
-### 예제 배경
-- 데이터 소스는 공장에서 수집되어 Tier0 UNS로 전송된 압축기의 온도, 압력, 상태, 진동입니다.
-- Isolation Forest is used to detect abnormal data points in the dataset.
-- Detection sensitivity can be adjusted, and the results are visualized accordingly in a dashboard.
+### 예시 배경
+- 데이터 소스는 factory에서 수집되어 Tier0 UNS로 전송되는 compressor의 temperature, pressure, status, vibration입니다.
+- Isolation Forest를 사용해 dataset의 abnormal data point를 감지합니다.
+- detection sensitivity를 조정할 수 있으며, 결과는 dashboard에 시각화됩니다.
 
 ### 작업
 <Steps>
-1. Create a notebook and add the following cells in order.
+1. notebook을 만들고 아래 cell을 순서대로 추가합니다.
 </Steps>
 
 <details className="notebook-cell">
-<summary>Cell 1: Import dependencies.</summary>
+<summary>Cell 1: dependency를 import합니다.</summary>
 
 ```python
 import marimo as mo
@@ -53,7 +53,7 @@ from sklearn.ensemble import IsolationForest
 </details>
 
 <details className="notebook-cell">
-<summary>Cell 2: Get data from UNS and clean it for analysis.</summary>
+<summary>Cell 2: UNS에서 data를 가져오고 분석용으로 정리합니다.</summary>
 
 ```sql
 status_pd = status_data.to_pandas()
@@ -140,7 +140,7 @@ running_data
 </details>
 
 <details className="notebook-cell">
-<summary>Cell 3: Set the slider for anomaly detection threshold.</summary>
+<summary>Cell 3: anomaly detection threshold slider를 설정합니다.</summary>
 
 ```python
 
@@ -169,7 +169,7 @@ A higher threshold applies stricter criteria and identifies more operating recor
 </details>
 
 <details className="notebook-cell">
-<summary>Cell 4: Use the <strong>Isolation Forest</strong> model to detect anomalies.</summary>
+<summary>Cell 4: <strong>Isolation Forest</strong> model로 anomaly를 감지합니다.</summary>
 
 ```python
 feature_names = [
@@ -232,7 +232,7 @@ ml_result
 </details>
 
 <details className="notebook-cell">
-<summary>Cell 5: Displays results on a dashboard.</summary>
+<summary>Cell 5: dashboard에 결과를 표시합니다.</summary>
 
 ```python
 # Calculate summary metrics
@@ -567,7 +567,7 @@ dashboard_chart = (
         title=alt.TitleParams(
             text="Detected Operating Anomalies",
             subtitle=(
-                f"Threshold: {anomaly_threshold.value:.2f} · "
+                f"Threshold: {anomaly_threshold.value:.2f} - "
                 f"{dashboard_anomaly:,} anomalies detected"
             ),
             anchor="start",
@@ -601,11 +601,11 @@ mo.vstack([
 <Steps>
 2. 모든 cell을 실행하고 결과를 확인합니다.
 </Steps>
-:::tip[Different ways to view the results]
-오른쪽 위에서 보기 스타일을 **Vertical**, **Grid**, **Slides** 중 하나로 변경할 수 있습니다.
+:::tip[결과를 보는 다양한 방식]
+오른쪽 위에서 view style을 **Vertical**, **Grid**, **Slides** 중 하나로 변경할 수 있습니다.
 :::
 
 ## 다음 단계
 
-- [Build Apps on UNS](../build-apps/) — Build industrial applications with UNS data.
-- [UNS Concepts](../uns-concepts/) — Understand data modeling in Unified Namespace.
+- [UNS에서 앱 구축](../build-apps/) - UNS 데이터로 산업 애플리케이션을 구축합니다.
+- [UNS 개념](../uns-concepts/) - Unified Namespace의 data modeling을 이해합니다.

@@ -39,7 +39,7 @@ Choose the modeling approach based on what the data represents.
 ### Metric, State, Action
 Industrial data changes at different frequencies and serves different purposes, so Tier0 separates UNS models into three fixed types.
 
-| Type | Why | Example |
+| Type | Object | Example |
 |---|---|---|
 | `METRIC` | Designed for high-frequency data that is collected continuously and needs time-series storage. | Machine temperature/pressure/voltage |
 | `STATE` | Designed for data that changes less often and describes the current condition or fact of an object. | Machine operational status |
@@ -93,7 +93,7 @@ See [How to Build a Data Model](../connect-data/#how-to-build-a-data-model).
 :::
 
 ## Broker
-In Tier0, the broker is the platform component that receives and sends data through MQTT or OpenAPI based on data models.
+In Tier0, the UNS broker is the platform component that receives and sends data through MQTT or OpenAPI based on data models.
 - **By MQTT**: The complete path of each node in the model tree works as the topic address to pass the message payload.
 - **By OpenAPI**: Perform CRUD commands on data models through HTTP requests.
 :::tip[API Reference]
@@ -105,7 +105,7 @@ Tier0 uses PostgreSQL to store data. Different data types change at different ra
 
 | Data Type | Storage | Description |
 |-----------|---------|-------------|
-| `METRIC` | Time-series database | Optimized for high-frequency measurements such as temperature and pressure. Each topic includes default fields: `timestamp` and `quality`. |
+| `METRIC` | TSDB | Optimized for high-frequency measurements such as temperature and pressure. Each topic includes default fields: `timestamp` and `quality`. |
 | `STATE` | PostgreSQL | Stores machine or system states in a flexible `JSONB` format. |
 | `ACTION` | PostgreSQL | Stores commands or actions in a flexible `JSONB` format. |
 

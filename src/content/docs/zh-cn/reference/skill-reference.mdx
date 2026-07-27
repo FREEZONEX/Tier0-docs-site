@@ -7,7 +7,7 @@ sidebar:
 
 此页面会包含在文档和 PDF 导出中。独立网页 reference 也可以在这里打开：
 
-[打开 Tier0 Skill Reference](../tier0-skill/)
+[?? Tier0 Skill ??](../tier0-skill/)
 
 ## 命令
 
@@ -25,7 +25,7 @@ sidebar:
 | UNS | 更新元数据或字段 | `tier0 uns update --path Plant/Line1/Metric/Temperature --description "Line 1 temperature" --update-mask description` |
 | UNS | 删除或恢复节点 | `tier0 uns delete --path Plant/Line1/Metric/Temperature --yes` 或 `tier0 uns restore --path Plant/Line1/Metric/Temperature --yes` |
 | Node-RED Flow | 列出或查看 Flow 详情 | `tier0 flow list`, `tier0 flow list --source --json`, 或 `tier0 flow get --id 1 --json` |
-| Node-RED Flow | 创建 Source Flow 或 Event Flow | `tier0 flow create --name "modbus-collector" --source --desc "Modbus TCP collector"` 或 `tier0 flow create --name "alert-handler" --event --desc "Temperature alarm processor"` |
+| Node-RED Flow | 创建数据连接或事件流程 | `tier0 flow create --name "modbus-collector" --source --desc "Modbus TCP collector"` 或 `tier0 flow create --name "alert-handler" --event --desc "Temperature alarm processor"` |
 | Node-RED Flow | 更新 Flow 元数据 | `tier0 flow update --id 1 --name "line1-collector"` 或 `tier0 flow update --id 1 --favorite` |
 | Node-RED Flow | 导出 canvas JSON | `tier0 flow data --id 1 --out flows.json` |
 | Node-RED Flow | 部署 canvas JSON | `tier0 flow deploy --id 1 -f flows.json --yes` |

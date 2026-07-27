@@ -5,7 +5,7 @@ sidebar:
   order: 3
 ---
 
-Tier0 is one platform in three editions. Same namespace model, same flows, same CLI — the difference is who runs it and how much platform you get.
+Tier0 is one platform in three editions. Same namespace model, same flows, same CLI — the difference is who runs it and what features you get.
 
 <section class="t0-board not-content">
 	<div class="t0-board-grid">
@@ -23,7 +23,7 @@ Tier0 is one platform in three editions. Same namespace model, same flows, same 
 					<div class="t0-plan t0-plan--apache">
 						<span class="t0-plan-name">Apache-2.0</span>
 						<span class="t0-plan-price">free</span>
-						<p class="t0-plan-desc">UNS core, SourceFlows/EventFlows, history storage — single-machine Docker deployment.</p>
+						<p class="t0-plan-desc">UNS core, Source Flow/Event Flow, history storage — single-machine Docker deployment.</p>
 					</div>
 					<a class="t0-col-cta" href="https://github.com/FREEZONEX/Tier0-Edge">Clone on GitHub</a>
 				</div>
@@ -36,7 +36,7 @@ Tier0 is one platform in three editions. Same namespace model, same flows, same 
 			<div class="t0-col-body">
 				<div class="t0-col-top">
 					<h3>Cloud <span class="t0-col-flag">Most teams start here</span></h3>
-					<p class="t0-col-tagline">The full platform, operated for you.</p>
+					<p class="t0-col-tagline">The full platform, managed on cloud for you.</p>
 					<p class="t0-col-for">Apps, notebooks, and launchpad on day one — no infrastructure to run.</p>
 				</div>
 				<div class="t0-plans">
@@ -48,7 +48,7 @@ Tier0 is one platform in three editions. Same namespace model, same flows, same 
 					<div class="t0-plan t0-plan--growth">
 						<span class="t0-plan-name">Growth <span class="t0-plan-star" aria-hidden="true">★</span></span>
 						<span class="t0-plan-price">$20,000/yr</span>
-						<p class="t0-plan-desc">Up to 5 edges. For a single factory with a few apps, wanting a quick start.</p>
+						<p class="t0-plan-desc">Up to 5 edges. For a single factory with a few apps.</p>
 					</div>
 					<div class="t0-plan t0-plan--scale">
 						<span class="t0-plan-name">Scale</span>
@@ -67,7 +67,7 @@ Tier0 is one platform in three editions. Same namespace model, same flows, same 
 				<div class="t0-col-top">
 					<h3>Enterprise</h3>
 					<p class="t0-col-tagline">The full platform, on your terms.</p>
-					<p class="t0-col-for">For data sovereignty, scale, governance, and enterprise-grade oversight.</p>
+					<p class="t0-col-for">For teams that requires data sovereignty, governance, and enterprise-grade oversight.</p>
 				</div>
 				<div class="t0-plans">
 					<div class="t0-plan t0-plan--base">
@@ -92,7 +92,10 @@ Tier0 is one platform in three editions. Same namespace model, same flows, same 
 	</div>
 </section>
 
-**Add-ons:** extra edge nodes $2,000 /edge/year · additional instances $10,000 /instance/year. Prices are for orientation — the source of truth is [tier0.app/pricing](https://tier0.app/pricing).
+**Add-ons**
+- Extra edge nodes $2,000 /edge/year
+- Additional instances $10,000 /instance/year.
+> For details on pricing, see [tier0.app/pricing](https://tier0.app/pricing).
 
 :::note[Special term explanation]
 In Cloud plans, an edge is a connection node that communicates with your cloud Tier0. It can be an Edge Tier0, or a gateway or industrial PC.
@@ -112,7 +115,7 @@ In Cloud plans, an edge is a connection node that communicates with your cloud T
 | Launchpad / My Apps | <span class="t0-no">&#215;</span> | <span class="t0-yes">&#10003;</span> Builder / Growth / Scale | <span class="t0-yes">&#10003;</span> Base / Plus / Cluster |
 | Audit / app & system logs | <span class="t0-no">&#215;</span> | <span class="t0-yes">&#10003;</span> Growth / Scale | <span class="t0-yes">&#10003;</span> Plus / Cluster; SIEM in Cluster |
 | HA / multi-instance / governance | <span class="t0-no">&#215;</span> | <span class="t0-no">&#215;</span> | <span class="t0-yes">&#10003;</span> Cluster |
-| Operations | You | FREEZONEX | You, with support |
+| Maintenance | You | FREEZONEX | You, with support |
 
 ## Edge Hardware Requirements
 
@@ -121,12 +124,12 @@ Edge is intended for technical evaluation and requires operational experience.
 Make sure your environment meets the following hardware requirements before using it.
 :::
 
-| | Minimum | Recommended |
+|Item | Minimum | Recommended |
 |---|---|---|
 | CPU | 4 cores | 8 cores |
 | Memory | 8 GB | 16 GB |
 | Disk | 100 GB (1000 IOPS) | 1 TB |
-| OS | Ubuntu 24.04, Windows 10/11 (Docker) | - |
+| OS | Ubuntu 24.04, Windows 10/11 (Docker) |
 
 ## Decision Tree
 
@@ -145,11 +148,7 @@ flowchart LR
   class growth,cluster t0accent
 ```
 
-## What's an "edge" (the unit)?
-
-In Cloud plans, an *edge* is a connection point that collects data close to your equipment — typically a gateway or industrial PC running collection flows — and publishes into the namespace. Count roughly one per site or isolated network segment. Not to be confused with the **Edge edition** (the open-source distribution above).
-
 ## Next
 
-- [Build Apps on UNS](../../using-tier0/build-apps/) — deploying containers on Edge and Enterprise
-- [Installation](../installation/) — the 14-day Cloud trial is the full platform
+- [Build Apps on UNS](../../using-tier0/build-apps/) — Build and deploy Tier0 app on Enterprise
+- [Installation](../installation/)

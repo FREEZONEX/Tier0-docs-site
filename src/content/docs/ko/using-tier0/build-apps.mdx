@@ -1,49 +1,59 @@
 ---
-title: UNS 기반 앱 구축
-description: A container is an app — deploy full containers on Tier0 Edge and Enterprise; build logic with Event Flow.
+title: UNS에서 앱 구축
+description: UNS 데이터와 Event Flow 로직을 사용해 Tier0에서 컨테이너 기반 앱을 배포합니다.
 editions: [cloud]
 sidebar:
-  order: 4
+  order: 6
 ---
 import { Steps } from '@astrojs/starlight/components';
 
-## What is a Tier0 App
+## Tier0 App이란
 
-A Tier0 application has the following features:
-- It is a **Docker Container**.
-- It is generated from the conversation you have with the **App Builder**, zero-coding, no programming required.
-- It feeds on industrial data already in the **UNS**, and can *write back* to the **UNS**.
-- It can use **Event Flow** to implement logic.
+Tier0 애플리케이션은 다음과 같은 특징을 가집니다.
+- **Docker Container**입니다.
+- **App Builder**와의 대화로 생성되며, 별도의 프로그래밍이 필요하지 않습니다.
+- 이미 **UNS**에 있는 산업 데이터를 사용하고, 결과를 다시 **UNS**에 쓸 수 있습니다.
+- **Event Flow**를 사용해 내부 로직을 구현할 수 있습니다.
 
-## How to Deploy a Tier0 App
+## Tier0 App 배포 방법
 
-### Building a Tier0 App
+### Tier0 App을 처음부터 구축하기
 <Steps>
-1. Log in to Tier0, go to **App** > **Projects** and create a project for the application.
-2. Create an application inside the project, and you will be redirected to the application building page.
-3. Write the application requirements in the dialog.
+1. Tier0에 로그인한 뒤 **App** > **Projects**로 이동해 애플리케이션용 project를 만듭니다.
+2. project 안에서 애플리케이션을 만들면 애플리케이션 구축 페이지로 이동합니다.
+3. 대화창에 애플리케이션 요구사항을 작성합니다.
+
+    :::tip[Prompt에 포함할 내용]
+    prompt에 다음 정보를 명확히 포함하세요.
+    - *[uns_model]* UNS model을 데이터 소스로 사용하고, *[uns_model]* UNS model을 write-back 대상으로 사용합니다.
+    - (선택 사항) 데이터 소스를 연결하기 위한 UNS model과 Source Flow flow를 만듭니다.
+    - 이상 알람, 낮은 health score 또는 기타 이벤트를 트리거하기 위한 Event Flow flow를 만듭니다.
+    :::
+
+4. 애플리케이션 구축을 시작합니다. preview 후 필요한 변경사항을 LLM에게 요청합니다.
+5. **Deploy**를 클릭해 애플리케이션 구축을 완료합니다.
 </Steps>
-:::tip[What to be included in the prompt]
-Make sure you state the following information in the prompt:
-- Use the UNS model *[uns_model]* as the data source and *[uns_model]* as write back destination.
-- (optional) Create UNS model and flows in Source Flow to connect data sources.
-- Event Flow에서 anomaly alarm, 낮은 health score 또는 기타 event를 트리거하는 flow를 생성합니다.
+
+### Template에서 Tier0 App 구축하기
+:::note[Template이 있는 이유]
+- 기존 template은 현재 산업 현장에서 자주 사용되는 애플리케이션입니다.
+- template에서 애플리케이션을 만들면 비슷한 작업을 처음부터 반복하지 않아도 됩니다.
 :::
 <Steps>
-4. Start building the application, change as you need by talking to the LLM upon preview.
-5. Click **Deploy** to finish the application building.
+1. Tier0에서 **Library**로 이동해 필요한 template을 선택합니다.
+2. template을 애플리케이션 기반으로 사용하고, **Builder**에서 LLM과 자연어 대화로 수정합니다.
+3. 애플리케이션을 배포합니다.
 </Steps>
 
-### Deploying App on Tier0 Enterprise
+### Tier0 Enterprise에 App 배포하기
 <Steps>
-1. Find the application inside your project.
-2. Access it, click the **...** icon of the **Active** version to **Download ZIP**.
-3. Log in to Tier0 Enterprise, go to **Project** and create a project for the application.
-4. Click **Import App** and upload the ZIP package.
+1. project 안에서 애플리케이션을 찾습니다.
+2. 애플리케이션에 들어가 **Active** version의 **...** icon을 클릭한 뒤 **Download ZIP**을 선택합니다.
+3. Tier0 Enterprise에 로그인하고 **Project**로 이동해 애플리케이션용 project를 만듭니다.
+4. **Import App**을 클릭하고 ZIP package를 업로드합니다.
 </Steps>
-
 
 ## 다음 단계
 
-- [Analyze UNS Data](../analyze-data/) — Analyze UNS data with Marimo Notebook and Python.
-- [Best practice: connecting industrial protocols](../../best-practice/protocol-connections/)
+- [UNS 데이터 분석](../analyze-data/) - Marimo Notebook과 Python으로 UNS 데이터를 분석합니다.
+- [Best practice: industrial protocol 연결](../../best-practice/protocol-connections/)

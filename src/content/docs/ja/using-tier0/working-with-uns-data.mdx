@@ -27,8 +27,8 @@ Tier0 の **Edge** ページで新しい credential を作成し、記録しま�
 <Tabs syncKey="mqtt-client">
   <TabItem label="MQTTX">
 
-1. Install and open <a href="https://mqttx.app/" target="_blank" rel="noopener noreferrer">MQTTX</a>.
-2. Add a connection with the information of the Tier0 UNS broker, and the generated credentials.
+1. <a href="https://mqttx.app/" target="_blank" rel="noopener noreferrer">MQTTX</a> をインストールして開きます。
+2. UNS broker の情報と生成された credentials を使って connection を追加します。
     ```json
     {
       "Host": "mqtt.tier0.dev",
@@ -42,8 +42,8 @@ Tier0 の **Edge** ページで新しい credential を作成し、記録しま�
   </TabItem>
   <TabItem label="MQTT Explorer">
 
-1. Install and open <a href="https://mqtt-explorer.com/" target="_blank" rel="noopener noreferrer">MQTT Explorer</a>.
-2. Add a new connection with the broker information and the generated credentials.
+1. <a href="https://mqtt-explorer.com/" target="_blank" rel="noopener noreferrer">MQTT Explorer</a> をインストールして開きます。
+2. UNS broker の情報と生成された credentials を使って新しい connection を追加します。
     ```json
     {
       "Protocol": "mqtt://",
@@ -57,12 +57,12 @@ Tier0 の **Edge** ページで新しい credential を作成し、記録しま�
 
   </TabItem>
   <TabItem label="Node-RED">
-      - Use **Event Flow** - Data processing module in Tier0 based on Node-RED.
-          1. Create a flow in **Event Flow**, and start it with an `mqtt in` node.
-          2. Select the UNS broker as **Server** (same name as the flow) and set **Topic** to a UNS model in the node.
-      - Use **Separate Node-RED Instance**
+      - **Event Flow** を使用 - Tier0 内の Node-RED ベースのデータ処理モジュールです。
+          1. **Flows** で **Event Flow** を作成し、`mqtt in` node から開始します。
+          2. node 内で UNS broker を **Server**（flow と同じ名前）として選択し、**Topic** を UNS model に設定します。
+      - **別の Node-RED Instance** を使用
           1. <a href="https://nodered.org/docs/getting-started/local" target="_blank" rel="noopener noreferrer">Node-RED</a> instance をインストールして開きます。
-          2. Add a server in the `mqtt in` node with the following information.
+          2. `mqtt in` node に、次の情報で server を追加します。
           ```json
           {
             {/* under Connection */}
@@ -79,45 +79,72 @@ Tier0 の **Edge** ページで新しい credential を作成し、記録しま�
 
 ### 接続をテストする
 <Steps>
-1. On the **Edge** page, make sure the status of each client under the **Clients** tab is normal.
-2. Copy a UNS model topic and publish a message to it through the client.
-3. Go back to **UNS**, check the data under the target topic.
+1. **Edge** ページで、**Clients** tab にある各 client の status が normal であることを確認します。
+2. UNS model topic をコピーし、client からその topic に message を publish します。
+3. **UNS** に戻り、対象 topic の下にあるデータを確認します。
 </Steps>
 
 ## API
-Use **RestAPI** to operate on UNS data, flows and authentication.
+**REST API** を使用して UNS データを操作します。
 :::tip[API の使い方]
-- OpenAPI base path は `/openapi/v1` です。`TIER0_BASE_URL` を Tier0 host と base path の組み合わせ（例：`https://your-workspace.tier0.app/openapi/v1`）に設定し、`x-api-key` header に API key を渡します。
-- 右上の account icon をクリックし、**Settings > API Keys** で API keys を生成します。
+- OpenAPI の base path は `/openapi/v1` です。`TIER0_BASE_URL` には Tier0 host と base path を合わせた値（例: `https://your-workspace.tier0.app/openapi/v1`）を設定し、API key は `x-api-key` header で渡します。
+- API keys は右上のアカウントアイコンから **Settings > API Keys** に移動して生成できます。
 :::
 
-- `/flow/create`
+- `/uns/create`
 
-  Source Flow または Event Flow を作成します。`flowName` と `flowType` は必須です。
+  UNS path nodes または topic nodes を作成します。`namespace` で node tree を定義します。
 
-  <Tabs syncKey="flow-api-language">
+  <Tabs syncKey="uns-api-language">
     <TabItem label="JavaScript">
 
       ```js
       const BASE_URL = process.env.TIER0_BASE_URL;
       const API_KEY = process.env.TIER0_API_KEY;
 
-      const response = await fetch(`${BASE_URL}/flow/create`, {
+      const response = await fetch(`${BASE_URL}/uns/create`, {
         method: 'POST',
         headers: {
           'content-type': 'application/json',
           'x-api-key': API_KEY,
         },
         body: JSON.stringify({
-          flowName: 'Manufacturing source flow',
-          flowType: 'SourceFlow',
-          description: 'Collects UNS source data from the plant.',
-          template: '{}',
+          namespace: [
+            {
+              name: 'DemoFactory',
+              type: 'PATH',
+              children: [
+                {
+                  name: 'Site_01',
+                  type: 'PATH',
+                  children: [
+                    {
+                      name: 'Production',
+                      type: 'PATH',
+                      children: [
+                        {
+                          name: 'Produced_Qty',
+                          type: 'TOPIC',
+                          topicType: 'METRIC',
+                          displayName: 'Produced Quantity',
+                          description: 'Produced quantity from the production line.',
+                          enableHistory: true,
+                          fields: [
+                            { name: 'value', type: 'DOUBLE', unit: 'pcs' },
+                          ],
+                        },
+                      ],
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
         }),
       });
 
       const result = await response.json();
-      console.log(result.data.id, result.data.brokerID);
+      console.log(result.data.results);
       ```
 
     </TabItem>
@@ -131,65 +158,122 @@ Use **RestAPI** to operate on UNS data, flows and authentication.
       api_key = os.environ["TIER0_API_KEY"]
 
       response = requests.post(
-          f"{base_url}/flow/create",
+          f"{base_url}/uns/create",
           headers={"x-api-key": api_key},
           json={
-              "flowName": "Manufacturing source flow",
-              "flowType": "SourceFlow",
-              "description": "Collects UNS source data from the plant.",
-              "template": "{}",
+              "namespace": [
+                  {
+                      "name": "DemoFactory",
+                      "type": "PATH",
+                      "children": [
+                          {
+                              "name": "Site_01",
+                              "type": "PATH",
+                              "children": [
+                                  {
+                                      "name": "Production",
+                                      "type": "PATH",
+                                      "children": [
+                                          {
+                                              "name": "Produced_Qty",
+                                              "type": "TOPIC",
+                                              "topicType": "METRIC",
+                                              "displayName": "Produced Quantity",
+                                              "description": "Produced quantity from the production line.",
+                                              "enableHistory": True,
+                                              "fields": [
+                                                  {"name": "value", "type": "DOUBLE", "unit": "pcs"},
+                                              ],
+                                          },
+                                      ],
+                                  },
+                              ],
+                          },
+                      ],
+                  },
+              ],
           },
           timeout=30,
       )
       response.raise_for_status()
 
       result = response.json()
-      print(result["data"]["id"], result["data"]["brokerID"])
+      print(result["data"]["results"])
       ```
 
     </TabItem>
     <TabItem label="cURL">
 
       ```bash
-      curl -X POST "$TIER0_BASE_URL/flow/create" \
+      curl -X POST "$TIER0_BASE_URL/uns/create" \
         -H "content-type: application/json" \
         -H "x-api-key: $TIER0_API_KEY" \
         -d '{
-          "flowName": "Manufacturing source flow",
-          "flowType": "SourceFlow",
-          "description": "Collects UNS source data from the plant.",
-          "template": "{}"
+          "namespace": [
+            {
+              "name": "DemoFactory",
+              "type": "PATH",
+              "children": [
+                {
+                  "name": "Site_01",
+                  "type": "PATH",
+                  "children": [
+                    {
+                      "name": "Production",
+                      "type": "PATH",
+                      "children": [
+                        {
+                          "name": "Produced_Qty",
+                          "type": "TOPIC",
+                          "topicType": "METRIC",
+                          "displayName": "Produced Quantity",
+                          "description": "Produced quantity from the production line.",
+                          "enableHistory": true,
+                          "fields": [
+                            { "name": "value", "type": "DOUBLE", "unit": "pcs" }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
         }'
       ```
 
     </TabItem>
   </Tabs>
 
-- `/flow/list`
+- `/uns/read`
 
-  flows を一覧表示し、必要に応じて `flowType` または `keyword` で絞り込みます。UPDATE または GET の前に flow `id` を探すために使います。
+  1 つ以上の UNS topics の最新値とメタデータを読み取ります。
 
-  <Tabs syncKey="flow-api-language">
+  <Tabs syncKey="uns-api-language">
     <TabItem label="JavaScript">
 
       ```js
       const BASE_URL = process.env.TIER0_BASE_URL;
       const API_KEY = process.env.TIER0_API_KEY;
 
-      const response = await fetch(`${BASE_URL}/flow/list`, {
+      const response = await fetch(`${BASE_URL}/uns/read`, {
         method: 'POST',
         headers: {
           'content-type': 'application/json',
           'x-api-key': API_KEY,
         },
         body: JSON.stringify({
-          flowType: 'SourceFlow',
-          keyword: 'Manufacturing',
+          topics: [
+            'DemoFactory/Site_01/Production/Produced_Qty',
+          ],
+          include_leaf_value: true,
+          include_metadata: true,
         }),
       });
 
       const result = await response.json();
-      console.log(result.data.list);
+      console.log(result.data.results);
       ```
 
     </TabItem>
@@ -203,131 +287,65 @@ Use **RestAPI** to operate on UNS data, flows and authentication.
       api_key = os.environ["TIER0_API_KEY"]
 
       response = requests.post(
-          f"{base_url}/flow/list",
+          f"{base_url}/uns/read",
           headers={"x-api-key": api_key},
           json={
-              "flowType": "SourceFlow",
-              "keyword": "Manufacturing",
+              "topics": [
+                  "DemoFactory/Site_01/Production/Produced_Qty",
+              ],
+              "include_leaf_value": True,
+              "include_metadata": True,
           },
           timeout=30,
       )
       response.raise_for_status()
 
       result = response.json()
-      print(result["data"]["list"])
+      print(result["data"]["results"])
       ```
 
     </TabItem>
     <TabItem label="cURL">
 
       ```bash
-      curl -X POST "$TIER0_BASE_URL/flow/list" \
+      curl -X POST "$TIER0_BASE_URL/uns/read" \
         -H "content-type: application/json" \
         -H "x-api-key: $TIER0_API_KEY" \
         -d '{
-          "flowType": "SourceFlow",
-          "keyword": "Manufacturing"
+          "topics": [
+            "DemoFactory/Site_01/Production/Produced_Qty"
+          ],
+          "include_leaf_value": true,
+          "include_metadata": true
         }'
       ```
 
     </TabItem>
   </Tabs>
 
-- `/flow/update`
+- `/uns/update`
 
-  `id` で flow を更新します。変更したいフィールドだけを送信します。
+  `path` で UNS node を更新します。`updateMask` を使用して変更するフィールドを指定します。
 
-  <Tabs syncKey="flow-api-language">
+  <Tabs syncKey="uns-api-language">
     <TabItem label="JavaScript">
 
       ```js
       const BASE_URL = process.env.TIER0_BASE_URL;
       const API_KEY = process.env.TIER0_API_KEY;
-      const flowId = 123;
 
-      const response = await fetch(`${BASE_URL}/flow/update`, {
+      const response = await fetch(`${BASE_URL}/uns/update`, {
         method: 'POST',
         headers: {
           'content-type': 'application/json',
           'x-api-key': API_KEY,
         },
         body: JSON.stringify({
-          id: flowId,
-          flowName: 'Manufacturing source flow v2',
-          description: 'Updated source flow description.',
-          isFavorite: 1,
+          path: 'DemoFactory/Site_01/Production/Produced_Qty',
+          displayName: 'Produced Quantity',
+          description: 'Updated production output quantity.',
+          updateMask: ['displayName', 'description'],
         }),
-      });
-
-      const result = await response.json();
-      console.log(result.data.success);
-      ```
-
-    </TabItem>
-    <TabItem label="Python">
-
-      ```python
-      import os
-      import requests
-
-      base_url = os.environ["TIER0_BASE_URL"]
-      api_key = os.environ["TIER0_API_KEY"]
-      flow_id = 123
-
-      response = requests.post(
-          f"{base_url}/flow/update",
-          headers={"x-api-key": api_key},
-          json={
-              "id": flow_id,
-              "flowName": "Manufacturing source flow v2",
-              "description": "Updated source flow description.",
-              "isFavorite": 1,
-          },
-          timeout=30,
-      )
-      response.raise_for_status()
-
-      result = response.json()
-      print(result["data"]["success"])
-      ```
-
-    </TabItem>
-    <TabItem label="cURL">
-
-      ```bash
-      curl -X POST "$TIER0_BASE_URL/flow/update" \
-        -H "content-type: application/json" \
-        -H "x-api-key: $TIER0_API_KEY" \
-        -d '{
-          "id": 123,
-          "flowName": "Manufacturing source flow v2",
-          "description": "Updated source flow description.",
-          "isFavorite": 1
-        }'
-      ```
-
-    </TabItem>
-  </Tabs>
-
-- `/flow/get`
-
-  `id` で 1 つの flow を取得します。
-
-  <Tabs syncKey="flow-api-language">
-    <TabItem label="JavaScript">
-
-      ```js
-      const BASE_URL = process.env.TIER0_BASE_URL;
-      const API_KEY = process.env.TIER0_API_KEY;
-      const flowId = 123;
-
-      const response = await fetch(`${BASE_URL}/flow/get`, {
-        method: 'POST',
-        headers: {
-          'content-type': 'application/json',
-          'x-api-key': API_KEY,
-        },
-        body: JSON.stringify({ id: flowId }),
       });
 
       const result = await response.json();
@@ -343,12 +361,16 @@ Use **RestAPI** to operate on UNS data, flows and authentication.
 
       base_url = os.environ["TIER0_BASE_URL"]
       api_key = os.environ["TIER0_API_KEY"]
-      flow_id = 123
 
       response = requests.post(
-          f"{base_url}/flow/get",
+          f"{base_url}/uns/update",
           headers={"x-api-key": api_key},
-          json={"id": flow_id},
+          json={
+              "path": "DemoFactory/Site_01/Production/Produced_Qty",
+              "displayName": "Produced Quantity",
+              "description": "Updated production output quantity.",
+              "updateMask": ["displayName", "description"],
+          },
           timeout=30,
       )
       response.raise_for_status()
@@ -361,10 +383,89 @@ Use **RestAPI** to operate on UNS data, flows and authentication.
     <TabItem label="cURL">
 
       ```bash
-      curl -X POST "$TIER0_BASE_URL/flow/get" \
+      curl -X POST "$TIER0_BASE_URL/uns/update" \
         -H "content-type: application/json" \
         -H "x-api-key: $TIER0_API_KEY" \
-        -d '{"id": 123}'
+        -d '{
+          "path": "DemoFactory/Site_01/Production/Produced_Qty",
+          "displayName": "Produced Quantity",
+          "description": "Updated production output quantity.",
+          "updateMask": ["displayName", "description"]
+        }'
+      ```
+
+    </TabItem>
+  </Tabs>
+
+- `/uns/delete`
+
+  1 つ以上の UNS models を削除します。`hard_delete: false` を使用すると models をごみ箱へ移動します。
+
+  <Tabs syncKey="uns-api-language">
+    <TabItem label="JavaScript">
+
+      ```js
+      const BASE_URL = process.env.TIER0_BASE_URL;
+      const API_KEY = process.env.TIER0_API_KEY;
+
+      const response = await fetch(`${BASE_URL}/uns/delete`, {
+        method: 'POST',
+        headers: {
+          'content-type': 'application/json',
+          'x-api-key': API_KEY,
+        },
+        body: JSON.stringify({
+          topics: [
+            'DemoFactory/Site_01/Production/Produced_Qty',
+          ],
+          hard_delete: false,
+        }),
+      });
+
+      const result = await response.json();
+      console.log(result.data);
+      ```
+
+    </TabItem>
+    <TabItem label="Python">
+
+      ```python
+      import os
+      import requests
+
+      base_url = os.environ["TIER0_BASE_URL"]
+      api_key = os.environ["TIER0_API_KEY"]
+
+      response = requests.post(
+          f"{base_url}/uns/delete",
+          headers={"x-api-key": api_key},
+          json={
+              "topics": [
+                  "DemoFactory/Site_01/Production/Produced_Qty",
+              ],
+              "hard_delete": False,
+          },
+          timeout=30,
+      )
+      response.raise_for_status()
+
+      result = response.json()
+      print(result["data"])
+      ```
+
+    </TabItem>
+    <TabItem label="cURL">
+
+      ```bash
+      curl -X POST "$TIER0_BASE_URL/uns/delete" \
+        -H "content-type: application/json" \
+        -H "x-api-key: $TIER0_API_KEY" \
+        -d '{
+          "topics": [
+            "DemoFactory/Site_01/Production/Produced_Qty"
+          ],
+          "hard_delete": false
+        }'
       ```
 
     </TabItem>
@@ -372,7 +473,7 @@ Use **RestAPI** to operate on UNS data, flows and authentication.
 
 ## API リファレンス
 
-- [Tier0 OpenAPI Reference](../../reference/tier0-openapi/)
+- [Tier0 OpenAPI リファレンス](../../reference/tier0-openapi/)
 
 ## 次へ
 

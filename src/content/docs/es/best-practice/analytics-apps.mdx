@@ -7,11 +7,11 @@ sidebar:
 ---
 import { Aside, Steps } from '@astrojs/starlight/components';
 
-Tier0 usa Marimo Notebook para análisis avanzado de datos con Python. Esta guía usa una aplicación Bowtie como flujo de ejemplo.
+Tier0 usa Marimo Notebook para análisis avanzado de datos con Python. Esta guía usa una aplicación Bowtie como ejemplo.
 
 ```mermaid
 flowchart LR
-  collect["Node-RED"] -->|"datos recopilados"| uns[("Modelado<br/>UNS")]
+  collect["Source Flow"] -->|"datos recopilados"| uns[("Modelos<br/>UNS")]
   uns -->|"datos sin procesar"| notebook["Notebook"]
   notebook -->|"resultados de análisis"| uns
   uns -->|"resultados de análisis"| builder["App Builder"]
@@ -27,7 +27,7 @@ flowchart LR
 
 ## Contexto del ejemplo
 
-La corrosión en refinería es un proceso complejo influido por múltiples factores operativos. Este ejemplo muestra un flujo de evaluación de riesgo de corrosión en tiempo real que combina datos de proceso para estimar la probabilidad de corrosión y apoyar el mantenimiento proactivo.
+La corrosión en refinería es un proceso complejo influido por múltiples factores operativos. Este ejemplo muestra una evaluación de riesgo de corrosión en tiempo real que combina datos de proceso para estimar la probabilidad de corrosión y apoyar el mantenimiento proactivo.
 
 ## Obtener datos raw
 
@@ -200,7 +200,6 @@ La corrosión en refinería es un proceso complejo influido por múltiples facto
     
 2. Ve a **Flows**, crea un **Source Flow** para conectar los datos sin procesar y publicarlos en **UNS**.
 
-    *(Node-RED conecta los datos y los publica en UNS.)*
     <details className="notebook-cell">
     <summary>Mostrar JSON de Source Flow</summary>
 
@@ -402,9 +401,7 @@ La corrosión en refinería es un proceso complejo influido por múltiples facto
 
 2. Abre el notebook y agrega las siguientes celdas para analizar datos de **UNS**.
 
-    - Celda 1 - Importar librerías y configuración
-
-      Importa las librerías necesarias y configura el broker MQTT, los topics y los ajustes de ejecución.
+    - Celda 1 - Importa las dependencias necesarias y configura el broker MQTT, los topics y los ajustes de ejecución.
 
       <details className="notebook-cell">
       <summary>Mostrar código</summary>
@@ -489,9 +486,7 @@ La corrosión en refinería es un proceso complejo influido por múltiples facto
 
       </details>
 
-    - Celda 2 - Definir la estructura de Bayesian Network
-
-      Define la topology de Bayesian Network, los espacios de estado, los generadores CPT y las reglas de probabilidad.
+    - Celda 2 - Define la topology de Bayesian Network, los espacios de estado, los generadores CPT y las reglas de probabilidad.
 
       <details className="notebook-cell">
       <summary>Mostrar código</summary>
@@ -694,9 +689,7 @@ La corrosión en refinería es un proceso complejo influido por múltiples facto
 
       </details>
 
-    - Celda 3 - Validar y discretizar los datos de origen
-
-      Valida el payload MQTT entrante y convierte los valores continuos del proceso en estados de Bayesian Network.
+    - Celda 3 - Valida el payload MQTT entrante y convierte los valores continuos del proceso en estados de Bayesian Network.
 
       <details className="notebook-cell">
       <summary>Mostrar código</summary>
@@ -881,9 +874,7 @@ La corrosión en refinería es un proceso complejo influido por múltiples facto
 
       </details>
 
-    - Celda 4 - Construir el modelo y ejecutar inferencia
-
-      Construye una Bayesian Network para el snapshot actual, ejecuta inferencia y genera payloads de salida.
+    - Celda 4 - Construye una Bayesian Network para el snapshot actual, ejecuta inferencia y genera payloads de salida.
 
       <details className="notebook-cell">
       <summary>Mostrar código</summary>
@@ -1047,9 +1038,7 @@ La corrosión en refinería es un proceso complejo influido por múltiples facto
 
       </details>
 
-    - Celda 5 - Ejecutar el servicio de análisis MQTT
-
-      Subscribe to the source topic, process each incoming snapshot, run Bayesian analysis, and publish the results.
+    - Celda 5 - Se suscribe al source topic, procesa cada snapshot entrante, ejecuta el análisis Bayesian y publica los resultados.
 
       <details className="notebook-cell">
       <summary>Mostrar código</summary>
@@ -1286,9 +1275,7 @@ La corrosión en refinería es un proceso complejo influido por múltiples facto
 
       </details>
 
-    - Celda 6 - Mostrar el estado del servicio
-
-      Display the MQTT connection status and service statistics.
+    - Celda 6 - Muestra el estado de conexión MQTT y las estadísticas del servicio.
 
       <details className="notebook-cell">
       <summary>Mostrar código</summary>
@@ -1351,9 +1338,7 @@ La corrosión en refinería es un proceso complejo influido por múltiples facto
 
       </details>
 
-    - Celda 7 - Mostrar el último resultado de análisis
-
-      Display the most recent Bayesian analysis result.
+    - Celda 7 - Muestra el resultado más reciente del análisis Bayesian.
 
       <details className="notebook-cell">
       <summary>Mostrar código</summary>

@@ -7,11 +7,11 @@ sidebar:
 ---
 import { Aside, Steps } from '@astrojs/starlight/components';
 
-Tier0 uses Marimo Notebook for advanced data analysis with Python. This guide uses a Bowtie application as an example workflow.
+Tier0 uses Marimo Notebook for advanced data analysis with Python. This guide uses a Bowtie application as an example.
 
 ```mermaid
 flowchart LR
-  collect["Node-RED"] -->|"collected data"| uns[("UNS<br/>modeling")]
+  collect["Source Flow"] -->|"collected data"| uns[("UNS<br/>models")]
   uns -->|"raw data"| notebook["Notebook"]
   notebook -->|"analysis results"| uns
   uns -->|"analysis results"| builder["App Builder"]
@@ -199,8 +199,6 @@ Refinery corrosion is a complex process influenced by multiple operating factors
       </details>
     
 2. Go to **Flows**, create a **Source Flow** to connect raw data and publish it to **UNS**.
-
-    *(Node-RED connects data and publishes it to UNS.)*
     <details className="notebook-cell">
     <summary>Show Source Flow JSON</summary>
 
@@ -402,9 +400,7 @@ Refinery corrosion is a complex process influenced by multiple operating factors
 
 2. Access the notebook, and add the following cells to analyze data from **UNS**.
 
-    - Cell 1 - Import Libraries & Configuration
-
-      Import required libraries and configure the MQTT broker, topics, and runtime settings.
+    - Cell 1 - Import required dependencies and configure the MQTT broker, topics, and runtime settings.
 
       <details className="notebook-cell">
       <summary>Show code</summary>
@@ -489,15 +485,9 @@ Refinery corrosion is a complex process influenced by multiple operating factors
 
       </details>
       :::tip[For external connections to UNS broker]
-      In addition to the authentication credentials from Tier0, use the following information when connecting to the UNS broker through an external client:
-        ```json
-        "MQTT TCP": "mqtt://enterprise-new-dev.tier0.dev:1883",
-        "WSS": "wss://enterprise-new-dev.tier0.dev:8084/mqtt"
-        ```
-
-    - Cell 2 - Define Bayesian Network Structure
-
-      Define the Bayesian Network topology, state spaces, CPT generators, and probability rules.
+      Refer to [Connecting MQTT Clients](../../using-tier0/working-with-uns-data/#connecting-mqtt-clients)
+      :::
+    - Cell 2 - Define the Bayesian Network topology, state spaces, CPT generators, and probability rules.
 
       <details className="notebook-cell">
       <summary>Show code</summary>
@@ -700,9 +690,7 @@ Refinery corrosion is a complex process influenced by multiple operating factors
 
       </details>
 
-    - Cell 3 - Validate & Discretize Source Data
-
-      Validate the incoming MQTT payload and convert continuous process values into Bayesian Network states.
+    - Cell 3 - Validate the incoming MQTT payload and convert continuous process values into Bayesian Network states.
 
       <details className="notebook-cell">
       <summary>Show code</summary>
@@ -887,9 +875,7 @@ Refinery corrosion is a complex process influenced by multiple operating factors
 
       </details>
 
-    - Cell 4 - Build Model & Run Inference
-
-      Build a Bayesian Network for the current snapshot, execute inference, and generate output payloads.
+    - Cell 4 - Build  a Bayesian Network for the current snapshot, execute inference, and generate output payloads.
 
       <details className="notebook-cell">
       <summary>Show code</summary>
@@ -1053,9 +1039,7 @@ Refinery corrosion is a complex process influenced by multiple operating factors
 
       </details>
 
-    - Cell 5 - Run MQTT Analysis Service
-
-      Subscribe to the source topic, process each incoming snapshot, run Bayesian analysis, and publish the results.
+    - Cell 5 - Subscribe to the source topic, process each incoming snapshot, run Bayesian analysis, and publish the results.
 
       <details className="notebook-cell">
       <summary>Show code</summary>
@@ -1292,9 +1276,7 @@ Refinery corrosion is a complex process influenced by multiple operating factors
 
       </details>
 
-    - Cell 6 - Display Service Status
-
-      Display the MQTT connection status and service statistics.
+    - Cell 6 - Display the MQTT connection status and service statistics.
 
       <details className="notebook-cell">
       <summary>Show code</summary>
@@ -1357,9 +1339,7 @@ Refinery corrosion is a complex process influenced by multiple operating factors
 
       </details>
 
-    - Cell 7 - Display Latest Analysis Result
-
-      Display the most recent Bayesian analysis result.
+    - Cell 7 - Display the most recent Bayesian analysis result.
 
       <details className="notebook-cell">
       <summary>Show code</summary>
@@ -1407,7 +1387,7 @@ Refinery corrosion is a complex process influenced by multiple operating factors
       Remember to tell the agent to use data from UNS. Specific topic paths are required; otherwise, the agent might have trouble displaying the correct data.
     </Aside>
     <Aside type="tip" title="In case you are building apps on another Tier0">
-      Use a different **clientId** (add a different suffix) to connect to the UNS broker and avoid client ID conflicts.
+      Use a different **clientId** (add a different suffix) to connect to the UNS broker to avoid client ID conflicts.
     </Aside>
     <details className="notebook-cell">
     <summary>Show Builder prompt</summary>

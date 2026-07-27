@@ -7,11 +7,11 @@ sidebar:
 ---
 import { Aside, Steps } from '@astrojs/starlight/components';
 
-Tier0는 Python 기반 고급 데이터 분석에 Marimo Notebook을 사용합니다. 이 가이드는 Bowtie 애플리케이션을 예제 workflow로 사용합니다.
+Tier0는 Python 기반 고급 데이터 분석에 Marimo Notebook을 사용합니다. 이 가이드는 Bowtie 애플리케이션을 예제로 사용합니다.
 
 ```mermaid
 flowchart LR
-  collect["Node-RED"] -->|"수집 데이터"| uns[("UNS<br/>모델링")]
+  collect["Source Flow"] -->|"수집 데이터"| uns[("UNS<br/>모델")]
   uns -->|"원시 데이터"| notebook["Notebook"]
   notebook -->|"분석 결과"| uns
   uns -->|"분석 결과"| builder["App Builder"]
@@ -27,7 +27,7 @@ flowchart LR
 
 ## 예제 배경
 
-정유 공정의 부식은 여러 운전 요인의 영향을 받는 복잡한 현상입니다. 이 예제는 공정 데이터를 결합해 부식 발생 가능성을 추정하고 선제 정비를 지원하는 실시간 부식 위험 평가 workflow를 보여줍니다.
+정유 공정의 부식은 여러 운전 요인의 영향을 받는 복잡한 현상입니다. 이 예제는 공정 데이터를 결합해 부식 발생 가능성을 추정하고 선제 정비를 지원하는 실시간 부식 위험 평가를 보여줍니다.
 
 ## 원천 데이터 가져오기
 
@@ -200,7 +200,6 @@ flowchart LR
     
 2. **Flows**로 이동해 **Source Flow**를 만들고 원시 데이터를 연결한 뒤 **UNS**에 게시합니다.
 
-    *(Node-RED가 데이터를 연결하고 UNS에 게시합니다.)*
     <details className="notebook-cell">
     <summary>Source Flow JSON 보기</summary>
 
@@ -402,9 +401,7 @@ flowchart LR
 
 2. notebook을 열고 **UNS** 데이터를 분석하기 위해 다음 cell을 추가합니다.
 
-    - 셀 1 - 라이브러리 가져오기 및 설정
-
-      필요한 라이브러리를 가져오고 MQTT broker, topic, runtime 설정을 구성합니다.
+    - 셀 1 - 필요한 의존성을 가져오고 MQTT broker, topics, runtime 설정을 구성합니다.
 
       <details className="notebook-cell">
       <summary>코드 보기</summary>
@@ -489,15 +486,9 @@ flowchart LR
 
       </details>
       :::tip[UNS broker 외부 연결]
-      외부 client로 UNS broker에 연결하는 경우 Tier0 인증 정보 외에 다음 정보를 사용합니다.
-        ```json
-        "MQTT TCP": "mqtt://enterprise-new-dev.tier0.dev:1883",
-        "WSS": "wss://enterprise-new-dev.tier0.dev:8084/mqtt"
-        ```
-
-    - 셀 2 - Bayesian Network 구조 정의
-
-      Bayesian Network topology, 상태 공간, CPT generator, 확률 규칙을 정의합니다.
+      [MQTT Clients 연결](../../using-tier0/working-with-uns-data/#connecting-mqtt-clients)을 참고하세요.
+      :::
+    - 셀 2 - Bayesian Network topology, 상태 공간, CPT generator, 확률 규칙을 정의합니다.
 
       <details className="notebook-cell">
       <summary>코드 보기</summary>
@@ -700,9 +691,7 @@ flowchart LR
 
       </details>
 
-    - 셀 3 - Source data 검증 및 이산화
-
-      수신 MQTT payload를 검증하고 연속 process 값을 Bayesian Network 상태로 변환합니다.
+    - 셀 3 - 수신 MQTT payload를 검증하고 연속 process 값을 Bayesian Network 상태로 변환합니다.
 
       <details className="notebook-cell">
       <summary>코드 보기</summary>
@@ -887,9 +876,7 @@ flowchart LR
 
       </details>
 
-    - 셀 4 - 모델 구축 및 추론 실행
-
-      현재 snapshot에 대한 Bayesian Network를 구축하고 추론을 실행한 뒤 output payload를 생성합니다.
+    - 셀 4 - 현재 snapshot에 대한 Bayesian Network를 구축하고 추론을 실행한 뒤 output payload를 생성합니다.
 
       <details className="notebook-cell">
       <summary>코드 보기</summary>
@@ -1053,9 +1040,7 @@ flowchart LR
 
       </details>
 
-    - 셀 5 - MQTT 분석 서비스 실행
-
-      source topic을 subscribe하고 각 incoming snapshot을 처리한 뒤 Bayesian analysis를 실행하고 result를 publish합니다.
+    - 셀 5 - source topic을 구독하고 각 incoming snapshot을 처리한 뒤 Bayesian analysis를 실행하고 result를 게시합니다.
 
       <details className="notebook-cell">
       <summary>코드 보기</summary>
@@ -1292,9 +1277,7 @@ flowchart LR
 
       </details>
 
-    - 셀 6 - 서비스 상태 표시
-
-      Display the MQTT connection status and service statistics.
+    - 셀 6 - MQTT connection status와 service statistics를 표시합니다.
 
       <details className="notebook-cell">
       <summary>코드 보기</summary>
@@ -1357,9 +1340,7 @@ flowchart LR
 
       </details>
 
-    - 셀 7 - 최신 분석 결과 표시
-
-      Display the most recent Bayesian analysis result.
+    - 셀 7 - 가장 최근의 Bayesian analysis result를 표시합니다.
 
       <details className="notebook-cell">
       <summary>코드 보기</summary>

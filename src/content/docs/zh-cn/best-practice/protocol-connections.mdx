@@ -1,28 +1,28 @@
 ﻿---
 title: 连接工业协议
-description: "使用 Node-RED 将 OPC UA、Modbus 和其他典型协议设备接入 UNS，并提供真实 flow JSON 参考。"
+description: "使用 Node-RED 将 OPC UA、Modbus 和其他典型协议设备接入 UNS，并提供真实数据流 JSON 参考。"
 editions: [edge, cloud, enterprise]
 sidebar:
   order: 2
-  label: Connecting OPC UA / Modbus
+  label: 连接 OPC UA/Modbus/Rest API
 ---
 import { Steps } from '@astrojs/starlight/components';
 
-本节以 OPC UA、Modbus 和 API 等常见数据类型为例，展示如何通过 **Source Flow** 将数据源连接到 **UNS**。
+本节以 OPC UA、Modbus 和 API 等常见数据类型为例，展示如何通过 **数据连接** 将数据源连接到 **UNS**。
 
 ## OPC UA
 
 ### 配置数据流
 
 <Steps>
-1. Log in to Tier0, go to **Flow** and create a new **Source Flow**.
-2. Add **inject**, **OPC UA Client** and **mqtt out** nodes in the flow.
-3. Connect them by order and double-click each node to configure the details.
+1. 进入 Tier0 的 **数据流程**，创建一个 **数据连接**。
+2. 在数据流中加入 `inject`，`OPC UA Client` 和 `mqtt out` 节点。
+3. 按顺序连接节点，并双击每个节点配置详细信息。
 </Steps>
-- **inject**
+- `inject`
     <Steps>
-    1. Click **add** at the lower-left corner to add an entry of property.
-    2. Set the properties to be the following items:
+    1. 单击左下角 **add** 添加一条属性。
+    2. 按照以下内容配置属性。
 
         ```json
         {
@@ -31,25 +31,25 @@ import { Steps } from '@astrojs/starlight/components';
         }
         ```
     </Steps>
-- **OPC UA Client**
+- `OPC UA Client`
     ```json
-    "Endpoint": "<OPC UA server address and port>", //e.g. opc.tcp://127.0.0.1:4850
+    "Endpoint": "<OPC UA 服务器地址和端口>", //e.g. opc.tcp://127.0.0.1:4850
     "Action": "SUBSCRIBE",
-    "Interval": "<data collecting interval>" //e.g. 10 seconds
+    "Interval": "<数据采集频率>" //e.g. 10 秒
     ```
-- **mqtt out**
+- `mqtt out`
     ```json
-    "Server": "<embedded UNS broker>", //same name as the flow
-    "Topic": "<UNS model>",
+    "Server": "<内置 UNS broker>", //与数据流同名
+    "Topic": "<UNS 模型>",
     ```
 <Steps>
-4. Deploy and trigger the flow.
+4. 部署并触发数据流。
 </Steps>
 
-### Flow Reference
+### 数据流参考
 
 <details>
-<summary>显示 OPC UA flow JSON</summary>
+<summary>显示 OPC UA 数据流 JSON</summary>
 
 ```json
 [
@@ -203,30 +203,30 @@ import { Steps } from '@astrojs/starlight/components';
 ## Modbus
 ### 配置数据流
 <Steps>
-1. In the flow, add **modbus-read** and **mqtt out** nodes.
-2. Double-click the nodes, and configure the required information.
-    - **modbus-read**
+1. 在数据流中加入 `modbus-read` 和 `mqtt out` 节点。
+2. 双击节点配置信息。
+    - `modbus-read`
         - **Settings**
-          - **FC**: Function code that specifies the Modbus action, e.g., FC 3 = Read Holding Registers.
-          - **Address**: The starting register address to read from (usually zero-based).
-          - **Quantity**:  The number of consecutive registers to read.
-          - **Poll Rate**: How often the node polls the Modbus device (e.g., every 10 seconds).
-          - **Server**: Reference to a configured Modbus server (IP, port, protocol, etc.).
+          - **FC**：选择 Modbus 功能码。例如，FC 3 表示读取保持寄存器。
+          - **Address**：设置起始寄存器地址。例如，从 0 开始读取。
+          - **Quantity**：设置要连续读取的寄存器数量。
+          - **Poll Rate**：设置 Modbus 轮询频率。例如，每 10 秒读取一次。
+          - **Server**：选择或创建 Modbus 服务器，配置 IP、端口和协议。
         - **Server**
-          - **Host**: Modbus server IP.
-          - **Port**: Modbus server port.
-    - **mqtt out**
+          - **Host**：Modbus 服务器 IP。
+          - **Port**：Modbus 服务器端口。
+    - `mqtt out`
         ```json
-        "Server": "<embedded UNS broker>", //same name as the flow
-        "Topic": "<UNS model>",
+        "Server": "<内置 UNS broker>", //与数据流同名
+        "Topic": "<UNS 模型>",
         ```
-3. Deploy and trigger the flow.
+3. 部署数据流。
 </Steps>
 
-### Flow Reference
+### 数据流参考
 
 <details>
-<summary>显示 Modbus flow JSON</summary>
+<summary>显示 Modbus 数据流 JSON</summary>
 
 ```json
 [
@@ -385,26 +385,26 @@ import { Steps } from '@astrojs/starlight/components';
 ## API
 ### 配置数据流
 <Steps>
-1. In the flow, add **inject**, **http request** and **mqtt out** nodes.
-2. Double-click the nodes, and configure the required information.
-    - **http request**
+1. 在数据流中加入 `inject`，`http request` 和 `mqtt out` 节点。
+2. 双击节点配置信息。
+    - `http request`
         ```json
         "Method": "<API method>",
         "URL": "<API URL>",
         "Return": "a parsed JSON object",
         "Headers": "<API headers>"
         ```
-    - **mqtt out**
+    - `mqtt out`
         ```json
-        "Server": "<embedded UNS broker>", //same name as the flow
-        "Topic": "<UNS model>",
+        "Server": "<内置 UNS broker>", //与数据流同名
+        "Topic": "<UNS 模型>",
         ```
-3. Deploy and trigger the flow.
+3. 部署数据流。
 </Steps>
 
-### Flow Reference
+### 数据流参考
 <details>
-<summary>显示 API flow JSON</summary>
+<summary>显示 API 数据流 JSON</summary>
 
 ```json
 [
@@ -505,8 +505,8 @@ import { Steps } from '@astrojs/starlight/components';
 
 </details>
 
-:::tip[Other things you might want to know]
-- 发布到 **UNS** 前，可以按需拖入 **function** 节点清洗数据。
+:::tip[节点使用建议]
+- 发布到 **UNS** 前，可以按需拖入 **function** 节点处理数据。
 - 可以使用 **debug** 节点现场检查数据。
-- 节点详情见 [Node-RED flows](https://flows.nodered.org/)。
+- 节点详情见 [Node-RED 数据流](https://flows.nodered.org/)。
 :::

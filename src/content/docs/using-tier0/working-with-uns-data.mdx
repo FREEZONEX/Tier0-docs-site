@@ -35,7 +35,7 @@ The Tier0 Edge version does not require credentials for external connections.
   <TabItem label="MQTTX">
 
 1. Install and open <a href="https://mqttx.app/" target="_blank" rel="noopener noreferrer">MQTTX</a>.
-2. Add a connection with the information of the Tier0 UNS broker, and the generated credentials.
+2. Add a connection with the information of the UNS broker and the generated credentials.
     ```json
     {
       "Host": "mqtt.tier0.dev", 
@@ -50,7 +50,7 @@ The Tier0 Edge version does not require credentials for external connections.
   <TabItem label="MQTT Explorer">
 
 1. Install and open <a href="https://mqtt-explorer.com/" target="_blank" rel="noopener noreferrer">MQTT Explorer</a>.
-2. Add a new connection with the broker information and the generated credentials.
+2. Add a new connection with the UNS broker information and the generated credentials.
     ```json
     {
       "Protocol": "mqtt://",
@@ -65,9 +65,12 @@ The Tier0 Edge version does not require credentials for external connections.
   </TabItem>
   <TabItem label="Node-RED">
       - Use **Event Flow** - Data processing module in Tier0 based on Node-RED.
-          1. Create a flow in **Event Flow**, and start it with an `mqtt in` node.
+
+          1. Create an **Event Flow** in **Flows**, and start it with an `mqtt in` node.
           2. Select the UNS broker as **Server** (same name as the flow) and set **Topic** to a UNS model in the node.
+
       - Use **Separate Node-RED Instance**
+
           1. Install and open the <a href="https://nodered.org/docs/getting-started/local" target="_blank" rel="noopener noreferrer">Node-RED</a> instance.
           2. Add a server in the `mqtt in` node with the following information.
           ```json
@@ -92,39 +95,66 @@ The Tier0 Edge version does not require credentials for external connections.
 </Steps>
 
 ## API
-Use the **REST API** to operate on UNS data, flows, and authentication.
+Use the **REST API** to operate on UNS data.
 :::tip[How to use the API]
 - The OpenAPI base path is `/openapi/v1`. Set `TIER0_BASE_URL` to your Tier0 host plus the base path, for example `https://your-workspace.tier0.app/openapi/v1`, and pass your API key in the `x-api-key` header.
 - API keys are generated under **Settings > API Keys** by clicking the account icon in the upper-right corner.
 :::
 
-- `/flow/create`
+- `/uns/create`
 
-  Create a **Source Flow** or **Event Flow**. `flowName` and `flowType` are required.
+  Create UNS path nodes or topic nodes. Use `namespace` to define the node tree.
 
-  <Tabs syncKey="flow-api-language">
+  <Tabs syncKey="uns-api-language">
     <TabItem label="JavaScript">
 
       ```js
       const BASE_URL = process.env.TIER0_BASE_URL;
       const API_KEY = process.env.TIER0_API_KEY;
 
-      const response = await fetch(`${BASE_URL}/flow/create`, {
+      const response = await fetch(`${BASE_URL}/uns/create`, {
         method: 'POST',
         headers: {
           'content-type': 'application/json',
           'x-api-key': API_KEY,
         },
         body: JSON.stringify({
-          flowName: 'Manufacturing source flow',
-          flowType: 'SourceFlow',
-          description: 'Collects UNS source data from the plant.',
-          template: '{}',
+          namespace: [
+            {
+              name: 'DemoFactory',
+              type: 'PATH',
+              children: [
+                {
+                  name: 'Site_01',
+                  type: 'PATH',
+                  children: [
+                    {
+                      name: 'Production',
+                      type: 'PATH',
+                      children: [
+                        {
+                          name: 'Produced_Qty',
+                          type: 'TOPIC',
+                          topicType: 'METRIC',
+                          displayName: 'Produced Quantity',
+                          description: 'Produced quantity from the production line.',
+                          enableHistory: true,
+                          fields: [
+                            { name: 'value', type: 'DOUBLE', unit: 'pcs' },
+                          ],
+                        },
+                      ],
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
         }),
       });
 
       const result = await response.json();
-      console.log(result.data.id, result.data.brokerID);
+      console.log(result.data.results);
       ```
 
     </TabItem>
@@ -138,65 +168,122 @@ Use the **REST API** to operate on UNS data, flows, and authentication.
       api_key = os.environ["TIER0_API_KEY"]
 
       response = requests.post(
-          f"{base_url}/flow/create",
+          f"{base_url}/uns/create",
           headers={"x-api-key": api_key},
           json={
-              "flowName": "Manufacturing source flow",
-              "flowType": "SourceFlow",
-              "description": "Collects UNS source data from the plant.",
-              "template": "{}",
+              "namespace": [
+                  {
+                      "name": "DemoFactory",
+                      "type": "PATH",
+                      "children": [
+                          {
+                              "name": "Site_01",
+                              "type": "PATH",
+                              "children": [
+                                  {
+                                      "name": "Production",
+                                      "type": "PATH",
+                                      "children": [
+                                          {
+                                              "name": "Produced_Qty",
+                                              "type": "TOPIC",
+                                              "topicType": "METRIC",
+                                              "displayName": "Produced Quantity",
+                                              "description": "Produced quantity from the production line.",
+                                              "enableHistory": True,
+                                              "fields": [
+                                                  {"name": "value", "type": "DOUBLE", "unit": "pcs"},
+                                              ],
+                                          },
+                                      ],
+                                  },
+                              ],
+                          },
+                      ],
+                  },
+              ],
           },
           timeout=30,
       )
       response.raise_for_status()
 
       result = response.json()
-      print(result["data"]["id"], result["data"]["brokerID"])
+      print(result["data"]["results"])
       ```
 
     </TabItem>
     <TabItem label="cURL">
 
       ```bash
-      curl -X POST "$TIER0_BASE_URL/flow/create" \
+      curl -X POST "$TIER0_BASE_URL/uns/create" \
         -H "content-type: application/json" \
         -H "x-api-key: $TIER0_API_KEY" \
         -d '{
-          "flowName": "Manufacturing source flow",
-          "flowType": "SourceFlow",
-          "description": "Collects UNS source data from the plant.",
-          "template": "{}"
+          "namespace": [
+            {
+              "name": "DemoFactory",
+              "type": "PATH",
+              "children": [
+                {
+                  "name": "Site_01",
+                  "type": "PATH",
+                  "children": [
+                    {
+                      "name": "Production",
+                      "type": "PATH",
+                      "children": [
+                        {
+                          "name": "Produced_Qty",
+                          "type": "TOPIC",
+                          "topicType": "METRIC",
+                          "displayName": "Produced Quantity",
+                          "description": "Produced quantity from the production line.",
+                          "enableHistory": true,
+                          "fields": [
+                            { "name": "value", "type": "DOUBLE", "unit": "pcs" }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
         }'
       ```
 
     </TabItem>
   </Tabs>
 
-- `/flow/list`
+- `/uns/read`
 
-  List flows and optionally filter by `flowType` or `keyword`. Use this to find the flow `id` before UPDATE or GET operations.
+  Read the latest value and metadata for one or more UNS topics.
 
-  <Tabs syncKey="flow-api-language">
+  <Tabs syncKey="uns-api-language">
     <TabItem label="JavaScript">
 
       ```js
       const BASE_URL = process.env.TIER0_BASE_URL;
       const API_KEY = process.env.TIER0_API_KEY;
 
-      const response = await fetch(`${BASE_URL}/flow/list`, {
+      const response = await fetch(`${BASE_URL}/uns/read`, {
         method: 'POST',
         headers: {
           'content-type': 'application/json',
           'x-api-key': API_KEY,
         },
         body: JSON.stringify({
-          flowType: 'SourceFlow',
-          keyword: 'Manufacturing',
+          topics: [
+            'DemoFactory/Site_01/Production/Produced_Qty',
+          ],
+          include_leaf_value: true,
+          include_metadata: true,
         }),
       });
 
       const result = await response.json();
-      console.log(result.data.list);
+      console.log(result.data.results);
       ```
 
     </TabItem>
@@ -210,131 +297,65 @@ Use the **REST API** to operate on UNS data, flows, and authentication.
       api_key = os.environ["TIER0_API_KEY"]
 
       response = requests.post(
-          f"{base_url}/flow/list",
+          f"{base_url}/uns/read",
           headers={"x-api-key": api_key},
           json={
-              "flowType": "SourceFlow",
-              "keyword": "Manufacturing",
+              "topics": [
+                  "DemoFactory/Site_01/Production/Produced_Qty",
+              ],
+              "include_leaf_value": True,
+              "include_metadata": True,
           },
           timeout=30,
       )
       response.raise_for_status()
 
       result = response.json()
-      print(result["data"]["list"])
+      print(result["data"]["results"])
       ```
 
     </TabItem>
     <TabItem label="cURL">
 
       ```bash
-      curl -X POST "$TIER0_BASE_URL/flow/list" \
+      curl -X POST "$TIER0_BASE_URL/uns/read" \
         -H "content-type: application/json" \
         -H "x-api-key: $TIER0_API_KEY" \
         -d '{
-          "flowType": "SourceFlow",
-          "keyword": "Manufacturing"
+          "topics": [
+            "DemoFactory/Site_01/Production/Produced_Qty"
+          ],
+          "include_leaf_value": true,
+          "include_metadata": true
         }'
       ```
 
     </TabItem>
   </Tabs>
 
-- `/flow/update`
+- `/uns/update`
 
-  Update a flow by `id`. Send only the fields you want to change.
+  Update a UNS node by `path`. Use `updateMask` to specify which fields should change.
 
-  <Tabs syncKey="flow-api-language">
+  <Tabs syncKey="uns-api-language">
     <TabItem label="JavaScript">
 
       ```js
       const BASE_URL = process.env.TIER0_BASE_URL;
       const API_KEY = process.env.TIER0_API_KEY;
-      const flowId = 123;
 
-      const response = await fetch(`${BASE_URL}/flow/update`, {
+      const response = await fetch(`${BASE_URL}/uns/update`, {
         method: 'POST',
         headers: {
           'content-type': 'application/json',
           'x-api-key': API_KEY,
         },
         body: JSON.stringify({
-          id: flowId,
-          flowName: 'Manufacturing source flow v2',
-          description: 'Updated source flow description.',
-          isFavorite: 1,
+          path: 'DemoFactory/Site_01/Production/Produced_Qty',
+          displayName: 'Produced Quantity',
+          description: 'Updated production output quantity.',
+          updateMask: ['displayName', 'description'],
         }),
-      });
-
-      const result = await response.json();
-      console.log(result.data.success);
-      ```
-
-    </TabItem>
-    <TabItem label="Python">
-
-      ```python
-      import os
-      import requests
-
-      base_url = os.environ["TIER0_BASE_URL"]
-      api_key = os.environ["TIER0_API_KEY"]
-      flow_id = 123
-
-      response = requests.post(
-          f"{base_url}/flow/update",
-          headers={"x-api-key": api_key},
-          json={
-              "id": flow_id,
-              "flowName": "Manufacturing source flow v2",
-              "description": "Updated source flow description.",
-              "isFavorite": 1,
-          },
-          timeout=30,
-      )
-      response.raise_for_status()
-
-      result = response.json()
-      print(result["data"]["success"])
-      ```
-
-    </TabItem>
-    <TabItem label="cURL">
-
-      ```bash
-      curl -X POST "$TIER0_BASE_URL/flow/update" \
-        -H "content-type: application/json" \
-        -H "x-api-key: $TIER0_API_KEY" \
-        -d '{
-          "id": 123,
-          "flowName": "Manufacturing source flow v2",
-          "description": "Updated source flow description.",
-          "isFavorite": 1
-        }'
-      ```
-
-    </TabItem>
-  </Tabs>
-
-- `/flow/get`
-
-  Get one flow by `id`.
-
-  <Tabs syncKey="flow-api-language">
-    <TabItem label="JavaScript">
-
-      ```js
-      const BASE_URL = process.env.TIER0_BASE_URL;
-      const API_KEY = process.env.TIER0_API_KEY;
-      const flowId = 123;
-
-      const response = await fetch(`${BASE_URL}/flow/get`, {
-        method: 'POST',
-        headers: {
-          'content-type': 'application/json',
-          'x-api-key': API_KEY,
-        },
-        body: JSON.stringify({ id: flowId }),
       });
 
       const result = await response.json();
@@ -350,12 +371,16 @@ Use the **REST API** to operate on UNS data, flows, and authentication.
 
       base_url = os.environ["TIER0_BASE_URL"]
       api_key = os.environ["TIER0_API_KEY"]
-      flow_id = 123
 
       response = requests.post(
-          f"{base_url}/flow/get",
+          f"{base_url}/uns/update",
           headers={"x-api-key": api_key},
-          json={"id": flow_id},
+          json={
+              "path": "DemoFactory/Site_01/Production/Produced_Qty",
+              "displayName": "Produced Quantity",
+              "description": "Updated production output quantity.",
+              "updateMask": ["displayName", "description"],
+          },
           timeout=30,
       )
       response.raise_for_status()
@@ -368,10 +393,89 @@ Use the **REST API** to operate on UNS data, flows, and authentication.
     <TabItem label="cURL">
 
       ```bash
-      curl -X POST "$TIER0_BASE_URL/flow/get" \
+      curl -X POST "$TIER0_BASE_URL/uns/update" \
         -H "content-type: application/json" \
         -H "x-api-key: $TIER0_API_KEY" \
-        -d '{"id": 123}'
+        -d '{
+          "path": "DemoFactory/Site_01/Production/Produced_Qty",
+          "displayName": "Produced Quantity",
+          "description": "Updated production output quantity.",
+          "updateMask": ["displayName", "description"]
+        }'
+      ```
+
+    </TabItem>
+  </Tabs>
+
+- `/uns/delete`
+
+  Delete one or more UNS models. Use `hard_delete: false` to move models to the recycle bin.
+
+  <Tabs syncKey="uns-api-language">
+    <TabItem label="JavaScript">
+
+      ```js
+      const BASE_URL = process.env.TIER0_BASE_URL;
+      const API_KEY = process.env.TIER0_API_KEY;
+
+      const response = await fetch(`${BASE_URL}/uns/delete`, {
+        method: 'POST',
+        headers: {
+          'content-type': 'application/json',
+          'x-api-key': API_KEY,
+        },
+        body: JSON.stringify({
+          topics: [
+            'DemoFactory/Site_01/Production/Produced_Qty',
+          ],
+          hard_delete: false,
+        }),
+      });
+
+      const result = await response.json();
+      console.log(result.data);
+      ```
+
+    </TabItem>
+    <TabItem label="Python">
+
+      ```python
+      import os
+      import requests
+
+      base_url = os.environ["TIER0_BASE_URL"]
+      api_key = os.environ["TIER0_API_KEY"]
+
+      response = requests.post(
+          f"{base_url}/uns/delete",
+          headers={"x-api-key": api_key},
+          json={
+              "topics": [
+                  "DemoFactory/Site_01/Production/Produced_Qty",
+              ],
+              "hard_delete": False,
+          },
+          timeout=30,
+      )
+      response.raise_for_status()
+
+      result = response.json()
+      print(result["data"])
+      ```
+
+    </TabItem>
+    <TabItem label="cURL">
+
+      ```bash
+      curl -X POST "$TIER0_BASE_URL/uns/delete" \
+        -H "content-type: application/json" \
+        -H "x-api-key: $TIER0_API_KEY" \
+        -d '{
+          "topics": [
+            "DemoFactory/Site_01/Production/Produced_Qty"
+          ],
+          "hard_delete": false
+        }'
       ```
 
     </TabItem>

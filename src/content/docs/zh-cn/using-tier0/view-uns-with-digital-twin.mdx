@@ -1,5 +1,5 @@
 ---
-title: 使用 Digital Twin 展示 UNS 数据
+title: 使用数字孪生展示 UNS 数据
 description: 在 3D 模型和场景中实时查看 UNS 数据。
 editions: [cloud, enterprise]
 sidebar:
@@ -8,24 +8,24 @@ sidebar:
 import { Steps } from '@astrojs/starlight/components';
 import { Tabs, TabItem } from '@astrojs/starlight/components';
 
-Tier0 的 digital twin 功能让你可以在逼真的 3D 场景和模型中实时查看 UNS 数据。
+Tier0 的数字孪生功能让你可以在逼真的 3D 场景和模型中实时查看 UNS 数据。
 
 ## 车间 Digital Twin
-本节会将一个车间以实时方式呈现出来。它包含以下设备：
+本节会将一个车间以数据孪生形式呈现出来。它包含以下设备：
 - 2 台车床
 - 1 个在两台车床之间工作的机械臂
-- 1 个入站缓存站和 1 个出站缓存区
+- 1 个入站缓存区和 1 个出站缓存区
 - 1 台质量检测设备
 - 1 套统一控制系统
 - 2 个原料货架和 2 个成品货架
-- 1 AGV
+- 1 个 AGV
 
 ## 采集车间数据
 将所有数据采集到 **UNS**，包括控制设备运动、表示设备状态和车间环境的数据。
 <Steps>
 1. 登录 Tier0，进入 **UNS** 并构建数据模型。
         <details className="notebook-cell">
-        <summary>显示 UNS model JSON</summary>
+        <summary>显示 UNS 模型 JSON</summary>
 
         ```json
         {
@@ -441,10 +441,10 @@ Tier0 的 digital twin 功能让你可以在逼真的 3D 场景和模型中实�
         }
         ```
         </details>
-2. 进入 **Flows**，创建 **Source Flow**，将数据源连接到 UNS 模型。
+2. 进入 **数据流程**，创建 **数据连接**，将数据源连接到 UNS 模型。
         - 机械臂
         <details className="notebook-cell">
-        <summary>显示机械臂 flow JSON</summary>
+        <summary>显示机械臂数据流 JSON</summary>
 
         ```json
         [
@@ -623,7 +623,7 @@ Tier0 的 digital twin 功能让你可以在逼真的 3D 场景和模型中实�
         </details>
         - AGV
         <details className="notebook-cell">
-        <summary>显示 AGV flow JSON</summary>
+        <summary>显示 AGV 数据流 JSON</summary>
 
         ```json
         [
@@ -823,9 +823,9 @@ Tier0 的 digital twin 功能让你可以在逼真的 3D 场景和模型中实�
         </details>
         - 车床 1
         <details className="notebook-cell">
-        <summary>显示车床 1 flow JSON</summary>
+        <summary>显示车床 1 数据流 JSON</summary>
 
-        ```
+        ```json
         [
             {
                 "id": "88fed08889390f28",
@@ -1022,7 +1022,7 @@ Tier0 的 digital twin 功能让你可以在逼真的 3D 场景和模型中实�
         </details>
         - 车床 2
         <details className="notebook-cell">
-        <summary>显示车床 2 flow JSON</summary>
+        <summary>显示车床 2 数据流 JSON</summary>
 
         ```json
         [
@@ -1223,35 +1223,39 @@ Tier0 的 digital twin 功能让你可以在逼真的 3D 场景和模型中实�
 
 ## 将数据映射到 3D 模型
 <Steps>
-1. 在 Tier0 中进入 **Model**。
+1. 在 Tier0 中进入 **模型库**。
 2. 上传模型，并选择需要映射 UNS 数据的模型节点。
 3. 创建实例，为节点映射选择 UNS topic，并设置模型在真实世界中的高度。
-4. 根据需要，将 topic 字段绑定到所选模型节点的 **Position** 和 **Rotation** 各轴上。
-5. 在 **Data Tagging** 下，为模型添加静态标签，并绑定 UNS 数据以展示静态信息。
-        :::tip
-        可以为同一个模型创建多个实例，用不同数据模拟一条由相同设备组成的产线。
-        :::
+4. 根据需要，将 topic 字段绑定到所选模型节点的 **位置** 和 **旋转** 各轴上。
+5. 在 **数据标记** 下，为模型添加静态标签，并绑定 UNS 数据以展示静态信息。
+
+    :::tip
+    可以为同一个模型创建多个实例，用不同数据模拟一条由相同设备组成的产线。
+    :::
+
 6. 添加车间所需的其他模型。
 </Steps>
 
 ## 可视化车间场景
 <Steps>
-1. 在 Tier0 中进入 **Scene** 并新增场景。
-2. 从 **Instance Library** 添加车间中存在的所有必要实例。
+1. 在 Tier0 中进入 **场景** 并新增场景。
+2. 从 **实例库** 添加车间中存在的所有必要实例。
 3. 将实例模型移动到车间中的对应位置。
-        :::tip[如何将模型移动到正确位置]
-        - 切换顶部工具来移动、缩放和旋转模型，并调整模型视角和坐标位置。
-        - 查看右侧的 **Object**，其中会显示绑定的 UNS 模型，用于确认模型位置。
-        :::
+
+    :::tip[如何将模型移动到正确位置]
+    - 切换顶部工具来移动、缩放和旋转模型，并调整模型视角和坐标位置。
+    - 查看右侧的 **对象**，包含了绑定的 UNS 模型，可协助确认模型位置。
+    :::
+
 4. 选择一个模型，并设置视口和光照。
 5. 设置完成后，保存场景以便后续展示。
 </Steps>
 
 ## 外部分享
 <Steps>
-1. 进入 **Model**，选择车间中已配置的模型。
+1. 进入 **模型库**，选择车间中已配置的模型。
 2. 选择一个已有实例，生成二维码。
 3. 选择分享模式，并将二维码发送给外部人员。
-        - **Share Model**：生成一个 Tier0 平台链接，用于展示带有实时 UNS 数据的模型。
-        - **Share Scene**：生成一个 Tier0 平台链接，用于展示模型所在场景，以及实时 UNS 数据和环境设置。
+        - **分享模型**：生成一个 Tier0 平台链接，用于展示带有实时 UNS 数据的模型。
+        - **分享场景**：生成一个 Tier0 平台链接，用于展示模型所在场景，以及实时 UNS 数据和环境设置。
 </Steps>

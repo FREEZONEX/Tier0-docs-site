@@ -4,7 +4,7 @@ description: "Node-RED を使って OPC UA、Modbus、その他の典型的な�
 editions: [edge, cloud, enterprise]
 sidebar:
   order: 2
-  label: Connecting OPC UA / Modbus
+  label: OPC UA/Modbus/Rest API ??
 ---
 import { Steps } from '@astrojs/starlight/components';
 
@@ -15,14 +15,14 @@ import { Steps } from '@astrojs/starlight/components';
 ### データフローの設定
 
 <Steps>
-1. Log in to Tier0, go to **Flow** and create a new **Source Flow**.
-2. Add **inject**, **OPC UA Client** and **mqtt out** nodes in the flow.
-3. Connect them by order and double-click each node to configure the details.
+1. Tier0 ???????**Flow** ???????? **Source Flow** ???????
+2. flow ? **inject**?**OPC UA Client**?**mqtt out** ??????????
+3. ??????????????????????????????
 </Steps>
 - **inject**
     <Steps>
-    1. Click **add** at the lower-left corner to add an entry of property.
-    2. Set the properties to be the following items:
+    1. ??? **add** ??????? property ???????
+    2. properties ?????????????
 
         ```json
         {
@@ -43,10 +43,10 @@ import { Steps } from '@astrojs/starlight/components';
     "Topic": "<UNS model>",
     ```
 <Steps>
-4. Deploy and trigger the flow.
+4. flow ?????????????
 </Steps>
 
-### Flow Reference
+### Flow ??????
 
 <details>
 <summary>OPC UA flow JSON を表示</summary>
@@ -203,27 +203,27 @@ import { Steps } from '@astrojs/starlight/components';
 ## Modbus
 ### データフローの設定
 <Steps>
-1. In the flow, add **modbus-read** and **mqtt out** nodes.
-2. Double-click the nodes, and configure the required information.
+1. flow ? **modbus-read** ? **mqtt out** ??????????
+2. ?????????????????????????
     - **modbus-read**
         - **Settings**
-          - **FC**: Function code that specifies the Modbus action, e.g., FC 3 = Read Holding Registers.
-          - **Address**: The starting register address to read from (usually zero-based).
+          - **FC**?Modbus ?????????????????FC 3 = ????????????
+          - **Address**???????????????????????? 0 ????
           - **Quantity**:  The number of consecutive registers to read.
-          - **Poll Rate**: How often the node polls the Modbus device (e.g., every 10 seconds).
-          - **Server**: Reference to a configured Modbus server (IP, port, protocol, etc.).
+          - **Poll Rate**????? Modbus ???????????????????10 ?????
+          - **Server**?????? Modbus server?IP?port?protocol ??????????
         - **Server**
-          - **Host**: Modbus server IP.
-          - **Port**: Modbus server port.
+          - **Host**?Modbus server ? IP?
+          - **Port**?Modbus server ? port?
     - **mqtt out**
         ```json
         "Server": "<embedded UNS broker>", //same name as the flow
         "Topic": "<UNS model>",
         ```
-3. Deploy and trigger the flow.
+3. flow ?????????????
 </Steps>
 
-### Flow Reference
+### Flow ??????
 
 <details>
 <summary>Modbus flow JSON を表示</summary>
@@ -385,8 +385,8 @@ import { Steps } from '@astrojs/starlight/components';
 ## API
 ### データフローの設定
 <Steps>
-1. In the flow, add **inject**, **http request** and **mqtt out** nodes.
-2. Double-click the nodes, and configure the required information.
+1. flow ? **inject**?**http request**?**mqtt out** ??????????
+2. ?????????????????????????
     - **http request**
         ```json
         "Method": "<API method>",
@@ -399,10 +399,10 @@ import { Steps } from '@astrojs/starlight/components';
         "Server": "<embedded UNS broker>", //same name as the flow
         "Topic": "<UNS model>",
         ```
-3. Deploy and trigger the flow.
+3. flow ?????????????
 </Steps>
 
-### Flow Reference
+### Flow ??????
 <details>
 <summary>API flow JSON を表示</summary>
 
@@ -505,7 +505,7 @@ import { Steps } from '@astrojs/starlight/components';
 
 </details>
 
-:::tip[Other things you might want to know]
+:::tip[????????]
 - **UNS** に publish する前に、必要に応じて **function** ノードでデータを整形できます。
 - **debug** ノードを使って、その場でデータを確認できます。
 - ノードの詳細は [Node-RED flows](https://flows.nodered.org/) を参照してください。
