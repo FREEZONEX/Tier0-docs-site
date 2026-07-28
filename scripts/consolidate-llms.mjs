@@ -1,14 +1,12 @@
-// Post-build: keep a single /llms.txt containing the full docs.
-// starlight-llms-txt always emits llms.txt (index) + llms-small.txt +
-// llms-full.txt with no option to disable the variants, so we replace
-// the index with the full content and drop the extras.
-import { copyFile, rm } from 'node:fs/promises';
+// Post-build: keep the AI-friendly llms.txt index and preserve the generated
+// small/full variants. External AI crawlers can start at /llms.txt and fetch
+// /llms-full.txt only when they need the full documentation body.
+import { access } from 'node:fs/promises';
 
 const dist = new URL('../dist/', import.meta.url);
 
-await copyFile(new URL('llms-full.txt', dist), new URL('llms.txt', dist));
-await rm(new URL('llms-full.txt', dist));
-await rm(new URL('llms-small.txt', dist));
-await rm(new URL('_llms-txt/', dist), { recursive: true, force: true });
+await Promise.all(
+	['llms.txt', 'llms-small.txt', 'llms-full.txt'].map((file) => access(new URL(file, dist))),
+);
 
-console.log('llms: consolidated to a single llms.txt (full content)');
+console.log('llms: kept llms.txt index plus llms-small.txt and llms-full.txt');
