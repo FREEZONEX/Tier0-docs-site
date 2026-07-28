@@ -1,31 +1,31 @@
 ---
-title: Digital Twin で UNS データを表示する
-description: UNS データを 3D モデルとシーンでリアルタイムに表示します。
+title: Display UNS Data with Digital Twin
+description: View UNS data in 3D models and scenes in real time.
 editions: [cloud, enterprise]
 sidebar:
-  order: 5
+  order: 3
 ---
 import { Steps } from '@astrojs/starlight/components';
 import { Tabs, TabItem } from '@astrojs/starlight/components';
 
-Tier0 の digital twin 機能により、リアルな 3D シーンとモデル上で UNS データをリアルタイムに表示できます。
+The digital twin feature in Tier0 enables you to view live UNS data on 3D models in lifelike scenes.
 
-## ワークショップ Digital Twin
-このセクションでは、ワークショップをリアルタイムに再現します。含まれる機器は次のとおりです：
-- 2 台の旋盤
-- これらの旋盤の間で動作する 1 台のロボットアーム
-- 1 つの入庫バッファステーションと 1 つの出庫バッファ
-- 1 台の品質検査装置
-- 1 つの統合制御システム
-- 2 つの原材料棚と 2 つの製品棚
+## Workshop Digital Twin
+In this section, we bring a workshop to life. It contains the following machines:
+- 2 lathes
+- 1 robot arm working between these lathes
+- 1 inbound buffer station and 1 outbound buffer
+- 1 quality checker
+- 1 Unified Control System
+- 2 raw material shelves and 2 product shelves
 - 1 AGV
 
-## ワークショップからデータを収集する
-機械の動作制御、機械状態、ワークショップ環境を示すデータを含め、すべてのデータを **UNS** に収集します。
+## Collecting Data from Workshop
+Publish all data to **UNS**, including data that controls machine movements and indicates machine status and the workshop environment.
 <Steps>
-1. Tier0 にログインし、**UNS** に移動してデータモデルを構築します。
+1. Log in to Tier0, go to **UNS** and build the data models.
         <details className="notebook-cell">
-        <summary>UNS model JSON を表示</summary>
+        <summary>Show UNS model JSON</summary>
 
         ```json
         {
@@ -441,10 +441,10 @@ Tier0 の digital twin 機能により、リアルな 3D シーンとモデル�
         }
         ```
         </details>
-2. **Flows** に移動し、データソースを UNS モデルに接続する **Source Flow** を作成します。
-        - ロボットアーム
+2. Go to **Flows**, create a **Source Flow** to connect data sources to UNS models.
+        - Robot Arm
         <details className="notebook-cell">
-        <summary>ロボットアーム flow JSON を表示</summary>
+        <summary>Show Robot Arm flow JSON</summary>
 
         ```json
         [
@@ -623,7 +623,7 @@ Tier0 の digital twin 機能により、リアルな 3D シーンとモデル�
         </details>
         - AGV
         <details className="notebook-cell">
-        <summary>AGV flow JSON を表示</summary>
+        <summary>Show AGV flow JSON</summary>
 
         ```json
         [
@@ -821,9 +821,9 @@ Tier0 の digital twin 機能により、リアルな 3D シーンとモデル�
         ]
         ```
         </details>
-        - 旋盤 1
+        - Lathe 1
         <details className="notebook-cell">
-        <summary>旋盤 1 flow JSON を表示</summary>
+        <summary>Show Lathe 1 flow JSON</summary>
 
         ```
         [
@@ -1020,9 +1020,9 @@ Tier0 の digital twin 機能により、リアルな 3D シーンとモデル�
         ]
         ```
         </details>
-        - 旋盤 2
+        - Lathe 2
         <details className="notebook-cell">
-        <summary>旋盤 2 flow JSON を表示</summary>
+        <summary>Show Lathe 2 flow JSON</summary>
 
         ```json
         [
@@ -1221,41 +1221,41 @@ Tier0 の digital twin 機能により、リアルな 3D シーンとモデル�
         </details>
 </Steps>
 
-## データを 3D モデルにマッピングする
+## Mapping Data to 3D Models
 <Steps>
-1. Tier0 で **Model** に移動します。
-2. モデルをアップロードし、UNS データをマッピングするモデルノードを選択します。
-3. インスタンスを作成し、ノードマッピング用の UNS topic を選択して、現実世界でのモデルの高さを設定します。
-4. 必要に応じて、topic フィールドを選択したモデルノードの **Position** と **Rotation** の各軸にバインドします。
-5. **Data Tagging** でモデルに静的タグを追加し、UNS データをバインドして静的情報を表示します。
+1. In Tier0, go to **Model**.
+2. Upload a model, select model nodes to which you want to map UNS data.
+3. Create an instance, select the UNS topic for the node mapping, and set the real-world model height.
+4. Bind the topic fields with the selected model nodes on all axes of **Position** and **Rotation** as needed.
+5. Under **Data Tagging**, add static tags to the model and bind UNS data to them to display static information.
 
     :::tip
-    1 つのモデルに複数のインスタンスを作成し、異なるデータを持つ同一機械のラインをシミュレートできます。
+    Create multiple instances for one model to simulate a line of identical machines with different data.
     :::
 
-6. ワークショップに必要な他のモデルを追加します。
+6. Add other models necessary for your workshop.
 </Steps>
 
-## ワークショップシーンを可視化する
+## Visualizing Workshop Scene
 <Steps>
-1. Tier0 で **Scene** に移動し、新しいシーンを追加します。
-2. **Instance Library** から、ワークショップ内に存在する必要なインスタンスをすべて追加します。
-3. インスタンスモデルをワークショップ内の位置に移動します。
+1. In Tier0, go to **Scene** and add a new scene.
+2. Add all necessary instances that exist in the workshop from **Instance Library**.
+3. Move instance models to their positions in the workshop.
 
-    :::tip[モデルを正しい位置へ移動する方法]
-    - 上部のツールを切り替えて、モデルを移動、拡大縮小、回転し、表示視点と座標位置を変更します。
-    - 右側の **Object** を確認します。ここにはバインドされた UNS モデルが表示され、モデル位置の確認に使えます。
+    :::tip[How to move models to the correct position]
+    - Use the tools at the top to move, scale, and rotate the model, and to change the viewing perspective and coordinate position.
+    - Check the **Object** on the right, which displays the bound UNS model, to help confirm the model position.
     :::
 
-4. モデルを 1 つ選択し、viewport と lighting を設定します。
-5. 設定が完了したら、今後の表示のためにシーンを保存します。
+4. Select a model, and set its viewport and lighting.
+5. Do the same for all models, once the settings are complete, save the scene for future display.
 </Steps>
 
-## 外部共有
+## External Share
 <Steps>
-1. **Model** に移動し、ワークショップ内で設定済みのモデルを選択します。
-2. 既存のインスタンスを選択し、QR コードを生成します。
-3. 共有モードを選択し、コードを外部関係者に送信します。
-        - **Share Model**：ライブ UNS データ付きのモデルを表示する Tier0 プラットフォームリンクを生成します。
-        - **Share Scene**：モデルとそれが配置されたシーン、ライブ UNS データ、環境設定を表示する Tier0 プラットフォームリンクを生成します。
+1. Go to **Model**, select a configured model in the workshop.
+2. Select an existing instance, generate a QR code.
+3. Select a sharing mode, and send the code to external parties.
+        - **Share Model**: Generates a Tier0 platform link where the model with live UNS data is displayed.
+        - **Share Scene**: Generates a Tier0 platform link where the model and its scene, with live UNS data and environment settings, are displayed.
 </Steps>

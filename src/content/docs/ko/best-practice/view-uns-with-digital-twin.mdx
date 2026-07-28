@@ -1,31 +1,31 @@
 ---
-title: Display UNS Data with Digital Twin
-description: View UNS data in 3D models and scenes in real time.
+title: Digital Twin으로 UNS 데이터 표시하기
+description: 3D 모델과 장면에서 UNS 데이터를 실시간으로 확인합니다.
 editions: [cloud, enterprise]
 sidebar:
-  order: 5
+  order: 3
 ---
 import { Steps } from '@astrojs/starlight/components';
 import { Tabs, TabItem } from '@astrojs/starlight/components';
 
-The digital twin feature in Tier0 enables you to view live UNS data on 3D models in lifelike scenes.
+Tier0의 digital twin 기능을 사용하면 실제와 같은 3D 장면과 모델에서 UNS 데이터를 실시간으로 볼 수 있습니다.
 
-## Workshop Digital Twin
-In this section, we bring a workshop to life. It contains the following machines:
-- 2 lathes
-- 1 robot arm working between these lathes
-- 1 inbound buffer station and 1 outbound buffer
-- 1 quality checker
-- 1 Unified Control System
-- 2 raw material shelves and 2 product shelves
+## 워크숍 Digital Twin
+이 섹션에서는 워크숍을 실시간으로 표현합니다. 포함된 장비는 다음과 같습니다:
+- 선반 2대
+- 두 선반 사이에서 작업하는 로봇암 1대
+- 인바운드 버퍼 스테이션 1개와 아웃바운드 버퍼 1개
+- 품질 검사 장비 1대
+- 통합 제어 시스템 1개
+- 원자재 선반 2개와 제품 선반 2개
 - 1 AGV
 
-## Collecting Data from Workshop
-Publish all data to **UNS**, including data that controls machine movements and indicates machine status and the workshop environment.
+## 워크숍 데이터 수집
+기계 동작을 제어하는 데이터, 기계 상태를 나타내는 데이터, 워크숍 환경 데이터를 포함한 모든 데이터를 **UNS**로 수집합니다.
 <Steps>
-1. Log in to Tier0, go to **UNS** and build the data models.
+1. Tier0에 로그인하고 **UNS**로 이동하여 데이터 모델을 구축합니다.
         <details className="notebook-cell">
-        <summary>Show UNS model JSON</summary>
+        <summary>UNS model JSON 보기</summary>
 
         ```json
         {
@@ -441,10 +441,10 @@ Publish all data to **UNS**, including data that controls machine movements and 
         }
         ```
         </details>
-2. Go to **Flows**, create a **Source Flow** to connect data sources to UNS models.
-        - Roboarm
+2. **Flows**로 이동하여 데이터 소스를 UNS 모델에 연결하는 **Source Flow**를 생성합니다.
+        - 로봇암
         <details className="notebook-cell">
-        <summary>Show Roboarm flow JSON</summary>
+        <summary>로봇암 flow JSON 보기</summary>
 
         ```json
         [
@@ -623,7 +623,7 @@ Publish all data to **UNS**, including data that controls machine movements and 
         </details>
         - AGV
         <details className="notebook-cell">
-        <summary>Show AGV flow JSON</summary>
+        <summary>AGV flow JSON 보기</summary>
 
         ```json
         [
@@ -821,9 +821,9 @@ Publish all data to **UNS**, including data that controls machine movements and 
         ]
         ```
         </details>
-        - Lathe 1
+        - 선반 1
         <details className="notebook-cell">
-        <summary>Show Lathe 1 flow JSON</summary>
+        <summary>선반 1 flow JSON 보기</summary>
 
         ```
         [
@@ -1020,9 +1020,9 @@ Publish all data to **UNS**, including data that controls machine movements and 
         ]
         ```
         </details>
-        - Lathe 2
+        - 선반 2
         <details className="notebook-cell">
-        <summary>Show Lathe 2 flow JSON</summary>
+        <summary>선반 2 flow JSON 보기</summary>
 
         ```json
         [
@@ -1221,41 +1221,41 @@ Publish all data to **UNS**, including data that controls machine movements and 
         </details>
 </Steps>
 
-## Mapping Data to 3D Models
+## 데이터를 3D 모델에 매핑하기
 <Steps>
-1. In Tier0, go to **Model**.
-2. Upload a model, select model nodes to which you want to map UNS data.
-3. Create an instance, select the UNS topic for the node mapping, and set the real-world model height.
-4. Bind the topic fields with the selected model nodes on all axes of **Position** and **Rotation** as needed.
-5. Under **Data Tagging**, add static tags to the model and bind UNS data to them to display static information.
+1. Tier0에서 **Model**로 이동합니다.
+2. 모델을 업로드하고 UNS 데이터를 매핑할 모델 노드를 선택합니다.
+3. 인스턴스를 만들고 노드 매핑에 사용할 UNS topic을 선택한 뒤 실제 세계 기준 모델 높이를 설정합니다.
+4. 필요에 따라 topic 필드를 선택한 모델 노드의 **Position** 및 **Rotation** 각 축에 바인딩합니다.
+5. **Data Tagging**에서 모델에 정적 태그를 추가하고 UNS 데이터를 바인딩하여 정적 정보를 표시합니다.
 
     :::tip
-    Create multiple instances for one model to simulate a line of identical machines with different data.
+    하나의 모델에 여러 인스턴스를 만들어 서로 다른 데이터를 가진 동일 장비 라인을 시뮬레이션할 수 있습니다.
     :::
 
-6. Add other models necessary for your workshop.
+6. 워크숍에 필요한 다른 모델을 추가합니다.
 </Steps>
 
-## Visualizing Workshop Scene
+## 워크숍 장면 시각화
 <Steps>
-1. In Tier0, go to **Scene** and add a new scene.
-2. Add all necessary instances that exist in the workshop from **Instance Library**.
-3. Move instance models to their positions in the workshop.
+1. Tier0에서 **Scene**으로 이동해 새 장면을 추가합니다.
+2. **Instance Library**에서 워크숍에 필요한 모든 인스턴스를 추가합니다.
+3. 인스턴스 모델을 워크숍 내 위치로 이동합니다.
 
-    :::tip[How to move models to the correct position]
-    - Use the tools at the top to move, scale, and rotate the model, and to change the viewing perspective and coordinate position.
-    - Check the **Object** on the right, which displays the bound UNS model, to help confirm the model position.
+    :::tip[모델을 올바른 위치로 이동하는 방법]
+    - 상단 도구를 전환하여 모델을 이동, 확대/축소, 회전하고 모델 보기 시점과 좌표 위치를 변경합니다.
+    - 오른쪽의 **Object**를 확인합니다. 여기에 바인딩된 UNS 모델이 표시되어 모델 위치를 확인할 수 있습니다.
     :::
 
-4. Select a model, and set its viewport and lighting.
-5. Do the same for all models, once the settings are complete, save the scene for future display.
+4. 모델 하나를 선택하고 viewport와 lighting을 설정합니다.
+5. 설정이 완료되면 이후 표시를 위해 장면을 저장합니다.
 </Steps>
 
-## External Share
+## 외부 공유
 <Steps>
-1. Go to **Model**, select a configured model in the workshop.
-2. Select an existing instance, generate a QR code.
-3. Select a sharing mode, and send the code to external parties.
-        - **Share Model**: Generates a Tier0 platform link where the model with live UNS data is displayed.
-        - **Share Scene**: Generates a Tier0 platform link where the model and its scene, with live UNS data and environment settings, are displayed.
+1. **Model**로 이동하여 워크숍에서 구성된 모델을 선택합니다.
+2. 기존 인스턴스를 선택하고 QR 코드를 생성합니다.
+3. 공유 모드를 선택하고 코드를 외부 관계자에게 보냅니다.
+        - **Share Model**: 실시간 UNS 데이터가 포함된 모델을 표시하는 Tier0 플랫폼 링크를 생성합니다.
+        - **Share Scene**: 모델과 해당 모델이 위치한 장면, 실시간 UNS 데이터 및 환경 설정을 표시하는 Tier0 플랫폼 링크를 생성합니다.
 </Steps>

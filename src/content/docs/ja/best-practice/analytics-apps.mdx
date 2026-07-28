@@ -3,7 +3,7 @@ title: 分析アプリの構築
 description: "Aramco Bowtie ケース（匿名化データ）を使い、Notebook で分析アプリを構築します。"
 editions: [cloud, enterprise]
 sidebar:
-  order: 3
+  order: 4
 ---
 import { Aside, Steps } from '@astrojs/starlight/components';
 
@@ -1390,52 +1390,84 @@ flowchart LR
     <summary>Builder prompt を表示</summary>
 
     ```text
-    Build a modern industrial Bow-Tie Analysis application for CDU Atmospheric Overhead Corrosion.
+        CDU 常圧塔頂腐食向けの、モダンな産業用 Bow-Tie Analysis アプリケーションを構築してください。
 
-    Use the following UNS topics as the only data sources:
+        次の UNS topic のみをデータソースとして使用してください。
 
-    - Refinery/CDU_Plant/Metric/Corrosion_Monitoring
-    - Refinery/CDU_Plant/Metric/Corrosion_Analysis
-    - Refinery/CDU_Plant/State/Corrosion_Risk
+        - Refinery/CDU_Plant/Metric/Corrosion_Monitoring
+        - Refinery/CDU_Plant/Metric/Corrosion_Analysis
+        - Refinery/CDU_Plant/State/Corrosion_Risk
 
-    The application should help operators understand current corrosion risk, contributing threats, barrier conditions, and possible consequences.
+        新しい UNS メッセージが届いたら、アプリケーションは自動的に更新される必要があります。
 
-    Create a single-page dashboard with:
+        このアプリケーションは、オペレーターが現在の腐食リスク、関連する脅威、バリア状態、起こり得る結果を理解できるようにしてください。
 
-    1. A Bow-Tie diagram as the main section:
-      - Threats on the left
-      - Preventative barriers between threats and the top event
-      - Corrosion as the central top event
-      - Mitigative barriers after the top event
-      - Consequences on the right
+        次を含む単一ページの dashboard を作成してください。
 
-    2. A prominent risk summary showing:
-      - Current risk state
-      - Model confidence
-      - Normal, developing, and confirmed probabilities
-      - Total corrosion risk
+        1. メインセクションとして Bow-Tie 図を配置する：
+        - 左側に脅威を表示
+        - 脅威とトップイベントの間に予防バリアを表示
+        - 腐食を中央のトップイベントとして表示
+        - トップイベントの後に緩和バリアを表示
+        - 右側に結果を表示
 
-    3. A compact live process data panel showing key values from Corrosion_Monitoring, including chloride, pH, wash water flow, desalter performance, wash water rate, total iron, SAP evidence, and injection quill status.
+        2. 目立つリスクサマリーを表示する：
+        - 現在のリスク状態
+        - モデル信頼度
+        - normal、developing、confirmed の確率
+        - 総腐食リスク
 
-    4. Consequence indicators for:
-      - Loss of primary containment
-      - Unplanned shutdown
-      - Escalation risk
+        3. Corrosion_Monitoring から主要値を表示するコンパクトな live process data panel を作成する。chloride、pH、wash water flow、desalter performance、wash water rate、total iron、SAP evidence、injection quill status を含めてください。
 
-    5. Visual status rules:
-      - Green for normal or healthy conditions
-      - Yellow for developing risk or warning conditions
-      - Red for confirmed risk, failed barriers, or severe consequences
-      - Gray when data is unavailable
+        4. 結果指標：
+        - 一次封じ込めの喪失
+        - 計画外停止
+        - エスカレーションリスク
 
-    6. Interaction:
-      - Selecting a threat, barrier, or consequence should show its current state, related process values, and a short explanation.
-      - Update the interface automatically when new data arrives.
-      - Show the latest data timestamp and connection status.
+        5. 視覚ステータスルール：
+        - 緑は normal または healthy condition
+        - 琥珀色/黄色は developing risk または warning condition
+        - 赤は confirmed risk、failed barrier、または severe consequence
+        - グレーは data unavailable
+        - 青は interaction と informational highlight のみに使用
 
-    Use a clean, professional refinery operations style with clear hierarchy, compact cards, readable labels, and responsive layout.
+        6. インタラクション：
+        - 脅威、バリア、結果を選択したら、現在の状態、関連する process value、短い説明を表示してください。
+        - 新しい UNS データが到着したら、インターフェースを自動更新してください。
+        - 最新データの timestamp と、組み込み SDK からの connection/subscription status を表示してください。
 
-    Use the payload fields exactly as defined in the corresponding UNS models. Do not invent additional fields, calculated values, or mock data.
+        デザイン要件：
+
+        アプリケーション全体で、既存の visual design language と styling を維持してください。
+
+        モダンな industrial operations dashboard スタイルを使用してください。
+        - pure black ではなく dark blue-gray color palette を使用する。
+        - subtle gradient を持つ layered panels を使用する。
+        - 16-20px 程度の大きめの角丸を持つ card-based layout を使用する。
+        - heavy shadow ではなく thin borders で分離する。
+        - soft depth と控えめな glow effects を使用する。
+        - 十分な padding、一貫した alignment、きれいな spacing を保つ。
+        - body text には IBM Plex Sans を使用する。
+        - headings には Space Grotesk を使用する。
+        - 明確な visual hierarchy を持つ、コンパクトで情報密度の高い card を使用する。
+        - letter spacing を広げた uppercase section labels を使用する。
+        - business analytics ではなく、professional refinery / SCADA interface にする。
+        - skeuomorphic elements ではなく、flat illustrations と SVG graphics を使用する。
+        - smooth で subtle な transitions と hover effects を使用する。
+
+        全体の見た目は clean、modern、technical、operational にしてください。
+
+        避けるもの：
+        - pure black backgrounds
+        - glassmorphism
+        - cyberpunk styling
+        - neon lighting
+        - overly decorative effects
+        - business analytics dashboard styling
+
+        clear hierarchy、compact cards、readable labels、responsive layout を備えた、clean で professional な refinery operations style を使用してください。
+
+        対応する UNS model で定義された payload fields を正確に使用してください。追加フィールド、計算値、mock data を作らないでください。
     ```
 
     </details>

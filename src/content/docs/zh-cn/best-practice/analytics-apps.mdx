@@ -3,7 +3,7 @@ title: 构建分析应用
 description: "使用 Aramco Bowtie 案例（脱敏数据），通过 Notebook 构建分析应用。"
 editions: [cloud, enterprise]
 sidebar:
-  order: 3
+  order: 4
 ---
 import { Aside, Steps } from '@astrojs/starlight/components';
 
@@ -1390,52 +1390,84 @@ flowchart LR
     <summary>显示 Builder prompt</summary>
 
     ```text
-    Build a modern industrial Bow-Tie Analysis application for CDU Atmospheric Overhead Corrosion.
+        为 CDU 常压塔顶腐蚀构建一个现代工业 Bow-Tie Analysis 应用。
 
-    Use the following UNS topics as the only data sources:
+        仅使用以下 UNS topic 作为数据源：
 
-    - Refinery/CDU_Plant/Metric/Corrosion_Monitoring
-    - Refinery/CDU_Plant/Metric/Corrosion_Analysis
-    - Refinery/CDU_Plant/State/Corrosion_Risk
+        - Refinery/CDU_Plant/Metric/Corrosion_Monitoring
+        - Refinery/CDU_Plant/Metric/Corrosion_Analysis
+        - Refinery/CDU_Plant/State/Corrosion_Risk
 
-    The application should help operators understand current corrosion risk, contributing threats, barrier conditions, and possible consequences.
+        当新的 UNS 消息到达时，应用必须自动更新。
 
-    Create a single-page dashboard with:
+        该应用应帮助操作员理解当前腐蚀风险、相关威胁、屏障状态以及可能后果。
 
-    1. A Bow-Tie diagram as the main section:
-      - Threats on the left
-      - Preventative barriers between threats and the top event
-      - Corrosion as the central top event
-      - Mitigative barriers after the top event
-      - Consequences on the right
+        创建一个单页 dashboard，包含：
 
-    2. A prominent risk summary showing:
-      - Current risk state
-      - Model confidence
-      - Normal, developing, and confirmed probabilities
-      - Total corrosion risk
+        1. 将 Bow-Tie 图作为主区域：
+        - 左侧显示威胁
+        - 在威胁与顶事件之间显示预防性屏障
+        - 以腐蚀作为中心顶事件
+        - 在顶事件之后显示缓解性屏障
+        - 右侧显示后果
 
-    3. A compact live process data panel showing key values from Corrosion_Monitoring, including chloride, pH, wash water flow, desalter performance, wash water rate, total iron, SAP evidence, and injection quill status.
+        2. 显著展示风险摘要，包括：
+        - 当前风险状态
+        - 模型置信度
+        - 正常、发展中、已确认三类概率
+        - 总腐蚀风险
 
-    4. Consequence indicators for:
-      - Loss of primary containment
-      - Unplanned shutdown
-      - Escalation risk
+        3. 一个紧凑的实时过程数据面板，显示 Corrosion_Monitoring 中的关键值，包括 chloride、pH、wash water flow、desalter performance、wash water rate、total iron、SAP evidence 和 injection quill status。
 
-    5. Visual status rules:
-      - Green for normal or healthy conditions
-      - Yellow for developing risk or warning conditions
-      - Red for confirmed risk, failed barriers, or severe consequences
-      - Gray when data is unavailable
+        4. 后果指标包括：
+        - 一次包容失效
+        - 非计划停机
+        - 升级风险
 
-    6. Interaction:
-      - Selecting a threat, barrier, or consequence should show its current state, related process values, and a short explanation.
-      - Update the interface automatically when new data arrives.
-      - Show the latest data timestamp and connection status.
+        5. 视觉状态规则：
+        - 绿色表示正常或健康状态
+        - 琥珀色/黄色表示风险发展中或警告状态
+        - 红色表示风险已确认、屏障失效或严重后果
+        - 灰色表示数据不可用
+        - 蓝色仅用于交互和信息高亮
 
-    Use a clean, professional refinery operations style with clear hierarchy, compact cards, readable labels, and responsive layout.
+        6. 交互：
+        - 选择威胁、屏障或后果时，应显示其当前状态、相关过程值和简短说明。
+        - 当新的 UNS 数据到达时，自动更新界面。
+        - 显示最新数据时间戳，以及内置 SDK 提供的连接/订阅状态。
 
-    Use the payload fields exactly as defined in the corresponding UNS models. Do not invent additional fields, calculated values, or mock data.
+        设计要求：
+
+        在整个应用中保持现有视觉设计语言和样式。
+
+        使用现代工业运营 dashboard 风格：
+        - 使用深蓝灰色调，而不是纯黑色。
+        - 使用带有细微渐变的分层面板。
+        - 使用卡片式布局，圆角较大，约 16-20px。
+        - 使用细边框做分隔，避免厚重阴影。
+        - 使用柔和层次感和克制的发光效果。
+        - 保持清晰间距、充足内边距和一致对齐。
+        - 正文使用 IBM Plex Sans。
+        - 标题使用 Space Grotesk。
+        - 使用紧凑、信息密集且层级清晰的卡片。
+        - 使用增加字距的大写 section label。
+        - 呈现专业的炼化厂 / SCADA 界面，而不是商业分析 dashboard。
+        - 使用扁平插图和 SVG 图形，避免拟物元素。
+        - 使用平滑、细微的过渡和 hover 效果。
+
+        整体外观应清晰、现代、技术化，并适合运营场景。
+
+        避免：
+        - 纯黑背景
+        - 玻璃拟态
+        - 赛博朋克风格
+        - 霓虹灯效
+        - 过度装饰效果
+        - 商业分析 dashboard 风格
+
+        使用清晰、专业的炼化运营风格，保持明确层级、紧凑卡片、可读标签和响应式布局。
+
+        严格使用对应 UNS 模型中定义的 payload 字段。不要虚构额外字段、计算值或 mock 数据。
     ```
 
     </details>

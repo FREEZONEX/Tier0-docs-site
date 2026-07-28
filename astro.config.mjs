@@ -131,11 +131,6 @@ export default defineConfig({
 							slug: 'using-tier0/monitor-uns-with-agent',
 						},
 						{
-							label: 'Displaying UNS Data with Digital Twin',
-							translations: { 'zh-CN': '用 Digital Twin 展示 UNS 数据', ja: 'Digital Twin で UNS データを表示する', es: 'Mostrar datos UNS con Digital Twin', ko: 'Digital Twin으로 UNS 데이터 표시하기' },
-							slug: 'using-tier0/view-uns-with-digital-twin',
-						},
-						{
 							label: 'Building Apps on UNS',
 							translations: { 'zh-CN': '在 UNS 上构建应用', ja: 'UNS 上でアプリを構築', es: 'Crear apps sobre UNS', ko: 'UNS 기반 앱 구축' },
 							slug: 'using-tier0/build-apps',
@@ -172,12 +167,17 @@ export default defineConfig({
 							translations: { 'zh-CN': '构建分析应用', ja: '分析アプリの構築', es: 'Apps de analítica', ko: '분석 앱 구축' },
 							slug: 'best-practice/analytics-apps',
 						},
+						{
+							label: 'Displaying UNS Data with Digital Twin',
+							translations: { 'zh-CN': '用 Digital Twin 展示 UNS 数据', ja: 'Digital Twin で UNS データを表示する', es: 'Mostrar datos UNS con Digital Twin', ko: 'Digital Twin으로 UNS 데이터 표시하기' },
+							slug: 'best-practice/view-uns-with-digital-twin',
+						},
 					],
 				},
 				{
 					label: 'Reference',
 					translations: { 'zh-CN': '参考资料', ja: 'リファレンス', es: 'Referencia', ko: '참조' },
-					collapsed: false,
+					collapsed: true,
 					items: [
 						{
 							label: 'API Reference',

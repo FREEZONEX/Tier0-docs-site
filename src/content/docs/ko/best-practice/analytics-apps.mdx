@@ -3,7 +3,7 @@ title: 분석 앱 구축
 description: Aramco Bowtie 사례(비식별 데이터)를 사용해 Notebook 기반 분석 앱을 구축합니다.
 editions: [cloud, enterprise]
 sidebar:
-  order: 3
+  order: 4
 ---
 import { Aside, Steps } from '@astrojs/starlight/components';
 
@@ -1394,52 +1394,84 @@ flowchart LR
     <summary>Builder prompt 보기</summary>
 
     ```text
-    Build a modern industrial Bow-Tie Analysis application for CDU Atmospheric Overhead Corrosion.
+        CDU Atmospheric Overhead Corrosion을 위한 현대적인 산업용 Bow-Tie Analysis 애플리케이션을 구축하세요.
 
-    Use the following UNS topics as the only data sources:
+        다음 UNS topic만 데이터 소스로 사용하세요.
 
-    - Refinery/CDU_Plant/Metric/Corrosion_Monitoring
-    - Refinery/CDU_Plant/Metric/Corrosion_Analysis
-    - Refinery/CDU_Plant/State/Corrosion_Risk
+        - Refinery/CDU_Plant/Metric/Corrosion_Monitoring
+        - Refinery/CDU_Plant/Metric/Corrosion_Analysis
+        - Refinery/CDU_Plant/State/Corrosion_Risk
 
-    The application should help operators understand current corrosion risk, contributing threats, barrier conditions, and possible consequences.
+        새 UNS 메시지가 도착하면 애플리케이션이 자동으로 업데이트되어야 합니다.
 
-    Create a single-page dashboard with:
+        이 애플리케이션은 운영자가 현재 부식 위험, 관련 위협, barrier 상태, 가능한 결과를 이해하는 데 도움이 되어야 합니다.
 
-    1. A Bow-Tie diagram as the main section:
-      - Threats on the left
-      - Preventative barriers between threats and the top event
-      - Corrosion as the central top event
-      - Mitigative barriers after the top event
-      - Consequences on the right
+        다음을 포함하는 single-page dashboard를 만드세요.
 
-    2. A prominent risk summary showing:
-      - Current risk state
-      - Model confidence
-      - Normal, developing, and confirmed probabilities
-      - Total corrosion risk
+        1. 메인 섹션으로 Bow-Tie diagram:
+        - 왼쪽에 threats 표시
+        - threats와 top event 사이에 preventative barriers 표시
+        - 중앙 top event로 corrosion 표시
+        - top event 이후 mitigative barriers 표시
+        - 오른쪽에 consequences 표시
 
-    3. A compact live process data panel showing key values from Corrosion_Monitoring, including chloride, pH, wash water flow, desalter performance, wash water rate, total iron, SAP evidence, and injection quill status.
+        2. 눈에 잘 띄는 risk summary:
+        - Current risk state
+        - Model confidence
+        - Normal, developing, confirmed probabilities
+        - Total corrosion risk
 
-    4. Consequence indicators for:
-      - Loss of primary containment
-      - Unplanned shutdown
-      - Escalation risk
+        3. Corrosion_Monitoring의 주요 값을 보여주는 compact live process data panel을 만드세요. chloride, pH, wash water flow, desalter performance, wash water rate, total iron, SAP evidence, injection quill status를 포함하세요.
 
-    5. Visual status rules:
-      - Green for normal or healthy conditions
-      - Yellow for developing risk or warning conditions
-      - Red for confirmed risk, failed barriers, or severe consequences
-      - Gray when data is unavailable
+        4. Consequence indicators:
+        - Loss of primary containment
+        - Unplanned shutdown
+        - Escalation risk
 
-    6. Interaction:
-      - Selecting a threat, barrier, or consequence should show its current state, related process values, and a short explanation.
-      - Update the interface automatically when new data arrives.
-      - Show the latest data timestamp and connection status.
+        5. Visual status rules:
+        - Green은 normal 또는 healthy condition
+        - Amber/yellow는 developing risk 또는 warning condition
+        - Red는 confirmed risk, failed barrier 또는 severe consequence
+        - Gray는 data unavailable
+        - Blue는 interaction 및 informational highlight에만 사용
 
-    Use a clean, professional refinery operations style with clear hierarchy, compact cards, readable labels, and responsive layout.
+        6. Interaction:
+        - threat, barrier 또는 consequence를 선택하면 현재 상태, 관련 process value, 짧은 설명을 표시해야 합니다.
+        - 새 UNS 데이터가 도착하면 interface를 자동으로 업데이트하세요.
+        - 최신 데이터 timestamp와 built-in SDK의 connection/subscription status를 표시하세요.
 
-    Use the payload fields exactly as defined in the corresponding UNS models. Do not invent additional fields, calculated values, or mock data.
+        Design requirements:
+
+        애플리케이션 전체에서 기존 visual design language와 styling을 유지하세요.
+
+        현대적인 industrial operations dashboard 스타일을 사용하세요.
+        - pure black 대신 dark blue-gray color palette를 사용합니다.
+        - subtle gradients가 있는 layered panels를 사용합니다.
+        - 약 16-20px의 큰 rounded corners를 가진 card-based layout을 사용합니다.
+        - heavy shadows 대신 thin borders로 구분합니다.
+        - soft depth와 restrained glow effects를 사용합니다.
+        - 충분한 padding, 일관된 alignment, 깨끗한 spacing을 유지합니다.
+        - body text에는 IBM Plex Sans를 사용합니다.
+        - headings에는 Space Grotesk를 사용합니다.
+        - clear visual hierarchy를 가진 compact, information-dense cards를 사용합니다.
+        - letter spacing을 늘린 uppercase section labels를 사용합니다.
+        - business analytics가 아니라 professional refinery / SCADA interface처럼 보이게 합니다.
+        - skeuomorphic elements 대신 flat illustrations와 SVG graphics를 사용합니다.
+        - smooth하고 subtle한 transitions 및 hover effects를 사용합니다.
+
+        전체 외관은 clean, modern, technical, operational하게 느껴져야 합니다.
+
+        피해야 할 것:
+        - Pure black backgrounds
+        - Glassmorphism
+        - Cyberpunk styling
+        - Neon lighting
+        - Overly decorative effects
+        - Business analytics dashboard styling
+
+        clear hierarchy, compact cards, readable labels, responsive layout을 갖춘 clean, professional refinery operations style을 사용하세요.
+
+        해당 UNS model에 정의된 payload fields를 정확히 사용하세요. 추가 fields, calculated values 또는 mock data를 만들지 마세요.
     ```
 
     </details>

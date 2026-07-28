@@ -2464,8 +2464,10 @@ main:has(.t0-banner) .t0-banner {
 	text-decoration: underline;
 	font-family: 'IBM Plex Mono', var(--sl-font-mono);
 	display: inline-block;
+	max-width: 100%;
 	margin-top: 0.25rem;
-	white-space: nowrap;
+	white-space: normal;
+	overflow-wrap: anywhere;
 }
 
 .t0-col-cta::after {

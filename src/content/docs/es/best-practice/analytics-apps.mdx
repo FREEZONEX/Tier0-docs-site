@@ -3,7 +3,7 @@ title: Crear apps de analítica
 description: "Crear una app de analítica con Notebook usando el caso Aramco Bowtie (datos anonimizados)."
 editions: [cloud, enterprise]
 sidebar:
-  order: 3
+  order: 4
 ---
 import { Aside, Steps } from '@astrojs/starlight/components';
 
@@ -1390,52 +1390,84 @@ La corrosión en refinería es un proceso complejo influido por múltiples facto
     <summary>Mostrar prompt de Builder</summary>
 
     ```text
-    Build a modern industrial Bow-Tie Analysis application for CDU Atmospheric Overhead Corrosion.
+        Crea una aplicación industrial moderna de Bow-Tie Analysis para la corrosión atmosférica superior de CDU.
 
-    Use the following UNS topics as the only data sources:
+        Usa los siguientes topics de UNS como las únicas fuentes de datos:
 
-    - Refinery/CDU_Plant/Metric/Corrosion_Monitoring
-    - Refinery/CDU_Plant/Metric/Corrosion_Analysis
-    - Refinery/CDU_Plant/State/Corrosion_Risk
+        - Refinery/CDU_Plant/Metric/Corrosion_Monitoring
+        - Refinery/CDU_Plant/Metric/Corrosion_Analysis
+        - Refinery/CDU_Plant/State/Corrosion_Risk
 
-    The application should help operators understand current corrosion risk, contributing threats, barrier conditions, and possible consequences.
+        La aplicación debe actualizarse automáticamente cuando lleguen nuevos mensajes de UNS.
 
-    Create a single-page dashboard with:
+        La aplicación debe ayudar a los operadores a entender el riesgo actual de corrosión, las amenazas contribuyentes, las condiciones de las barreras y las posibles consecuencias.
 
-    1. A Bow-Tie diagram as the main section:
-      - Threats on the left
-      - Preventative barriers between threats and the top event
-      - Corrosion as the central top event
-      - Mitigative barriers after the top event
-      - Consequences on the right
+        Crea un dashboard de una sola página con:
 
-    2. A prominent risk summary showing:
-      - Current risk state
-      - Model confidence
-      - Normal, developing, and confirmed probabilities
-      - Total corrosion risk
+        1. Un diagrama Bow-Tie como sección principal:
+        - Amenazas a la izquierda
+        - Barreras preventivas entre las amenazas y el evento principal
+        - Corrosión como evento principal central
+        - Barreras mitigadoras después del evento principal
+        - Consecuencias a la derecha
 
-    3. A compact live process data panel showing key values from Corrosion_Monitoring, including chloride, pH, wash water flow, desalter performance, wash water rate, total iron, SAP evidence, and injection quill status.
+        2. Un resumen de riesgo destacado que muestre:
+        - Estado de riesgo actual
+        - Confianza del modelo
+        - Probabilidades normal, en desarrollo y confirmada
+        - Riesgo total de corrosión
 
-    4. Consequence indicators for:
-      - Loss of primary containment
-      - Unplanned shutdown
-      - Escalation risk
+        3. Un panel compacto de datos de proceso en vivo que muestre valores clave de Corrosion_Monitoring, incluidos chloride, pH, wash water flow, desalter performance, wash water rate, total iron, SAP evidence e injection quill status.
 
-    5. Visual status rules:
-      - Green for normal or healthy conditions
-      - Yellow for developing risk or warning conditions
-      - Red for confirmed risk, failed barriers, or severe consequences
-      - Gray when data is unavailable
+        4. Indicadores de consecuencias para:
+        - Pérdida de contención primaria
+        - Parada no planificada
+        - Riesgo de escalamiento
 
-    6. Interaction:
-      - Selecting a threat, barrier, or consequence should show its current state, related process values, and a short explanation.
-      - Update the interface automatically when new data arrives.
-      - Show the latest data timestamp and connection status.
+        5. Reglas visuales de estado:
+        - Verde para condiciones normales o saludables
+        - Ámbar/amarillo para riesgo en desarrollo o condiciones de advertencia
+        - Rojo para riesgo confirmado, barreras fallidas o consecuencias graves
+        - Gris cuando los datos no están disponibles
+        - Azul solo para interacción y resaltados informativos
 
-    Use a clean, professional refinery operations style with clear hierarchy, compact cards, readable labels, and responsive layout.
+        6. Interacción:
+        - Al seleccionar una amenaza, barrera o consecuencia, se debe mostrar su estado actual, los valores de proceso relacionados y una breve explicación.
+        - Actualiza la interfaz automáticamente cuando lleguen nuevos datos de UNS.
+        - Muestra la marca de tiempo de los datos más recientes y el estado de conexión/suscripción desde el SDK integrado.
 
-    Use the payload fields exactly as defined in the corresponding UNS models. Do not invent additional fields, calculated values, or mock data.
+        Requisitos de diseño:
+
+        Mantén el lenguaje visual y el estilo existentes en toda la aplicación.
+
+        Usa un estilo moderno de dashboard de operaciones industriales:
+        - Paleta azul grisácea oscura en lugar de negro puro.
+        - Paneles por capas con gradientes sutiles.
+        - Diseño basado en tarjetas con esquinas grandes, de alrededor de 16-20px.
+        - Bordes finos para separar elementos en lugar de sombras pesadas.
+        - Profundidad suave y efectos de brillo moderados.
+        - Espaciado limpio con padding generoso y alineación consistente.
+        - IBM Plex Sans para el texto del cuerpo.
+        - Space Grotesk para los encabezados.
+        - Tarjetas compactas y densas en información, con jerarquía visual clara.
+        - Etiquetas de sección en mayúsculas con mayor espaciado entre letras.
+        - Una interfaz profesional de refinería / SCADA, no un dashboard de analítica empresarial.
+        - Ilustraciones planas y gráficos SVG en lugar de elementos skeuomórficos.
+        - Transiciones y efectos hover suaves y sutiles.
+
+        La apariencia general debe sentirse limpia, moderna, técnica y operativa.
+
+        Evita:
+        - Fondos negro puro
+        - Glassmorphism
+        - Estilo cyberpunk
+        - Iluminación neón
+        - Efectos demasiado decorativos
+        - Estilo de dashboard de analítica empresarial
+
+        Usa un estilo limpio y profesional de operaciones de refinería, con jerarquía clara, tarjetas compactas, etiquetas legibles y layout responsive.
+
+        Usa los campos de payload exactamente como están definidos en los modelos UNS correspondientes. No inventes campos adicionales, valores calculados ni datos mock.
     ```
 
     </details>
