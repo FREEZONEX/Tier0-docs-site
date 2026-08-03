@@ -1,0 +1,1017 @@
+---
+const prodApiUrl = import.meta.env.PUBLIC_TIER0_CHAT_API_URL || 'https://docsbot.tier0.app/chat';
+const localApiUrl = import.meta.env.PUBLIC_TIER0_CHAT_LOCAL_API_URL || 'http://127.0.0.1:8000/chat';
+const iconUrl =
+	import.meta.env.PUBLIC_TIER0_CHAT_ICON_URL ||
+	'https://enterpriseimage.oss-cn-hangzhou.aliyuncs.com/icon.png';
+---
+
+<div
+	class="doc-chatbot"
+	data-doc-chatbot
+	data-prod-api-url={prodApiUrl}
+	data-local-api-url={localApiUrl}
+	data-icon-url={iconUrl}
+>
+	<div class="doc-chatbot-entry">
+		<div class="doc-chatbot-tip" data-doc-chatbot-tip></div>
+		<button
+			class="doc-chatbot-button"
+			type="button"
+			aria-label="Open AI documentation assistant"
+			data-doc-chatbot-toggle
+		>
+			<img class="doc-chatbot-icon" src={iconUrl} alt="AI assistant" data-doc-chatbot-icon />
+			<span class="doc-chatbot-close-icon" aria-hidden="true" data-doc-chatbot-entry-close>×</span>
+		</button>
+	</div>
+
+	<div class="doc-chatbot-panel" hidden data-doc-chatbot-panel>
+		<div class="doc-chatbot-header">
+			<div>
+				<div class="doc-chatbot-title" data-doc-chatbot-title></div>
+				<div class="doc-chatbot-subtitle" data-doc-chatbot-subtitle></div>
+			</div>
+			<button class="doc-chatbot-close" type="button" data-doc-chatbot-close>×</button>
+		</div>
+
+		<div class="doc-chatbot-messages" data-doc-chatbot-messages></div>
+
+		<div class="doc-chatbot-input-area">
+			<textarea
+				class="doc-chatbot-input"
+				rows="2"
+				data-doc-chatbot-input
+			></textarea>
+			<button class="doc-chatbot-send" type="button" disabled data-doc-chatbot-send></button>
+		</div>
+	</div>
+</div>
+
+<script>
+	(function () {
+		const TEXTS = {
+			en: {
+				entryTip: 'Are you ready to get started with Tier0?',
+				welcome:
+					'Hi, I am the Tier0 Onboarding Assistant. I can help you understand the product, complete tasks, and troubleshoot issues based on the documentation.',
+				placeholder: 'Ask about Tier0...',
+				title: 'Tier0 Onboarding Assistant',
+				subtitle: 'Guided help based on Tier0 documentation',
+				send: 'Send',
+				thinking: 'Thinking...',
+				unavailable:
+					'Sorry, the documentation assistant is temporarily unavailable. Please check whether the AI Bot API is running.',
+				noAnswer: 'No answer returned.',
+				references: 'References',
+				suggestedTitle: 'Try asking',
+				openLabel: 'Open AI documentation assistant',
+				closeLabel: 'Close AI documentation assistant',
+				suggestedQuestions: [
+					'How should I build a data model?',
+					'How do I connect data?',
+					'How can I do more advanced data analysis?',
+					'What is the basic workflow for using Tier0?',
+					'How do I create a dashboard?',
+					'How do I manage users and permissions?',
+				],
+			},
+			zh: {
+				entryTip: '准备好开始使用 Tier0 了吗？',
+				welcome:
+					'你好，我是 Tier0 Onboarding 助手，可以根据文档帮你理解产品、完成操作和排查问题。',
+				placeholder: '请输入你的问题...',
+				title: 'Tier0 Onboarding 助手',
+				subtitle: '基于 Tier0 文档帮助你更快上手',
+				send: '发送',
+				thinking: '思考中...',
+				unavailable: '抱歉，文档助手暂时不可用，请检查 AI Bot API 是否正在运行。',
+				noAnswer: '未返回答案。',
+				references: '参考文档',
+				suggestedTitle: '你可以这样问',
+				openLabel: '打开 AI 文档助手',
+				closeLabel: '关闭 AI 文档助手',
+				suggestedQuestions: [
+					'我该怎么建模？',
+					'如何连接数据？',
+					'高级一点的数据分析怎么做？',
+					'Tier0 的基础操作顺序是什么？',
+					'如何创建仪表盘？',
+					'如何管理用户和权限？',
+				],
+			},
+		};
+
+		function getLang() {
+			const path = window.location.pathname.toLowerCase();
+			if (path.startsWith('/zh-cn') || path.startsWith('/zh')) return 'zh';
+			return 'en';
+		}
+
+		function getApiUrl(root) {
+			const host = window.location.hostname;
+			if (host === 'localhost' || host === '127.0.0.1') {
+				return root.dataset.localApiUrl;
+			}
+			return root.dataset.prodApiUrl;
+		}
+
+		function escapeHtml(value) {
+			return String(value || '')
+				.replaceAll('&', '&amp;')
+				.replaceAll('<', '&lt;')
+				.replaceAll('>', '&gt;')
+				.replaceAll('"', '&quot;')
+				.replaceAll("'", '&#39;');
+		}
+
+		function safeHref(value) {
+			const href = String(value || '').trim();
+			if (/^(https?:\/\/|\/)/i.test(href)) return href;
+			return '#';
+		}
+
+		function renderInlineMarkdown(text) {
+			let html = escapeHtml(text);
+			html = html.replace(/\[([^\]]+)\]\(([^)]+)\)/g, function (_, label, href) {
+				return (
+					'<a href="' +
+					escapeHtml(safeHref(href)) +
+					'" target="_blank" rel="noreferrer">' +
+					label +
+					'</a>'
+				);
+			});
+			html = html.replace(/`([^`]+)`/g, '<code>$1</code>');
+			html = html.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+			return html;
+		}
+
+		function renderMarkdown(markdown) {
+			const lines = String(markdown || '').split(/\r?\n/);
+			const html = [];
+			let listType = null;
+			let paragraph = [];
+			let inCode = false;
+			let codeLines = [];
+
+			function closeParagraph() {
+				if (!paragraph.length) return;
+				html.push('<p>' + renderInlineMarkdown(paragraph.join(' ')) + '</p>');
+				paragraph = [];
+			}
+
+			function closeList() {
+				if (!listType) return;
+				html.push('</' + listType + '>');
+				listType = null;
+			}
+
+			for (const line of lines) {
+				if (/^```/.test(line.trim())) {
+					if (inCode) {
+						html.push('<pre><code>' + escapeHtml(codeLines.join('\n')) + '</code></pre>');
+						codeLines = [];
+						inCode = false;
+					} else {
+						closeParagraph();
+						closeList();
+						inCode = true;
+					}
+					continue;
+				}
+
+				if (inCode) {
+					codeLines.push(line);
+					continue;
+				}
+
+				const trimmed = line.trim();
+				if (!trimmed) {
+					closeParagraph();
+					closeList();
+					continue;
+				}
+
+				const heading = /^(#{1,3})\s+(.+)$/.exec(trimmed);
+				if (heading) {
+					closeParagraph();
+					closeList();
+					html.push('<h' + heading[1].length + '>' + renderInlineMarkdown(heading[2]) + '</h' + heading[1].length + '>');
+					continue;
+				}
+
+				const unordered = /^[-*]\s+(.+)$/.exec(trimmed);
+				const ordered = /^\d+\.\s+(.+)$/.exec(trimmed);
+				if (unordered || ordered) {
+					const nextType = unordered ? 'ul' : 'ol';
+					closeParagraph();
+					if (listType !== nextType) {
+						closeList();
+						html.push('<' + nextType + '>');
+						listType = nextType;
+					}
+					html.push('<li>' + renderInlineMarkdown((unordered || ordered)[1]) + '</li>');
+					continue;
+				}
+
+				closeList();
+				paragraph.push(trimmed);
+			}
+
+			if (inCode) html.push('<pre><code>' + escapeHtml(codeLines.join('\n')) + '</code></pre>');
+			closeParagraph();
+			closeList();
+			return html.join('');
+		}
+
+		function initDocChatBot() {
+			document.querySelectorAll('[data-doc-chatbot]').forEach(function (root) {
+				if (root.dataset.bound === '1') return;
+				root.dataset.bound = '1';
+
+				let lang = getLang();
+				let texts = TEXTS[lang];
+				let apiUrl = getApiUrl(root);
+				let open = false;
+				let loading = false;
+				let input = '';
+				let messages = [
+					{
+						role: 'assistant',
+						content: texts.welcome,
+						references: [],
+						suggestedQuestions: texts.suggestedQuestions,
+					},
+				];
+
+				const panel = root.querySelector('[data-doc-chatbot-panel]');
+				const toggle = root.querySelector('[data-doc-chatbot-toggle]');
+				const close = root.querySelector('[data-doc-chatbot-close]');
+				const icon = root.querySelector('[data-doc-chatbot-icon]');
+				const entryClose = root.querySelector('[data-doc-chatbot-entry-close]');
+				const tip = root.querySelector('[data-doc-chatbot-tip]');
+				const title = root.querySelector('[data-doc-chatbot-title]');
+				const subtitle = root.querySelector('[data-doc-chatbot-subtitle]');
+				const messagesEl = root.querySelector('[data-doc-chatbot-messages]');
+				const inputEl = root.querySelector('[data-doc-chatbot-input]');
+				const sendButton = root.querySelector('[data-doc-chatbot-send]');
+
+				function syncLocale() {
+					const nextLang = getLang();
+					if (nextLang === lang) return;
+					lang = nextLang;
+					texts = TEXTS[lang];
+					apiUrl = getApiUrl(root);
+					messages = [
+						{
+							role: 'assistant',
+							content: texts.welcome,
+							references: [],
+							suggestedQuestions: texts.suggestedQuestions,
+						},
+					];
+				}
+
+				function render() {
+					tip.textContent = texts.entryTip;
+					tip.hidden = open;
+					title.textContent = texts.title;
+					subtitle.textContent = texts.subtitle;
+					inputEl.placeholder = texts.placeholder;
+					sendButton.textContent = texts.send;
+					sendButton.disabled = loading || !input.trim();
+					panel.hidden = !open;
+					toggle.classList.toggle('doc-chatbot-button-open', open);
+					toggle.setAttribute('aria-label', open ? texts.closeLabel : texts.openLabel);
+					icon.hidden = open;
+					entryClose.hidden = !open;
+
+					const lastMessage = messages[messages.length - 1];
+					const suggestedQuestions =
+						lastMessage?.role === 'assistant' && lastMessage?.suggestedQuestions?.length
+							? lastMessage.suggestedQuestions
+							: texts.suggestedQuestions;
+					const shouldShowSuggestions =
+						!loading &&
+						messages.length > 0 &&
+						lastMessage.role === 'assistant' &&
+						suggestedQuestions.length > 0;
+
+					messagesEl.innerHTML = messages
+						.map(function (message) {
+							const refs = Array.isArray(message.references) ? message.references : [];
+							const refsHtml = refs.length
+								? '<div class="doc-chatbot-references"><div class="doc-chatbot-references-title">' +
+									escapeHtml(texts.references) +
+									'</div><ul>' +
+									refs
+										.map(function (ref) {
+											const title = escapeHtml(ref.title || ref.url || 'Document');
+											const section = ref.section
+												? ' <span class="doc-chatbot-section">/ ' + escapeHtml(ref.section) + '</span>'
+												: '';
+											return (
+												'<li><a href="' +
+												escapeHtml(safeHref(ref.url)) +
+												'" target="_blank" rel="noreferrer">' +
+												title +
+												'</a>' +
+												section +
+												'</li>'
+											);
+										})
+										.join('') +
+									'</ul></div>'
+								: '';
+							return (
+								'<div class="doc-chatbot-message doc-chatbot-message-' +
+								escapeHtml(message.role) +
+								'"><div class="doc-chatbot-bubble">' +
+								renderMarkdown(message.content) +
+								refsHtml +
+								'</div></div>'
+							);
+						})
+						.join('');
+
+					if (loading) {
+						messagesEl.insertAdjacentHTML(
+							'beforeend',
+							'<div class="doc-chatbot-message doc-chatbot-message-assistant"><div class="doc-chatbot-bubble">' +
+								escapeHtml(texts.thinking) +
+								'</div></div>',
+						);
+					}
+
+					if (shouldShowSuggestions) {
+						const suggestions = document.createElement('div');
+						suggestions.className = 'doc-chatbot-suggestions';
+						suggestions.innerHTML =
+							'<div class="doc-chatbot-suggestions-title">' +
+							escapeHtml(texts.suggestedTitle) +
+							'</div><div class="doc-chatbot-suggestions-list"></div>';
+						const list = suggestions.querySelector('.doc-chatbot-suggestions-list');
+						suggestedQuestions.forEach(function (question) {
+							const button = document.createElement('button');
+							button.className = 'doc-chatbot-suggestion';
+							button.type = 'button';
+							button.textContent = question;
+							button.disabled = loading;
+							button.addEventListener('click', function () {
+								sendMessage(question);
+							});
+							list.appendChild(button);
+						});
+						messagesEl.appendChild(suggestions);
+					}
+
+					if (open) messagesEl.scrollTop = messagesEl.scrollHeight;
+				}
+
+				async function sendMessage(overrideText) {
+					const text = String(overrideText || inputEl.value || '').trim();
+					if (!text || loading) return;
+
+					input = '';
+					inputEl.value = '';
+					messages.push({
+						role: 'user',
+						content: text,
+						references: [],
+						suggestedQuestions: [],
+					});
+					loading = true;
+					render();
+
+					try {
+						const response = await fetch(apiUrl, {
+							method: 'POST',
+							headers: { 'Content-Type': 'application/json' },
+							body: JSON.stringify({ message: text, lang }),
+						});
+						if (!response.ok) throw new Error('Request failed: ' + response.status);
+
+						const data = await response.json();
+						const suggestedQuestions =
+							Array.isArray(data.suggested_questions) && data.suggested_questions.length > 0
+								? data.suggested_questions
+								: texts.suggestedQuestions;
+						messages.push({
+							role: 'assistant',
+							content: data.answer || texts.noAnswer,
+							references: Array.isArray(data.references) ? data.references : [],
+							suggestedQuestions,
+						});
+					} catch (_) {
+						messages.push({
+							role: 'assistant',
+							content: texts.unavailable,
+							references: [],
+							suggestedQuestions: texts.suggestedQuestions,
+						});
+					} finally {
+						loading = false;
+						render();
+					}
+				}
+
+				toggle.addEventListener('click', function () {
+					syncLocale();
+					open = !open;
+					render();
+					if (open) inputEl.focus();
+				});
+				close.addEventListener('click', function () {
+					open = false;
+					render();
+				});
+				inputEl.addEventListener('input', function () {
+					input = inputEl.value;
+					sendButton.disabled = loading || !input.trim();
+				});
+				inputEl.addEventListener('keydown', function (event) {
+					if (event.key === 'Enter' && !event.shiftKey) {
+						event.preventDefault();
+						sendMessage();
+					}
+				});
+				sendButton.addEventListener('click', function () {
+					sendMessage();
+				});
+
+				render();
+			});
+		}
+
+		if (document.readyState === 'loading') {
+			document.addEventListener('DOMContentLoaded', initDocChatBot);
+		} else {
+			initDocChatBot();
+		}
+		document.addEventListener('astro:page-load', initDocChatBot);
+	})();
+</script>
+
+<style is:global>
+	.doc-chatbot {
+		--doc-chatbot-black: #050b14;
+		--doc-chatbot-text: #050b14;
+		--doc-chatbot-text-secondary: #585c62;
+		--doc-chatbot-text-tertiary: #acaeb1;
+		--doc-chatbot-border: #cccccc;
+		--doc-chatbot-border-soft: #e6e6e6;
+		--doc-chatbot-bg: #ffffff;
+		--doc-chatbot-bg-secondary: #f5f5f5;
+		--doc-chatbot-bg-accent: #f0fbd2;
+		--doc-chatbot-green-soft: #ddf59c;
+		--doc-chatbot-green-button: #ccf368;
+		--doc-chatbot-green-deep: #73b200;
+		--doc-chatbot-radius: 4px;
+		--doc-chatbot-shadow: 1px 2px 8px rgba(5, 11, 20, 0.1);
+		--doc-chatbot-shadow-hover: 2px 4px 16px rgba(5, 11, 20, 0.14);
+	}
+
+	.doc-chatbot [hidden] {
+		display: none !important;
+	}
+
+	:root[data-theme='dark'] .doc-chatbot {
+		--doc-chatbot-black: #ffffff;
+		--doc-chatbot-text: #f7f7f7;
+		--doc-chatbot-text-secondary: #cdced0;
+		--doc-chatbot-text-tertiary: #acaeb1;
+		--doc-chatbot-border: #3a3d42;
+		--doc-chatbot-border-soft: #2a2d32;
+		--doc-chatbot-bg: #111820;
+		--doc-chatbot-bg-secondary: #050b14;
+		--doc-chatbot-bg-accent: rgba(178, 237, 29, 0.12);
+		--doc-chatbot-green-soft: rgba(178, 237, 29, 0.24);
+		--doc-chatbot-green-button: #ccf368;
+		--doc-chatbot-green-deep: #b2ed1d;
+		--doc-chatbot-shadow: 1px 2px 10px rgba(0, 0, 0, 0.32);
+		--doc-chatbot-shadow-hover: 2px 4px 18px rgba(0, 0, 0, 0.38);
+	}
+
+	.doc-chatbot-entry {
+		position: fixed;
+		right: 24px;
+		bottom: 24px;
+		z-index: 9999;
+		display: flex;
+		align-items: center;
+		font-family: var(--sl-font, system-ui, sans-serif);
+	}
+
+	.doc-chatbot-tip {
+		position: absolute;
+		right: 84px;
+		bottom: 32px;
+		width: max-content;
+		max-width: min(360px, calc(100vw - 180px));
+		padding: 8px 12px;
+		border: 1px solid var(--doc-chatbot-border);
+		border-radius: var(--doc-chatbot-radius);
+		background: var(--doc-chatbot-bg);
+		color: var(--doc-chatbot-text);
+		font-size: 13px;
+		font-weight: 500;
+		line-height: 1.35;
+		box-shadow: var(--doc-chatbot-shadow);
+		white-space: normal;
+		word-break: keep-all;
+		opacity: 0;
+		transform: translateY(4px) scale(0.96);
+		transform-origin: right bottom;
+		pointer-events: none;
+		transition:
+			opacity 0.18s ease,
+			transform 0.18s ease;
+	}
+
+	.doc-chatbot-tip::after {
+		content: '';
+		position: absolute;
+		right: -5px;
+		bottom: 13px;
+		width: 10px;
+		height: 10px;
+		background: var(--doc-chatbot-bg);
+		border-right: 1px solid var(--doc-chatbot-border);
+		border-bottom: 1px solid var(--doc-chatbot-border);
+		transform: rotate(-45deg);
+	}
+
+	.doc-chatbot-entry:hover .doc-chatbot-tip {
+		opacity: 1;
+		transform: translateY(0) scale(1);
+	}
+
+	.doc-chatbot-button {
+		width: 80px;
+		height: 80px;
+		flex: 0 0 auto;
+		padding: 0;
+		border: none;
+		border-radius: 0;
+		background: transparent;
+		color: var(--doc-chatbot-text);
+		font-size: 28px;
+		font-weight: 600;
+		cursor: pointer;
+		overflow: visible;
+		box-shadow: none;
+		line-height: 0;
+	}
+
+	.doc-chatbot-icon {
+		display: block;
+		width: 100%;
+		height: 100%;
+		object-fit: contain;
+		background: transparent;
+		filter: drop-shadow(0 8px 14px rgba(5, 11, 20, 0.14));
+		transform: scale(1.08);
+		transition:
+			transform 0.18s ease,
+			filter 0.18s ease;
+	}
+
+	.doc-chatbot-entry:hover .doc-chatbot-icon {
+		transform: scale(1.14);
+		filter: drop-shadow(0 10px 18px rgba(5, 11, 20, 0.18));
+	}
+
+	.doc-chatbot-button-open {
+		width: 40px;
+		height: 40px;
+		border: 1px solid var(--doc-chatbot-border);
+		border-radius: var(--doc-chatbot-radius);
+		background: var(--doc-chatbot-bg);
+		box-shadow: var(--doc-chatbot-shadow);
+	}
+
+	.doc-chatbot-button-open:hover {
+		border-color: var(--doc-chatbot-green-deep);
+		box-shadow: var(--doc-chatbot-shadow-hover);
+	}
+
+	.doc-chatbot-close-icon {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		width: 100%;
+		height: 100%;
+		color: var(--doc-chatbot-text);
+		font-size: 24px;
+		font-weight: 400;
+		line-height: 1;
+		transition: transform 0.18s ease;
+	}
+
+	.doc-chatbot-button-open:hover .doc-chatbot-close-icon {
+		transform: rotate(90deg);
+	}
+
+	.doc-chatbot-panel {
+		position: fixed;
+		right: 24px;
+		bottom: 112px;
+		z-index: 9999;
+		width: 460px;
+		max-width: calc(100vw - 32px);
+		height: min(640px, calc(100vh - 140px));
+		min-height: 480px;
+		display: flex;
+		flex-direction: column;
+		overflow: hidden;
+		border: 1px solid var(--doc-chatbot-border);
+		border-radius: var(--doc-chatbot-radius);
+		background: var(--doc-chatbot-bg);
+		color: var(--doc-chatbot-text);
+		box-shadow: var(--doc-chatbot-shadow-hover);
+		font-family: var(--sl-font, system-ui, sans-serif);
+	}
+
+	.doc-chatbot-panel[hidden] {
+		display: none;
+	}
+
+	.doc-chatbot-header {
+		display: flex;
+		align-items: flex-start;
+		justify-content: space-between;
+		gap: 12px;
+		padding: 14px 16px 12px;
+		border-bottom: 1px solid var(--doc-chatbot-border-soft);
+		background: var(--doc-chatbot-bg);
+	}
+
+	.doc-chatbot-title {
+		color: var(--doc-chatbot-text);
+		font-size: 15px;
+		font-weight: 600;
+		line-height: 1.25;
+		letter-spacing: 0;
+	}
+
+	.doc-chatbot-subtitle {
+		margin-top: 4px;
+		color: var(--doc-chatbot-text-secondary);
+		font-size: 12px;
+		font-weight: 400;
+		line-height: 1.35;
+	}
+
+	.doc-chatbot-close {
+		width: 28px;
+		height: 28px;
+		flex: 0 0 auto;
+		padding: 0;
+		border: 1px solid transparent;
+		border-radius: var(--doc-chatbot-radius);
+		background: transparent;
+		color: var(--doc-chatbot-text-secondary);
+		font-size: 24px;
+		line-height: 1;
+		cursor: pointer;
+		transition:
+			border-color 0.18s ease,
+			background 0.18s ease,
+			color 0.18s ease;
+	}
+
+	.doc-chatbot-close:hover {
+		border-color: var(--doc-chatbot-border);
+		background: var(--doc-chatbot-bg-secondary);
+		color: var(--doc-chatbot-text);
+	}
+
+	.doc-chatbot-messages {
+		flex: 1;
+		min-height: 0;
+		padding: 14px 16px;
+		overflow-y: auto;
+		background: var(--doc-chatbot-bg-secondary);
+	}
+
+	.doc-chatbot-messages::-webkit-scrollbar {
+		width: 8px;
+	}
+
+	.doc-chatbot-messages::-webkit-scrollbar-thumb {
+		background: var(--doc-chatbot-border);
+		border-radius: 999px;
+	}
+
+	.doc-chatbot-message {
+		display: flex;
+		margin-bottom: 12px;
+	}
+
+	.doc-chatbot-message-user {
+		justify-content: flex-end;
+	}
+
+	.doc-chatbot-message-assistant {
+		justify-content: flex-start;
+	}
+
+	.doc-chatbot-bubble {
+		max-width: 92%;
+		padding: 10px 12px;
+		border-radius: var(--doc-chatbot-radius);
+		font-size: 13px;
+		line-height: 1.55;
+		letter-spacing: 0;
+	}
+
+	.doc-chatbot-message-user .doc-chatbot-bubble {
+		border: 1px solid var(--doc-chatbot-black);
+		background: var(--doc-chatbot-black);
+		color: var(--doc-chatbot-bg);
+	}
+
+	.doc-chatbot-message-assistant .doc-chatbot-bubble {
+		border: 1px solid var(--doc-chatbot-border-soft);
+		background: var(--doc-chatbot-bg);
+		color: var(--doc-chatbot-text);
+		box-shadow: 0 1px 2px rgba(5, 11, 20, 0.04);
+	}
+
+	.doc-chatbot-bubble h1,
+	.doc-chatbot-bubble h2,
+	.doc-chatbot-bubble h3 {
+		margin: 0.7em 0 0.4em;
+		color: inherit;
+		font-size: 15px;
+		font-weight: 600;
+		line-height: 1.35;
+		letter-spacing: 0;
+	}
+
+	.doc-chatbot-bubble h1:first-child,
+	.doc-chatbot-bubble h2:first-child,
+	.doc-chatbot-bubble h3:first-child {
+		margin-top: 0;
+	}
+
+	.doc-chatbot-bubble p {
+		margin: 0.45em 0;
+	}
+
+	.doc-chatbot-bubble p:first-child {
+		margin-top: 0;
+	}
+
+	.doc-chatbot-bubble p:last-child {
+		margin-bottom: 0;
+	}
+
+	.doc-chatbot-bubble ul,
+	.doc-chatbot-bubble ol {
+		margin: 0.45em 0;
+		padding-left: 1.15rem;
+	}
+
+	.doc-chatbot-bubble li {
+		margin: 0.25em 0;
+	}
+
+	.doc-chatbot-bubble strong {
+		font-weight: 600;
+	}
+
+	.doc-chatbot-bubble a {
+		color: var(--doc-chatbot-green-deep);
+		text-decoration: underline;
+		text-underline-offset: 2px;
+	}
+
+	.doc-chatbot-bubble code {
+		padding: 1px 4px;
+		border: 1px solid var(--doc-chatbot-border-soft);
+		border-radius: var(--doc-chatbot-radius);
+		background: var(--doc-chatbot-bg-secondary);
+		color: var(--doc-chatbot-text);
+		font-family: var(--sl-font-mono, Menlo, Consolas, monospace);
+		font-size: 12px;
+	}
+
+	.doc-chatbot-bubble pre {
+		max-width: 100%;
+		margin: 8px 0;
+		padding: 10px;
+		overflow-x: auto;
+		border: 1px solid var(--doc-chatbot-border-soft);
+		border-radius: var(--doc-chatbot-radius);
+		background: var(--doc-chatbot-bg-secondary);
+	}
+
+	.doc-chatbot-bubble pre code {
+		padding: 0;
+		border: none;
+		background: transparent;
+	}
+
+	.doc-chatbot-references {
+		margin-top: 10px;
+		padding-top: 10px;
+		border-top: 1px solid var(--doc-chatbot-border-soft);
+		font-size: 12px;
+	}
+
+	.doc-chatbot-references-title {
+		margin-bottom: 6px;
+		color: var(--doc-chatbot-text-secondary);
+		font-weight: 600;
+	}
+
+	.doc-chatbot-references ul {
+		margin: 0;
+		padding-left: 16px;
+	}
+
+	.doc-chatbot-references li {
+		margin: 4px 0;
+	}
+
+	.doc-chatbot-section {
+		color: var(--doc-chatbot-text-secondary);
+	}
+
+	.doc-chatbot-suggestions {
+		max-width: 92%;
+		margin: 0 0 12px;
+		padding: 0;
+		border: none;
+		border-radius: 0;
+		background: transparent;
+		box-shadow: none;
+	}
+
+	.doc-chatbot-suggestions-title {
+		margin: 0 0 8px;
+		color: var(--doc-chatbot-text-secondary);
+		font-size: 12px;
+		font-weight: 600;
+		line-height: 1.2;
+	}
+
+	.doc-chatbot-suggestions-list {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 6px;
+	}
+
+	.doc-chatbot-suggestion {
+		max-width: 100%;
+		padding: 6px 9px;
+		border: 1px solid var(--doc-chatbot-border);
+		border-radius: var(--doc-chatbot-radius);
+		background: var(--doc-chatbot-bg);
+		color: var(--doc-chatbot-text);
+		font-family: inherit;
+		font-size: 12px;
+		font-weight: 500;
+		line-height: 1.3;
+		cursor: pointer;
+		transition:
+			border-color 0.18s ease,
+			background 0.18s ease,
+			color 0.18s ease;
+	}
+
+	.doc-chatbot-suggestion:hover:not(:disabled) {
+		border-color: var(--doc-chatbot-green-deep);
+		background: var(--doc-chatbot-bg-accent);
+		color: var(--doc-chatbot-text);
+	}
+
+	.doc-chatbot-suggestion:disabled {
+		opacity: 0.5;
+		cursor: not-allowed;
+	}
+
+	.doc-chatbot-input-area {
+		display: flex;
+		gap: 8px;
+		padding: 12px;
+		border-top: 1px solid var(--doc-chatbot-border-soft);
+		background: var(--doc-chatbot-bg);
+	}
+
+	.doc-chatbot-input {
+		flex: 1;
+		min-height: 40px;
+		max-height: 96px;
+		resize: none;
+		padding: 9px 10px;
+		border: 1px solid var(--doc-chatbot-border);
+		border-radius: var(--doc-chatbot-radius);
+		background: var(--doc-chatbot-bg);
+		color: var(--doc-chatbot-text);
+		font-family: inherit;
+		font-size: 13px;
+		line-height: 1.45;
+		outline: none;
+		transition:
+			border-color 0.18s ease,
+			box-shadow 0.18s ease;
+	}
+
+	.doc-chatbot-input::placeholder {
+		color: var(--doc-chatbot-text-tertiary);
+		font-family: inherit;
+	}
+
+	.doc-chatbot-input:focus {
+		border-color: var(--doc-chatbot-green-deep);
+		box-shadow: 0 0 0 2px rgba(178, 237, 29, 0.22);
+	}
+
+	.doc-chatbot-send {
+		align-self: flex-end;
+		min-width: 64px;
+		height: 40px;
+		padding: 0 14px;
+		border: 1px solid var(--doc-chatbot-black);
+		border-radius: var(--doc-chatbot-radius);
+		background: var(--doc-chatbot-black);
+		color: var(--doc-chatbot-bg);
+		font-family: inherit;
+		font-size: 13px;
+		font-weight: 600;
+		line-height: 1;
+		cursor: pointer;
+		transition:
+			background 0.18s ease,
+			border-color 0.18s ease,
+			color 0.18s ease,
+			opacity 0.18s ease;
+	}
+
+	.doc-chatbot-send:hover:not(:disabled) {
+		border-color: var(--doc-chatbot-green-button);
+		background: var(--doc-chatbot-green-button);
+		color: #333333;
+	}
+
+	.doc-chatbot-send:disabled {
+		opacity: 0.45;
+		cursor: not-allowed;
+	}
+
+	@media (max-width: 600px) {
+		.doc-chatbot-entry {
+			right: 16px;
+			bottom: 16px;
+		}
+
+		.doc-chatbot-tip {
+			right: 80px;
+			bottom: 24px;
+			max-width: min(260px, calc(100vw - 150px));
+			padding: 7px 10px;
+			font-size: 12px;
+		}
+
+		.doc-chatbot-button {
+			width: 72px;
+			height: 72px;
+		}
+
+		.doc-chatbot-button-open {
+			width: 40px;
+			height: 40px;
+		}
+
+		.doc-chatbot-panel {
+			right: 12px;
+			left: 12px;
+			bottom: 92px;
+			width: auto;
+			height: min(72vh, calc(100vh - 120px));
+			min-height: 420px;
+		}
+
+		.doc-chatbot-header,
+		.doc-chatbot-messages {
+			padding: 12px;
+		}
+
+		.doc-chatbot-bubble {
+			max-width: 94%;
+			font-size: 13px;
+		}
+
+		.doc-chatbot-input-area {
+			padding: 10px;
+		}
+
+		.doc-chatbot-send {
+			min-width: 58px;
+			padding: 0 12px;
+		}
+	}
+</style>

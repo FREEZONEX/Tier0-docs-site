@@ -81,8 +81,38 @@ import Default from '@astrojs/starlight/components/Head.astro';
 			);
 		}
 
+		function getLocalePrefix() {
+			var firstSegment = location.pathname.split('/').filter(Boolean)[0];
+			return ['zh-cn', 'ja', 'es', 'ko'].includes(firstSegment) ? '/' + firstSegment : '';
+		}
+
+		function bindSidebarGroupHome() {
+			var firstGroup = document.querySelector(
+				'#starlight__sidebar .top-level > li:first-child summary .group-label',
+			);
+			if (!firstGroup || firstGroup.dataset.t0HomeBound === '1') return;
+			firstGroup.dataset.t0HomeBound = '1';
+			firstGroup.classList.add('t0-sidebar-group-home-link');
+			firstGroup.setAttribute('role', 'link');
+			firstGroup.setAttribute('tabindex', '0');
+			firstGroup.setAttribute('aria-label', 'Open Get Started overview');
+
+			function openHome(event) {
+				event.preventDefault();
+				event.stopPropagation();
+				location.href = getLocalePrefix() + '/get-started/';
+			}
+
+			firstGroup.addEventListener('click', openHome);
+			firstGroup.addEventListener('keydown', function (event) {
+				if (event.key !== 'Enter' && event.key !== ' ') return;
+				openHome(event);
+			});
+		}
+
 		function scan() {
 			scanSidebarToggle();
+			bindSidebarGroupHome();
 			syncScrollClass();
 			if (!document.documentElement.classList.contains('t0-table-scroll')) return;
 			document.querySelectorAll('.sl-markdown-content table').forEach(bindTable);

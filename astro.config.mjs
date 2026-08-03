@@ -131,8 +131,8 @@ export default defineConfig({
 							slug: 'using-tier0/monitor-uns-with-agent',
 						},
 						{
-							label: 'Building Apps on UNS',
-							translations: { 'zh-CN': '在 UNS 上构建应用', ja: 'UNS 上でアプリを構築', es: 'Crear apps sobre UNS', ko: 'UNS 기반 앱 구축' },
+							label: 'Building Apps on Factory Data',
+							translations: { 'zh-CN': '基于工厂数据构建应用', ja: '工場データでアプリを構築', es: 'Crear apps con datos de fábrica', ko: '공장 데이터로 앱 구축하기' },
 							slug: 'using-tier0/build-apps',
 						},
 						{

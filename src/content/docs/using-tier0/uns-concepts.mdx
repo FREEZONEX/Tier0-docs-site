@@ -15,20 +15,46 @@ In Tier0, the UNS (Unified Namespace) is organized around three parts: **Model**
     - **Action/State**: JSONB (PostgreSQL)
     - **Metric**: Real-time data (TSDB)
 
-```text
-Data Source / Consumer
-        ^
-        | MQTT / HTTP API
-        v
-Unified Namespace
-+-- Broker
-|   +-- Model
-|       +-- Metric  -> TSDB
-|       +-- State   -> JSONB
-|       +-- Action  -> JSONB
-+-- Storage
-    +-- TSDB   stores high-frequency Metric data
-    +-- JSONB  stores State and Action payloads
+```mermaid
+flowchart TB
+  subgraph dataFlow["Data source to UNS"]
+    direction TB
+    source["Data Source / Consumer"]
+    broker["Broker<br/>receives and publishes data"]
+    model["Model<br/>defines paths, topics, and payloads"]
+    storage["Storage<br/>persists incoming and outgoing data"]
+
+    source <-->|"MQTT / HTTP API"| broker
+    broker --> model
+    model --> storage
+  end
+
+  subgraph modelTypes["Model types"]
+    direction LR
+    metric["Metric"] --> metricData["High-frequency numeric data"]
+    state["State"] --> stateData["Current facts or status"]
+    action["Action"] --> actionData["Commands or requested operations"]
+  end
+
+  subgraph storageTypes["Storage types"]
+    direction LR
+    tsdb["TSDB"] --> tsdbUse["Time-series storage for Metric history"]
+    jsonb["JSONB"] --> jsonbUse["Flexible document storage for State and Action payloads"]
+  end
+
+  metric -.-> tsdb
+  state -.-> jsonb
+  action -.-> jsonb
+
+  classDef t0source fill:#F7FAF2,stroke:#D8E6B8,stroke-width:1px,color:#2A2A2A
+  classDef t0uns fill:#EAF8C8,stroke:#A6CF38,stroke-width:1px,color:#171717
+  classDef t0data fill:#EEF4FF,stroke:#B7C7E8,stroke-width:1px,color:#1F2937
+  classDef t0storage fill:#F4F1FF,stroke:#C7B7E8,stroke-width:1px,color:#1F2937
+
+  class source t0source
+  class broker,model,metric,state,action t0uns
+  class metricData,stateData,actionData t0data
+  class storage,tsdb,jsonb,tsdbUse,jsonbUse t0storage
 ```
 ## Model
 :::tip[Which guide should I follow when building a model?]

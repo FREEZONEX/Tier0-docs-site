@@ -649,6 +649,20 @@ site-search button[data-close-modal]:hover {
 	color: #878787;
 }
 
+#starlight__sidebar .t0-sidebar-group-home-link {
+	cursor: pointer;
+	border-radius: 4px;
+}
+
+#starlight__sidebar .t0-sidebar-group-home-link:hover .large {
+	color: #5f9900;
+}
+
+#starlight__sidebar .t0-sidebar-group-home-link:focus-visible {
+	outline: 2px solid #73b200;
+	outline-offset: 2px;
+}
+
 #starlight__sidebar details ul {
 	margin-inline-start: 8px;
 }

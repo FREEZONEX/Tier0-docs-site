@@ -1,59 +1,91 @@
 ---
-title: UNS에서 앱 구축
-description: UNS 데이터와 Event Flow 로직을 사용해 Tier0에서 컨테이너 기반 앱을 배포합니다.
+title: 공장 데이터로 앱 구축하기
+description: AI 대화를 통해 공장 데이터, 접근 제어, 버전 관리, 배포 기능을 갖춘 산업용 앱을 구축합니다.
 editions: [cloud]
 sidebar:
   order: 6
 ---
 import { Steps } from '@astrojs/starlight/components';
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
 
-## Tier0 App이란
+AI 대화를 통해 맞춤형 산업용 애플리케이션을 구축합니다. 애플리케이션은 공장 데이터를 사용할 수 있으며 역할 기반 접근 제어, 버전 관리, 배포 같은 기능을 기본으로 포함할 수 있습니다.
 
-Tier0 애플리케이션은 다음과 같은 특징을 가집니다.
-- **Docker Container**입니다.
-- **App Builder**와의 대화로 생성되며, 별도의 프로그래밍이 필요하지 않습니다.
-- 이미 **UNS**에 있는 산업 데이터를 사용하고, 결과를 다시 **UNS**에 쓸 수 있습니다.
-- **Event Flow**를 사용해 내부 로직을 구현할 수 있습니다.
+## Tier0 앱 구축하기
+애플리케이션을 구축하기 전에 project 를 생성합니다.
 
-## Tier0 App 배포 방법
+- Project 는 애플리케이션을 분류하고 애플리케이션 접근 권한을 관리하는 데 사용됩니다.
+- 하나의 project 안에 있는 애플리케이션들은 복잡한 시스템의 관련 기능 모듈처럼 구성될 수 있습니다.
+- 각 project 의 데이터는 다른 project 의 데이터와 독립적입니다.
 
-### Tier0 App을 처음부터 구축하기
-<Steps>
-1. Tier0에 로그인한 뒤 **App** > **Projects**로 이동해 애플리케이션용 project를 만듭니다.
-2. project 안에서 애플리케이션을 만들면 애플리케이션 구축 페이지로 이동합니다.
-3. 대화창에 애플리케이션 요구사항을 작성합니다.
+### Prompt 작성
+Agent 가 요구 사항에 더 잘 맞는 애플리케이션을 생성할 수 있도록 prompt 에는 ***최소한*** 다음 내용을 포함해야 합니다.
 
-    :::tip[Prompt에 포함할 내용]
-    prompt에 다음 정보를 명확히 포함하세요.
-    - *[uns_model]* UNS model을 데이터 소스로 사용하고, *[uns_model]* UNS model을 write-back 대상으로 사용합니다.
-    - (선택 사항) 데이터 소스를 연결하기 위한 UNS model과 Source Flow flow를 만듭니다.
-    - 이상 알람, 낮은 health score 또는 기타 이벤트를 트리거하기 위한 Event Flow flow를 만듭니다.
-    :::
+- **애플리케이션 목적**: 이 애플리케이션의 목적은 무엇인가요?
+    ```text
+    공장 기술자를 위한 설비 유지보수 애플리케이션을 생성합니다.
+    ```
+- **애플리케이션 데이터**: 애플리케이션은 어떤 데이터를 사용하며, 그 데이터는 어디에 있나요?
 
-4. 애플리케이션 구축을 시작합니다. preview 후 필요한 변경사항을 LLM에게 요청합니다.
-5. **Deploy**를 클릭해 애플리케이션 구축을 완료합니다.
-</Steps>
+    <Tabs>
+    <TabItem label="Platform Plan">
+    [UNS 에 데이터 연결](../connect-data/)을 수행하고 prompt 에 UNS topic 을 명시합니다.
+    ```text
+    이 애플리케이션은 xxx UNS model 의 설비 상태, 알람 기록, 유지보수 이력을 사용해야 합니다.
+    ```
+    </TabItem>
+    <TabItem label="Builder Plan">
+    Agent 는 초기화 중 시작에 필요한 데이터를 자동으로 시뮬레이션합니다.
+    </TabItem>
+    </Tabs>
+- **애플리케이션 기능**: 애플리케이션은 무엇을 해야 하나요?
+    ```text
+    이 애플리케이션은 사용자가 설비 상태를 모니터링하고, 유지보수 요청을 제출하며, 수리 진행 상황을 추적할 수 있어야 합니다.
+    ```
 
-### Template에서 Tier0 App 구축하기
-:::note[Template이 있는 이유]
-- 기존 template은 현재 산업 현장에서 자주 사용되는 애플리케이션입니다.
-- template에서 애플리케이션을 만들면 비슷한 작업을 처음부터 반복하지 않아도 됩니다.
+:::caution[**Builder** 를 사용하는 경우]
+**Builder** plan 은 현재 UNS 를 지원하지 않지만, 시뮬레이션 데이터는 사용할 수 있습니다. 더 구체적인 데이터 통합 요구 사항이 있으면 sales@freezonex.io 로 문의하세요.
 :::
-<Steps>
-1. Tier0에서 **Library**로 이동해 필요한 template을 선택합니다.
-2. template을 애플리케이션 기반으로 사용하고, **Builder**에서 LLM과 자연어 대화로 수정합니다.
-3. 애플리케이션을 배포합니다.
-</Steps>
+:::tip[애플리케이션을 더 빠르게 구축하기]
+일반적인 산업용 애플리케이션 템플릿은 **Library** 에 제공됩니다. 템플릿을 사용하고 그 위에서 기능을 수정하면 애플리케이션을 훨씬 빠르게 구축할 수 있습니다.
+:::
 
-### Tier0 Enterprise에 App 배포하기
-<Steps>
-1. project 안에서 애플리케이션을 찾습니다.
-2. 애플리케이션에 들어가 **Active** version의 **...** icon을 클릭한 뒤 **Download ZIP**을 선택합니다.
-3. Tier0 Enterprise에 로그인하고 **Project**로 이동해 애플리케이션용 project를 만듭니다.
-4. **Import App**을 클릭하고 ZIP package를 업로드합니다.
-</Steps>
+### 접근 제어
+역할 기반 접근 제어는 project 와 애플리케이션 모두에 적용됩니다.
 
-## 다음 단계
+- Project roles
+    - **Can Edit**: project 삭제를 제외한 전체 접근 권한입니다.
+    - **Can Launch**: **Launchpad** 에서 project 를 보고 허용된 애플리케이션만 사용할 수 있습니다.
+- Application roles
+    - 애플리케이션의 비즈니스 로직에 따라 agent 가 자동 생성합니다.
+    - Project 멤버로 추가된 후에만 할당할 수 있습니다.
 
-- [UNS 데이터 분석](../analyze-data/) - Marimo Notebook과 Python으로 UNS 데이터를 분석합니다.
-- [Best practice: industrial protocol 연결](../../best-practice/protocol-connections/)
+:::tip[직접 역할을 지정하려는 경우]
+Prompt 에 역할과 권한 범위를 명시하세요. Agent 는 이를 자동 생성된 역할과 비교합니다. 지정한 역할이 생성된 역할과 충돌하면 agent 가 확인을 요청합니다.
+:::
+:::caution[애플리케이션 역할 할당은 필수입니다]
+애플리케이션에 접근하려면 애플리케이션 역할이 반드시 할당되어야 합니다. Project owner 라도 애플리케이션 역할이 없으면 **Launchpad** 에서 해당 애플리케이션을 볼 수 없습니다.
+:::
+
+### 버전 관리
+Tier0 에서 애플리케이션은 3가지 상태로 존재합니다.
+
+- **Draft**: 애플리케이션의 최신 상태입니다. 배포하지 않으면 이 버전의 변경 사항은 다른 버전에 영향을 주지 않습니다.
+- **Snapshot**: snapshot 생성 시점의 애플리케이션을 저장합니다. Snapshot 버전을 배포하면 현재 **Active** 버전이 교체됩니다.
+- **Active**: 현재 온라인으로 실행 중인 애플리케이션 버전입니다.
+
+:::tip[버전 전환]
+- Draft 를 배포하면 active 애플리케이션이 더 새로운 버전으로 업데이트됩니다.
+- Snapshot 을 배포하면 active 애플리케이션이 이전 버전으로 롤백됩니다.
+:::
+
+### 외부로 내보내기
+애플리케이션이 준비되면 **Preview** 페이지에서 외부 타사 환경 또는 Tier0 Enterprise 용으로 내보낼 수 있습니다.
+
+- **Download Source Code**: 2차 개발을 위해 애플리케이션 소스 코드를 내보냅니다.
+- **Export Bundle**: **Tier0 Enterprise** 에서 로컬로 가져오기 위한 전용 내보내기입니다.
+
+## 다음
+
+- [UNS 데이터 분석](../analyze-data/) - Marimo Notebook 과 Python 으로 UNS 데이터를 분석합니다.
+- [베스트 프랙티스: 산업 프로토콜 연결](../../best-practice/protocol-connections/) - 일반적인 데이터 소스 연결 예시입니다.

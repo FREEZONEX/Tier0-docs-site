@@ -6,6 +6,7 @@ import Search from 'virtual:starlight/components/Search';
 import SiteTitle from 'virtual:starlight/components/SiteTitle';
 import SocialIcons from 'virtual:starlight/components/SocialIcons';
 import ThemeSelect from 'virtual:starlight/components/ThemeSelect';
+import DocChatBot from './DocChatBot.astro';
 
 /**
  * Render the `Search` component if Pagefind is enabled or the default search component has been overridden.
@@ -66,3 +67,4 @@ const { hasSidebar } = Astro.locals.starlightRoute;
 		<LanguageSelect />
 	</div>
 </div>
+<DocChatBot />

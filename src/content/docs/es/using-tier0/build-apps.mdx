@@ -1,48 +1,91 @@
 ---
-title: Crear apps sobre UNS
-description: Un container es una app; despliega containers completos en Tier0 Edge y Enterprise, y construye lógica con Event Flow.
+title: Crear apps con datos de fábrica
+description: Crea aplicaciones industriales mediante conversaciones con IA, usando datos de fábrica, control de acceso, gestión de versiones y despliegue.
 editions: [cloud]
 sidebar:
-  order: 4
+  order: 6
 ---
 import { Steps } from '@astrojs/starlight/components';
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
 
-## Qué es una app de Tier0
+Crea aplicaciones industriales personalizadas mediante conversaciones con IA. Las aplicaciones pueden usar datos de fábrica e incluir capacidades integradas como control de acceso basado en roles, gestión de versiones y despliegue.
 
-Una aplicación Tier0 tiene las siguientes características:
-- Es un **Docker Container**.
-- Se genera a partir de la conversación que tienes con **App Builder**, sin código y sin necesidad de programación.
-- Se alimenta de datos industriales ya existentes en **UNS** y puede *escribir de vuelta* en **UNS**.
-- Puede usar **Event Flow** para implementar lógica.
+## Crear una app de Tier0
+Antes de crear una aplicación, crea un project.
 
-## Cómo desplegar una app de Tier0
+- El project se usa para clasificar aplicaciones y gestionar el control de acceso.
+- Las aplicaciones dentro de un mismo project pueden funcionar como módulos relacionados de un sistema complejo.
+- Los datos de cada project son independientes de los datos de otros projects.
 
-### Crear una app de Tier0
-<Steps>
-1. Inicia sesión en Tier0, ve a **App** > **Projects** y crea un project para la aplicación.
-2. Crea una aplicación dentro del project y serás redirigido a la página de construcción de la aplicación.
-3. Escribe los requisitos de la aplicación en el diálogo.
-</Steps>
-:::tip[Qué incluir en el prompt]
-Asegúrate de indicar la siguiente información en el prompt:
-- Usar el modelo UNS *[uns_model]* como fuente de datos y *[uns_model]* como destino de escritura de retorno.
-- (Opcional) Crear modelo UNS y flows en Source Flow para conectar fuentes de datos.
-- Crear flows en Event Flow para activar alarmas de anomalía/health scores bajos/otros eventos.
+### Escribir el prompt
+Para que el agent genere una aplicación que se ajuste mejor a tus requisitos, asegúrate de que el prompt cubra ***al menos*** los siguientes aspectos.
+
+- **Propósito de la aplicación**: ¿Cuál es el objetivo de la aplicación?
+    ```text
+    Crea una aplicación de mantenimiento de equipos para técnicos de fábrica.
+    ```
+- **Datos de la aplicación**: ¿Qué datos usa la aplicación y dónde están?
+
+    <Tabs>
+    <TabItem label="Platform Plan">
+    [Conecta datos a UNS](../connect-data/) e indica el UNS topic en el prompt.
+    ```text
+    La aplicación debe usar el estado de los equipos, los registros de alarmas y el historial de mantenimiento del modelo UNS xxx.
+    ```
+    </TabItem>
+    <TabItem label="Builder Plan">
+    El agent simulará automáticamente los datos necesarios para el arranque durante la inicialización.
+    </TabItem>
+    </Tabs>
+- **Función de la aplicación**: ¿Qué debe hacer la aplicación?
+    ```text
+    La aplicación debe permitir a los usuarios supervisar el estado de los equipos, enviar solicitudes de mantenimiento y seguir el progreso de las reparaciones.
+    ```
+
+:::caution[Cuando estás en **Builder**]
+El plan **Builder** actualmente no admite UNS, pero los datos simulados están disponibles. Para necesidades de integración de datos más específicas, contacta con nuestro equipo en sales@freezonex.io.
 :::
-<Steps>
-4. Comienza a construir la aplicación y cambia lo necesario hablando con el LLM durante la vista previa.
-5. Haz clic en **Deploy** para terminar la construcción de la aplicación.
-</Steps>
+:::tip[Para crear aplicaciones más rápido]
+Las plantillas de aplicaciones industriales comunes están disponibles en **Library**. Puedes usar una plantilla y modificar sus funciones para crear una aplicación mucho más rápido.
+:::
 
-### Desplegar app en Tier0 Enterprise
-<Steps>
-1. Encuentra la aplicación dentro de tu project.
-2. Accede a ella y haz clic en el icono **...** de la versión **Active** para **Download ZIP**.
-3. Inicia sesión en Tier0 Enterprise, ve a **Project** y crea un project para la aplicación.
-4. Haz clic en **Import App** y sube el paquete ZIP.
-</Steps>
+### Control de acceso
+El control de acceso basado en roles se aplica tanto al project como a la aplicación.
+
+- Roles del project
+    - **Can Edit**: Acceso completo al project, excepto eliminarlo.
+    - **Can Launch**: Solo puede ver el project en **Launchpad** y usar las aplicaciones permitidas.
+- Roles de la aplicación
+    - El agent los genera automáticamente según la lógica de negocio de la aplicación.
+    - Solo pueden asignarse después de añadir al usuario como miembro del project.
+
+:::tip[Si quieres asignar tus propios roles]
+Indica los roles y el alcance de permisos en el prompt. El agent los comparará con los roles generados automáticamente. Si tu rol entra en conflicto con el rol generado, el agent te pedirá confirmación.
+:::
+:::caution[La asignación de roles de aplicación es obligatoria]
+Para acceder a una aplicación, debes tener roles de aplicación asignados. Incluso el project owner no puede ver la aplicación en **Launchpad** sin roles de aplicación.
+:::
+
+### Gestión de versiones
+Las aplicaciones existen en Tier0 en 3 estados.
+
+- **Draft**: El estado más reciente de la aplicación. Los cambios en esta versión no afectan a otras versiones si no se despliega.
+- **Snapshot**: Guarda la aplicación en el momento de crear el snapshot. Desplegar una versión snapshot reemplaza la versión **Active** actual.
+- **Active**: La versión actual de la aplicación en línea.
+
+:::tip[Cambio de versión]
+- Al desplegar un draft, la aplicación active se actualiza a una versión más nueva.
+- Al desplegar un snapshot, la aplicación active vuelve a una versión anterior.
+:::
+
+### Exportar a entornos externos
+Cuando la aplicación esté lista, se puede exportar desde la página **Preview** tanto para terceros externos como para Tier0 Enterprise.
+
+- **Download Source Code**: Exporta el código fuente de la aplicación para desarrollo secundario.
+- **Export Bundle**: Exportación específica para importación local en **Tier0 Enterprise**.
 
 ## Siguiente
 
 - [Analizar datos UNS](../analyze-data/) - Analiza datos UNS con Marimo Notebook y Python.
-- [Mejor práctica: conectar protocolos industriales](../../best-practice/protocol-connections/)
+- [Mejor práctica: conectar protocolos industriales](../../best-practice/protocol-connections/) - Ejemplos de conexión de fuentes de datos comunes.
