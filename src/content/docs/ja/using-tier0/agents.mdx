@@ -1,36 +1,37 @@
 ---
 title: Agents で Tier0 を操作する
-description: Tier0 Skill でできることと、そのインストール方法。
+description: Tier0 Skill でできることとインストール方法。
 editions: [edge, cloud, enterprise]
 sidebar:
-  order: 6
+  order: 8
 ---
 
 import { Steps } from '@astrojs/starlight/components';
 import { Tabs, TabItem } from '@astrojs/starlight/components';
 
-Tier0 は、agents が操作するための skills と CLI コマンドを提供します。
+Tier0 は、agents が Tier0 を操作するための skills と CLI コマンドを提供します。
 
 ## Tier0 Skills のインストール
 
 > Required CLI version: `v0.4.6+`
 
-環境に合うインストーラーを選択してください。
+環境に合ったインストール方法を選択してください。
 
 ### Node.js がある場合
 
-Node.js 16 以降が利用できる場合は、`npx` を使って CLI と skills をインストールします。
+Node.js 16 以降を利用できる場合は、`npx` で CLI と skills をインストールします。
 
 ```bash
 npx @tier0/cli@latest
 ```
 
-これはフルインストーラーを実行し、次の 2 つを行います。
+このコマンドはフルインストーラーを実行し、次の 2 つを行います。
 
 - `tier0` CLI binary を `~/.tier0/bin/` にインストールします。
 - `FREEZONEX/Tier0-skill` から Cursor/Claude Agent Skills をインストールします。
-:::tip[Agent Skills の登録ステップが失敗した場合]
-Agent Skills の登録ステップが失敗しても、CLI のインストールには影響しません。skills installer を手動で実行してください。
+
+:::tip[Agent Skill の登録が失敗した場合]
+Agent Skill の登録が失敗しても、CLI のインストールには影響しません。skills installer を手動で実行してください。
 
 ```bash
 npx skills add FREEZONEX/Tier0-skill
@@ -41,43 +42,39 @@ npx skills add FREEZONEX/Tier0-skill
 
 <Steps>
 1. `tier0` CLI binary をインストールします。
-</Steps>
+    <Tabs syncKey="tier0-cli-binary-install">
+      <TabItem label="curl">
 
-<Tabs syncKey="tier0-cli-binary-install">
-  <TabItem label="curl">
+        ```bash
+        curl -fsSL https://raw.githubusercontent.com/FREEZONEX/Tier0-cli/main/install.sh | bash
+        ```
 
-    ```bash
-    curl -fsSL https://raw.githubusercontent.com/FREEZONEX/Tier0-cli/main/install.sh | bash
-    ```
+      </TabItem>
+      <TabItem label="iwr">
 
-  </TabItem>
-  <TabItem label="iwr">
+        ```powershell
+        iwr https://raw.githubusercontent.com/FREEZONEX/Tier0-cli/main/install.ps1 | iex
+        ```
 
-    ```powershell
-    iwr https://raw.githubusercontent.com/FREEZONEX/Tier0-cli/main/install.ps1 | iex
-    ```
-
-  </TabItem>
-</Tabs>
-
-<Steps>
+      </TabItem>
+    </Tabs>
 2. Agent Skills をインストールします。
-
+    ```bash
+    tier0 skills update
+    ```
 </Steps>
-
-```bash
-tier0 skills update
-```
 
 ## Tier0 Skill でできること
 
-Tier0 Skills は、agents が適切な CLI コマンドを選び、対応する reference を読み、`tier0` CLI を通じて Tier0 を操作するための構造化された方法を提供します。
+Tier0 Skills は、agents が適切な CLI コマンドを選び、対応する reference を読み、`tier0` CLI で Tier0 を操作するための構造化された方法を提供します。
 
 ### 操作インスタンスを設定する
+
 :::note
 Cloud はデフォルトで `https://tier0.dev` を使用するため、base URL の設定は不要です。
 :::
-プライベートデプロイでは、ログイン前に base URL を設定する必要があります。設定後、以降のコマンドはすべてそのインスタンスで実行されます。
+
+Private deployments では、ログイン前に base URL を設定する必要があります。設定後、以降のコマンドはすべてそのインスタンスで実行されます。
 
 ```bash
 tier0 config --base-url https://your-tier0.example.com
@@ -86,10 +83,10 @@ tier0 config --base-url https://your-tier0.example.com
 ### ログイン
 
 <Tabs syncKey="tier0-login-method">
-  <TabItem label="API key あり">
+  <TabItem label="API key がある場合">
 
   <Steps>
-  1. 操作インスタンスに API key を設定します。
+  1. 操作インスタンスの API key を設定します。
 
       ```bash
       tier0 config --api-key <api-key>
@@ -102,7 +99,7 @@ tier0 config --base-url https://your-tier0.example.com
   </Steps>
 
   </TabItem>
-  <TabItem label="API key なし">
+  <TabItem label="API key がない場合">
 
   <Steps>
   1. ブラウザログインを開始します。
@@ -111,7 +108,7 @@ tier0 config --base-url https://your-tier0.example.com
       tier0 login --no-wait --json
       ```
   2. 返された `verification_url` にアクセスし、ブラウザで認証を完了します。
-  3. 返された `setup_code` でログイン結果をポーリングします。
+  3. 返された `setup_code` でログイン結果を取得します。
       ```bash
       tier0 login --setup-code <setup_code>
       ```
@@ -120,7 +117,7 @@ tier0 config --base-url https://your-tier0.example.com
 </Tabs>
 
 :::caution[重要]
-API key を設定する前、またはブラウザログインを開始する前に、`config` を実行して操作インスタンスを設定してください。そうしないと、CLI が誤ったインスタンスを操作する可能性があります。
+API key を設定する前、またはブラウザログインを開始する前に、`config` で操作インスタンスを設定してください。そうしないと、CLI が誤ったインスタンスを操作する可能性があります。
 :::
 
 ## Tier0 Skills のアンインストール
@@ -129,13 +126,13 @@ API key を設定する前、またはブラウザログインを開始する前
 # ローカル設定を残したまま Tier0 CLI を削除します。
 npx @tier0/cli@latest uninstall
 
-# Tier0 CLI を削除し、ローカル設定、認証情報、skills、キャッシュも削除します。
+# Tier0 CLI を削除し、ローカル設定、認証情報、skills、cache も削除します。
 npx @tier0/cli@latest uninstall --purge
 ```
 
-## Skill リファレンス
+## Skill Reference
 
-[Tier0 Skill ??????](../../reference/tier0-skill/) には、サポートされる操作対象、一般的なタスク、対応する CLI コマンドが一覧化されています。
+[Tier0 Skill Reference](../../reference/skill-reference/) には、サポートされる操作対象、一般的なタスク、対応する CLI コマンドが一覧化されています。
 
 :::tip[agent に repo を読ませる]
 コマンドを実行する前に、agent に [Tier0 Skill repo](https://github.com/FREEZONEX/Tier0-skill) を読ませてください。

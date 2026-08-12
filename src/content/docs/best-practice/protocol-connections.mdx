@@ -15,15 +15,11 @@ This section uses common data source types, including OPC UA, Modbus, and APIs, 
 ### Configuring Data Flow
 
 <Steps>
-1. Log in to Tier0, go to **Flow** and create a new **Source Flow**.
-2. Add `inject`, `OPC UA Client` and `mqtt out` nodes in the flow.
-3. Connect them in order and double-click each node to configure the details.
+1. In a new **Source Flow**, add `inject`, `OPC UA Client` and `mqtt out` nodes.
+2. Connect them in order and configure their details.
 </Steps>
 - `inject`
-    <Steps>
-    1. Click **add** at the lower-left corner to add a property entry.
-    2. Set the properties to be the following items:
-
+    Add a property entry and set the properties to the following items:
         ```json
         {
           "msg.payload": "[
@@ -42,7 +38,6 @@ This section uses common data source types, including OPC UA, Modbus, and APIs, 
           "msg.topic": "multiple"
         }
         ```
-    </Steps>
 - `OPC UA Client`
     ```json
     "Endpoint": "<OPC UA server address and port>", //e.g. opc.tcp://127.0.0.1:4850
@@ -54,9 +49,6 @@ This section uses common data source types, including OPC UA, Modbus, and APIs, 
     "Server": "<embedded UNS broker>", //same name as the flow
     "Topic": "<UNS model>",
     ```
-<Steps>
-4. Deploy and trigger the flow.
-</Steps>
 
 ### Flow Reference
 
@@ -214,9 +206,7 @@ This section uses common data source types, including OPC UA, Modbus, and APIs, 
 
 ## Modbus
 ### Configuring Data Flow
-<Steps>
-1. In the flow, add `modbus-read` and `mqtt out` nodes.
-2. Double-click the nodes, and configure the required information.
+In the flow, add `modbus-read` and `mqtt out` nodes and configure the required information.
     - `modbus-read`
         - **Settings**
           - **FC**: Function code that specifies the Modbus action, e.g., FC 3 = Read Holding Registers.
@@ -232,8 +222,6 @@ This section uses common data source types, including OPC UA, Modbus, and APIs, 
         "Server": "<embedded UNS broker>", //same name as the flow
         "Topic": "<UNS model>",
         ```
-3. Deploy and trigger the flow.
-</Steps>
 
 ### Flow Reference
 
@@ -396,9 +384,7 @@ This section uses common data source types, including OPC UA, Modbus, and APIs, 
 
 ## API
 ### Configuring Data Flow
-<Steps>
-1. In the flow, add `inject`, `http request` and `mqtt out` nodes.
-2. Double-click the nodes, and configure the required information.
+In the flow, add `inject`, `http request` and `mqtt out` nodes and configure the required information.
     - `http request`
         ```json
         "Method": "<API method>",
@@ -411,8 +397,6 @@ This section uses common data source types, including OPC UA, Modbus, and APIs, 
         "Server": "<embedded UNS broker>", //same name as the flow
         "Topic": "<UNS model>",
         ```
-3. Deploy and trigger the flow.
-</Steps>
 
 ### Flow Reference
 <details>
@@ -518,7 +502,7 @@ This section uses common data source types, including OPC UA, Modbus, and APIs, 
 </details>
 
 :::tip[Other things you might want to know]
-- You can drag a `function` node to clean the data as needed before publishing to **UNS**.
+- A `function` node is often used to clean the data before publishing to **UNS**.
 - A `debug` node can be used to check the data on the spot.
 - For node details, see [Node-RED flows](https://flows.nodered.org/).
 :::

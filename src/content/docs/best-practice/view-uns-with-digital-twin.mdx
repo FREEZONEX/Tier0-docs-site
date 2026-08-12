@@ -1,5 +1,5 @@
 ---
-title: Display UNS Data with Digital Twin
+title: Displaying Factory Data with Digital Twin
 description: View UNS data in 3D models and scenes in real time.
 editions: [cloud, enterprise]
 sidebar:
@@ -8,9 +8,7 @@ sidebar:
 import { Steps } from '@astrojs/starlight/components';
 import { Tabs, TabItem } from '@astrojs/starlight/components';
 
-The digital twin feature in Tier0 enables you to view live UNS data on 3D models in lifelike scenes.
-
-## Workshop Digital Twin
+The digital twin feature in Tier0 is for you to view live UNS data on 3D models in lifelike scenes.
 In this section, we bring a workshop to life. It contains the following machines:
 - 2 lathes
 - 1 robot arm working between these lathes
@@ -21,9 +19,9 @@ In this section, we bring a workshop to life. It contains the following machines
 - 1 AGV
 
 ## Collecting Data from Workshop
-Publish all data to **UNS**, including data that controls machine movements and indicates machine status and the workshop environment.
+Collect all data to **UNS**, including data that controls machine movements and indicates machine status and the workshop environment.
 <Steps>
-1. Log in to Tier0, go to **UNS** and build the data models.
+1. Build data models in **UNS**.
         <details className="notebook-cell">
         <summary>Show UNS model JSON</summary>
 
@@ -441,7 +439,7 @@ Publish all data to **UNS**, including data that controls machine movements and 
         }
         ```
         </details>
-2. Go to **Flows**, create a **Source Flow** to connect data sources to UNS models.
+2. Use a **Source Flow** to connect data sources to UNS models.
         - Robot Arm
         <details className="notebook-cell">
         <summary>Show Robot Arm flow JSON</summary>
@@ -825,7 +823,7 @@ Publish all data to **UNS**, including data that controls machine movements and 
         <details className="notebook-cell">
         <summary>Show Lathe 1 flow JSON</summary>
 
-        ```
+        ```json
         [
             {
                 "id": "88fed08889390f28",
@@ -1221,41 +1219,9 @@ Publish all data to **UNS**, including data that controls machine movements and 
         </details>
 </Steps>
 
-## Mapping Data to 3D Models
-<Steps>
-1. In Tier0, go to **Model**.
-2. Upload a model, select model nodes to which you want to map UNS data.
-3. Create an instance, select the UNS topic for the node mapping, and set the real-world model height.
-4. Bind the topic fields with the selected model nodes on all axes of **Position** and **Rotation** as needed.
-5. Under **Data Tagging**, add static tags to the model and bind UNS data to them to display static information.
-
-    :::tip
-    Create multiple instances for one model to simulate a line of identical machines with different data.
-    :::
-
-6. Add other models necessary for your workshop.
-</Steps>
-
 ## Visualizing Workshop Scene
 <Steps>
-1. In Tier0, go to **Scene** and add a new scene.
-2. Add all necessary instances that exist in the workshop from **Instance Library**.
-3. Move instance models to their positions in the workshop.
-
-    :::tip[How to move models to the correct position]
-    - Use the tools at the top to move, scale, and rotate the model, and to change the viewing perspective and coordinate position.
-    - Check the **Object** on the right, which displays the bound UNS model, to help confirm the model position.
-    :::
-
-4. Select a model, and set its viewport and lighting.
-5. Do the same for all models, once the settings are complete, save the scene for future display.
-</Steps>
-
-## External Share
-<Steps>
-1. Go to **Model**, select a configured model in the workshop.
-2. Select an existing instance, generate a QR code.
-3. Select a sharing mode, and send the code to external parties.
-        - **Share Model**: Generates a Tier0 platform link where the model with live UNS data is displayed.
-        - **Share Scene**: Generates a Tier0 platform link where the model and its scene, with live UNS data and environment settings, are displayed.
+1. In **Model**, import models exist in the workshop, map UNS data to and create instances for them.
+2. Go to **Scene** and add instances in the workshop to a scene from **Instance Library**.
+3. Move models to their positions in the workshop and set environment lighting and other details.
 </Steps>

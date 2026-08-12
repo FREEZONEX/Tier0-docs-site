@@ -5,6 +5,15 @@ import Default from '@astrojs/starlight/components/Head.astro';
 <Default {...Astro.props} />
 <meta name="algolia-site-verification" content="958EE07D47EDCCC6" />
 <link rel="alternate" type="text/plain" href="/llms.txt" title="llms.txt" />
+<!-- Google tag (gtag.js) -->
+<script is:inline async src="https://www.googletagmanager.com/gtag/js?id=G-8CGBWXXKGJ"></script>
+<script is:inline>
+	window.dataLayer = window.dataLayer || [];
+	function gtag(){dataLayer.push(arguments);}
+	gtag('js', new Date());
+
+	gtag('config', 'G-8CGBWXXKGJ');
+</script>
 {/* Apply sidebar collapse before paint to avoid layout flash. */}
 <script is:inline>
 	(function () {

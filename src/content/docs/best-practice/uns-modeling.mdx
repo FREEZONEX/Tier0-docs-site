@@ -1,5 +1,5 @@
 ﻿---
-title: UNS Modeling
+title: Modeling Factory Data
 description: "The Demo UNS design: avoiding topic explosion and payload structure best practices."
 editions: [edge, cloud, enterprise]
 sidebar:
@@ -8,6 +8,7 @@ sidebar:
 import { Steps } from '@astrojs/starlight/components';
 import { Tabs, TabItem } from '@astrojs/starlight/components';
 
+Data in your factory, either machine data sending from sensors, or order data exiting in ERP/MES, can all be modeled into understandable tree structure in Tier0.
 
 ## How the Demo UNS is Structured
 :::tip[What needs to be done first]
@@ -19,18 +20,7 @@ Before modeling data, answer the following questions.
 
 ### Physical Data
 
-Industrial data from machines and equipment with physical locations is modeled based on the ISA-95 standard.
-
-#### ISA-95 Equipment Hierarchy
-The ISA-95 Equipment Hierarchy outlines how physical assets and control systems are structured within an organization.
-It is broken into the following levels:
-- **Enterprise**: The top level, representing the entire organization. This includes overall business processes and decision-making entities, typically supported by ERP systems.  
-- **Site**: Represents a specific geographic location or facility. Each site can have its own management systems and local production control. 
-- **Area**: An operational division within a site, often a functional area such as packaging, assembly, or warehousing. 
-- **Process Cell**: The basic unit of manufacturing within an area. It encompasses all the equipment required to produce a specific product or perform a specific function. 
-- **Unit**: A distinct part of the process cell, responsible for a specific function such as mixing, heating, or assembling. 
-- **Equipment Module**: A modular piece of equipment that performs a specific task within a unit. For example, in a mixing unit, the module could be a heating element.  
-- **Control Module**: The lowest level, representing individual devices or controllers such as sensors, pumps, actuators, or PID control loops that handle direct control of physical processes.
+Industrial data from machines and equipment with physical locations is modeled based on the [ISA-95 standard](../../reference/isa-95-equipment-hierarchy/).
 
 #### Demo Model
 <Tabs syncKey="demo-uns-model">
@@ -420,7 +410,7 @@ Factory / Business Domain / Business Object / Topic Type / Topic
     | ACTION | Commands for external executors | Start equipment, stop equipment, reset alarm, request work order dispatch |
 
 #### Demo Model
-<Tabs syncKey="business-data-model">
+<Tabs syncKey="demo-uns-model">
   <TabItem label="Tree Structure">
 
 ```text
@@ -671,127 +661,6 @@ DemoFactory
   </TabItem>
 </Tabs>
 
-## How to Avoid Topic Explosion
-Tier0 uses three fixed topic types, `Metric`, `Action`, and `State`, to avoid topic explosion. 
-
-- **Use `Metric` for high-frequency real-time data**
-
-  Put high-frequency measurements and telemetry under `Metric` instead of expanding the namespace for every signal detail.
-
-  <Tabs syncKey="topic-explosion-metric">
-    <TabItem label="Bad">
-
-  ```text
-  Factory_A
-  └── SMT_Line_1
-      └── Machine_001
-          ├── Temperature_Value
-          ├── Temperature_Unit
-          ├── Temperature_Status
-          └── Speed_Value
-  ```
-
-    </TabItem>
-    <TabItem label="Better">
-
-  ```text
-  Factory_A
-  └── SMT_Line_1
-      └── Metric
-          └── Machine_001
-  ```
-
-  Topic payload:
-
-  ```json
-  {
-    "temperature": 80,
-    "temperature_unit": "Celsius",
-    "temperature_status": "Normal",
-    "speed": 300
-  }
-  ```
-
-    </TabItem>
-  </Tabs>
-
-- **Use `State` for low-frequency status data**
-
-  Put low-frequency status, snapshots, and current business state under `State`. Avoid creating a new topic for every changing entity such as jobs, batches, or orders.
-
-  <Tabs syncKey="topic-explosion-state">
-    <TabItem label="Bad">
-
-  ```text
-  Factory_A
-  └── SMT_Line_1
-      └── State
-          ├── Job_001
-          ├── Job_002
-          └── Job_003
-  ```
-
-    </TabItem>
-    <TabItem label="Better">
-
-  ```text
-  Factory_A
-  └── SMT_Line_1
-      └── State
-          └── Machine_001
-  ```
-
-  Topic payload:
-
-  ```json
-  {
-    "current_job": "Job_003",
-    "product": "Product_A"
-  }
-  ```
-
-    </TabItem>
-  </Tabs>
-
-- **Use `Action` for low-frequency action data**
-
-  Put commands, requests, and operator actions under `Action`. Keep action inputs as fields on a topic rather than creating one topic per parameter.
-
-  <Tabs syncKey="topic-explosion-action">
-    <TabItem label="Bad">
-
-  ```text
-  Factory_A
-  └── SMT_Line_1
-      └── Machine_001
-          ├── Start_Command
-          ├── Target_Height
-          └── Light_On
-  ```
-
-    </TabItem>
-    <TabItem label="Better">
-
-  ```text
-  Factory_A
-  └── SMT_Line_1
-      └── Action
-          └── StartJob
-  ```
-
-  Topic payload:
-
-  ```json
-  {
-    "target_height": 12.5,
-    "light_on": true,
-    "requested_by": "operator"
-  }
-  ```
-
-    </TabItem>
-  </Tabs>
-
 ## Payload Structure
 
 Data to be consumed and written back must both be considered when structuring the topic payload.
@@ -824,7 +693,6 @@ Data to be consumed and written back must both be considered when structuring th
 
     </TabItem>
   </Tabs>
-
 - **Metric**
 
   Metric payloads automatically include `_timestamp`, which records when the data is stored in the Tier0 database, and `_quality`, which represents data quality.
@@ -901,6 +769,126 @@ Data to be consumed and written back must both be considered when structuring th
     "reason": "In production",
     "updated_at": "2026-07-10T10:00:00Z",
     "_timestamp": "2026-07-10T10:00:00Z"
+  }
+  ```
+
+    </TabItem>
+  </Tabs>
+## How to Avoid Topic Explosion
+Tier0 uses three fixed topic types, `Metric`, `Action`, and `State`, to avoid topic explosion.
+
+- **Use `Metric` for high-frequency real-time data**
+
+  Put high-frequency measurements and telemetry under `Metric` instead of expanding the namespace for every signal detail.
+
+  <Tabs syncKey="topic-explosion">
+    <TabItem label="Bad">
+
+  ```text
+  Factory_A
+  └── SMT_Line_1
+      └── Machine_001
+          ├── Temperature_Value
+          ├── Temperature_Unit
+          ├── Temperature_Status
+          └── Speed_Value
+  ```
+
+    </TabItem>
+    <TabItem label="Better">
+
+  ```text
+  Factory_A
+  └── SMT_Line_1
+      └── Metric
+          └── Machine_001
+  ```
+
+  Topic payload:
+
+  ```json
+  {
+    "temperature": 80,
+    "temperature_unit": "Celsius",
+    "temperature_status": "Normal",
+    "speed": 300
+  }
+  ```
+
+    </TabItem>
+  </Tabs>
+
+- **Use `State` for low-frequency status data**
+
+  Put low-frequency status, snapshots, and current business state under `State`. Avoid creating a new topic for every changing entity such as jobs, batches, or orders.
+
+  <Tabs syncKey="topic-explosion">
+    <TabItem label="Bad">
+
+  ```text
+  Factory_A
+  └── SMT_Line_1
+      └── State
+          ├── Job_001
+          ├── Job_002
+          └── Job_003
+  ```
+
+    </TabItem>
+    <TabItem label="Better">
+
+  ```text
+  Factory_A
+  └── SMT_Line_1
+      └── State
+          └── Machine_001
+  ```
+
+  Topic payload:
+
+  ```json
+  {
+    "current_job": "Job_003",
+    "product": "Product_A"
+  }
+  ```
+
+    </TabItem>
+  </Tabs>
+
+- **Use `Action` for low-frequency action data**
+
+  Put commands, requests, and operator actions under `Action`. Keep action inputs as fields on a topic rather than creating one topic per parameter.
+
+  <Tabs syncKey="topic-explosion">
+    <TabItem label="Bad">
+
+  ```text
+  Factory_A
+  └── SMT_Line_1
+      └── Machine_001
+          ├── Start_Command
+          ├── Target_Height
+          └── Light_On
+  ```
+
+    </TabItem>
+    <TabItem label="Better">
+
+  ```text
+  Factory_A
+  └── SMT_Line_1
+      └── Action
+          └── StartJob
+  ```
+
+  Topic payload:
+
+  ```json
+  {
+    "target_height": 12.5,
+    "light_on": true,
+    "requested_by": "operator"
   }
   ```
 

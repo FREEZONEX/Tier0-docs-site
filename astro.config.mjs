@@ -111,24 +111,19 @@ export default defineConfig({
 					collapsed: false,
 					items: [
 						{
-							label: 'UNS Concepts',
-							translations: { 'zh-CN': 'UNS 核心概念', ja: 'UNS の概念', es: 'Conceptos de UNS', ko: 'UNS 개념' },
+							label: 'Factory Data Foundation',
+							translations: { 'zh-CN': '工厂数据基础', ja: '工場データ基盤', es: 'Base de datos de fábrica', ko: '공장 데이터 기반' },
 							slug: 'using-tier0/uns-concepts',
 						},
 						{
-							label: 'Connecting Data to UNS',
-							translations: { 'zh-CN': '连接数据到 UNS', ja: 'UNS へのデータ接続', es: 'Conectar datos a UNS', ko: 'UNS에 데이터 연결' },
+							label: 'Preparing Data Foundation',
+							translations: { 'zh-CN': '准备数据基础', ja: 'データ基盤を準備する', es: 'Preparar la base de datos', ko: '데이터 기반 준비' },
 							slug: 'using-tier0/connect-data',
 						},
 						{
-							label: 'Working with UNS Data',
-							translations: { 'zh-CN': '操作 UNS 数据', ja: 'UNS データの操作', es: 'Trabajar con datos de UNS', ko: 'UNS 데이터 작업' },
+							label: 'Working with Factory Data',
+							translations: { 'zh-CN': '操作工厂数据', ja: '工場データを扱う', es: 'Trabajar con datos de fábrica', ko: '공장 데이터 작업' },
 							slug: 'using-tier0/working-with-uns-data',
-						},
-						{
-							label: 'Building Workflow with UNS Agent',
-							translations: { 'zh-CN': '用 UNS Agent 构建 Workflow', ja: 'UNS Agent で Workflow を構築する', es: 'Crear workflows con UNS Agent', ko: 'UNS Agent로 Workflow 구축하기' },
-							slug: 'using-tier0/monitor-uns-with-agent',
 						},
 						{
 							label: 'Building Apps on Factory Data',
@@ -136,13 +131,18 @@ export default defineConfig({
 							slug: 'using-tier0/build-apps',
 						},
 						{
-							label: 'Analyzing UNS Data',
-							translations: { 'zh-CN': '分析 UNS 数据', ja: 'UNS データの分析', es: 'Analizar datos de UNS', ko: 'UNS 데이터 분석' },
+							label: 'Visualizing Factory',
+							translations: { 'zh-CN': '可视化工厂', ja: '工場を可視化する', es: 'Visualizar la fábrica', ko: '공장 시각화' },
+							slug: 'using-tier0/digital-twin',
+						},
+						{
+							label: 'Analyzing Factory Data',
+							translations: { 'zh-CN': '分析工厂数据', ja: '工場データを分析する', es: 'Analizar datos de fábrica', ko: '공장 데이터 분석' },
 							slug: 'using-tier0/analyze-data',
 						},
 						{
 							label: 'Operating on Tier0 with Agents',
-							translations: { 'zh-CN': '用 Agent 操作 Tier0', ja: 'エージェントで Tier0 を操作', es: 'Operar Tier0 con agentes', ko: 'Agent로 Tier0 운영' },
+							translations: { 'zh-CN': '用 Agents 操作 Tier0', ja: 'Agents で Tier0 を操作する', es: 'Operar Tier0 con Agents', ko: 'Agent로 Tier0 운영' },
 							slug: 'using-tier0/agents',
 						},
 					],
@@ -153,14 +153,19 @@ export default defineConfig({
 					collapsed: false,
 					items: [
 						{
-							label: 'UNS Modeling',
-							translations: { 'zh-CN': 'UNS 建模', ja: 'UNS モデリング', es: 'Modelado de UNS', ko: 'UNS 모델링' },
+							label: 'Modeling Factory Data',
+							translations: { 'zh-CN': '工厂数据建模', ja: '工場データをモデリングする', es: 'Modelar datos de fábrica', ko: '공장 데이터 모델링' },
 							slug: 'best-practice/uns-modeling',
 						},
 						{
-							label: 'Connecting OPC UA/Modbus/Rest API',
-							translations: { 'zh-CN': '连接 OPC UA/Modbus/Rest API', ja: 'OPC UA/Modbus/Rest API 接続', es: 'Conexión OPC UA/Modbus/Rest API', ko: 'OPC UA/Modbus/Rest API 연결' },
+							label: 'Connecting Industrial Protocols',
+							translations: { 'zh-CN': '连接工业协议', ja: '産業プロトコルの接続', es: 'Conectar protocolos industriales', ko: '산업 프로토콜 연결' },
 							slug: 'best-practice/protocol-connections',
+						},
+						{
+							label: 'Building Shopfloor Workflow with Agent',
+							translations: { 'zh-CN': '用 Agent 构建车间工作流', ja: 'Agent でデータワークフローを構築する', es: 'Crear flujos de datos con Agent', ko: 'Agent로 데이터 워크플로 구축하기' },
+							slug: 'best-practice/building-data-workflow-with-agent',
 						},
 						{
 							label: 'Building Analytics Apps',
@@ -168,8 +173,8 @@ export default defineConfig({
 							slug: 'best-practice/analytics-apps',
 						},
 						{
-							label: 'Displaying UNS Data with Digital Twin',
-							translations: { 'zh-CN': '用 Digital Twin 展示 UNS 数据', ja: 'Digital Twin で UNS データを表示する', es: 'Mostrar datos UNS con Digital Twin', ko: 'Digital Twin으로 UNS 데이터 표시하기' },
+							label: 'Displaying Factory Data with Digital Twin',
+							translations: { 'zh-CN': '使用数字孪生展示工厂数据', ja: 'Digital Twin で工場データを表示する', es: 'Mostrar datos de fábrica con Digital Twin', ko: 'Digital Twin으로 공장 데이터 표시하기' },
 							slug: 'best-practice/view-uns-with-digital-twin',
 						},
 					],
@@ -188,6 +193,11 @@ export default defineConfig({
 							label: 'Skill Reference',
 							translations: { 'zh-CN': 'Skill 参考', ja: 'Skill リファレンス', es: 'Referencia de Skill', ko: 'Skill 참조' },
 							slug: 'reference/skill-reference',
+						},
+						{
+							label: 'ISA-95 Equipment Hierarchy',
+							translations: { 'zh-CN': 'ISA-95 设备层级', ja: 'ISA-95 設備階層', es: 'Jerarquía de equipos ISA-95', ko: 'ISA-95 설비 계층' },
+							slug: 'reference/isa-95-equipment-hierarchy',
 						},
 						{
 							label: 'High Availability Deployment Plan',

@@ -9,7 +9,7 @@ sidebar:
 
 import { Steps } from '@astrojs/starlight/components';
 
-The quickest way to understand Tier0 is to explore a factory that already works.
+A demo factory that already works on Tier0 shows you how the factory data is modeled, managed and used in a smart and smooth way.
 ## Business Background
 The factory in Tier0 receives orders from ERP, splits them, schedules production, sends the schedule to production, and receives production progress data as work proceeds.
 
@@ -57,7 +57,7 @@ flowchart TB
 
 ## Process
 <Steps>
-1. In Tier0, go to **UNS** and check the details of orders that came from ERP.
+1. Go to **UNS** and check the details of orders that came from ERP.
     - `DemoFactory/ERP/ProductionOrders/State/UpsertProductionOrder`: Orders.
     - `DemoFactory/ERP/ProductionOrders/State/OrderList`: Current order list snapshot.
     :::tip[How is data collected into UNS?]

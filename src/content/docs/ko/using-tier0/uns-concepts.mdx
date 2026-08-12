@@ -1,35 +1,69 @@
 ---
-title: Tier0의 UNS 개념
-description: "Unified Namespace model: Metric, State, Action, 그리고 UNS 데이터 저장 방식."
+title: 공장 데이터 기반
+description: "Unified Namespace model: Metric, State, Action, 그리고 UNS가 공장 데이터를 저장하는 방식."
 editions: [edge, cloud, enterprise]
 sidebar:
   order: 1
 ---
 import { Tabs, TabItem } from '@astrojs/starlight/components';
 
-Tier0에서 UNS(Unified Namespace)는 **Model**, **Broker**, **Storage** 세 부분을 중심으로 구성됩니다.
 
-- Model은 수집되는 데이터의 특성에 따라 **Metric**, **State**, **Action** 세 가지 type으로 분류됩니다.
-- Broker는 model에 정의된 topic을 통해 데이터를 수신하고 전송합니다.
-- 들어오고 나가는 데이터는 model type에 따라 다른 database에 저장됩니다.
-    - **Action/State**: JSONB(PostgreSQL)
+Tier0에서 공장 데이터는 UNS(Unified Namespace) 방법론을 기반으로 명확한 트리 구조의 모델로 구성되어 통합 데이터 기반을 형성합니다.
+- Broker는 model topic을 통해 데이터를 수신하고 전송합니다.
+
+<div className="t0-uns-foundation-mermaid t0-uns-foundation-mermaid--flow">
+```mermaid
+  %%{init: {"flowchart": {"defaultRenderer": "elk", "nodeSpacing": 32, "rankSpacing": 48, "diagramPadding": 8}}}%%
+  flowchart TB
+  source["데이터 소스 / 소비자"]
+  subgraph UNS["Unified Namespace"]
+      direction LR
+      Model["Model<br/>path, topic, payload 정의"]
+      Broker["Broker<br/>데이터 교환 처리"]
+      Storage["스토리지<br/>데이터 영구 저장"]
+      Model <--> Broker
+      Broker --> Storage
+  end
+  source <-- "MQTT / API" --> Broker
+  classDef broker fill:#F7FAF2,stroke:#D8E6B8,stroke-width:1px,color:#2A2A2A,stroke-dasharray:5 5
+  class Broker broker
+```
+</div>
+- Model은 **Metric**, **State**, **Action** 세 가지 type으로 분류됩니다.
+- 데이터는 model type에 따라 서로 다른 database에 저장됩니다.
+    - **Action/State**: JSONB (PostgreSQL)
     - **Metric**: real-time data(TSDB)
 
-```text
-Data Source / Consumer
-        ^
-        | MQTT / HTTP API
-        v
-Unified Namespace
-+-- Broker
-|   +-- Model
-|       +-- Metric  -> TSDB
-|       +-- State   -> JSONB
-|       +-- Action  -> JSONB
-+-- Storage
-    +-- TSDB   stores high-frequency Metric data
-    +-- JSONB  stores State and Action payloads
+<div className="t0-uns-foundation-mermaid t0-uns-foundation-mermaid--types">
+```mermaid
+    %%{init: {
+      "themeVariables": {
+        "fontSize": "14pt"
+      },
+      "flowchart": {
+        "defaultRenderer": "elk",
+        "nodeSpacing": 40,
+        "rankSpacing": 56,
+        "diagramPadding": 8
+      }
+    }}%%
+    flowchart LR
+    subgraph Model["모델 타입"]
+        direction TB
+        metric["Metric<br/>고빈도 숫자 데이터"]
+        state["State<br/>현재 사실 또는 상태"]
+        action["Action<br/>명령 또는 요청 작업"]
+    end
+    subgraph Storage["스토리지"]
+        direction TB
+        tsdb["TSDB<br/>Metric 이력을 위한 시계열 저장소"]
+        jsonb["JSONB<br/>State와 Action을 위한 문서 저장소"]
+    end
+    metric --> tsdb
+    state --> jsonb
+    action --> jsonb
 ```
+</div>
 ## Model
 :::tip[model을 만들 때 어떤 guide를 따라야 하나요?]
 데이터가 무엇을 나타내는지에 따라 modeling 방법을 선택합니다.
@@ -87,7 +121,7 @@ Unified Namespace
 </Tabs>
 
 :::tip[model을 만들려면]
-[데이터 모델 구축 방법](../connect-data/#데이터-모델-구축-방법)을 확인하세요.
+[데이터 모델 구축 방법](../connect-data/#데이터-모델-구축)을 확인하세요.
 :::
 
 ## Broker

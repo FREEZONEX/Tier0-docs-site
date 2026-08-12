@@ -1,35 +1,69 @@
 ---
-title: Conceptos de UNS en Tier0
-description: "El modelo Unified Namespace: Metric, State, Action y cómo UNS almacena datos."
+title: Base de datos de fábrica
+description: "El modelo Unified Namespace: Metric, State, Action y cómo UNS almacena datos de fábrica."
 editions: [edge, cloud, enterprise]
 sidebar:
   order: 1
 ---
 import { Tabs, TabItem } from '@astrojs/starlight/components';
 
-En Tier0, UNS (Unified Namespace) se organiza alrededor de tres partes: **Model**, **Broker** y **Storage**.
 
-- Los modelos se clasifican en tres tipos, **Metric**, **State** y **Action**, según los datos que se recopilan.
-- El broker recibe y envía datos a través de topics definidos por el modelo.
-- Los datos entrantes y salientes se almacenan en diferentes bases de datos según el tipo de modelo.
-    - **Action/State**: JSONB (PostgreSQL)
-    - **Metric**: Datos en tiempo real (TSDB)
+En Tier0, los datos de fábrica se organizan en modelos claros con estructura de árbol basados en la metodología UNS (Unified Namespace), formando una base de datos unificada.
+- El broker recibe y envía datos a través de topics del modelo.
 
-```text
-Data Source / Consumer
-        ^
-        | MQTT / HTTP API
-        v
-Unified Namespace
-+-- Broker
-|   +-- Model
-|       +-- Metric  -> TSDB
-|       +-- State   -> JSONB
-|       +-- Action  -> JSONB
-+-- Storage
-    +-- TSDB   stores high-frequency Metric data
-    +-- JSONB  stores State and Action payloads
+<div className="t0-uns-foundation-mermaid t0-uns-foundation-mermaid--flow">
+```mermaid
+  %%{init: {"flowchart": {"defaultRenderer": "elk", "nodeSpacing": 32, "rankSpacing": 48, "diagramPadding": 8}}}%%
+  flowchart TB
+  source["Fuente de datos / consumidor"]
+  subgraph UNS["Unified Namespace"]
+      direction LR
+      Model["Modelo<br/>Define rutas, topics y payloads"]
+      Broker["Broker<br/>Gestiona el intercambio de datos"]
+      Storage["Almacenamiento<br/>Persiste los datos"]
+      Model <--> Broker
+      Broker --> Storage
+  end
+  source <-- "MQTT / API" --> Broker
+  classDef broker fill:#F7FAF2,stroke:#D8E6B8,stroke-width:1px,color:#2A2A2A,stroke-dasharray:5 5
+  class Broker broker
 ```
+</div>
+- Los modelos se clasifican en tres tipos: **Metric**, **State** y **Action**.
+- Los datos se almacenan en diferentes bases de datos según el tipo de modelo.
+    - **Action/State**: JSONB (PostgreSQL)
+    - **Metric**: datos en tiempo real (TSDB)
+
+<div className="t0-uns-foundation-mermaid t0-uns-foundation-mermaid--types">
+```mermaid
+    %%{init: {
+      "themeVariables": {
+        "fontSize": "14pt"
+      },
+      "flowchart": {
+        "defaultRenderer": "elk",
+        "nodeSpacing": 40,
+        "rankSpacing": 56,
+        "diagramPadding": 8
+      }
+    }}%%
+    flowchart LR
+    subgraph Model["Tipo de modelo"]
+        direction TB
+        metric["Metric<br/>Datos numéricos de alta frecuencia"]
+        state["State<br/>Hechos o estados actuales"]
+        action["Action<br/>Comandos u operaciones solicitadas"]
+    end
+    subgraph Storage["Almacenamiento"]
+        direction TB
+        tsdb["TSDB<br/>Almacenamiento de series temporales para Metric"]
+        jsonb["JSONB<br/>Almacenamiento documental para State y Action"]
+    end
+    metric --> tsdb
+    state --> jsonb
+    action --> jsonb
+```
+</div>
 ## Model
 :::tip[¿Qué guía debo seguir al crear un modelo?]
 Elige el enfoque de modelado según lo que representan los datos.
@@ -88,7 +122,7 @@ Por ejemplo, un modelo en UNS se ve como el árbol siguiente:
 </Tabs>
 
 :::tip[Para crear un modelo]
-Consulta [Cómo crear un modelo de datos](../connect-data/#how-to-build-a-data-model).
+Consulta [Cómo crear un modelo de datos](../connect-data/#crear-un-modelo-de-datos).
 :::
 
 ## Broker

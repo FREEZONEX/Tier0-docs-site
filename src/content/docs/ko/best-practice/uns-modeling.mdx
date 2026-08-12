@@ -1,5 +1,5 @@
-﻿---
-title: UNS 모델링
+---
+title: 공장 데이터 모델링
 description: "Demo UNS 설계: topic 폭증 방지와 payload 구조 베스트 프랙티스."
 editions: [edge, cloud, enterprise]
 sidebar:
@@ -19,18 +19,7 @@ import { Tabs, TabItem } from '@astrojs/starlight/components';
 
 ### 물리 데이터
 
-물리적 위치가 있는 기계와 설비의 산업 데이터는 ISA-95 표준을 기반으로 모델링합니다.
-
-#### ISA-95 장비 계층
-ISA-95 설비 계층은 조직 내 물리 자산과 제어 시스템이 어떻게 구조화되는지 설명합니다.
-다음 계층으로 나뉩니다.
-- **Enterprise**: 전체 조직을 나타내는 최상위 계층입니다. ERP system이 보통 지원하는 전체 business process와 decision-making entity를 포함합니다.  
-- **Site**: 특정 지리적 위치나 시설을 나타냅니다. 각 site는 자체 management system과 local production control을 가질 수 있습니다. 
-- **Area**: site 안의 운영 구역으로, packaging, assembly, warehousing 같은 기능 영역인 경우가 많습니다. 
-- **Process Cell**: area 안의 제조 기본 단위입니다. 특정 제품을 생산하거나 특정 기능을 수행하는 데 필요한 모든 equipment를 포함합니다. 
-- **Unit**: process cell의 독립된 부분으로, mixing, heating, assembling 같은 특정 기능을 담당합니다. 
-- **Equipment Module**: unit 안에서 특정 작업을 수행하는 모듈형 장비입니다. 예를 들어 mixing unit에서는 heating element가 module이 될 수 있습니다.
-- **Control Module**: 최하위 계층으로, 물리 공정을 직접 제어하는 sensor, pump, actuator, PID control loop 같은 개별 device나 controller를 나타냅니다.
+물리적 위치가 있는 기계와 설비의 산업 데이터는 일반적으로 [ISA-95 표준](../../reference/isa-95-equipment-hierarchy/)을 기반으로 모델링합니다.
 
 #### Demo Model
 <Tabs syncKey="demo-uns-model">

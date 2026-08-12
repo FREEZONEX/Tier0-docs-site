@@ -32,7 +32,7 @@ Refinery corrosion is a complex process influenced by multiple operating factors
 ## Getting Raw Data
 
 <Steps>
-1. In Tier0, go to **UNS**, and import the data model.
+1. Import the data model in **UNS**.
     
       <details className="notebook-cell">
       <summary>Show UNS model JSON</summary>
@@ -198,7 +198,7 @@ Refinery corrosion is a complex process influenced by multiple operating factors
 
       </details>
     
-2. Go to **Flows**, create a **Source Flow** to connect raw data and publish it to **UNS**.
+2. Go to **Flows**, use **Source Flow** to connect raw data and publish it to **UNS**.
     <details className="notebook-cell">
     <summary>Show Source Flow JSON</summary>
 
@@ -395,10 +395,8 @@ Refinery corrosion is a complex process influenced by multiple operating factors
 </Steps>
 
 ## Building an Analytics App in Notebook
-
-1. In Tier0, go to **Notebook**, and create a new notebook.
-
-2. Access the notebook, and add the following cells to analyze data from **UNS**.
+<Steps>
+1. Add the following cells in the notebook to analyze data from **UNS**.
 
     - Cell 1 - Import required dependencies and configure the MQTT broker, topics, and runtime settings.
 
@@ -1376,12 +1374,11 @@ Refinery corrosion is a complex process influenced by multiple operating factors
 
       </details>
 
-3. Run all cells and go to **UNS** to check the results.
-
+2. Run all cells and go to **UNS** to check the results.
+</Steps>
 ## Building Bow-tie App
 <Steps>
-1. In Tier0, go to **Builder**.
-2. Enter the application requirements in the dialog, and start building.
+1. In **Builder**, enter the application requirements in the dialog, and start building.
 
     <Aside type="caution" title="What must be stated">
       Remember to tell the agent to use data from UNS. Specific topic paths are required; otherwise, the agent might have trouble displaying the correct data.
@@ -1474,6 +1471,6 @@ Refinery corrosion is a complex process influenced by multiple operating factors
     ```
 
     </details>
-3. Once the application is complete after certain rounds of refining, deploy it.
-4. Go to **Launchpad**, open the application and check.
+2. Once the application is complete after certain rounds of refining, deploy it.
+3. Go to **Launchpad**, open the application and check.
 </Steps>

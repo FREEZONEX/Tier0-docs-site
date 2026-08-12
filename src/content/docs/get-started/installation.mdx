@@ -49,6 +49,16 @@ See [Choosing the Best Version](../choosing-version/) to find the edition that b
 		vi .env.default
 		:wq!
 		```
+		:::note[Parameters to be configured]
+
+		| Field | Type | Description |
+		|------|------|-------------|
+		| VOLUMES_PATH | string | Storage path for project data |
+		| ENTRANCE_DOMAIN/ENTRANCE_PORT | string | Tier0 access endpoint (IP/domain + port) |
+		| OS_PLATFORM_TYPE | enum | OS where Tier0 is installed. Can be **linux** or **windows** |
+		| LANGUAGE | enum | zh-CN / en-US |
+
+		:::
 	3. Run the installation script.
 
 		```bash
@@ -57,16 +67,7 @@ See [Choosing the Best Version](../choosing-version/) to find the edition that b
 
 	</Steps>
 
-:::note[Parameters to be configured]
 
-| Field | Type | Description |
-|------|------|-------------|
-| VOLUMES_PATH | string | Storage path for project data |
-| ENTRANCE_DOMAIN/ENTRANCE_PORT | string | Tier0 access endpoint (IP/domain + port) |
-| OS_PLATFORM_TYPE | enum | OS where Tier0 is installed. Can be **linux** or **windows** |
-| LANGUAGE | enum | zh-CN / en-US |
-
-:::
 		
 
 	</TabItem>

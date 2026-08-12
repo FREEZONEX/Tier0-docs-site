@@ -1,0 +1,34 @@
+---
+title: Visualizing Factory
+description: Visualize your factory through 3D models with real-time machine data.
+editions: [cloud, enterprise]
+sidebar:
+  order: 5
+---
+import { Steps } from '@astrojs/starlight/components';
+
+Factory data connected to Tier0 can be visualized as digital twin with life-like motions and environment. The process goes from mapping data to 3D models to combining models together to build a
+complete factory scene.
+
+## Mapping Data to 3D Models
+<Steps>
+1. Select nodes to map with UNS data for real-time motions after uploading a model in **Model**.
+2. Add instances with different UNS data onto the model to simulate different machines.
+3. Bind data to the model, and use **Preview** to check whether it moves and rotates as the data changes.
+        - **Position**: The model moves along the mapped direction of the coordinate.
+        - **Rotation**: The model rotates around the coordinate original point in the mapped direction.
+4. Use **Data Tagging** to add tags for static information display.
+</Steps>
+
+## Visualizing Factory Scene
+<Steps>
+1. Add instances that exist in the scene from **Instance Library**.
+2. Use the tools at the top to move, scale, and rotate models to fit the scene, and to change the viewing perspective and coordinate position.
+3. Model position can be confirmed by **Object** at the right corner, which displays the bound UNS data.
+4. Viewport and lighting are for environment details.
+</Steps>
+
+## External Share
+Only instances can be shared either by model or by scene.
+- **Share Model**: Generates a Tier0 platform link where the model with live UNS data is displayed.
+- **Share Scene**: Generates a Tier0 platform link where the model and its scene, with live UNS data and environment settings, are displayed.

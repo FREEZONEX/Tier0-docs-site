@@ -1,5 +1,5 @@
 ---
-title: Building Workflow with UNS Agent
+title: Building Shopfloor Workflow with Agent
 description: Use the UNS agent to build workflows that cover data modeling, data connection, and data events.
 editions: [cloud]
 sidebar:
@@ -9,11 +9,8 @@ sidebar:
 import { Steps } from '@astrojs/starlight/components';
 import { Tabs, TabItem } from '@astrojs/starlight/components';
 
-Tier0 provides a UNS agent on the **UNS** page so you can operate on UNS models and flows through natural language.
+UNS agent provides a faster and easier way to build factory data models, connect data from factories and create alarm events based on the data through conversation in natural language.
 
-:::note[Why UNS agent exists]
-Instead of building data models, connections, and events step by step across different modules, the UNS agent handles the workflow through conversation.
-:::
 
 ## Workflow Background
 
@@ -38,10 +35,10 @@ flowchart RL
 
 </div>
 
-## How to Build the Workflow?
+## How to Build the Workflow
 <Steps>
-1. Log in to Tier0, go to **UNS** and start a conversation with the UNS agent on the right side.
-2. Change the conversation permission to `full_access`, and enter the prompt.
+1. Start a conversation with the UNS agent in **UNS** with `full_access`.
+2. Enter the prompt to build UNS models.
     ```text
     Create a data model representing the temperature, water level and heater status of a mixing tank, temperature and level in one metric topic and heater status in a state topic.
     ```

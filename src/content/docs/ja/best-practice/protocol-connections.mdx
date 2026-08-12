@@ -4,7 +4,7 @@ description: "Node-RED を使って OPC UA、Modbus、その他の典型的な�
 editions: [edge, cloud, enterprise]
 sidebar:
   order: 2
-  label: OPC UA/Modbus/Rest API ??
+  label: OPC UA/Modbus/Rest API 接続
 ---
 import { Steps } from '@astrojs/starlight/components';
 
@@ -15,14 +15,14 @@ import { Steps } from '@astrojs/starlight/components';
 ### データフローの設定
 
 <Steps>
-1. Tier0 ???????**Flow** ???????? **Source Flow** ???????
-2. flow ? **inject**?**OPC UA Client**?**mqtt out** ??????????
-3. ??????????????????????????????
+1. Tier0 にログインし、**Flow** に移動して新しい **Source Flow** を作成します。
+2. flow に **inject**、**OPC UA Client**、**mqtt out** ノードを追加します。
+3. 順番に接続し、各ノードをダブルクリックして詳細を設定します。
 </Steps>
 - **inject**
     <Steps>
-    1. ??? **add** ??????? property ???????
-    2. properties ?????????????
+    1. 左下の **add** をクリックして property entry を追加します。
+    2. properties を次の項目に設定します。
 
         ```json
         {
@@ -43,10 +43,10 @@ import { Steps } from '@astrojs/starlight/components';
     "Topic": "<UNS model>",
     ```
 <Steps>
-4. flow ?????????????
+4. flow を保存して deploy します。
 </Steps>
 
-### Flow ??????
+### Flow Reference
 
 <details>
 <summary>OPC UA flow JSON を表示</summary>
@@ -203,27 +203,27 @@ import { Steps } from '@astrojs/starlight/components';
 ## Modbus
 ### データフローの設定
 <Steps>
-1. flow ? **modbus-read** ? **mqtt out** ??????????
-2. ?????????????????????????
+1. flow に **modbus-read** と **mqtt out** ノードを追加します。
+2. 各ノードをダブルクリックして必要な情報を設定します。
     - **modbus-read**
         - **Settings**
-          - **FC**?Modbus ?????????????????FC 3 = ????????????
-          - **Address**???????????????????????? 0 ????
+          - **FC**: Modbus の function code です。FC 3 は holding registers を読み取ります。
+          - **Address**: 読み取りを開始する register address です。通常は 0 から始まります。
           - **Quantity**:  The number of consecutive registers to read.
-          - **Poll Rate**????? Modbus ???????????????????10 ?????
-          - **Server**?????? Modbus server?IP?port?protocol ??????????
+          - **Poll Rate**: Modbus device を読み取る間隔です。たとえば 10 秒です。
+          - **Server**: 接続する Modbus server、IP、port、protocol を設定します。
         - **Server**
-          - **Host**?Modbus server ? IP?
-          - **Port**?Modbus server ? port?
+          - **Host**: Modbus server の IP。
+          - **Port**: Modbus server の port。
     - **mqtt out**
         ```json
         "Server": "<embedded UNS broker>", //same name as the flow
         "Topic": "<UNS model>",
         ```
-3. flow ?????????????
+3. flow を保存して deploy します。
 </Steps>
 
-### Flow ??????
+### Flow Reference
 
 <details>
 <summary>Modbus flow JSON を表示</summary>
@@ -385,8 +385,8 @@ import { Steps } from '@astrojs/starlight/components';
 ## API
 ### データフローの設定
 <Steps>
-1. flow ? **inject**?**http request**?**mqtt out** ??????????
-2. ?????????????????????????
+1. flow に **inject**、**http request**、**mqtt out** ノードを追加します。
+2. 各ノードをダブルクリックして必要な情報を設定します。
     - **http request**
         ```json
         "Method": "<API method>",
@@ -399,10 +399,10 @@ import { Steps } from '@astrojs/starlight/components';
         "Server": "<embedded UNS broker>", //same name as the flow
         "Topic": "<UNS model>",
         ```
-3. flow ?????????????
+3. flow を保存して deploy します。
 </Steps>
 
-### Flow ??????
+### Flow Reference
 <details>
 <summary>API flow JSON を表示</summary>
 
@@ -505,7 +505,7 @@ import { Steps } from '@astrojs/starlight/components';
 
 </details>
 
-:::tip[????????]
+:::tip[実用上のヒント]
 - **UNS** に publish する前に、必要に応じて **function** ノードでデータを整形できます。
 - **debug** ノードを使って、その場でデータを確認できます。
 - ノードの詳細は [Node-RED flows](https://flows.nodered.org/) を参照してください。

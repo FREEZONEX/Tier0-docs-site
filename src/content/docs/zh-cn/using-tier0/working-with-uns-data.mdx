@@ -1,6 +1,6 @@
-﻿---
-title: 操作 UNS 数据
-description: "通过 MQTT 和 API 操作 UNS 数据"
+---
+title: 操作工厂数据
+description: 通过 MQTT 和 API 操作 UNS 数据，并查看 API 参考。
 editions: [edge, cloud, enterprise]
 sidebar:
   order: 3
@@ -8,15 +8,15 @@ sidebar:
 import { Steps } from '@astrojs/starlight/components';
 import { Tabs, TabItem } from '@astrojs/starlight/components';
 
-Tier0 支持通过 MQTT 和 API 操作 UNS 数据。
+你可以通过 MQTT 和 API 操作 UNS 数据。
 
 ## MQTT
-MQTT 客户端可使用认证凭据连接到 UNS broker。
+MQTT 客户端可以使用 Tier0 生成的凭据连接到 UNS broker。
 :::note
 你可以使用 **MQTTX**、**MQTT Explorer** 和 **Node-RED** 等 MQTT 客户端连接 UNS broker，并发布/订阅消息。
 :::
 ### 生成 MQTT 凭据
-在 Tier0 的 **Edge** 页面创建新的凭据，并记录下来。
+在 Tier0 的 **Edge** 页签创建新的凭据，并记录下来。
 
 ### 连接 MQTT 客户端
 
@@ -79,21 +79,30 @@ MQTT 客户端可使用认证凭据连接到 UNS broker。
 
 ### 测试连接
 <Steps>
-1. 在 **Edge** 页面，确认 **客户端** 页签下每个客户端的状态正常。
-2. 复制一个 UNS 模型 topic，并通过客户端向它发布一条消息。
-3. 回到 **UNS**，检查目标 topic 下的数据。
+1. 确认 client 状态正常。
+2. 复制一个 UNS 模型 topic，并通过 client 向它发布一条 message。
 </Steps>
 
 ## API
 使用 **REST API** 操作 UNS 数据。
 :::tip[如何使用 API]
-- OpenAPI base path 是 `/openapi/v1`。将 `TIER0_BASE_URL` 设置为你的 Tier0 host 加上 base path，例如 `https://your-workspace.tier0.app/openapi/v1`，并在 `x-api-key` header 中传入 API 密钥。
-- 单击右上角账号图标，进入 **设置 > API 密钥** 生成 API 密钥。
+OpenAPI base path 是 `/openapi/v1`，例如 `https://your-workspace.tier0.app/openapi/v1`，API key 通过 `x-api-key` header 传入。
 :::
+
+### 获取 API Key
+
+API keys 位于 **Settings > API Keys**。不同 account type 允许创建的 key type 不同。
+- **Service Key**：只能由 **Admin** 和 **Owner** 创建。
+- **Personal Key**：任何人都可以创建，permission scope 与该 account 相同。
+:::caution[Key permission vs Account permission]
+Account permission 优先于 key permission。即使 key permission 设置为 **Full Access**，account 无权访问的数据仍然无法通过该 key 访问。
+:::
+
+### 示例
 
 - `/uns/create`
 
-  创建 UNS path 或 topic。使用 `namespace` 定义树形结构。
+  创建 UNS path 或 topic。使用 `namespace` 定义 node tree.
 
   <Tabs syncKey="uns-api-language">
     <TabItem label="JavaScript">

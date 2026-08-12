@@ -1,5 +1,5 @@
 ---
-title: Connect Data to UNS
+title: Preparing Data Foundation
 description: Model your namespace and bring data in with Source Flows. Available in all editions.
 editions: [edge, cloud, enterprise]
 sidebar:
@@ -7,7 +7,7 @@ sidebar:
 ---
 import { Steps } from '@astrojs/starlight/components';
 
-To connect data to Tier0, first build a model in **UNS**, then connect data sources through **Source Flow** to the model.
+First build a model in **UNS**, then connect data through **Source Flow** to the model, forming a data foundation for subsequent use.
 
 ```mermaid
 flowchart BT
@@ -22,81 +22,76 @@ flowchart BT
   class uns t0accent
   class flow t0node
 ```
-## How to Build a Data Model
-Define the data hierarchy as a tree map based on a simple folder-file structure.
 
-### Building Models Manually
-
-:::note[Example Model]
-**Model**:
-```
-  Factory_A
-  └── Site_01
-      └── SMT_Line_1
-          └── Metric
-              └── Machine_001
-```
-**Payload**:
-```json
-"temperature": 85,
-"vibration": 2.8
-```
+:::note
+The process can be done through conversations with the UNS agent. Check [here](../../best-practice/building-data-workflow-with-agent/) for details.
 :::
+
+## Build a Data Model
+Define the data hierarchy as a tree map according to:
+  - The physical location the data comes from ([ISA-95](../../reference/isa-95-equipment-hierarchy/));
+  - The business logic the data conforms to.
+
+### Build Models Manually
+
+:::tip[Use drafts to verify models first]
+Create or import models in **Draft** to verify whether the models conform to model principles and deploy them after validity.
+:::
+
 <Steps>
-1. In **UNS**, add the root path `Factory_A`.
-2. Add the second path `Site_01` under `Factory_A`, and subsequent paths in the hierarchical order shown in the tree map.
-3. Add the topic `Machine_001` under `SMT_Line_1`, and set its **Topic Type** to **Metric**.
-4. Define the topic payload. Add 2 fields `temperature` and `vibration` and set their data types.
-5. Select **Mock Data** to send simulated data to the model, and **Enable History** to store the data to database.
+1. Design the model structure, and add paths by order before adding the topic.
+2. Set **Topic Type** among **Metric**, **State** and **Action** based on [data features](../uns-concepts/#metric-state-action).
+3. Select **Mock Data** to send simulated data to the model, and **Enable History** to store the data to database.
+4. Add data fields to the topic with the correct data types by **Auto Parsing** or **Pre-defined**.
+    - **Auto Parsing**: Convert fields automatically from JSON text in batches.
+
+        ```json
+        {
+          "temp":85.5
+        }
+        ```
+        :::caution
+        Can only parse single layer JSON, and for multi-layer JSON, only the first layer will be parsed.
+        :::
+    - **Pre-defined**: Manually set fields for the topic one by one.
 </Steps>
 
-:::tip[Additional parameters]
-**Auto Parsing** parses JSON text and converts it into general fields.
-:::
-
-### Importing Models
+### Import Models
 :::tip
 Use LLMs like ChatGPT to help import models.
 :::
 
 <Steps>
-1. Copy the template JSON or download the template file on the **Import** window.
-2. Send the template to AI, and use a similar prompt.
+1. Send the template JSON from **Import** to AI, and use a similar prompt.
     ```
     Generate a UNS model used for xx in xx plant, including xx equipment and data sources based on the template.
     ```
-3. Import the generated result in UNS.
+2. Import the generated result in UNS.
 </Steps>
 
 
+## Connect Data to UNS
 
-## How to Connect Data to UNS
-**Source Flow**, based on **Node-RED**, is used to connect data sources to Tier0.
-:::tip[To understand Source Flow]
-In **Source Flow**:
-- Every flow ends with an **mqtt out** node. It works as an MQTT client to publish data to the UNS broker.
-- The UNS broker is embedded in the **mqtt out** node with the same name as the flow.
+### Data Flow Features
+- Based on Node-RED.
+- Every flow ends with an `mqtt out` node. It works as an MQTT client to publish data to the UNS broker.
+- The UNS broker is embedded in the `mqtt out` and `mqtt in` nodes with the same name as the flow.
 - When a UNS model is used as the topic, data goes directly to the corresponding model in **UNS**.
-:::
+
+### Steps
+
 <Steps>
-1. Create a **Source Flow** in **Flows**.
-2. Use nodes based on the data source type, and end the flow with an **mqtt out** node.
-3. Make sure the **Server** of the node is set to the UNS broker.
-4. Use a **UNS** model as MQTT topic (e.g. `Factory_A/Site_01/SMT_Line_1/Metric/Machine_001`).
+1. Use nodes based on the data source type to build a flow, and end it with an `mqtt out` node.
+
+    :::tip[If you need nodes that are not there]
+    Install nodes from Node-RED community for your requirements. Official nodes often start with `node-red-contrib`.
+    :::
+
+2. Make sure the **Server** of the `mqtt out` node is set to the UNS broker, and topic is a model from **UNS**.
 </Steps>
 
-## Additional Options
-:::note
-This section describes additional parameters or configurations related to the workflow.
-:::
-
-| Scope | Parameter | Item | When to use |
-|------|-----------|------|-------------|
-| Path | Custom Attributes | - | Use when you need to add additional attributes to the path, such as unit information. |
-| Topic | Topic Type | [Metric, State, Action](../uns-concepts/#metric-state-action) | Select the topic type that matches the data semantics: measurements, current status, or executable operations. |
-| Topic | Attribute Generation Method | Pre-defined | Manually set attributes for the topic one by one. |
-| Topic | Attribute Generation Method | Auto Parsing | Convert attributes automatically from JSON text in batches. |
-
+### Flow Version Management
+Save versions of the data flow, so you can either roll back to an earlier version or start a new flow with a history version.
 
 ## Next
 

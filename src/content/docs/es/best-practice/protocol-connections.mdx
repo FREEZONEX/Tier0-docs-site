@@ -4,7 +4,7 @@ description: "Conecta OPC UA, Modbus y otros dispositivos de protocolo típicos 
 editions: [edge, cloud, enterprise]
 sidebar:
   order: 2
-  label: Conexi?n OPC UA/Modbus/Rest API
+  label: Conexión OPC UA/Modbus/Rest API
 ---
 import { Steps } from '@astrojs/starlight/components';
 
@@ -15,9 +15,9 @@ Esta sección usa tipos de datos comunes, incluidos OPC UA, Modbus y API, como e
 ### Configurar Data Flow
 
 <Steps>
-1. Inicia sesi?n en Tier0, ve a **Flow** y crea un nuevo **Source Flow**.
+1. Inicia sesión en Tier0, ve a **Flow** y crea un nuevo **Source Flow**.
 2. Agrega los nodos **inject**, **OPC UA Client** y **mqtt out** al flow.
-3. Con?ctalos en orden y haz doble clic en cada nodo para configurar los detalles.
+3. Conéctalos en orden y haz doble clic en cada nodo para configurar los detalles.
 </Steps>
 - **inject**
     <Steps>
@@ -204,11 +204,11 @@ Esta sección usa tipos de datos comunes, incluidos OPC UA, Modbus y API, como e
 ### Configurar Data Flow
 <Steps>
 1. En el flow, agrega los nodos **modbus-read** y **mqtt out**.
-2. Haz doble clic en los nodos y configura la informaci?n requerida.
+2. Haz doble clic en los nodos y configura la información requerida.
     - **modbus-read**
         - **Settings**
-          - **FC**: c?digo de funci?n que especifica la acci?n Modbus, por ejemplo FC 3 = leer registros holding.
-          - **Address**: direcci?n inicial del registro que se va a leer (normalmente empieza en 0).
+          - **FC**: código de función que especifica la acción Modbus, por ejemplo FC 3 = leer registros holding.
+          - **Address**: dirección inicial del registro que se va a leer (normalmente empieza en 0).
           - **Quantity**:  The number of consecutive registers to read.
           - **Poll Rate**: frecuencia con la que el nodo consulta el dispositivo Modbus (por ejemplo, cada 10 segundos).
           - **Server**: referencia a un Modbus server configurado (IP, port, protocol, etc.).
@@ -386,7 +386,7 @@ Esta sección usa tipos de datos comunes, incluidos OPC UA, Modbus y API, como e
 ### Configurar Data Flow
 <Steps>
 1. En el flow, agrega los nodos **inject**, **http request** y **mqtt out**.
-2. Haz doble clic en los nodos y configura la informaci?n requerida.
+2. Haz doble clic en los nodos y configura la información requerida.
     - **http request**
         ```json
         "Method": "<API method>",

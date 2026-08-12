@@ -1,31 +1,33 @@
 ---
 title: 運用 Runbook
-description: 標準 Tier0 Enterprise デプロイの毎日点検、failover、backup、restore、cleanup、troubleshooting 手順。
+description: 標準 Tier0 Enterprise deployment の daily inspection、failover、backup、restore、cleanup、troubleshooting 手順。
 sidebar:
   order: 6
 ---
 import { Steps } from '@astrojs/starlight/components';
 
-この文書は Enterprise New オフラインアプリケーションを前提にしています。
+この document は Enterprise New offline application を前提にしています。
 
-## 毎日点検
+## 日次点検
 
 <Steps>
-1. デプロイパッケージのルートディレクトリで以下のコマンドを実行します。
+1. deployment package の root directory で次の commands を実行します。
     ```bash
     ./bin/verify.sh --site config/site.conf
     ./bin/smoke-business-emqx.sh --site config/site.conf
     ```
-2. 以下の項目を確認します。
-    - 3 台の Swarm ノードが `Ready` である。
+2. 次の項目を確認します。
+    - 3 台の Swarm nodes が `Ready` である。
     - `APP VIP /healthz` と `/readyz` が `200` を返す。
     - `DB VIP:5432` にアクセスできる。
-    - PostgreSQL primary、standby、witness の topology が正常である。
-    - `backend`?`redis`?`emqx`?`sourceflow`?`eventflow`?`marimo`?`opcua-server` ???????????????????????????????
+    - PostgreSQL primary、standby、witness topology が正常である。
+    - `backend`、`redis`、`emqx`、`sourceflow`、`eventflow`、`marimo`、`opcua-server` が active application node ですべて running である。
 </Steps>
-## アプリケーション確認
+
+## Application Checks
+
 <Steps>
-1. アクティブなアプリケーションノードで以下のコマンドを実行します。
+1. active application node で次の commands を実行します。
     ```bash
     cd /opt/tier0-enterprise/tier0-deploy
     bash bin/compose.sh ps
@@ -33,15 +35,18 @@ import { Steps } from '@astrojs/starlight/components';
     curl -fsS http://127.0.0.1:8088/healthz
     curl -fsS http://127.0.0.1:8088/readyz
     ```
+
     :::note
-    `bin/compose.sh` を迂回して生の `docker compose` コマンドを直接実行しないでください。このラッパースクリプトは、インストーラーが生成したランタイム環境を読み込みます。
+    `bin/compose.sh` を迂回して raw `docker compose` commands を直接実行しないでください。この wrapper script は installer が生成した runtime environment を読み込みます。
     :::
-2. Health-check の解釈:
-    - `healthz` ??: ?? backend ???????????????????????
-    - `readyz` 失敗: DB VIP、Redis、?????????? も確認します。
-    - ホームページには到達できるがログインできない場合：`.env` の `ADMIN_INITIAL_PASSWORD` を確認し、その後 backend IAM migration ログとユーザーテーブルを確認します。HTTP ポートだけでデプロイ成功を判断しないでください。
+
+2. Health-check の見方:
+    - `healthz` failure: まず backend process、image、container logs を確認します。
+    - `readyz` failure: DB VIP、Redis、database migration logs も確認します。
+    - Home page に到達できるが login できない場合: `.env` の `ADMIN_INITIAL_PASSWORD` を確認し、その後 backend IAM migration logs と user tables を確認します。HTTP port だけで deployment success を判断しないでください。
 </Steps>
-## プロトコル入口確認
+
+## Protocol Entry Checks
 
 ```bash
 nc -vz <APP_VIP> 1883
@@ -50,12 +55,14 @@ nc -vz <APP_VIP> 8083
 nc -vz <APP_VIP> 8084
 nc -vz <APP_VIP> 4840
 ```
-:::note
-EMQX と OPC UA Server はアクティブなアプリケーションノードに固定されています。APP VIP フェイルオーバーが保証するのは `APP VIP:80` の HTTP 入口のみです。プロトコルポートは HAProxy TCP プロキシ経由でルーティングされないため、この設計ではプロトコル入口の高可用性を保証しません。
-:::
-## データベース確認
 
-データベースノードで以下を実行します。
+:::note
+EMQX と OPC UA Server は active application node に固定されています。APP VIP failover が保証するのは `APP VIP:80` の HTTP entry のみです。Protocol ports は HAProxy TCP proxying 経由で route されないため、この design は protocol entries の high availability を保証しません。
+:::
+
+## Database Checks
+
+Database nodes で次を実行します。
 
 ```bash
 systemctl status tier0-postgresql
@@ -66,36 +73,40 @@ sudo -iu postgres /usr/local/bin/repmgr -f /etc/repmgr.conf cluster show
 
 - `pg_is_in_recovery=false` は primary を意味します。
 - `pg_is_in_recovery=true` は standby を意味します。
-- DB VIP は現在の primary 上にのみ配置されている必要があります。
-- standby 複製が中断されたり witness が upstream エラーを報告した場合は、まず現場を保全してください。完全デプロイを直接再実行しないでください。
+- DB VIP は current primary のみに配置されている必要があります。
+- standby replication が interrupted した場合、または witness が upstream errors を報告した場合は、まず site を保全してください。full deployment を直接再実行しないでください。
 
 ## APP VIP Failover
+
 <Steps>
-1. テスト前に、現在 VIP を保持しているノードを記録し、確認します。
+1. test 前に、現在 VIP を保持している node を記録し、次を確認します。
 
     ```bash
     curl -fsS http://<APP_VIP>/healthz
     curl -fsS http://<APP_VIP>/readyz
     ```
 
-2. 現在の VIP ノードで `keepalived` を停止した後、別のアプリケーションノードが VIP を引き継いだことを確認し、両方の URL を再テストします。HAProxy backend はアクティブなアプリケーションノードの `8088/TCP` を指すため、3 台すべてのアプリケーションノードがアクティブノードの 8088 ポートへ到達できる必要があります。
+2. 現在の VIP node で `keepalived` を停止した後、別の application node への VIP takeover を確認し、両方の URLs を再テストします。HAProxy backend は active application node の `8088/TCP` を指すため、3 台すべての application nodes が active node の port 8088 に到達できる必要があります。
 
-3. `keepalived` を復元した後、`verify.sh` とスモークチェックを再度実行します。訓練中にアクティブなアプリケーションコンテナを停止しないでください。
+3. `keepalived` を復旧した後、`verify.sh` と smoke checks を再実行します。drill 中に active application containers を停止しないでください。
 </Steps>
-## DB Primary 障害切り替え
 
-障害訓練の前に backup を作成し、replication が正常であることを確認します。
+## DB Primary Failure Switchover
+
+Failure drill の前に backup を作成し、replication が healthy であることを確認します。
 
 ```bash
 ./bin/backup-db.sh --site config/site.conf
 ```
 
-現在の primary で `tier0-postgresql` を停止した後、`repmgr` による standby 昇格と DB VIP 引き継ぎを確認します。目標 RTO は 2 分以内です。同じアーキテクチャでの過去テストは約 59-64 秒でした。
+現在の primary で `tier0-postgresql` を停止した後、`repmgr` が standby を promote し、DB VIP takeover することを確認します。target RTO は 2 分以内です。同じ architecture での過去の tests は約 59-64 秒でした。
+
 :::caution
-- 旧 primary を本番トポロジーへ直接戻して起動してはいけません。まず PostgreSQL、repmgrd、keepalived を停止し、残っている DB VIP を削除します。その後、現在の新 primary から basebackup を実行し、ノードを standby として登録し、最後に witness を再接続します。
-- フェイルオーバー後に完全インストーラーを直接再実行しないでください。inventory 内の静的な primary/standby 定義が現在のトポロジーを乱す可能性があります。
+- old primary を production topology に直接戻して起動してはいけません。まず PostgreSQL、repmgrd、keepalived を停止し、残っている DB VIP を削除します。その後 current new primary から basebackup を実行し、node を standby として register し、最後に witness を再接続します。
+- failover 後に full installer を直接再実行しないでください。inventory 内の static primary/standby definitions が current topology を乱す可能性があります。
 :::
-## Backup と Restore
+
+## Backup and Restore
 
 - Backup:
 
@@ -108,54 +119,65 @@ sudo -iu postgres /usr/local/bin/repmgr -f /etc/repmgr.conf cluster show
     ```bash
     ./bin/restore-db.sh --site config/site.conf --restore-file /backup/tier0-db/postgres-YYYYmmddTHHMMSS.dump
     ```
+
 :::note
-復元前に現在のプライマリを確認してください。復元後は `verify.sh`、スモークチェック、デフォルトユーザーパスでの実際のプラットフォームログイン検証を実行します。
+restore 前に current primary を確認してください。restore 後は `verify.sh`、smoke checks、default-user path の実際の platform login verification を実行します。
 :::
-## Cleanup と再テスト
+
+## Cleanup and Retest
 
 ```bash
 ./full-cleanup.sh --env install.env --yes
 ./install.sh --auto --yes
 ```
-:::caution
-完全クリーンアップは、6 ノード上の Tier0 ランタイムデータ、Docker/Swarm データ、データベースバックアップを削除します。また、制御コンテナ終了後に制御ノードの最終クリーンアップも実行します。この入口は破棄可能と確認済みのテスト環境でのみ使用してください。顧客データや障害現場を保持する必要がある場合は、通常の `--cleanup` を使用し、先にバックアップを完了してください。
-:::
-## よくある問題
 
-### Backend 起動失敗
+:::caution
+Full cleanup は 6 nodes 上の Tier0 runtime data、Docker/Swarm data、database backups を削除します。また control container が終了した後、control node の final cleanup も実行します。この entry は disposable であることが確認済みの test environments でのみ使用してください。customer data または incident site を保持する必要がある場合は、通常の `--cleanup` を使用し、先に backup を完了してください。
+:::
+
+## Common Issues
+
+### Backend Startup Failure
 
 ```bash
 cd /opt/tier0-enterprise/tier0-deploy
 bash bin/compose.sh logs --tail=300 backend
 bash bin/compose.sh ps
 ```
+
 :::note
-DB URL、DB VIP、Redis、migration、mounted directory permission に注目してください。
+DB URL、DB VIP、Redis、migration、mounted directory permissions に注目してください。
 :::
-### EMQX 起動失敗
+
+### EMQX Startup Failure
 
 ```bash
 cd /opt/tier0-enterprise/tier0-deploy
 bash bin/compose.sh logs --tail=200 emqx
 ```
+
 :::note
-証明書、設定ファイル、volume permission、ポート `1883/8883/8083/8084` が占有されていないかを確認します。
+certificates、configuration files、volume permissions、および ports `1883/8883/8083/8084` が占有されていないか確認してください。
 :::
-### repmgrd の繰り返し再起動
+
+### repmgrd Repeated Restarts
 
 ```bash
 systemctl status tier0-repmgrd
 tail -100 /var/log/repmgr/repmgr.log
 sudo -iu postgres psql -Atqc 'show shared_preload_libraries;'
 ```
+
 :::note
-`shared_preload_libraries` に `repmgr` が含まれ、systemd unit が `repmgrd --daemonize=false` を使用していることを確認します。
+`shared_preload_libraries` に `repmgr` が含まれていること、および systemd unit が `repmgrd --daemonize=false` を使用していることを確認してください。
 :::
-### 資材検証失敗
+
+### Material Verification Failure
 
 ```bash
 ./bin/verify-materials.sh
 ```
+
 :::caution
-SHA256 検証を省略してデプロイを続行しないでください。納品パッケージを再取得するか、追跡可能なプロセスに従って材料を再構築してください。
+SHA256 verification を skip して deployment を続行しないでください。delivery package を再取得するか、traceable process に従って materials を rebuild してください。
 :::

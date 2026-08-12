@@ -1,56 +1,99 @@
 ---
-title: Tier0 の UNS コンセプト
-description: "Unified Namespace モデル：Metric、State、Action、および UNS のデータ保存方法。"
+title: 工場データ基盤
+description: "Unified Namespace モデル：Metric、State、Action、および UNS が工場データを保存する方法。"
 editions: [edge, cloud, enterprise]
 sidebar:
   order: 1
 ---
 import { Tabs, TabItem } from '@astrojs/starlight/components';
 
-Tier0 では、UNS（Unified Namespace）は **Model**、**Broker**、**Storage** の 3 つを中心に構成されます。
 
-- Model は、収集するデータに基づいて **Metric**、**State**、**Action** の 3 種類に分類されます。
-- Broker は、モデルで定義された topics を通じてデータを送受信します。
-- 入出力データは、モデルタイプに応じて異なるデータベースに保存されます。
-    - **Action/State**：JSONB（PostgreSQL）
-    - **Metric**：リアルタイムデータ（TSDB）
+Tier0 では、工場データは UNS（Unified Namespace）の考え方に基づき、明確なツリー構造のモデルとして整理され、統一されたデータ基盤を形成します。
+- Broker は model topic を通じてデータを受信、送信します。
 
-```text
-Data Source / Consumer
-        ^
-        | MQTT / HTTP API
-        v
-Unified Namespace
-+-- Broker
-|   +-- Model
-|       +-- Metric  -> TSDB
-|       +-- State   -> JSONB
-|       +-- Action  -> JSONB
-+-- Storage
-    +-- TSDB   stores high-frequency Metric data
-    +-- JSONB  stores State and Action payloads
+<div className="t0-uns-foundation-mermaid t0-uns-foundation-mermaid--flow">
+```mermaid
+  %%{init: {"flowchart": {"defaultRenderer": "elk", "nodeSpacing": 32, "rankSpacing": 48, "diagramPadding": 8}}}%%
+  flowchart TB
+  source["データソース / コンシューマー"]
+  subgraph UNS["Unified Namespace"]
+      direction LR
+      Model["Model<br/>path、topic、payload を定義"]
+      Broker["Broker<br/>データ交換を処理"]
+      Storage["ストレージ<br/>データを永続化"]
+      Model <--> Broker
+      Broker --> Storage
+  end
+  source <-- "MQTT / API" --> Broker
+  classDef broker fill:#F7FAF2,stroke:#D8E6B8,stroke-width:1px,color:#2A2A2A,stroke-dasharray:5 5
+  class Broker broker
 ```
+</div>
+- Model は **Metric**、**State**、**Action** の 3 種類に分類されます。
+- データは model type に応じて異なるデータベースに保存されます。
+    - **Action/State**: JSONB (PostgreSQL)
+    - **Metric**: リアルタイムデータ（TSDB）
+
+<div className="t0-uns-foundation-mermaid t0-uns-foundation-mermaid--types">
+```mermaid
+    %%{init: {
+      "themeVariables": {
+        "fontSize": "14pt"
+      },
+      "flowchart": {
+        "defaultRenderer": "elk",
+        "nodeSpacing": 40,
+        "rankSpacing": 56,
+        "diagramPadding": 8
+      }
+    }}%%
+    flowchart LR
+    subgraph Model["モデルタイプ"]
+        direction TB
+        metric["Metric<br/>高頻度の数値データ"]
+        state["State<br/>現在の事実または状態"]
+        action["Action<br/>コマンドまたは要求操作"]
+    end
+    subgraph Storage["ストレージ"]
+        direction TB
+        tsdb["TSDB<br/>Metric 履歴の時系列ストレージ"]
+        jsonb["JSONB<br/>State と Action のドキュメントストレージ"]
+    end
+    metric --> tsdb
+    state --> jsonb
+    action --> jsonb
+```
+</div>
+## Broker
+UNS broker は、データモデルに基づいて MQTT または OpenAPI 経由でデータを受信、送信するプラットフォームコンポーネントです。
+- **MQTT の場合**：model tree 内の各 node の完全な path が topic address として機能し、message payload を渡します。
+- **OpenAPI の場合**：HTTP request を通じて data model に対する CRUD コマンドを実行します。
+:::tip[API リファレンス]
+API の詳細は [API Reference](../../reference/api-reference/) を参照してください。
+:::
+
 ## Model
-:::tip[モデルを構築するとき、どのガイドに従うべきですか？]
+:::tip[モデルを作るとき、どのガイドに従うべきですか？]
 データが何を表しているかに基づいて、モデリング方法を選びます。
 - **Physical Data**：物理機械からのリアルタイムデータです。通常は **ISA-95** 標準に基づいて整理され、場所の階層に強く依存します。
-- **Business Data**：生産要件、スケジュール、タスク、ディスパッチに関連するデータです。通常は **業務ドメインとオブジェクト** によって整理されます。
+- **Business Data**：生産要件、スケジュール、タスク、ディスパッチに関係するデータです。通常は **business domain と object** によって整理されます。
 :::
-### Metric、State、Action
-産業データは変化頻度も用途も異なるため、Tier0 は UNS モデルを 3 つの固定タイプに分けています。
 
-| タイプ | 設計理由 | 例 |
+### Metric, State, Action
+産業データは変化頻度と用途が異なるため、Tier0 は UNS model を 3 つの固定 type に分けます。
+
+| Type | Object | Example |
 |---|---|---|
-| `METRIC` | 継続的に収集され、時系列保存が必要な高頻度データ向け。 | 機械の温度/圧力/電圧 |
-| `STATE` | 変化頻度が比較的低く、オブジェクトの現在状態や事実を表すデータ向け。 | 機械の運転状態 |
-| `ACTION` | 外部システムまたはオペレーターが実行すべき内容を記録する低頻度のコマンドデータ向け。 | バッチ開始、機械停止 |
+| `METRIC` | 継続的に収集され、時系列保存が必要な高頻度データ向けに設計されています。 | Machine temperature/pressure/voltage |
+| `STATE` | 変化頻度が比較的低く、object の現在状態または事実を表すデータ向けに設計されています。 | Machine operational status |
+| `ACTION` | 外部システムまたは operator が実行すべき内容を記録する低頻度の command data 向けに設計されています。 | Start batch, stop machine |
 
-### Path/Topic、Payload
-各 UNS モデルには path、topic、payload が含まれます。これらは一緒に**ツリー**構造を形成し、業務コンテキストを持ちながら産業データを転送します。
-- **Path/Topic**：path はデータの所属を表し、topic はメッセージ payload を運びます。これらは ***model address*** を定義します。
-- **Payload**：topic が保持するメッセージ payload です。**key-value** 形式の JSON で、***model data*** を定義します。
+### Path/Topic, Payload
+各 UNS model には path、topic、payload が含まれます。これらが一緒になって、business context を持ち産業データを運ぶ **tree** 構造を形成します。
+- **Path/Topic**：path はデータの所属を表し、topic は message payload を運びます。これらが ***model address*** を定義します。
+- **Payload**：topic が保持する message payload です。**key-value** 形式の JSON で、***model data*** を定義します。
 
-たとえば、UNS のモデルは次のようなツリーで表せます。
+たとえば、UNS 内の model は次のような tree になります。
 <Tabs>
 	<TabItem label="Physical Data">
 ```text
@@ -60,8 +103,8 @@ Unified Namespace
           └── Metric
               └── Machine_001
 ```
-- **Path**：`Factory_A/Site_01/SMT_Line_1/Metric`
-- **Topic**：`/Machine_001`。
+- **Path**: `Factory_A/Site_01/SMT_Line_1/Metric`
+- **Topic**: `/Machine_001`.
 - **Payload**
     ```json
     "temperature": 85,
@@ -77,8 +120,8 @@ Unified Namespace
           └── State
               └── OrderList
 ```
-- **Path**：`Factory_A/ERP/ProductionOrders/State`
-- **Topic**：`/OrderList`。
+- **Path**: `Factory_A/ERP/ProductionOrders/State`
+- **Topic**: `/OrderList`.
 - **Payload**
     ```json
     "orders": "0123569876",
@@ -87,28 +130,20 @@ Unified Namespace
 </TabItem>
 </Tabs>
 
-:::tip[モデルを構築する]
-[データモデルの構築方法](../connect-data/#how-to-build-a-data-model) を参照してください。
-:::
-
-## Broker
-Tier0 では、broker はデータモデルに基づき、MQTT または OpenAPI を通じてデータを送受信するプラットフォームコンポーネントです。
-- **MQTT の場合**：モデルツリー内の各ノードの完全な path が topic address として機能し、message payload を渡します。
-- **Open API の場合**：HTTP リクエストを通じてデータモデルに CRUD コマンドを実行します。
-:::tip[API ??????]
-API の詳細は [API ??????](../../reference/tier0-openapi/) を参照してください。
+:::tip[モデルを構築するには]
+[データモデルを構築する](../connect-data/#データモデルを構築する)を参照してください。
 :::
 
 ## Storage
-Tier0 は PostgreSQL を使用してデータを保存します。データタイプごとに変化速度と保存要件が異なります。
+Tier0 は PostgreSQL を使ってデータを保存します。データ type によって変化速度と保存要件が異なります。
 
-| データタイプ | ストレージ | 説明 |
+| Data Type | Storage | Description |
 |-----------|---------|-------------|
-| Metric | Time-series database | 温度や圧力などの高頻度測定値に最適化されています。各 topic にはデフォルトで `timestamp` と `quality` フィールドが含まれます。 |
-| State | PostgreSQL | 機械またはシステム状態を柔軟な `JSONB` 形式で保存します。 |
-| Action | PostgreSQL | コマンドまたはアクションを柔軟な `JSONB` 形式で保存します。 |
+| `METRIC` | TSDB | 温度や圧力などの高頻度測定値に最適化されています。各 topic には default field として `timestamp` と `quality` が含まれます。 |
+| `STATE` | PostgreSQL | machine または system state を柔軟な `JSONB` 形式で保存します。 |
+| `ACTION` | PostgreSQL | command または action を柔軟な `JSONB` 形式で保存します。 |
 
 ## 次へ
 
-- [UNS にデータを接続](../connect-data/) - 工場を UNS にモデル化し、データをモデルに接続する方法。
-- [UNS データを扱う](../working-with-uns-data/) - MQTT と API を通じて UNS モデルを操作する方法。
+- [UNS にデータを接続する](../connect-data/) - 工場を UNS にモデル化し、データをモデルへ接続する方法。
+- [工場データを扱う](../working-with-uns-data/) - MQTT と API を通じて UNS model を操作する方法。

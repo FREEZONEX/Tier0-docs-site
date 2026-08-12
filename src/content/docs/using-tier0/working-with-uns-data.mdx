@@ -1,6 +1,6 @@
 ---
-title: Working with UNS Data
-description: Operate the UNS over MQTT and the API — with the API reference.
+title: Working with Factory Data
+description: Operate on the UNS data over MQTT and the API — with the API reference.
 editions: [edge, cloud, enterprise]
 sidebar:
   order: 3
@@ -8,15 +8,15 @@ sidebar:
 import { Steps } from '@astrojs/starlight/components';
 import { Tabs, TabItem } from '@astrojs/starlight/components';
 
-Tier0 allows you to operate on the UNS through MQTT and APIs.
+Data in Tier0 unified namespace can be altered and managed through MQTT and APIs with authorization.
 
 ## MQTT
-Tier0 enables MQTT clients to connect to the UNS broker with credentials.
+MQTT clients can connect to the UNS broker with credentials generated on Tier0.
 :::note
 You can use MQTT clients such as **MQTTX**, **MQTT Explorer**, and **Node-RED** to connect to the broker and publish/subscribe messages.
 :::
 ### Generating MQTT Credentials
-On the **Edge** page in Tier0, create a new credential and make a note of it.
+On the **Edge** tab in Tier0, create a new credential and make a note of it.
 :::note[Exceptions on Tier0 Edge version]
 The Tier0 Edge version does not require credentials for external connections.
 :::
@@ -69,7 +69,7 @@ The Tier0 Edge version does not require credentials for external connections.
           1. Create an **Event Flow** in **Flows**, and start it with an `mqtt in` node.
           2. Select the UNS broker as **Server** (same name as the flow) and set **Topic** to a UNS model in the node.
 
-      - Use **Separate Node-RED Instance**
+      - Use **Independent Node-RED Instance**
 
           1. Install and open the <a href="https://nodered.org/docs/getting-started/local" target="_blank" rel="noopener noreferrer">Node-RED</a> instance.
           2. Add a server in the `mqtt in` node with the following information.
@@ -89,21 +89,30 @@ The Tier0 Edge version does not require credentials for external connections.
 
 ### Testing Connections
 <Steps>
-1. On the **Edge** page, make sure the status of each client under the **Clients** tab is normal.
+1. Make sure the client status is normal.
 2. Copy a UNS model topic and publish a message to it through the client.
-3. Go back to **UNS**, check the data under the target topic.
 </Steps>
 
 ## API
 Use the **REST API** to operate on UNS data.
 :::tip[How to use the API]
-- The OpenAPI base path is `/openapi/v1`. Set `TIER0_BASE_URL` to your Tier0 host plus the base path, for example `https://your-workspace.tier0.app/openapi/v1`, and pass your API key in the `x-api-key` header.
-- API keys are generated under **Settings > API Keys** by clicking the account icon in the upper-right corner.
+The OpenAPI base path is `/openapi/v1`, For example `https://your-workspace.tier0.app/openapi/v1`, and pass your API key in the `x-api-key` header.
 :::
+
+### Getting API Key
+
+API keys are from **Settings > API Keys**. Depend on different account type, allowed key types are different.
+- **Service Key**: Can only be created by **Admin** and **Owner**.
+- **Personal Key**: Can be created by anyone, and the permission scope is the same as that of the account.
+:::caution[Key permisson vs Account permission]
+Account permission trumps key permission. When the key permission is set to **Full Access**, data unavailable to the account still cannot be accessed with this key.
+:::
+
+### Examples
 
 - `/uns/create`
 
-  Create UNS path nodes or topic nodes. Use `namespace` to define the node tree.
+  Create UNS path or topic. Use `namespace` to define the node tree.
 
   <Tabs syncKey="uns-api-language">
     <TabItem label="JavaScript">

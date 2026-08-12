@@ -1,35 +1,69 @@
 ---
-title: Tier0 中的 UNS 概念
-description: "Unified Namespace 模型：Metric、State、Action，以及 UNS 如何存储数据。"
+title: 工厂数据基础
+description: "Unified Namespace 模型：Metric、State、Action，以及 UNS 如何存储工厂数据。"
 editions: [edge, cloud, enterprise]
 sidebar:
   order: 1
 ---
 import { Tabs, TabItem } from '@astrojs/starlight/components';
 
-在 Tier0 中，UNS（Unified Namespace）围绕三个部分组织：**模型**、**Broker** 和 **存储**。
 
-- 模型会根据采集的数据类型分为 **Metric**、**State** 和 **Action** 三类。
-- Broker 通过模型定义的 topics 接收和发送数据。
-- 流入和流出的数据会根据模型类型存储到不同数据库中。
-    - **Action/State**：JSONB（PostgreSQL）
-    - **Metric**：实时数据（TSDB）
+在 Tier0 中，工厂数据会基于 UNS（Unified Namespace）方法组织成清晰的树形模型，形成统一的数据基础。
+- Broker 通过模型 topic 接收和发送数据。
 
-```text
-数据源 / 消费者
-        ^
-        | MQTT / HTTP API
-        v
-Unified Namespace
-+-- Broker
-|   +-- 模型
-|       +-- Metric  -> TSDB
-|       +-- State   -> JSONB
-|       +-- Action  -> JSONB
-+-- 存储
-    +-- TSDB   存储高频 Metric 数据
-    +-- JSONB  存储 State 和 Action 消息
+<div className="t0-uns-foundation-mermaid t0-uns-foundation-mermaid--flow">
+```mermaid
+  %%{init: {"flowchart": {"defaultRenderer": "elk", "nodeSpacing": 32, "rankSpacing": 48, "diagramPadding": 8}}}%%
+  flowchart TB
+  source["数据源 / 消费者"]
+  subgraph UNS["Unified Namespace"]
+      direction LR
+      Model["模型<br/>定义路径、topic 和 payload"]
+      Broker["Broker<br/>处理数据交换"]
+      Storage["存储<br/>持久化数据"]
+      Model <--> Broker
+      Broker --> Storage
+  end
+  source <-- "MQTT / API" --> Broker
+  classDef broker fill:#F7FAF2,stroke:#D8E6B8,stroke-width:1px,color:#2A2A2A,stroke-dasharray:5 5
+  class Broker broker
 ```
+</div>
+- 模型分为 **Metric**、**State** 和 **Action** 三种类型。
+- 数据会根据模型类型存储到不同数据库中。
+    - **Action/State**: JSONB (PostgreSQL)
+    - **Metric**: 实时数据（TSDB）
+
+<div className="t0-uns-foundation-mermaid t0-uns-foundation-mermaid--types">
+```mermaid
+    %%{init: {
+      "themeVariables": {
+        "fontSize": "14pt"
+      },
+      "flowchart": {
+        "defaultRenderer": "elk",
+        "nodeSpacing": 40,
+        "rankSpacing": 56,
+        "diagramPadding": 8
+      }
+    }}%%
+    flowchart LR
+    subgraph Model["模型类型"]
+        direction TB
+        metric["Metric<br/>高频数值数据"]
+        state["State<br/>当前事实或状态"]
+        action["Action<br/>命令或请求操作"]
+    end
+    subgraph Storage["存储"]
+        direction TB
+        tsdb["TSDB<br/>Metric 历史的时序存储"]
+        jsonb["JSONB<br/>State 和 Action 的文档存储"]
+    end
+    metric --> tsdb
+    state --> jsonb
+    action --> jsonb
+```
+</div>
 ## 模型
 :::tip[建模时应该参考哪种方式？]
 根据数据代表的对象选择建模方式。
@@ -88,7 +122,7 @@ Unified Namespace
 </Tabs>
 
 :::tip[构建模型]
-参见 [如何构建数据模型](../connect-data/#how-to-build-a-data-model)。
+参见 [如何构建数据模型](../connect-data/#构建数据模型)。
 :::
 
 ## Broker

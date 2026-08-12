@@ -1,6 +1,6 @@
-﻿---
-title: UNS データを扱う
-description: "MQTT と API で UNS を操作し、API reference を参照します。"
+---
+title: 工場データを扱う
+description: MQTT と API で UNS データを操作し、API リファレンスを参照します。
 editions: [edge, cloud, enterprise]
 sidebar:
   order: 3
@@ -8,15 +8,15 @@ sidebar:
 import { Steps } from '@astrojs/starlight/components';
 import { Tabs, TabItem } from '@astrojs/starlight/components';
 
-Tier0 では、MQTT と API を通じて UNS を操作できます。
+MQTT と API を通じて UNS データを操作できます。
 
 ## MQTT
-Tier0 では、MQTT clients が credentials を使って UNS broker に接続できます。
+MQTT clients は、Tier0 で生成された credentials を使って UNS broker に接続できます。
 :::note
 **MQTTX**、**MQTT Explorer**、**Node-RED** などの MQTT clients を使って broker に接続し、messages を publish/subscribe できます。
 :::
 ### MQTT Credentials を生成する
-Tier0 の **Edge** ページで新しい credential を作成し、記録します。
+Tier0 の **Edge** タブで新しい credential を作成し、記録します。
 
 ### MQTT Clients を接続する
 
@@ -60,7 +60,7 @@ Tier0 の **Edge** ページで新しい credential を作成し、記録しま�
       - **Event Flow** を使用 - Tier0 内の Node-RED ベースのデータ処理モジュールです。
           1. **Flows** で **Event Flow** を作成し、`mqtt in` node から開始します。
           2. node 内で UNS broker を **Server**（flow と同じ名前）として選択し、**Topic** を UNS model に設定します。
-      - **別の Node-RED Instance** を使用
+      - **独立した Node-RED Instance** を使用
           1. <a href="https://nodered.org/docs/getting-started/local" target="_blank" rel="noopener noreferrer">Node-RED</a> instance をインストールして開きます。
           2. `mqtt in` node に、次の情報で server を追加します。
           ```json
@@ -79,21 +79,30 @@ Tier0 の **Edge** ページで新しい credential を作成し、記録しま�
 
 ### 接続をテストする
 <Steps>
-1. **Edge** ページで、**Clients** tab にある各 client の status が normal であることを確認します。
-2. UNS model topic をコピーし、client からその topic に message を publish します。
-3. **UNS** に戻り、対象 topic の下にあるデータを確認します。
+1. client status が正常であることを確認します。
+2. UNS model topic をコピーし、client から message を publish します。
 </Steps>
 
 ## API
 **REST API** を使用して UNS データを操作します。
 :::tip[API の使い方]
-- OpenAPI の base path は `/openapi/v1` です。`TIER0_BASE_URL` には Tier0 host と base path を合わせた値（例: `https://your-workspace.tier0.app/openapi/v1`）を設定し、API key は `x-api-key` header で渡します。
-- API keys は右上のアカウントアイコンから **Settings > API Keys** に移動して生成できます。
+OpenAPI base path は `/openapi/v1` です。例: `https://your-workspace.tier0.app/openapi/v1`。API key は `x-api-key` header で渡します。
 :::
+
+### API Key を取得する
+
+API keys は **Settings > API Keys** にあります。account type によって作成できる key type が異なります。
+- **Service Key**: **Admin** と **Owner** のみ作成できます。
+- **Personal Key**: 誰でも作成でき、permission scope は account と同じです。
+:::caution[Key permission vs Account permission]
+Account permission は key permission より優先されます。key permission を **Full Access** に設定しても、account がアクセスできないデータにはこの key でもアクセスできません。
+:::
+
+### 例
 
 - `/uns/create`
 
-  UNS path nodes または topic nodes を作成します。`namespace` で node tree を定義します。
+  UNS path または topic を作成します。`namespace` を使って node tree を定義します。
 
   <Tabs syncKey="uns-api-language">
     <TabItem label="JavaScript">

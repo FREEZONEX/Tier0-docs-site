@@ -2726,6 +2726,85 @@ main:has(.t0-banner) .t0-banner {
 	font-size: 18px !important;
 }
 
+.t0-uns-foundation-mermaid {
+	display: flex;
+	justify-content: center;
+	width: 100%;
+	max-width: 100%;
+	overflow: visible;
+	margin: 1.5rem auto 1.75rem;
+	scrollbar-width: none;
+}
+
+.t0-uns-foundation-mermaid .mermaid {
+	width: fit-content;
+	min-width: 0;
+	max-width: 100%;
+	margin: 0 auto;
+	padding: 0.75rem 1rem;
+	display: block;
+	border: 0 !important;
+	background: transparent !important;
+	overflow: visible;
+	scrollbar-width: none;
+}
+
+.t0-uns-foundation-mermaid::-webkit-scrollbar,
+.t0-uns-foundation-mermaid .mermaid::-webkit-scrollbar,
+.t0-uns-foundation-mermaid *::-webkit-scrollbar {
+	display: none;
+}
+
+.t0-uns-foundation-mermaid .mermaid svg {
+	display: block;
+	width: auto !important;
+	min-width: 0;
+	max-width: 100% !important;
+	max-height: none;
+	height: auto !important;
+	overflow: visible;
+}
+
+.t0-uns-foundation-mermaid--flow .mermaid {
+	width: min(100%, 740px) !important;
+	max-width: 740px !important;
+	padding: 0.5rem 0.75rem !important;
+}
+
+.t0-uns-foundation-mermaid--flow .mermaid svg {
+	width: 100% !important;
+	max-width: 740px !important;
+	max-height: none !important;
+}
+
+.t0-uns-foundation-mermaid--types .mermaid {
+	width: min(100%, 760px) !important;
+	max-width: 760px !important;
+	padding: 0.5rem 0.75rem !important;
+}
+
+.t0-uns-foundation-mermaid--types .mermaid svg {
+	width: 100% !important;
+	max-width: 760px !important;
+	max-height: none !important;
+}
+
+:root[data-theme='light'] .t0-uns-foundation-mermaid .mermaid,
+:root[data-theme='dark'] .t0-uns-foundation-mermaid .mermaid {
+	border: 0 !important;
+	background: transparent !important;
+}
+
+.t0-uns-foundation-mermaid .mermaid .nodeLabel,
+.t0-uns-foundation-mermaid .mermaid .node .label,
+.t0-uns-foundation-mermaid .mermaid .edgeLabel,
+.t0-uns-foundation-mermaid .mermaid .edgeLabel p,
+.t0-uns-foundation-mermaid .mermaid .edgeLabel span,
+.t0-uns-foundation-mermaid .mermaid .cluster-label .nodeLabel,
+.t0-uns-foundation-mermaid .mermaid .cluster-label span {
+	font-size: 15px !important;
+}
+
 .mermaid .nodeLabel,
 .mermaid .node .label,
 .mermaid .edgeLabel,

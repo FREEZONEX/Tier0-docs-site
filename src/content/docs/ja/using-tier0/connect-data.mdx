@@ -1,13 +1,14 @@
 ---
-title: UNS にデータを接続
-description: namespace をモデル化し、Source Flow でデータを取り込みます。すべてのエディションで利用できます。
+title: データ基盤を準備する
+description: namespace モデルを構築し、Source Flow でデータを取り込みます。すべてのエディションで利用できます。
 editions: [edge, cloud, enterprise]
 sidebar:
   order: 2
 ---
+
 import { Steps } from '@astrojs/starlight/components';
 
-データを Tier0 に接続するには、まず **UNS** でモデルを構築し、次に **Source Flow** でデータソースを接続し、UNS モデルを送信先として使用します。
+まず **UNS** でモデルを構築し、その後 **Source Flow** でデータをモデルへ接続して、後続利用のためのデータ基盤を作ります。
 
 ```mermaid
 flowchart BT
@@ -21,37 +22,26 @@ flowchart BT
   class uns t0accent
   class flow t0node
 ```
-## データモデルの構築方法
-シンプルなフォルダーとファイルの構造に基づき、データ階層をツリーマップとして定義します。
 
-### 手動でモデルを構築する
-
-:::note[サンプルモデル]
-**Model**:
-```
-  Factory_A
-  └── Site_01
-      └── SMT_Line_1
-          └── Metric
-              └── Machine_001
-```
-**Payload**:
-```json
-"temperature": 85,
-"vibration": 2.8
-```
+:::note
+このプロセスは UNS Agent との会話で完了できます。詳細は[こちら](../../best-practice/building-data-workflow-with-agent/)を確認してください。
 :::
+
+## データモデルを構築する
+次の内容に基づいて、データ階層をツリーマップとして定義します。
+  - データが発生する物理的な場所（[ISA-95](../../reference/isa-95-equipment-hierarchy/) を参照）；
+  - データが従う業務ロジック。
+
+### モデルを手動で構築する
+
 <Steps>
-1. **UNS** でルート path `Factory_A` を追加します。
-2. `Factory_A` の下に 2 階層目の path `Site_01` を追加し、ツリーマップに示された階層順に後続の path を追加します。
-3. `SMT_Line_1` の下に topic `Machine_001` を追加し、**Topic Type** を **Metric** に設定します。
-4. topic payload を定義します。`temperature` と `vibration` の 2 フィールドを追加し、それぞれのデータ型を設定します。
-5. **Mock Data** を選択してモデルへシミュレーションデータを送信し、**Enable History** でデータをデータベースに保存します。
+1. モデル構造を設計し、topic を追加する前に順序どおりに path を追加します。
+2. [データ特性](../uns-concepts/#metric-state-action)に基づいて、**Metric**、**State**、**Action** から **Topic Type** を設定します。
+3. **Mock Data** を選択してモデルへシミュレーションデータを送信し、**Enable History** を有効にしてデータをデータベースへ保存します。
+4. **Auto Parsing** または **Pre-defined** を使って、正しいデータ型のフィールドを topic に追加します。
+    - **Auto Parsing**：JSON テキストからフィールドを一括で自動変換します。
+    - **Pre-defined**：topic のフィールドを 1 つずつ手動で設定します。
 </Steps>
-
-:::tip[追加パラメータ]
-**Auto Parsing** は JSON テキストを解析し、一般フィールドに変換します。
-:::
 
 ### モデルをインポートする
 :::tip
@@ -59,42 +49,37 @@ ChatGPT などの LLM を使ってモデルのインポートを支援できま�
 :::
 
 <Steps>
-1. **Import** ウィンドウでテンプレート JSON をコピーするか、テンプレートファイルをダウンロードします。
-2. テンプレートを AI に送り、次のような prompt を使います。
+1. **Import** からテンプレート JSON を AI に送り、次のような prompt を使用します。
     ```
-    Generate a UNS model used for xx in xx plant, including xx equipment and data sources based on the template.
+    テンプレートに基づき、xx 工場の xx 用途で使う UNS モデルを生成してください。xx 設備とデータソースを含めてください。
     ```
-3. 生成された結果を UNS にインポートします。
+2. 生成された結果を UNS にインポートします。
 </Steps>
 
-## UNS にデータを接続する方法
-**Source Flow** は **Node-RED** をベースにしており、データソースを Tier0 に接続するために使用します。
-:::tip[Source Flow を理解する]
-**Source Flow** では：
-- すべての flow は **mqtt out** ノードで終わります。これは MQTT client として broker にデータを publish します。
-- UNS broker は flow と同じ名前の **mqtt out** ノードに組み込まれています。
-- UNS モデルを topic として使用すると、データは **UNS** の対応するモデルに直接入ります。
-:::
+## データを UNS に接続する
+
+### データフローの特徴
+- Node-RED をベースにしています。
+- すべての flow は `mqtt out` ノードで終わります。このノードは MQTT client として UNS broker にデータを publish します。
+- UNS broker は、flow と同じ名前の `mqtt out` と `mqtt in` ノードに組み込まれています。
+- UNS モデルを topic として使用すると、データは **UNS** の対応するモデルへ直接入ります。
+
+### 手順
+
 <Steps>
-1. **Flows** で **Source Flow** を作成します。
-2. データソースタイプに応じたノードを使用し、flow の最後を **mqtt out** ノードにします。
-3. ノードの **Server** が UNS broker に設定されていることを確認します。
-4. **UNS** モデルを MQTT topic として使用します（例：`Factory_A/Site_01/SMT_Line_1/Metric/Machine_001`）。
+1. データソースの種類に応じてノードを使って flow を構築し、最後を `mqtt out` ノードにします。
+
+    :::tip[必要なノードがない場合]
+    要件に合わせて Node-RED コミュニティからノードをインストールできます。公式コミュニティノードは、多くの場合 `node-red-contrib` で始まります。
+    :::
+
+2. `mqtt out` ノードの **Server** が UNS broker に設定され、topic が **UNS** のモデルになっていることを確認します。
 </Steps>
 
-## 追加オプション
-:::note
-このセクションでは、ワークフローに関連する追加パラメータまたは設定について説明します。
-:::
-
-| Scope | Parameter | Item | When to use |
-|------|-----------|------|-------------|
-| Path | Extended Attribute/Custom Attributes | - | 単位情報など、path に追加属性を加える必要がある場合に使用します。 |
-| Topic | Topic Type | [Metric, State, Action](../uns-concepts/#metric-state-action) | 測定値、現在状態、実行可能操作など、データの意味に合う topic type を選択します。 |
-| Topic | Attribute Generation Method | Pre-defined | topic の属性を 1 つずつ手動設定します。 |
-| Topic | Attribute Generation Method | Auto-Parsing | JSON テキストから属性をまとめて自動変換します。 |
+### Flow のバージョン管理
+データ flow のバージョンを保存すると、以前のバージョンへロールバックしたり、履歴バージョンから新しい flow を開始したりできます。
 
 ## 次へ
 
-- [UNS 上にアプリを構築](../build-apps/) - UNS データを使って産業アプリケーションを構築します。
-- [UNS データを分析](../analyze-data/) - Marimo Notebook と Python で UNS データを分析します。
+- [工場データでアプリを構築](../build-apps/) - UNS データを使って産業アプリケーションを構築します。
+- [工場データを分析する](../analyze-data/) - Marimo Notebook と Python で UNS データを分析します。

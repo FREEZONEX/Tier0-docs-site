@@ -1,5 +1,5 @@
-﻿---
-title: Modelado de UNS
+---
+title: Modelar datos de fábrica
 description: "Diseño del Demo UNS: evitar topic explosion y mejores prácticas de payload structure."
 editions: [edge, cloud, enterprise]
 sidebar:
@@ -10,7 +10,7 @@ import { Tabs, TabItem } from '@astrojs/starlight/components';
 
 
 ## Cómo está estructurado Demo UNS
-:::tip[Qu? hacer primero]
+:::tip[Qué hacer primero]
 Antes de modelar los datos, responde estas preguntas.
 - ¿Qué datos se consumirán desde UNS?
 - ¿Qué datos se publicarán de vuelta a UNS?
@@ -19,18 +19,7 @@ Antes de modelar los datos, responde estas preguntas.
 
 ### Datos físicos
 
-Los datos industriales de máquinas y equipos con ubicaciones físicas se modelan normalmente según el estándar ISA-95.
-
-#### Jerarquía de equipos ISA-95
-La jerarquía de equipos ISA-95 describe cómo se estructuran los activos físicos y los sistemas de control dentro de una organización.
-Se divide en los siguientes niveles:
-- **Enterprise**: El nivel superior, que representa toda la organización. Incluye procesos de negocio generales y entidades de decisión, normalmente soportadas por sistemas ERP.  
-- **Site**: Representa una ubicación geográfica o instalación específica. Cada site puede tener sus propios sistemas de gestión y control local de producción. 
-- **Area**: Una división operativa dentro de un site, a menudo un área funcional como empaque, ensamblaje o almacén. 
-- **Process Cell**: La unidad básica de fabricación dentro de un area. Incluye todos los equipos necesarios para producir un producto específico o realizar una función específica. 
-- **Unit**: Una parte diferenciada del process cell, responsable de una función específica como mezclar, calentar o ensamblar. 
-- **Equipment Module**: Un equipo modular que realiza una tarea específica dentro de un unit. Por ejemplo, en un unit de mezcla, el módulo podría ser un elemento calefactor.  
-- **Control Module**: El nivel más bajo, que representa dispositivos o controladores individuales como sensores, bombas, actuadores o lazos PID que controlan directamente procesos físicos.
+Los datos industriales de máquinas y equipos con ubicaciones físicas se modelan normalmente según el [estándar ISA-95](../../reference/isa-95-equipment-hierarchy/).
 
 #### Modelo demo
 <Tabs syncKey="demo-uns-model">
@@ -379,7 +368,7 @@ DemoFactory
 
 Para objetos de planificación y proceso de negocio, como órdenes de producción y planes de trabajo en un ERP, modela los datos según su contexto de negocio.
 :::tip[How to recognize business data]
-Datos que no tienen una ubicaci?n f?sica.
+Datos que no tienen una ubicación física.
 :::
 #### Guía de modelado de datos de negocio
 ```

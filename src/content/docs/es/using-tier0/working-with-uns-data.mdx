@@ -1,6 +1,6 @@
-﻿---
-title: Trabajar con datos UNS
-description: "Opera UNS mediante MQTT y API, con la referencia de API."
+---
+title: Trabajar con datos de fábrica
+description: Opera datos UNS con MQTT y la API, con la referencia de API.
 editions: [edge, cloud, enterprise]
 sidebar:
   order: 3
@@ -8,15 +8,15 @@ sidebar:
 import { Steps } from '@astrojs/starlight/components';
 import { Tabs, TabItem } from '@astrojs/starlight/components';
 
-Tier0 te permite operar sobre UNS mediante MQTT y APIs.
+Puedes operar datos de UNS mediante MQTT y APIs.
 
 ## MQTT
-Tier0 permite que MQTT clients se conecten al broker UNS con credentials.
+Los MQTT clients pueden conectarse al broker UNS con credentials generadas en Tier0.
 :::note
 Puedes usar MQTT clients como **MQTTX**, **MQTT Explorer** y **Node-RED** para conectarte al broker y publicar/suscribirte a messages.
 :::
 ### Generar MQTT Credentials
-En la página **Edge** de Tier0, crea una nueva credential y guárdala.
+En la pestaña **Edge** de Tier0, crea una nueva credential y guárdala.
 
 ### Conectar MQTT Clients
 
@@ -79,21 +79,30 @@ Los siguientes clients se usan como ejemplos para mostrar cómo usar las credent
 
 ### Probar conexiones
 <Steps>
-1. On the **Edge** page, make sure the status of each client under the **Clients** tab is normal.
-2. Copy a UNS model topic and publish a message to it through the client.
-3. Go back to **UNS**, check the data under the target topic.
+1. Asegúrate de que el client status sea normal.
+2. Copia un topic de modelo UNS y publica un message en él mediante el client.
 </Steps>
 
 ## API
 Usa la **REST API** para operar datos de UNS.
 :::tip[Cómo usar la API]
-- El base path de OpenAPI es `/openapi/v1`. Configura `TIER0_BASE_URL` con tu host de Tier0 más el base path, por ejemplo `https://your-workspace.tier0.app/openapi/v1`, y pasa la API key en el header `x-api-key`.
-- Las API keys se generan desde el icono de cuenta en la esquina superior derecha, en **Settings > API Keys**.
+El base path de OpenAPI es `/openapi/v1`, por ejemplo `https://your-workspace.tier0.app/openapi/v1`, y la API key se pasa en el header `x-api-key`.
 :::
+
+### Obtener API Key
+
+Las API keys están en **Settings > API Keys**. Según el account type, los tipos de key permitidos son distintos.
+- **Service Key**: Solo la pueden crear **Admin** y **Owner**.
+- **Personal Key**: La puede crear cualquier persona, y su permission scope es el mismo que el de la cuenta.
+:::caution[Permiso de key vs permiso de cuenta]
+El permiso de cuenta prevalece sobre el permiso de key. Cuando la key está configurada como **Full Access**, los datos no disponibles para la cuenta siguen sin poder accederse con esa key.
+:::
+
+### Ejemplos
 
 - `/uns/create`
 
-  Crea path nodes o topic nodes de UNS. Usa `namespace` para definir el node tree.
+  Crea un path o topic de UNS. Usa `namespace` para definir el node tree.
 
   <Tabs syncKey="uns-api-language">
     <TabItem label="JavaScript">

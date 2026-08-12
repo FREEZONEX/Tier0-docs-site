@@ -1,5 +1,5 @@
-﻿---
-title: UNS 建模
+---
+title: 工厂数据建模
 description: "Demo UNS 设计：避免 topic explosion 和 payload structure 的最佳实践。"
 editions: [edge, cloud, enterprise]
 sidebar:
@@ -19,18 +19,7 @@ import { Tabs, TabItem } from '@astrojs/starlight/components';
 
 ### 物理数据
 
-来自有物理位置的机器和设备的工业数据，通常基于 ISA-95 标准建模。
-
-#### ISA-95 设备层级
-ISA-95 设备层级描述了组织内物理资产和控制系统的结构方式。
-可拆分为以下层级：
-- **Enterprise**：最高层级，代表整个组织，包括整体业务流程和决策实体，通常由 ERP 系统支持。  
-- **Site**：代表特定地理位置或设施。每个 site 可以拥有自己的管理系统和本地生产控制。 
-- **Area**：site 内的运营分区，通常是包装、装配或仓储等功能区域。 
-- **Process Cell**：area 内的制造基本单元，包含生产特定产品或执行特定功能所需的全部设备。 
-- **Unit**：process cell 中的独立部分，负责混合、加热或装配等特定功能。 
-- **Equipment Module**：unit 内执行特定任务的模块化设备。例如在混合单元中，该模块可以是加热元件。  
-- **Control Module**：最低层级，代表传感器、泵、执行器或 PID 控制回路等单个设备或控制器，用于直接控制物理过程。
+来自有物理位置的机器和设备的工业数据，通常基于 [ISA-95 标准](../../reference/isa-95-equipment-hierarchy/)建模。
 
 #### 示例模型
 <Tabs syncKey="demo-uns-model">

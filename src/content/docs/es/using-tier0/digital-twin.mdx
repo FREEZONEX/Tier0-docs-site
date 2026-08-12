@@ -1,0 +1,33 @@
+---
+title: Visualizar la fábrica
+description: Visualiza tu fábrica con modelos 3D y datos de máquinas en tiempo real.
+editions: [cloud, enterprise]
+sidebar:
+  order: 5
+---
+import { Steps } from '@astrojs/starlight/components';
+
+Los datos de fábrica conectados a Tier0 se pueden visualizar como un Digital Twin con movimientos y entorno realistas. El proceso va desde mapear datos a modelos 3D hasta combinar esos modelos para crear una escena completa de fábrica.
+
+## Mapear datos a modelos 3D
+<Steps>
+1. Después de subir un modelo en **Model**, selecciona los nodos que se mapearán con datos UNS para movimientos en tiempo real.
+2. Añade instancias con distintos datos UNS sobre el modelo para simular distintas máquinas.
+3. Vincula los datos al modelo y usa **Preview** para comprobar si se mueve y rota cuando cambian los datos.
+        - **Position**: El modelo se mueve en la dirección seleccionada del sistema de coordenadas.
+        - **Rotation**: El modelo rota alrededor del punto de origen de las coordenadas.
+4. Usa **Data Tagging** para añadir etiquetas destinadas a mostrar información estática.
+</Steps>
+
+## Visualizar la escena de fábrica
+<Steps>
+1. Añade desde **Instance Library** las instancias que existen en la escena.
+2. Usa las herramientas superiores para mover, escalar y rotar los modelos hasta ajustarlos a la escena, y para cambiar la perspectiva de visualización y la posición de coordenadas.
+3. La posición del modelo se puede confirmar con **Object** en la esquina derecha, donde se muestran los datos UNS vinculados.
+4. El viewport y la iluminación sirven para ajustar detalles del entorno.
+</Steps>
+
+## Uso compartido externo
+Solo las instancias se pueden compartir, ya sea por modelo o por escena.
+- **Share Model**: Genera un enlace de la plataforma Tier0 donde se muestra el modelo con datos UNS en vivo.
+- **Share Scene**: Genera un enlace de la plataforma Tier0 donde se muestran el modelo y su escena, con datos UNS en vivo y ajustes del entorno.

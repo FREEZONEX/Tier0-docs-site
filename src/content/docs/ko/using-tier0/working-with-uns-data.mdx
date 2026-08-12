@@ -1,6 +1,6 @@
 ---
-title: UNS 데이터 작업
-description: MQTT와 API로 UNS를 운영하고 API 참조를 확인합니다.
+title: 공장 데이터 작업
+description: MQTT와 API로 UNS 데이터를 조작하고 API 레퍼런스를 확인합니다.
 editions: [edge, cloud, enterprise]
 sidebar:
   order: 3
@@ -8,15 +8,15 @@ sidebar:
 import { Steps } from '@astrojs/starlight/components';
 import { Tabs, TabItem } from '@astrojs/starlight/components';
 
-Tier0에서는 MQTT와 API를 통해 UNS를 운영할 수 있습니다.
+MQTT와 API를 통해 UNS 데이터를 조작할 수 있습니다.
 
 ## MQTT
-Tier0는 MQTT client가 credential을 사용해 UNS broker에 연결할 수 있도록 합니다.
+MQTT client는 Tier0에서 생성한 credential로 UNS broker에 연결할 수 있습니다.
 :::note
 **MQTTX**, **MQTT Explorer**, **Node-RED** 같은 MQTT client를 사용해 broker에 연결하고 message를 publish/subscribe할 수 있습니다.
 :::
 ### MQTT Credential 생성
-Tier0의 **Edge** page에서 새 credential을 만들고 기록해 둡니다.
+Tier0의 **Edge** 탭에서 새 credential을 만들고 기록해 둡니다.
 :::note[Tier0 Edge version 예외]
 Tier0 Edge version은 외부 연결에 credential이 필요하지 않습니다.
 :::
@@ -67,7 +67,7 @@ Tier0 Edge version은 외부 연결에 credential이 필요하지 않습니다.
       - **Event Flow** 사용 - Tier0 안의 Node-RED 기반 data processing module입니다.
           1. **Event Flow**에서 flow를 만들고 `mqtt in` node로 시작합니다.
           2. node에서 **Server**를 UNS broker(flow와 같은 이름)로 선택하고 **Topic**을 UNS model로 설정합니다.
-      - **별도 Node-RED Instance** 사용
+      - **독립 Node-RED Instance** 사용
           1. <a href="https://nodered.org/docs/getting-started/local" target="_blank" rel="noopener noreferrer">Node-RED</a> instance를 설치하고 엽니다.
           2. `mqtt in` node에서 아래 정보로 server를 추가합니다.
           ```json
@@ -86,21 +86,30 @@ Tier0 Edge version은 외부 연결에 credential이 필요하지 않습니다.
 
 ### Connection 테스트
 <Steps>
-1. **Edge** page에서 **Clients** tab 아래 각 client status가 정상인지 확인합니다.
+1. client status가 정상인지 확인합니다.
 2. UNS model topic을 복사하고 client를 통해 message를 publish합니다.
-3. **UNS**로 돌아가 target topic 아래의 데이터를 확인합니다.
 </Steps>
 
 ## API
 **REST API**를 사용해 UNS 데이터를 조작합니다.
 :::tip[API 사용 방법]
-- OpenAPI base path는 `/openapi/v1`입니다. `TIER0_BASE_URL`은 Tier0 host와 base path를 합친 값으로 설정합니다. 예: `https://your-workspace.tier0.app/openapi/v1`. API key는 `x-api-key` header로 전달합니다.
-- API keys는 오른쪽 위 계정 아이콘의 **Settings > API Keys**에서 생성할 수 있습니다.
+OpenAPI base path는 `/openapi/v1`입니다. 예: `https://your-workspace.tier0.app/openapi/v1`. API key는 `x-api-key` header로 전달합니다.
 :::
+
+### API Key 가져오기
+
+API keys는 **Settings > API Keys**에 있습니다. account type에 따라 허용되는 key type이 다릅니다.
+- **Service Key**: **Admin**과 **Owner**만 만들 수 있습니다.
+- **Personal Key**: 누구나 만들 수 있으며 permission scope는 account와 같습니다.
+:::caution[Key permission vs Account permission]
+Account permission이 key permission보다 우선합니다. key permission을 **Full Access**로 설정해도 account가 접근할 수 없는 데이터는 이 key로도 접근할 수 없습니다.
+:::
+
+### 예시
 
 - `/uns/create`
 
-  UNS path nodes 또는 topic nodes를 생성합니다. `namespace`를 사용해 node tree를 정의합니다.
+  UNS path 또는 topic을 생성합니다. `namespace`를 사용해 node tree를 정의합니다.
 
   <Tabs syncKey="uns-api-language">
     <TabItem label="JavaScript">
