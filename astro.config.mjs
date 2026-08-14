@@ -56,9 +56,7 @@ export default defineConfig({
 				{ icon: 'github', label: 'GitHub', href: 'https://github.com/FREEZONEX' },
 				{ icon: 'discord', label: 'Discord', href: 'https://tier0.app/media' },
 			],
-			editLink: {
-				baseUrl: 'https://github.com/FREEZONEX/Tier0-docs-site/edit/main/',
-			},
+			lastUpdated: true,
 			pagefind: false,
 			expressiveCode: {
 				themes: ['vitesse-dark', 'vitesse-light'],
@@ -69,7 +67,9 @@ export default defineConfig({
 			components: {
 				Head: './src/components/Head.astro',
 				Header: './src/components/Header.astro',
+				SiteTitle: './src/components/SiteTitle.astro',
 				PageTitle: './src/components/PageTitle.astro',
+				LastUpdated: './src/components/LastUpdated.astro',
 				Pagination: './src/components/Pagination.astro',
 			},
 			customCss: [
@@ -111,7 +111,7 @@ export default defineConfig({
 					collapsed: false,
 					items: [
 						{
-							label: 'Factory Data Foundation',
+							label: 'Factory Data Modeling',
 							translations: { 'zh-CN': '工厂数据基础', ja: '工場データ基盤', es: 'Base de datos de fábrica', ko: '공장 데이터 기반' },
 							slug: 'using-tier0/uns-concepts',
 						},
@@ -126,18 +126,18 @@ export default defineConfig({
 							slug: 'using-tier0/working-with-uns-data',
 						},
 						{
-							label: 'Building Apps on Factory Data',
-							translations: { 'zh-CN': '基于工厂数据构建应用', ja: '工場データでアプリを構築', es: 'Crear apps con datos de fábrica', ko: '공장 데이터로 앱 구축하기' },
+							label: 'Building Apps',
+							translations: { 'zh-CN': '构建应用', ja: '工場データでアプリを構築', es: 'Crear apps con datos de fábrica', ko: '공장 데이터로 앱 구축하기' },
 							slug: 'using-tier0/build-apps',
 						},
 						{
-							label: 'Visualizing Factory',
+							label: 'Visualizing Workshop',
 							translations: { 'zh-CN': '可视化工厂', ja: '工場を可視化する', es: 'Visualizar la fábrica', ko: '공장 시각화' },
 							slug: 'using-tier0/digital-twin',
 						},
 						{
-							label: 'Analyzing Factory Data',
-							translations: { 'zh-CN': '分析工厂数据', ja: '工場データを分析する', es: 'Analizar datos de fábrica', ko: '공장 데이터 분석' },
+							label: 'Analyzing Data',
+							translations: { 'zh-CN': '分析数据', ja: '工場データを分析する', es: 'Analizar datos de fábrica', ko: '공장 데이터 분석' },
 							slug: 'using-tier0/analyze-data',
 						},
 						{
@@ -164,7 +164,7 @@ export default defineConfig({
 						},
 						{
 							label: 'Building Shopfloor Workflow with Agent',
-							translations: { 'zh-CN': '用 Agent 构建车间工作流', ja: 'Agent でデータワークフローを構築する', es: 'Crear flujos de datos con Agent', ko: 'Agent로 데이터 워크플로 구축하기' },
+							translations: { 'zh-CN': '用 Agent 构建车间工作流', ja: 'Agent で現場ワークフローを構築する', es: 'Crear flujos de planta con Agent', ko: 'Agent로 현장 워크플로 구축하기' },
 							slug: 'best-practice/building-data-workflow-with-agent',
 						},
 						{
@@ -173,7 +173,7 @@ export default defineConfig({
 							slug: 'best-practice/analytics-apps',
 						},
 						{
-							label: 'Displaying Factory Data with Digital Twin',
+							label: 'Displaying Data with Digital Twin',
 							translations: { 'zh-CN': '使用数字孪生展示工厂数据', ja: 'Digital Twin で工場データを表示する', es: 'Mostrar datos de fábrica con Digital Twin', ko: 'Digital Twin으로 공장 데이터 표시하기' },
 							slug: 'best-practice/view-uns-with-digital-twin',
 						},
@@ -190,8 +190,8 @@ export default defineConfig({
 							slug: 'reference/api-reference',
 						},
 						{
-							label: 'Skill Reference',
-							translations: { 'zh-CN': 'Skill 参考', ja: 'Skill リファレンス', es: 'Referencia de Skill', ko: 'Skill 참조' },
+							label: 'CLI Command Reference',
+							translations: { 'zh-CN': 'CLI 命令参考', ja: 'CLI コマンドリファレンス', es: 'Referencia de comandos CLI', ko: 'CLI 명령 참조' },
 							slug: 'reference/skill-reference',
 						},
 						{

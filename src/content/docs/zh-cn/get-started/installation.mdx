@@ -28,47 +28,6 @@ Tier0 提供三个版本：
 	</Steps>
 	
 	</TabItem>
-	<TabItem label="Edge">
-
-	#### 环境要求
-	- 至少 4 核 CPU、8 GB RAM、100 GB 磁盘
-	- Ubuntu 24.04，或安装了 Docker 和 Git 的 Windows 10/11
-	#### 操作步骤
-	<Steps>
-	1. 从 GitHub 克隆 Tier0-Edge 仓库并进入项目目录。
-
-		```bash
-		git clone https://github.com/FREEZONEX/Tier0-Edge
-		cd Tier0-Edge/deploy
-		```
-
-	2. 根据你的环境，在 `.env.default` 中按需编辑下表列出的参数。
-	
-		```bash
-		vi .env.default
-		:wq!
-		```
-	3. 运行安装脚本。
-
-		```bash
-		bash bin/install.sh
-		```
-
-	</Steps>
-
-:::note[需要配置的参数]
-
-| 字段 | 类型 | 说明 |
-|------|------|-------------|
-| VOLUMES_PATH | string | 项目数据的存储路径 |
-| ENTRANCE_DOMAIN/ENTRANCE_PORT | string | Tier0 访问入口（IP/域名 + 端口） |
-| OS_PLATFORM_TYPE | enum | 安装 Tier0 的操作系统。可选 **linux** 或 **windows** |
-| LANGUAGE | enum | zh-CN / en-US |
-
-:::
-		
-
-	</TabItem>
 	<TabItem label="Enterprise">
 #### 环境要求
 - 标准部署
@@ -118,18 +77,63 @@ Enterprise 的硬件要求会随部署场景变化。
 		```bash
 		./full-cleanup.sh --env install.env --yes
 		```
-		> 此命令会清除全部 Tier0 运行时数据和数据库备份，但会保留虚拟机、操作系统以及已安装的 Docker 软件。
+		:::caution[影响说明]
+		此命令会清除全部 Tier0 运行时数据和数据库备份，但会保留虚拟机、操作系统以及已安装的 Docker 软件。
+		:::
 - 安装完成后会生成部署报告。
 		```text
 		runtime/install-reports/<timestamp>/deployment-report.md
 		```
-		> 如果报告中包含任何 **FAIL** 项，请不要交付项目，请先联系支持团队。
+		:::caution[报告中出现 **FAIL** 时应该怎么做]
+		如果报告中包含任何 **FAIL** 项，请不要交付项目，请先联系支持团队。
+		:::
 #### 维护参考
 - [标准端口列表](../../reference/standard-port-list/)
 - [维护与故障排查指南](../../reference/operations-runbook/)
 - [高可用边界说明](../../reference/sla-and-ha-boundaries/)
 
 </TabItem>
+	<TabItem label="Edge">
+
+	#### 环境要求
+	- 至少 4 核 CPU、8 GB RAM、100 GB 磁盘
+	- Ubuntu 24.04，或安装了 Docker 和 Git 的 Windows 10/11
+	#### 操作步骤
+	<Steps>
+	1. 从 GitHub 克隆 Tier0-Edge 仓库并进入项目目录。
+
+		```bash
+		git clone https://github.com/FREEZONEX/Tier0-Edge
+		cd Tier0-Edge/deploy
+		```
+
+	2. 根据你的环境，在 `.env.default` 中按需编辑下表列出的参数。
+	
+		```bash
+		vi .env.default
+		:wq!
+		```
+
+		:::note[需要配置的参数]
+
+		| 字段 | 类型 | 说明 |
+		|------|------|-------------|
+		| VOLUMES_PATH | string | 项目数据的存储路径 |
+		| ENTRANCE_DOMAIN/ENTRANCE_PORT | string | Tier0 访问入口（IP/域名 + 端口） |
+		| OS_PLATFORM_TYPE | enum | 安装 Tier0 的操作系统。可选 **linux** 或 **windows** |
+		| LANGUAGE | enum | zh-CN / en-US |
+
+		:::
+	3. 运行安装脚本。
+
+		```bash
+		bash bin/install.sh
+		```
+
+	</Steps>
+		
+
+	</TabItem>
 </Tabs>
 
 ## 下一步

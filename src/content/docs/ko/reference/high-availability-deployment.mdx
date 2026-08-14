@@ -1,6 +1,6 @@
----
+﻿---
 title: 고가용성 배포 계획
-description: 고가용 Tier0 Enterprise 환경을 위한 참조 배포 계획입니다.
+description: Tier0 Enterprise 고가용성 환경을 위한 참조 배포 계획입니다.
 sidebar:
   order: 3
 tableOfContents:
@@ -10,132 +10,276 @@ tableOfContents:
 
 ## 계획 목표
 
-이 계획은 오프라인 또는 프라이빗 환경에 Tier0 Enterprise 환경 하나를 배포하기 위한 것입니다. 기본 구성은 총 6대의 가상 머신입니다.
+이 V2 계획은 오프라인 또는 프라이빗 환경에 논리적인 Tier0 Enterprise Fleet Center를 배포하기 위한 것입니다. 6대의 머신이 비즈니스, 미들웨어, 데이터베이스, 스토리지, Agent 역할을 나누어 담당합니다. 사용자와 Enterprise 내부 서비스는 항상 고정 VIP 주소로 접속합니다. 하나의 머신 또는 하나의 프록시에 장애가 발생하면 Keepalived, HAProxy, repmgr, RustFS, Fleet Agent가 각자의 계층에서 인계를 수행합니다.
 
-- 애플리케이션 노드 3대가 `Docker Swarm` 클러스터를 구성하고, 단일 replica Tier0 Enterprise 서비스와 stateful **EMQX** 서비스를 실행합니다.
-- 데이터베이스 노드 2대가 `PostgreSQL + TimescaleDB` primary-standby 클러스터를 구성합니다.
-- `Witness` 노드 1대가 데이터베이스 모니터링, 중재, failover에 참여합니다.
+이 계획은 동일 네트워크 세그먼트 안에서 단일 머신 장애를 복구하는 것을 목표로 합니다. 이는 Active/Standby 재해 복구 설계이며, 다중 데이터센터, 합의 기반 선출, 또는 데이터 손실 0을 보장하는 엄격한 고가용성 클러스터가 아닙니다.
 
-:::note[선택 사항]
-외부 `NFS/NAS` 공유 스토리지를 추가하고 세 Swarm 노드에 마운트할 수 있습니다. 이는 Tier0 Enterprise의 노드 간 공유 파일용 외부 의존성이며, 이 계획의 6대 업무 VM에는 포함하지 않습니다.
-:::
+설계 목표는 다음과 같습니다.
 
-:::tip[데이터베이스 리소스가 변경되는 경우]
-이 계획은 각 데이터베이스 VM이 `4C / 8G / 500G`라고 가정합니다. 전체 데이터베이스 클러스터 기준 요구사항이 `4C / 8G / 500G`라면, 구현 전에 성능과 용량을 다시 계산해야 합니다.
-:::
+- 현재 비즈니스 노드가 실패하면 Fleet Center 진입점을 정상 Standby 노드로 이동할 수 있습니다.
+- PostgreSQL, Redis, RustFS는 고정 VIP 주소를 사용하므로 backend 역할이 바뀌어도 Enterprise의 `.env`를 변경하지 않습니다.
+- App, Flow, Marimo, License와 같은 로컬 비즈니스 파일을 Active에서 Standby로 동기화할 수 있습니다.
+- 하나의 Cluster License는 하나의 논리 설치에 매핑되며, Enterprise가 다른 노드로 전환되어도 다시 활성화하지 않습니다.
+- 별도의 deployer가 6대 머신 초기화, 역할 할당, 서비스 배포, 상태 모니터링, failover 검증을 수행합니다.
+- VIP failover, 파일 동기화, 독립 Redis 인스턴스, 데이터베이스 복제, 객체 스토리지 중복성을 명확히 분리합니다.
 
-## 계획 IP 주소
-
-아래 IP는 예시입니다. 구현 전에 실제 현장 네트워크 주소로 교체하세요.
-
-| 유형 | 이름 | 계획 IP | 설명 |
-| --- | --- | --- | --- |
-| 논리 진입점 | APP VIP | `10.60.10.10` | 통합 업무 진입점이며 3대 Swarm 노드 사이에서 failover할 수 있습니다. |
-| 외부 의존성 | NFS/NAS | `10.60.40.10` | 선택적 공유 스토리지이며 6대 VM에 포함하지 않습니다. |
-| 애플리케이션 노드 | ent-swarm-01 | `10.60.10.11` | Docker Swarm manager/worker. 고정 EMQX 노드 또는 EMQX 클러스터 노드로 사용할 수 있습니다. |
-| 애플리케이션 노드 | ent-swarm-02 | `10.60.10.12` | Docker Swarm manager/worker. 재스케줄 가능한 서비스를 실행합니다. |
-| 애플리케이션 노드 | ent-swarm-03 | `10.60.10.13` | Docker Swarm manager/worker. 재스케줄 가능한 서비스를 실행합니다. |
-| 논리 진입점 | DB VIP | `10.60.20.10` | 통합 데이터베이스 진입점이며 현재 primary만 가리킵니다. |
-| 데이터베이스 노드 | ent-db-01 | `10.60.20.11` | PostgreSQL + TimescaleDB primary 후보. |
-| 데이터베이스 노드 | ent-db-02 | `10.60.20.12` | PostgreSQL + TimescaleDB standby 후보. |
-| 중재 노드 | ent-db-witness-01 | `10.60.20.13` | repmgr witness / 중재 및 모니터링 노드. |
+이 계획은 Fleet Center에만 적용됩니다. Branch Enterprise 노드는 일반 단일 머신 배포로 설치되며, 이 6대 Active/Standby 설계에 참여하지 않습니다.
 
 ## 전체 토폴로지
 
-<img class="t0-topology" src="/images/enterprise-ha-topology.ko.png" alt="tier0-enterprise 6 VM 남북 데이터 경로" />
+<img class="t0-topology" src="/images/enterprise-ha-overview.ko.svg" alt="Tier0 Enterprise 전체 토폴로지" />
 
-그림은 핵심 링크만 보여줍니다.
+핵심 요청 경로는 다음과 같습니다.
 
-- 업무 접근 경로: 사용자 / 현장 시스템 -> `APP VIP` -> 세 `Docker Swarm` 노드 -> `DB VIP` -> 현재 primary 데이터베이스.
-- `APP VIP`는 세 Swarm 노드로 트래픽을 분산합니다. Swarm 노드는 `DB VIP`를 통해 데이터베이스에 접근합니다.
-- `APP VIP`는 세 Swarm 노드 사이에서 failover할 수 있습니다. `DB VIP`는 현재 PostgreSQL Primary 역할을 따라가며 두 데이터베이스 노드 사이에서 failover할 수 있습니다.
-- `Witness`는 데이터베이스 중재, primary 선택, health check에만 참여하며 업무 접근 경로에는 포함되지 않습니다.
-- `EMQX`는 stateful 서비스입니다. 기본적으로 영구 스토리지가 있는 한 노드에 고정해야 합니다. 메시징 계층에도 HA가 필요하면 3노드 EMQX 클러스터를 배포하세요.
+```text
+클라이언트 / 현장 시스템
+    -> Business VIP :8088
+    -> 현재 Active Enterprise (D / E / F)
+    |-- PostgreSQL VIP :5432 -> D/E HAProxy -> A/B 현재 쓰기 가능한 Primary
+    |-- Redis VIP      :6379 -> C 또는 F 독립 Redis
+    `-- RustFS VIP     :19000 -> A/B HAProxy -> C/D/E/F RustFS 클러스터
+```
 
-## 데이터베이스 모니터링 및 Failover
+4개의 VIP는 비즈니스 설정의 고정 진입점입니다. Enterprise가 노드를 전환하거나 미들웨어 backend 역할이 변경되어도 클라이언트와 Enterprise는 접속 주소를 변경하지 않습니다.
 
-| 단계 | 링크 | 설명 |
+## 계획 IP 주소
+
+아래 주소는 예시입니다. 구현 전 현장의 동일 IPv4 서브넷에 있는 실제 주소로 교체하십시오. 4개의 VIP는 DHCP, 정적 호스트, 또는 다른 VRRP 인스턴스에서 사용 중이면 안 됩니다.
+
+| 이름 | 예시 IP | 설명 |
 | --- | --- | --- |
-| 정상 접근 | Swarm 노드의 Tier0 Enterprise replica -> `DB VIP` -> 현재 primary | 애플리케이션은 항상 `10.60.20.10:5432`에만 연결합니다. |
-| 정상 복제 | 현재 primary -> 현재 standby | PostgreSQL WAL streaming replication으로 데이터를 동기화합니다. |
-| 정상 모니터링 | `DB-01` / `DB-02` -> `Witness` | `repmgrd`가 상태를 보고하고 `Witness`가 중재에 참여합니다. |
-| primary 장애 | standby -> `Witness` | standby가 split-brain을 피하기 위해 중재를 요청합니다. |
-| standby 승격 | standby `promote` | `Witness` 확인 후 standby가 새로운 primary로 승격됩니다. |
-| VIP failover | `DB VIP` -> 새 primary | `10.60.20.10`이 새 primary에 바인딩됩니다. |
-| 애플리케이션 복구 | Tier0 Enterprise -> `DB VIP` -> 새 primary | 연결 풀이 재연결되고 읽기/쓰기가 복구됩니다. |
+| deployer-controller | `10.60.10.20` | 독립 deployer. 6대 비즈니스 머신에는 포함하지 않음 |
+| ent-ha-01 / A | `10.60.10.11` | PostgreSQL Primary 및 관련 역할 |
+| ent-ha-02 / B | `10.60.10.12` | PostgreSQL Standby 및 관련 역할 |
+| ent-ha-03 / C | `10.60.10.13` | Witness, Redis-1, RustFS-1 |
+| ent-ha-04 / D | `10.60.10.14` | 초기 Active Enterprise 및 관련 역할 |
+| ent-ha-05 / E | `10.60.10.15` | Enterprise Standby 및 관련 역할 |
+| ent-ha-06 / F | `10.60.10.16` | Enterprise Standby 및 관련 역할 |
+| Business VIP | `10.60.10.101` | Enterprise 통합 진입점, 기본값 `8088` |
+| PostgreSQL VIP | `10.60.10.102` | 데이터베이스 통합 진입점, 기본값 `5432` |
+| Redis VIP | `10.60.10.103` | Redis 통합 진입점, 기본값 `6379` |
+| RustFS VIP | `10.60.10.104` | S3 통합 진입점, 기본값 `19000` |
 
-핵심 경계:
+구현 전에는 비즈니스 NIC 이름, IPv4 prefix, gateway, DNS, NTP, hostname, SSH 사용자, 디스크 mount point, firewall allowlist를 확인하십시오. VIP, node IP, NIC를 스크립트가 추측한 값으로 운영 환경에 직접 사용해서는 안 됩니다.
 
-- 업무 서비스는 `DB VIP:5432`에만 연결하며 `ent-db-01/02` 직접 연결은 허용하지 않습니다.
-- `Witness`는 업무 데이터를 저장하지 않고, 업무 읽기/쓰기 트래픽을 처리하지 않으며, 애플리케이션에 데이터베이스 접근을 노출하지 않습니다.
-- `TimescaleDB`는 두 데이터베이스 노드 모두에 PostgreSQL extension으로 배포됩니다.
-- 권장 설계는 `PostgreSQL streaming replication + repmgr + repmgr witness + keepalived DB VIP`입니다.
-- 자동 failover는 primary 데이터베이스가 사용할 수 없는 경우만 처리합니다. 원래 primary가 복구되면 먼저 standby로 다시 참여해야 합니다.
+## 6대 머신 책임
 
-## 노드 구성 목록
+<img class="t0-topology" src="/images/enterprise-ha-six-node.ko.svg" alt="Tier0 Enterprise 6대 Active/Standby 아키텍처" />
 
-| 노드 | 역할 | vCPU | 메모리 | 스토리지 | 주요 구성 요소 |
-| --- | --- | ---: | --- | --- | --- |
-| ent-swarm-01 | Swarm manager/worker | 8 | 32G | 100G | Docker Engine, Swarm, Keepalived, HAProxy/Nginx |
-| ent-swarm-02 | Swarm manager/worker | 8 | 32G | 100G | Docker Engine, Swarm, Keepalived, HAProxy/Nginx |
-| ent-swarm-03 | Swarm manager/worker | 8 | 32G | 100G | Docker Engine, Swarm, Keepalived, HAProxy/Nginx |
-| ent-db-01 | 데이터베이스 primary 후보 | 4 | 8G | 500G | PostgreSQL, TimescaleDB, repmgr, keepalived |
-| ent-db-02 | 데이터베이스 standby 후보 | 4 | 8G | 500G | PostgreSQL, TimescaleDB, repmgr, keepalived |
-| ent-db-witness-01 | Witness / 중재 | 2 | 4G | 40G | repmgr witness, health check scripts |
-
-## 배포 권장사항
-
-- `docker stack deploy`로 Tier0 Enterprise를 배포합니다.
-- 설정 파일에는 `Docker config`를 사용하고, 비밀번호, 데이터베이스 자격 증명, 인증서 private key에는 `Docker secret`을 사용합니다.
-- 배포 중 공용 네트워크 의존성을 피하려면 현장 내부 이미지 registry를 사용합니다.
-- `APP VIP`는 세 Swarm 노드에 `keepalived + HAProxy` 또는 `keepalived + Nginx`로 배포합니다.
-- 데이터베이스 진입점은 `DB VIP`로 통일합니다. 데이터베이스 연결 수가 과도해지지 않도록 애플리케이션 측 연결 풀 사용을 권장합니다.
-- NFS/NAS는 Tier0 Enterprise의 노드 간 공유 파일에만 사용하고 PostgreSQL/TimescaleDB 데이터 디렉터리나 EMQX 핵심 runtime 데이터에는 사용하지 마세요.
-
-## 포트 및 방화벽
-
-전체 포트 세부 정보는 [표준 포트 목록](../standard-port-list/)을 참고하세요.
-
-기본적으로 열지 않을 포트:
-
-- Docker remote API `2375` / `2376`. 꼭 필요한 경우에도 O&M 네트워크로 제한하세요.
-- 데이터베이스 노드의 `80/443`. 데이터베이스 노드는 Web 진입점을 호스팅하지 않습니다.
-- 애플리케이션에서 Witness로의 `5432` 접근. Witness는 업무 SQL을 처리하지 않습니다.
-
-## 고가용성 기능 및 장애 경계
-
-| 장애 시나리오 | 시스템 동작 | 경계 |
+| 머신 | 기본 배포 컴포넌트 | 핵심 책임 |
 | --- | --- | --- |
-| 현재 Swarm 노드 장애 | Swarm이 단일 replica 서비스를 다른 정상 노드로 재스케줄합니다. | 컨테이너 재시작과 애플리케이션 재연결을 기다려야 합니다. |
-| 단일 노드 고정 모드 EMQX 장애 | 먼저 원래 노드를 복구하고, 불가능하면 백업에서 새 노드로 복원합니다. | 메시징 계층이 중단되며 stateless 서비스처럼 무손실 failover할 수 없습니다. |
-| 3노드 EMQX 클러스터의 단일 노드 장애 | 남은 노드가 계속 서비스하고 장애 노드는 복구 후 다시 참여합니다. | EMQX 클러스터 구성이 사전에 완료되어야 합니다. |
-| 현재 primary 장애 | Witness 중재 후 standby가 승격되고 `DB VIP`가 failover합니다. | 쓰기가 수초에서 수분 중단되며 애플리케이션은 재연결해야 합니다. |
-| standby 장애 | primary가 계속 서비스하고 복제 중단 알림이 발생합니다. | 자동 failover 능력이 감소합니다. |
-| Witness 장애 | 현재 primary가 계속 서비스합니다. | 자동 failover 능력이 감소하므로 Witness를 먼저 복구하세요. |
-| NFS/NAS 장애 | 공유 파일에 의존하는 기능이 영향을 받습니다. | 데이터베이스와 메모리 내 업무 프로세스는 반드시 중단되지는 않습니다. |
+| A | PostgreSQL Primary, RustFS HAProxy, Keepalived | 초기 데이터베이스 Primary, 첫 번째 RustFS proxy 후보 |
+| B | PostgreSQL Standby, RustFS HAProxy, Keepalived | Streaming database Standby, 두 번째 RustFS proxy 후보 |
+| C | PostgreSQL Witness, Redis-1, RustFS-1 | 데이터베이스 Witness/상태 기록, Redis 및 RustFS 데이터 노드 |
+| D | PG HAProxy, Keepalived, RustFS-2, Enterprise, Fleet Agent, rsync | 초기 비즈니스 Active, 첫 번째 PostgreSQL proxy 후보 |
+| E | PG HAProxy, Keepalived, RustFS-3, Enterprise, Fleet Agent, rsync | 비즈니스 Standby, 두 번째 PostgreSQL proxy 후보 |
+| F | Redis-2, RustFS-4, Enterprise, Fleet Agent, rsync | 비즈니스 Standby, 두 번째 Redis 인스턴스 |
+
+이 할당은 단일 머신 장애 허용과 6대 머신 간 리소스 균형을 위한 것입니다. deployer는 hostname/IP 주소의 자연 순서에 따라 머신을 A-F에 매핑하고 기본 역할을 선택하지만, 최종 할당은 현장 디스크 구성과 장애 도메인을 기준으로 다시 검토해야 합니다.
+
+### 머신 구성 체크리스트
+
+Enterprise 비즈니스 계층은 Single Active/Standby입니다. 어느 시점이든 Business VIP를 보유한 노드만 비즈니스 요청을 처리합니다. 비즈니스 계층은 하나의 비즈니스 노드 CPU, 메모리, 디스크를 늘리는 수직 확장으로 확장하십시오. Enterprise 노드 수를 곱해서 동시 처리량을 추정하지 마십시오.
+
+| 머신 | 노드 유형 | vCPU | 메모리 | 기본 스토리지 | 디스크 권장 사항 |
+| --- | --- | --- | --- | --- | --- |
+| A | PostgreSQL Primary 노드 | 8C | 16G | 1T | `/` 약 80G, 나머지는 PostgreSQL 데이터, WAL, backup staging 용도 |
+| B | PostgreSQL Standby 노드 | 8C | 16G | 1T | `/` 약 80G, 나머지는 PostgreSQL 데이터, WAL, backup staging 용도 |
+| C | Witness / middleware 노드 | 4C | 8G | 500G | system, Redis, RustFS data에 고정 mount point 할당 |
+| D | 초기 Active Enterprise 노드 | 8C | 32G | 500G | system, containers, Enterprise 동기화 파일, RustFS data에 고정 mount point 할당 |
+| E | Standby Enterprise 노드 | 8C | 32G | 500G | D와 동일 |
+| F | Standby Enterprise 노드 | 8C | 32G | 500G | D와 동일 |
+
+| 범주 | 수량 | 노드당 사양 | vCPU 소계 | 메모리 소계 | 스토리지 소계 |
+| --- | --- | --- | --- | --- | --- |
+| PostgreSQL 데이터베이스 노드 | 2 | `8C / 16G / 1T` | 16C | 32G | 2T |
+| Witness / middleware 노드 | 1 | `4C / 8G / 500G` | 4C | 8G | 500G |
+| Enterprise 비즈니스 노드 | 3 | `8C / 32G / 500G` | 24C | 96G | 1.5T |
+| **합계** | **6** | - | **44C** | **136G** | **4T** |
+
+## 구성 요약
+
+### Enterprise 통합 접속 구성
+
+D, E, F는 동일한 Enterprise 구성을 유지합니다.
+
+| 의존성 | 구성 원칙 |
+| --- | --- |
+| PostgreSQL | A/B 노드 IP가 아니라 PostgreSQL VIP에 연결 |
+| Redis | C/F 노드 IP가 아니라 Redis VIP에 연결 |
+| File storage | `FILESTORE_DRIVER=s3` 사용, S3 endpoint를 RustFS VIP로 지정 |
+| Fleet identity | 3개 노드는 하나의 논리 `installationId`를 공유하고, 각 노드는 고유한 `memberId`를 가짐 |
+| Fleet Agent | 각 Enterprise 노드에서 하나의 process-level Fleet Agent 실행 |
+| License | Business VIP를 통해 한 번만 활성화하고, Bundle을 HA fileset에 포함 |
+
+`installationId`와 `memberId`는 설치 프로세스에서 생성되고 영속화됩니다. 운영자가 이를 수동으로 만들거나 머신 간에 `memberId`를 복사해서는 안 됩니다.
+
+### VIP와 후보 노드
+
+| VIP | 후보 노드 | Health 기준 | 인계 결과 |
+| --- | --- | --- | --- |
+| Business VIP | D, E, F | Fleet Agent readiness, 비즈니스 컨테이너 상태, sync generation | Owner만 Enterprise HA 비즈니스 그룹을 시작 |
+| PostgreSQL VIP | D, E | HAProxy/Keepalived 상태. HAProxy는 쓰기 가능한 Primary로만 라우팅 | Enterprise는 동일한 데이터베이스 주소 유지 |
+| Redis VIP | C, F | Redis `PING` 및 로컬 서비스 상태 | 다른 독립 인스턴스로 전환. cache/session 손실 가능 |
+| RustFS VIP | A, B | HAProxy 및 RustFS backend health | S3 주소는 유지되고 proxy entry만 이동 |
+
+## 컴포넌트 배포 설계
+
+### Enterprise, Fleet Agent, Business VIP
+
+- D, E, F는 동일한 전체 Enterprise offline ZIP을 설치합니다.
+- Fleet Agent는 host-level process service이며 비즈니스 컨테이너가 아닙니다.
+- Keepalived는 Business VIP를 관리하고 Fleet Agent readiness endpoint를 호출하여 로컬 노드가 VIP를 보유할 수 있는지 판단합니다.
+- Business VIP Owner만 비즈니스 그룹을 실행하고, 나머지 2대는 Standby 상태를 유지합니다.
+- VIP를 잃은 노드는 비즈니스 그룹을 중지해야 합니다. 복구된 노드는 먼저 Standby로 재참여해야 합니다.
+- EMQX는 Single Active 비즈니스 그룹의 일부로 실행됩니다. Agent 제어 밖에서 재시작하거나 3대 머신 사이에 별도 election 메커니즘을 만들지 마십시오.
+
+### PostgreSQL Primary/Standby, Witness, 통합 진입점
+
+- A는 Primary, B는 Streaming Standby, C는 repmgr Witness로 시작합니다.
+- Witness는 cluster 상태를 기록하고 장애 판단에 참여합니다. 전체 비즈니스 데이터를 저장하지 않으며 읽기나 쓰기를 처리하지 않습니다.
+- Primary 장애 시 repmgr는 정상 Standby를 새 Primary로 승격합니다.
+- D/E HAProxy는 `5432` 트래픽을 현재 쓰기 가능한 Primary로만 라우팅합니다.
+- PostgreSQL VIP는 D/E proxy 노드 사이에서 이동합니다. proxy failover와 database primary/standby failover는 분리되어 있습니다.
+- 검수 시에는 “쓰기 가능한 Primary가 하나뿐임”과 “Standby가 streaming을 재개함”을 모두 증명해야 합니다.
+
+### Redis 독립 인스턴스
+
+- C와 F는 각각 하나의 standalone Redis 인스턴스를 실행합니다.
+- 두 Redis 인스턴스는 Sentinel, Cluster, primary/replica replication을 구성하지 않습니다.
+- Redis VIP는 접속 진입점만 전환합니다. 현재 인스턴스에 장애가 발생하면 VIP는 다른 정상 인스턴스로 이동합니다.
+- Redis에는 손실되거나 재구성 가능한 데이터만 저장해야 합니다. 전환 후 빈 cache와 사용자 재로그인은 설계 경계에 포함됩니다.
+- 향후 Redis가 폐기할 수 없는 상태를 저장한다면 독립 인스턴스 가정을 유지하지 말고 replication/arbitration 설계로 업그레이드해야 합니다.
+
+### RustFS 4노드 클러스터
+
+- C, D, E, F는 4노드 distributed RustFS object storage cluster를 구성합니다.
+- A와 B의 HAProxy는 모든 정상 RustFS backend로 proxy합니다.
+- RustFS VIP는 A와 B 사이에서 이동합니다. Enterprise는 항상 이 VIP를 통해 S3에 접근합니다.
+- 단일 RustFS 노드 장애는 cluster mechanism이 처리하고, 단일 proxy 장애는 VIP failover가 처리합니다.
+- object data를 rsync, hot copy, RustFS mount directory 직접 편집으로 동기화하지 마십시오.
+- RustFS node count, disk count, erasure-coding availability boundary는 배포된 버전의 cluster check 결과를 따라야 합니다.
+
+### App, Flow, Marimo, License 파일 동기화
+
+Fleet Agent는 PostgreSQL/RustFS에 직접 둘 수 없지만 새 Active 노드에 반드시 있어야 하는 로컬 비즈니스 파일만 동기화합니다.
+
+- App runtime directory 및 `node_modules`
+- Flow, Marimo, Notebook 및 관련 local runtime file
+- License Bundle
+- 현재 구현에 명시적으로 등록된 기타 HA fileset
+
+동기화는 deployer가 관리하는 비즈니스 노드 간 SSH trust 위에서 system `rsync`를 사용합니다. 각 release는 완전한 generation/manifest를 생성합니다. Standby 노드는 generation이 완전함을 확인한 뒤에만 인계할 수 있습니다. PostgreSQL data directory, Redis data directory, RustFS data directory는 이 동기화 범위에 포함되지 않습니다.
+
+## 접속 방식과 네트워크 기준
+
+### 접근 관계
+
+| Source | Target | Purpose |
+| --- | --- | --- |
+| 사용자 / 현장 시스템 | Business VIP | Web/API 비즈니스 접근 |
+| D/E/F Enterprise | PostgreSQL VIP | 비즈니스 데이터베이스 읽기/쓰기 |
+| D/E/F Enterprise | Redis VIP | cache 및 session |
+| D/E/F Enterprise | RustFS VIP | S3 object 읽기/쓰기 |
+| Deployer controller | A-F | SSH, 배포, 상태 수집, 운영 |
+| D/E/F | D/E/F | rsync/SSH 파일 동기화 |
+| A/B/C | A/B/C | PostgreSQL streaming replication, repmgr, Witness communication |
+| RustFS members/proxies | C/D/E/F | RustFS cluster 및 S3 backend communication |
+| 동일 VIP를 공유하는 노드 | 해당 후보 노드 | VRRP advertisement 및 VIP 이동 |
+
+### 포트와 프로토콜
+
+포트는 필요한 최소 source-to-target 관계에 따라 허용하십시오. 모든 관리 포트를 사용자 네트워크에 직접 노출하지 마십시오.
+
+| Port / protocol | 권장 allowlist | Purpose |
+| --- | --- | --- |
+| `22/TCP` | Deployer -> A-F; D/E/F 상호 sync | SSH, deployment, rsync |
+| `8088/TCP` | 사용자 네트워크 -> Business VIP | Enterprise 비즈니스 진입점 |
+| `5432/TCP` | D/E/F -> PostgreSQL VIP; PG/proxy internal access | PostgreSQL, streaming replication, proxy |
+| `6379/TCP` | D/E/F -> Redis VIP; health-check nodes -> C/F | Redis access 및 health check |
+| `19000/TCP` | D/E/F -> RustFS VIP | Enterprise fixed S3 entry |
+| `9000/TCP` | A/B -> C/D/E/F; RustFS members | RustFS S3 backend/cluster communication. 버전별 확인 필요 |
+| `9001/TCP` | 통제된 운영 네트워크 -> RustFS admin entry | 선택적 RustFS admin endpoint. 사용자 네트워크에 노출 금지 |
+| `19731/TCP` | Localhost / Keepalived / 통제된 운영 네트워크 | Fleet Agent HTTP health/control interface |
+| `18080/TCP` | 운영 네트워크 -> deployer controller | Deployer HTTPS UI |
+| `112/VRRP` | 각 VIP 후보 노드 | Keepalived VIP movement. TCP/UDP가 아니라 IP protocol number |
+| `1883/8883` | 현장 장치 네트워크 -> 비즈니스 진입점, 제품 설정 기준 | MQTT/MQTTS |
+
+## Failover와 기능 경계
+
+| Failure scenario | Expected behavior | Boundary |
+| --- | --- | --- |
+| D Active 비즈니스 노드 장애 | Business VIP가 E 또는 F로 이동하고, 새 Owner는 readiness 통과 후 비즈니스 그룹을 시작 | Standby에 최신 HA fileset generation이 완료되어 있어야 함 |
+| PostgreSQL A Primary 장애 | B가 Primary로 승격되고 PostgreSQL VIP는 D/E proxy를 통해 쓰기 가능한 Primary로 계속 라우팅 | 데이터 손실은 streaming replication 상태에 따라 달라짐 |
+| 현재 Redis 노드 장애 | Redis VIP가 다른 독립 Redis 인스턴스로 이동 | cache/session 손실 가능 |
+| RustFS proxy A 또는 B 장애 | RustFS VIP가 다른 proxy로 이동 | RustFS data는 여전히 4노드 cluster health에 의존 |
+| 단일 RustFS data node 장애 | redundancy 조건이 충족되면 RustFS cluster가 서비스를 계속함 | 실제 경계는 disk count 및 erasure-coding configuration에 따라 달라짐 |
+
+네트워크 분리, 동시 다중 노드 장애, 잘못된 VRRP priority, 디스크 가득 참, clock drift, deployer 외부의 수동 변경은 일반 자동 복구 약속 범위 밖이며 운영 절차로 다뤄야 합니다.
 
 ## 백업, 모니터링, 점검
 
-- 매일 데이터베이스 백업을 실행하고, 큰 변경 전에는 반드시 백업합니다.
-- APP VIP, DB VIP, PostgreSQL replication lag, Swarm 노드 상태, EMQX 상태, 디스크 사용률을 모니터링합니다.
-- primary 전환, 애플리케이션 노드 장애, 백업 복원, 공유 스토리지 장애를 정기적으로 리허설합니다.
-- 운영 전 SSH passwordless 접근, NTP 시간 동기화, 이미지 registry, 인증서, DNS, gateway, 방화벽 규칙을 확인합니다.
+- PostgreSQL은 독립적인 logical 또는 physical backup과 restore 검증이 필요합니다.
+- RustFS는 capacity, disk, cluster health monitoring이 필요합니다.
+- Redis는 향후 replication 설계가 도입되기 전까지 cache/session으로 취급해야 합니다.
+- D/E/F의 Fleet Agent와 Keepalived 상태를 모니터링해야 합니다.
+- rsync generation lag를 모니터링해야 합니다. 오래된 generation을 가진 Standby는 비즈니스 트래픽을 인계해서는 안 됩니다.
+- 정기 failover drill에는 Business VIP, PostgreSQL promotion, Redis VIP switch, RustFS proxy switch, backup restore가 포함되어야 합니다.
+
+## Go-live 전 점검
+
+- deployer controller에서 6대 머신 모두 SSH로 접근할 수 있습니다.
+- hostname, IP address, NIC name, NTP, DNS, firewall rule이 고정되고 기록되어 있습니다.
+- 4개의 VIP는 사용 중이 아니며 후보 노드 사이에서 이동할 수 있습니다.
+- disk mount point가 고정되어 있고 reboot 후에도 유지됩니다.
+- Enterprise, PostgreSQL, Redis, RustFS, Keepalived, HAProxy, repmgr, Fleet Agent, rsync 구성이 deployer에 의해 생성되고 검토되었습니다.
+- Cluster License는 Business VIP를 통해 한 번만 활성화되었습니다.
+- production traffic 투입 전에 backup 및 restore 절차를 rehearsal했습니다.
 
 ## 구현 순서
 
-1. 현장 네트워크, VIP, DNS, NTP, 인증서, 이미지 registry, 방화벽 정책을 확인합니다.
-2. 6대 VM의 OS, 디스크, 시간 동기화, 기본 보안 설정을 준비합니다.
-3. NFS/NAS를 사용하는 경우 공유 디렉터리, 권한, 마운트, 재부팅 후 자동 마운트를 검증합니다.
-4. 3노드 Docker Swarm을 배포합니다.
-5. `APP VIP + HAProxy/Nginx`를 배포합니다.
-6. 필요에 따라 단일 노드 고정 EMQX 또는 3노드 EMQX 클러스터를 배포합니다.
-7. PostgreSQL + TimescaleDB primary-standby를 배포합니다.
-8. repmgr witness, repmgrd, DB VIP failover script를 배포합니다.
-9. Tier0 Enterprise 단일 replica stack을 게시합니다.
+1. deployer controller와 6대 머신을 준비합니다.
+2. IP, VIP, NIC, disk, DNS, NTP, SSH, firewall 정보를 확인합니다.
+3. Enterprise offline package와 configuration material을 업로드합니다.
+4. PostgreSQL primary/standby 및 Witness를 배포합니다.
+5. Redis independent instance와 Redis VIP를 배포합니다.
+6. RustFS 4노드 cluster와 RustFS VIP를 배포합니다.
+7. D/E/F에 Enterprise, Fleet Agent, rsync fileset, Business VIP를 배포합니다.
+8. Business VIP를 통해 License를 활성화합니다.
+9. 기능 검증과 failover drill을 실행합니다.
+10. 최종 topology, password/key, backup policy, monitoring target, recovery procedure를 기록합니다.
 
-## 위험 및 확인 항목
+## 검수 기준
 
-- 현장 네트워크 세그먼트, gateway, DNS, NTP, 인증서, 이미지 registry 주소를 확인해야 합니다.
-- Tier0 Enterprise가 로컬 파일 영속성을 필요로 하는지 확인하세요. 필요하면 공유 스토리지 또는 object storage 방안을 추가합니다.
-- `DB VIP` failover script는 현장에서 검증해야 하며, 특히 가상화 플랫폼이 VRRP를 허용하는지 확인해야 합니다.
-- 현장 네트워크가 VRRP를 허용하지 않는 경우 load balancer, DNS 전환 또는 가상화 플랫폼 floating IP를 사용하세요.
+### 기능 검수
+
+- 사용자는 Business VIP를 통해 Enterprise에 접근할 수 있습니다.
+- Enterprise는 PostgreSQL VIP를 통해서만 PostgreSQL을 읽고 씁니다.
+- Enterprise는 Redis VIP를 통해서만 Redis를 사용합니다.
+- Enterprise는 RustFS VIP를 통해서만 RustFS를 사용합니다.
+- failover 후 App, Flow, Marimo, Notebook, License 파일이 Active 노드에 존재합니다.
+- Branch Enterprise는 계속 독립적으로 설치할 수 있으며 이 6대 HA group에 참여하지 않습니다.
+
+### Failover drill 검수
+
+- Active 비즈니스 노드 중지: Business VIP가 정상 Standby로 이동하고 비즈니스 그룹은 그곳에서만 시작됩니다.
+- PostgreSQL Primary 중지: Standby가 승격되고 PostgreSQL VIP는 쓰기 가능한 Primary를 계속 가리킵니다.
+- Redis VIP owner 중지: Redis VIP가 다른 인스턴스로 이동하며 cache/session 손실을 허용합니다.
+- RustFS proxy owner 중지: RustFS VIP가 다른 proxy로 이동합니다.
+- RustFS data node 하나 중지: object access는 실제 RustFS redundancy boundary 안에서 유지됩니다.
+- 장애 노드 복구: Standby 또는 정상 member로 돌아오며 더 새로운 data나 file을 덮어쓰지 않습니다.
+
+## 현장 확인 리스크와 항목
+
+- 네트워크가 VRRP protocol `112`를 허용하는지.
+- 4개의 VIP 주소가 실제로 미사용 상태인지.
+- disk mount layout과 capacity가 실제 file retention 및 RustFS redundancy requirement를 충족하는지.
+- Redis가 disposable data만 저장하는지.
+- PostgreSQL replication lag와 backup policy가 비즈니스 RPO를 충족하는지.
+- 운영 담당자가 VIP failover, file synchronization, database replication, object storage redundancy의 차이를 이해하는지.
+
+## 결론
+
+현재 계획은 6대 머신, 4개의 고정 VIP, Single Active Enterprise를 중심으로 합니다. 비즈니스 진입점, 데이터베이스 진입점, 캐시 진입점, 객체 스토리지 진입점을 분리합니다. 동일 네트워크 세그먼트 안에서 일반적인 단일 머신 장애를 커버할 수 있고, failover 후 connection configuration 변경, License 재활성화, App 파일 수동 복사 작업을 크게 줄입니다.
+
+동시에 세 가지 경계를 받아들여야 합니다. Redis는 데이터를 복제하지 않고, 비즈니스 fileset은 비동기로 동기화되며, 네트워크 partition에는 consensus arbitration이 없습니다. 따라서 이 계획은 **Fleet Center 6대 Single Active Active/Standby 재해 복구 계획**으로 정의하는 것이 적합합니다. 외부에 zero interruption, zero data loss, 또는 cross-data-center strict high availability를 약속해서는 안 됩니다.

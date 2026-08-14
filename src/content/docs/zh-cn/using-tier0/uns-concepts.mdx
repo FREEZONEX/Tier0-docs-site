@@ -9,6 +9,8 @@ import { Tabs, TabItem } from '@astrojs/starlight/components';
 
 
 在 Tier0 中，工厂数据会基于 UNS（Unified Namespace）方法组织成清晰的树形模型，形成统一的数据基础。
+
+## 数据基础架构
 - Broker 通过模型 topic 接收和发送数据。
 
 <div className="t0-uns-foundation-mermaid t0-uns-foundation-mermaid--flow">
@@ -24,7 +26,7 @@ import { Tabs, TabItem } from '@astrojs/starlight/components';
       Model <--> Broker
       Broker --> Storage
   end
-  source <-- "MQTT / API" --> Broker
+  source <-- "MQTT / API" --> UNS
   classDef broker fill:#F7FAF2,stroke:#D8E6B8,stroke-width:1px,color:#2A2A2A,stroke-dasharray:5 5
   class Broker broker
 ```
@@ -64,6 +66,15 @@ import { Tabs, TabItem } from '@astrojs/starlight/components';
     action --> jsonb
 ```
 </div>
+
+## Broker
+在 Tier0 中，broker 是平台组件，它会基于数据模型，通过 MQTT 或 OpenAPI 接收和发送数据。
+- **通过 MQTT**：模型树中每个节点的完整路径会作为 topic 地址，用于传递消息内容。
+- **通过 OpenAPI**：通过 HTTP 请求对数据模型执行 CRUD 操作。
+:::tip[API 参考]
+API 详情见 [API 参考](../../reference/tier0-openapi/)。
+:::
+
 ## 模型
 :::tip[建模时应该参考哪种方式？]
 根据数据代表的对象选择建模方式。
@@ -123,14 +134,6 @@ import { Tabs, TabItem } from '@astrojs/starlight/components';
 
 :::tip[构建模型]
 参见 [如何构建数据模型](../connect-data/#构建数据模型)。
-:::
-
-## Broker
-在 Tier0 中，broker 是平台组件，它会基于数据模型，通过 MQTT 或 OpenAPI 接收和发送数据。
-- **通过 MQTT**：模型树中每个节点的完整路径会作为 topic 地址，用于传递消息内容。
-- **通过 Open API**：通过 HTTP 请求对数据模型执行 CRUD 操作。
-:::tip[API 文档]
-API 详情见 [API 文档](../../reference/tier0-openapi/)。
 :::
 
 ## Storage

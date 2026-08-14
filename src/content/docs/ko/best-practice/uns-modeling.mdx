@@ -666,7 +666,7 @@ Tier0는 topic 폭증을 피하기 위해 `Metric`, `Action`, `State` 세 가지
 - **Use `Metric` for high-frequency real-time data**
 
   각 signal 세부 항목마다 namespace를 확장하지 말고, 고빈도 측정값과 telemetry는 `Metric` 아래에 둡니다.
-
+  <div className="t0-topic-explosion-tabs">
   <Tabs syncKey="topic-explosion-metric">
     <TabItem label="Bad">
 
@@ -703,11 +703,12 @@ Tier0는 topic 폭증을 피하기 위해 `Metric`, `Action`, `State` 세 가지
 
     </TabItem>
   </Tabs>
+  </div>
 
 - **Use `State` for low-frequency status data**
 
   저빈도 상태, snapshot, 현재 비즈니스 상태는 `State` 아래에 둡니다. 작업, batch, 주문처럼 변하는 entity마다 새 topic을 만들지 않습니다.
-
+  <div className="t0-topic-explosion-tabs">
   <Tabs syncKey="topic-explosion-state">
     <TabItem label="Bad">
 
@@ -741,11 +742,12 @@ Tier0는 topic 폭증을 피하기 위해 `Metric`, `Action`, `State` 세 가지
 
     </TabItem>
   </Tabs>
+  </div>
 
 - **Use `Action` for low-frequency action data**
 
   명령, 요청, operator action은 `Action` 아래에 둡니다. action 입력은 parameter별 topic이 아니라 topic의 field로 유지합니다.
-
+  <div className="t0-topic-explosion-tabs">
   <Tabs syncKey="topic-explosion-action">
     <TabItem label="Bad">
 
@@ -780,6 +782,7 @@ Tier0는 topic 폭증을 피하기 위해 `Metric`, `Action`, `State` 세 가지
 
     </TabItem>
   </Tabs>
+  </div>
 
 ## Payload 구조
 

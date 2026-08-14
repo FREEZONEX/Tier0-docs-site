@@ -660,127 +660,6 @@ DemoFactory
   </TabItem>
 </Tabs>
 
-## 如何避免 Topic 爆炸
-Tier0 设计了三种固定的 Topic 类型， `Metric`, `Action` 和 `State` 来避免 topic 爆炸. 
-
-- **将 `Metric` 用于高频实时数据**
-
-  将高频测量值和遥测数据统一放在 `Metric` 下，而不是为每个信号细节创建 topic。
-
-  <Tabs syncKey="topic-explosion-metric">
-    <TabItem label="Bad">
-
-  ```text
-  Factory_A
-  └── SMT_Line_1
-      └── Machine_001
-          ├── Temperature_Value
-          ├── Temperature_Unit
-          ├── Temperature_Status
-          └── Speed_Value
-  ```
-
-    </TabItem>
-    <TabItem label="Better">
-
-  ```text
-  Factory_A
-  └── SMT_Line_1
-      └── Metric
-          └── Machine_001
-  ```
-
-  消息内容：
-
-  ```json
-  {
-    "temperature": 80,
-    "temperature_unit": "Celsius",
-    "temperature_status": "Normal",
-    "speed": 300
-  }
-  ```
-
-    </TabItem>
-  </Tabs>
-
-- **将 `State` 用于低频状态数据**
-
-  将低频状态、快照和当前业务状态放在 `State` 下。避免为作业、批次或订单等变化实体分别创建新 topic。
-
-  <Tabs syncKey="topic-explosion-state">
-    <TabItem label="Bad">
-
-  ```text
-  Factory_A
-  └── SMT_Line_1
-      └── State
-          ├── Job_001
-          ├── Job_002
-          └── Job_003
-  ```
-
-    </TabItem>
-    <TabItem label="Better">
-
-  ```text
-  Factory_A
-  └── SMT_Line_1
-      └── State
-          └── Machine_001
-  ```
-
-  消息内容：
-
-  ```json
-  {
-    "current_job": "Job_003",
-    "product": "Product_A"
-  }
-  ```
-
-    </TabItem>
-  </Tabs>
-
-- **将 `Action` 用于低频动作数据**
-
-  将命令、请求和操作员动作放在 `Action` 下。动作输入应作为 topic 的字段，而不是为每个参数创建一个 topic。
-
-  <Tabs syncKey="topic-explosion-action">
-    <TabItem label="Bad">
-
-  ```text
-  Factory_A
-  └── SMT_Line_1
-      └── Machine_001
-          ├── Start_Command
-          ├── Target_Height
-          └── Light_On
-  ```
-
-    </TabItem>
-    <TabItem label="Better">
-
-  ```text
-  Factory_A
-  └── SMT_Line_1
-      └── Action
-          └── StartJob
-  ```
-
-  消息内容：
-
-  ```json
-  {
-    "target_height": 12.5,
-    "light_on": true,
-    "requested_by": "operator"
-  }
-  ```
-
-    </TabItem>
-  </Tabs>
-
 ## 消息结构
 
 设计 topic 消息内容时，需要同时考虑要消费的数据和要回写的数据。
@@ -895,3 +774,127 @@ Tier0 设计了三种固定的 Topic 类型， `Metric`, `Action` 和 `State` �
 
     </TabItem>
   </Tabs>
+
+## 如何避免 Topic 爆炸
+Tier0 设计了三种固定的 Topic 类型， `Metric`, `Action` 和 `State` 来避免 topic 爆炸. 
+
+- **将 `Metric` 用于高频实时数据**
+
+  将高频测量值和遥测数据统一放在 `Metric` 下，而不是为每个信号细节创建 topic。
+  <div className="t0-topic-explosion-tabs">
+  <Tabs syncKey="topic-explosion">
+    <TabItem label="Bad">
+
+  ```text
+  Factory_A
+  └── SMT_Line_1
+      └── Machine_001
+          ├── Temperature_Value
+          ├── Temperature_Unit
+          ├── Temperature_Status
+          └── Speed_Value
+  ```
+
+    </TabItem>
+    <TabItem label="Better">
+
+  ```text
+  Factory_A
+  └── SMT_Line_1
+      └── Metric
+          └── Machine_001
+  ```
+
+  消息内容：
+
+  ```json
+  {
+    "temperature": 80,
+    "temperature_unit": "Celsius",
+    "temperature_status": "Normal",
+    "speed": 300
+  }
+  ```
+
+    </TabItem>
+  </Tabs>
+  </div>
+
+- **将 `State` 用于低频状态数据**
+
+  将低频状态、快照和当前业务状态放在 `State` 下。避免为作业、批次或订单等变化实体分别创建新 topic。
+  <div className="t0-topic-explosion-tabs">
+  <Tabs syncKey="topic-explosion">
+    <TabItem label="Bad">
+
+  ```text
+  Factory_A
+  └── SMT_Line_1
+      └── State
+          ├── Job_001
+          ├── Job_002
+          └── Job_003
+  ```
+
+    </TabItem>
+    <TabItem label="Better">
+
+  ```text
+  Factory_A
+  └── SMT_Line_1
+      └── State
+          └── Machine_001
+  ```
+
+  消息内容：
+
+  ```json
+  {
+    "current_job": "Job_003",
+    "product": "Product_A"
+  }
+  ```
+
+    </TabItem>
+  </Tabs>
+  </div>
+
+- **将 `Action` 用于低频动作数据**
+
+  将命令、请求和操作员动作放在 `Action` 下。动作输入应作为 topic 的字段，而不是为每个参数创建一个 topic。
+  <div className="t0-topic-explosion-tabs">
+  <Tabs syncKey="topic-explosion">
+    <TabItem label="Bad">
+
+  ```text
+  Factory_A
+  └── SMT_Line_1
+      └── Machine_001
+          ├── Start_Command
+          ├── Target_Height
+          └── Light_On
+  ```
+
+    </TabItem>
+    <TabItem label="Better">
+
+  ```text
+  Factory_A
+  └── SMT_Line_1
+      └── Action
+          └── StartJob
+  ```
+
+  消息内容：
+
+  ```json
+  {
+    "target_height": 12.5,
+    "light_on": true,
+    "requested_by": "operator"
+  }
+  ```
+
+    </TabItem>
+  </Tabs>
+  </div>

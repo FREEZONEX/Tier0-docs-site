@@ -1,0 +1,119 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1800" height="1100" viewBox="0 0 1800 1100" role="img" aria-label="6대 장비 기본 책임">
+<style>text{font-family:IBM Plex Sans,Segoe UI,Arial,sans-serif}.small{fill:#475569}.white{fill:#fff}</style>
+<rect x="0" y="0" width="1800" height="1100" rx="14" fill="#f4f8ff" stroke="none" stroke-width="2"/>
+<rect x="0" y="0" width="1800" height="120" rx="14" fill="#1f5f9d" stroke="none" stroke-width="2"/>
+<text x="72" y="54" text-anchor="start" font-size="36" font-weight="800" fill="#fff"><tspan x="72" dy="0">Tier0 Enterprise</tspan></text>
+<text x="1440" y="62" text-anchor="middle" font-size="22" font-weight="700" fill="#fff"><tspan x="1440" dy="0">목표: 단일 장비 장애 후 진입점 자동 복구</tspan></text>
+<text x="72" y="158" text-anchor="start" font-size="24" font-weight="800" fill="#0f172a"><tspan x="72" dy="0">고정 접근 진입점</tspan></text>
+<rect x="72" y="180" width="390" height="128" rx="18" fill="#eff6ff" stroke="#7aa5ff" stroke-width="2"/>
+<circle cx="116" cy="222" r="25" fill="#2563eb"/>
+<text x="158" y="218" text-anchor="start" font-size="22" font-weight="800" fill="#2563eb"><tspan x="158" dy="0">Business VIP</tspan></text>
+<text x="158" y="248" text-anchor="start" font-size="16" font-weight="700" fill="#2563eb"><tspan x="158" dy="0">:8088 · Enterprise 고정 진입점</tspan></text>
+<rect x="96" y="268" width="340" height="26" rx="13" fill="#ffffff80" stroke="none" stroke-width="2"/>
+<text x="266" y="286" text-anchor="middle" font-size="13" font-weight="500" fill="#334155"><tspan x="266" dy="0">D가 초기 Active이며 장애 시 E / F로 이동</tspan></text>
+<rect x="492" y="180" width="390" height="128" rx="18" fill="#f4efff" stroke="#a78bfa" stroke-width="2"/>
+<circle cx="536" cy="222" r="25" fill="#7c3aed"/>
+<text x="578" y="218" text-anchor="start" font-size="22" font-weight="800" fill="#7c3aed"><tspan x="578" dy="0">PostgreSQL VIP</tspan></text>
+<text x="578" y="248" text-anchor="start" font-size="16" font-weight="700" fill="#7c3aed"><tspan x="578" dy="0">:5432 · 유일한 쓰기 진입점</tspan></text>
+<rect x="516" y="268" width="340" height="26" rx="13" fill="#ffffff80" stroke="none" stroke-width="2"/>
+<text x="686" y="286" text-anchor="middle" font-size="13" font-weight="500" fill="#334155"><tspan x="686" dy="0">D / E HAProxy → A primary 또는 B 새 primary</tspan></text>
+<rect x="912" y="180" width="390" height="128" rx="18" fill="#fff7ed" stroke="#fb923c" stroke-width="2"/>
+<circle cx="956" cy="222" r="25" fill="#ea580c"/>
+<text x="998" y="218" text-anchor="start" font-size="22" font-weight="800" fill="#ea580c"><tspan x="998" dy="0">Redis VIP</tspan></text>
+<text x="998" y="248" text-anchor="start" font-size="16" font-weight="700" fill="#ea580c"><tspan x="998" dy="0">:6379 · 캐시와 세션 진입점</tspan></text>
+<rect x="936" y="268" width="340" height="26" rx="13" fill="#ffffff80" stroke="none" stroke-width="2"/>
+<text x="1106" y="286" text-anchor="middle" font-size="13" font-weight="500" fill="#334155"><tspan x="1106" dy="0">C / F 독립 인스턴스, 데이터 복제 없음</tspan></text>
+<rect x="1332" y="180" width="390" height="128" rx="18" fill="#ecfdf5" stroke="#5cc8ad" stroke-width="2"/>
+<circle cx="1376" cy="222" r="25" fill="#047857"/>
+<text x="1418" y="218" text-anchor="start" font-size="22" font-weight="800" fill="#047857"><tspan x="1418" dy="0">RustFS VIP</tspan></text>
+<text x="1418" y="248" text-anchor="start" font-size="16" font-weight="700" fill="#047857"><tspan x="1418" dy="0">:19000 · 고정 S3 진입점</tspan></text>
+<rect x="1356" y="268" width="340" height="26" rx="13" fill="#ffffff80" stroke="none" stroke-width="2"/>
+<text x="1526" y="286" text-anchor="middle" font-size="13" font-weight="500" fill="#334155"><tspan x="1526" dy="0">A / B HAProxy → C / D / E / F</tspan></text>
+<rect x="72" y="340" width="1656" height="88" rx="18" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
+<text x="130" y="386" text-anchor="start" font-size="22" font-weight="800" fill="#0f172a"><tspan x="130" dy="0">통합 전환 원칙</tspan></text>
+<text x="310" y="386" text-anchor="start" font-size="17" font-weight="500" fill="#334155"><tspan x="310" dy="0">클라이언트와 Enterprise는 항상 고정 VIP를 사용하며, 백엔드 역할 변경 후에도 연결 주소를 변경하지 않습니다.</tspan></text>
+<text x="72" y="475" text-anchor="start" font-size="24" font-weight="800" fill="#0f172a"><tspan x="72" dy="0">6대 장비 기본 책임</tspan></text>
+<rect x="72" y="500" width="252" height="390" rx="20" fill="#ffffff" stroke="none" stroke-width="2"/>
+<rect x="72" y="500" width="252" height="86" rx="20" fill="#1f4d84" stroke="none" stroke-width="2"/>
+<circle cx="116" cy="538" r="24" fill="#ffffff33"/>
+<text x="116" y="546" text-anchor="middle" font-size="24" font-weight="800" fill="#fff"><tspan x="116" dy="0">A</tspan></text>
+<text x="154" y="532" text-anchor="start" font-size="18" font-weight="800" fill="#fff"><tspan x="154" dy="0">DB Primary 노드</tspan></text>
+<rect x="92" y="602" width="212" height="52" rx="12" fill="#f4efff" stroke="none" stroke-width="2"/>
+<text x="106" y="634" text-anchor="start" font-size="18" font-weight="800" fill="#6d28d9"><tspan x="106" dy="0">PostgreSQL Primary</tspan></text>
+<rect x="92" y="668" width="212" height="52" rx="12" fill="#ecfdf5" stroke="none" stroke-width="2"/>
+<text x="106" y="700" text-anchor="start" font-size="18" font-weight="800" fill="#047857"><tspan x="106" dy="0">RustFS HAProxy</tspan></text>
+<rect x="92" y="734" width="212" height="52" rx="12" fill="#eff6ff" stroke="none" stroke-width="2"/>
+<text x="106" y="766" text-anchor="start" font-size="18" font-weight="800" fill="#2563eb"><tspan x="106" dy="0">Keepalived</tspan></text>
+<text x="92" y="866" text-anchor="start" font-size="13" font-weight="500" fill="#475569"><tspan x="92" dy="0">장애 영향: PG Primary / S3 프록시</tspan></text>
+<rect x="352" y="500" width="252" height="390" rx="20" fill="#ffffff" stroke="none" stroke-width="2"/>
+<rect x="352" y="500" width="252" height="86" rx="20" fill="#1f4d84" stroke="none" stroke-width="2"/>
+<circle cx="396" cy="538" r="24" fill="#ffffff33"/>
+<text x="396" y="546" text-anchor="middle" font-size="24" font-weight="800" fill="#fff"><tspan x="396" dy="0">B</tspan></text>
+<text x="434" y="532" text-anchor="start" font-size="18" font-weight="800" fill="#fff"><tspan x="434" dy="0">DB Standby 노드</tspan></text>
+<rect x="372" y="602" width="212" height="52" rx="12" fill="#f4efff" stroke="none" stroke-width="2"/>
+<text x="386" y="634" text-anchor="start" font-size="18" font-weight="800" fill="#6d28d9"><tspan x="386" dy="0">PostgreSQL Standby</tspan></text>
+<rect x="372" y="668" width="212" height="52" rx="12" fill="#ecfdf5" stroke="none" stroke-width="2"/>
+<text x="386" y="700" text-anchor="start" font-size="18" font-weight="800" fill="#047857"><tspan x="386" dy="0">RustFS HAProxy</tspan></text>
+<rect x="372" y="734" width="212" height="52" rx="12" fill="#eff6ff" stroke="none" stroke-width="2"/>
+<text x="386" y="766" text-anchor="start" font-size="18" font-weight="800" fill="#2563eb"><tspan x="386" dy="0">Keepalived</tspan></text>
+<text x="372" y="866" text-anchor="start" font-size="13" font-weight="500" fill="#475569"><tspan x="372" dy="0">Primary 장애 시 승격 가능</tspan></text>
+<rect x="632" y="500" width="252" height="390" rx="20" fill="#ffffff" stroke="none" stroke-width="2"/>
+<rect x="632" y="500" width="252" height="86" rx="20" fill="#64748b" stroke="none" stroke-width="2"/>
+<circle cx="676" cy="538" r="24" fill="#ffffff33"/>
+<text x="676" y="546" text-anchor="middle" font-size="24" font-weight="800" fill="#fff"><tspan x="676" dy="0">C</tspan></text>
+<text x="714" y="532" text-anchor="start" font-size="18" font-weight="800" fill="#fff"><tspan x="714" dy="0">Witness 및 스토리지 노드</tspan></text>
+<rect x="652" y="602" width="212" height="52" rx="12" fill="#f4efff" stroke="none" stroke-width="2"/>
+<text x="666" y="634" text-anchor="start" font-size="18" font-weight="800" fill="#6d28d9"><tspan x="666" dy="0">PG Witness</tspan></text>
+<rect x="652" y="668" width="212" height="52" rx="12" fill="#fff7ed" stroke="none" stroke-width="2"/>
+<text x="666" y="700" text-anchor="start" font-size="18" font-weight="800" fill="#c2410c"><tspan x="666" dy="0">Redis-1</tspan></text>
+<rect x="652" y="734" width="212" height="52" rx="12" fill="#ecfdf5" stroke="none" stroke-width="2"/>
+<text x="666" y="766" text-anchor="start" font-size="18" font-weight="800" fill="#047857"><tspan x="666" dy="0">RustFS-1</tspan></text>
+<text x="652" y="866" text-anchor="start" font-size="13" font-weight="500" fill="#475569"><tspan x="652" dy="0">Redis는 F와 복제하지 않음</tspan></text>
+<rect x="912" y="500" width="252" height="390" rx="20" fill="#ffffff" stroke="none" stroke-width="2"/>
+<rect x="912" y="500" width="252" height="86" rx="20" fill="#2f77aa" stroke="none" stroke-width="2"/>
+<circle cx="956" cy="538" r="24" fill="#ffffff33"/>
+<text x="956" y="546" text-anchor="middle" font-size="24" font-weight="800" fill="#fff"><tspan x="956" dy="0">D</tspan></text>
+<text x="994" y="532" text-anchor="start" font-size="18" font-weight="800" fill="#fff"><tspan x="994" dy="0">초기 업무 노드</tspan></text>
+<rect x="932" y="602" width="212" height="52" rx="12" fill="#eff6ff" stroke="none" stroke-width="2"/>
+<text x="946" y="634" text-anchor="start" font-size="18" font-weight="800" fill="#2563eb"><tspan x="946" dy="0">Enterprise Active</tspan></text>
+<rect x="932" y="668" width="212" height="52" rx="12" fill="#f4efff" stroke="none" stroke-width="2"/>
+<text x="946" y="700" text-anchor="start" font-size="18" font-weight="800" fill="#6d28d9"><tspan x="946" dy="0">PG HAProxy</tspan></text>
+<rect x="932" y="734" width="212" height="52" rx="12" fill="#eff6ff" stroke="none" stroke-width="2"/>
+<text x="946" y="766" text-anchor="start" font-size="18" font-weight="800" fill="#2563eb"><tspan x="946" dy="0">Keepalived</tspan></text>
+<rect x="932" y="800" width="212" height="52" rx="12" fill="#ecfdf5" stroke="none" stroke-width="2"/>
+<text x="946" y="832" text-anchor="start" font-size="18" font-weight="800" fill="#047857"><tspan x="946" dy="0">RustFS-2</tspan></text>
+<text x="932" y="866" text-anchor="start" font-size="13" font-weight="500" fill="#475569"><tspan x="932" dy="0">Business VIP + PG VIP 후보</tspan></text>
+<rect x="1192" y="500" width="252" height="390" rx="20" fill="#ffffff" stroke="none" stroke-width="2"/>
+<rect x="1192" y="500" width="252" height="86" rx="20" fill="#2f77aa" stroke="none" stroke-width="2"/>
+<circle cx="1236" cy="538" r="24" fill="#ffffff33"/>
+<text x="1236" y="546" text-anchor="middle" font-size="24" font-weight="800" fill="#fff"><tspan x="1236" dy="0">E</tspan></text>
+<text x="1274" y="532" text-anchor="start" font-size="18" font-weight="800" fill="#fff"><tspan x="1274" dy="0">첫 번째 Standby 노드</tspan></text>
+<rect x="1212" y="602" width="212" height="52" rx="12" fill="#eff6ff" stroke="none" stroke-width="2"/>
+<text x="1226" y="634" text-anchor="start" font-size="18" font-weight="800" fill="#2563eb"><tspan x="1226" dy="0">Enterprise Standby</tspan></text>
+<rect x="1212" y="668" width="212" height="52" rx="12" fill="#f4efff" stroke="none" stroke-width="2"/>
+<text x="1226" y="700" text-anchor="start" font-size="18" font-weight="800" fill="#6d28d9"><tspan x="1226" dy="0">PG HAProxy</tspan></text>
+<rect x="1212" y="734" width="212" height="52" rx="12" fill="#eff6ff" stroke="none" stroke-width="2"/>
+<text x="1226" y="766" text-anchor="start" font-size="18" font-weight="800" fill="#2563eb"><tspan x="1226" dy="0">Keepalived</tspan></text>
+<rect x="1212" y="800" width="212" height="52" rx="12" fill="#ecfdf5" stroke="none" stroke-width="2"/>
+<text x="1226" y="832" text-anchor="start" font-size="18" font-weight="800" fill="#047857"><tspan x="1226" dy="0">RustFS-3</tspan></text>
+<text x="1212" y="866" text-anchor="start" font-size="13" font-weight="500" fill="#475569"><tspan x="1212" dy="0">Business VIP + PG VIP 후보</tspan></text>
+<rect x="1472" y="500" width="252" height="390" rx="20" fill="#ffffff" stroke="none" stroke-width="2"/>
+<rect x="1472" y="500" width="252" height="86" rx="20" fill="#2f77aa" stroke="none" stroke-width="2"/>
+<circle cx="1516" cy="538" r="24" fill="#ffffff33"/>
+<text x="1516" y="546" text-anchor="middle" font-size="24" font-weight="800" fill="#fff"><tspan x="1516" dy="0">F</tspan></text>
+<text x="1554" y="532" text-anchor="start" font-size="18" font-weight="800" fill="#fff"><tspan x="1554" dy="0">두 번째 Standby 노드</tspan></text>
+<rect x="1492" y="602" width="212" height="52" rx="12" fill="#eff6ff" stroke="none" stroke-width="2"/>
+<text x="1506" y="634" text-anchor="start" font-size="18" font-weight="800" fill="#2563eb"><tspan x="1506" dy="0">Enterprise Standby</tspan></text>
+<rect x="1492" y="668" width="212" height="52" rx="12" fill="#fff7ed" stroke="none" stroke-width="2"/>
+<text x="1506" y="700" text-anchor="start" font-size="18" font-weight="800" fill="#c2410c"><tspan x="1506" dy="0">Redis-2</tspan></text>
+<rect x="1492" y="734" width="212" height="52" rx="12" fill="#ecfdf5" stroke="none" stroke-width="2"/>
+<text x="1506" y="766" text-anchor="start" font-size="18" font-weight="800" fill="#047857"><tspan x="1506" dy="0">RustFS-4</tspan></text>
+<text x="1492" y="866" text-anchor="start" font-size="13" font-weight="500" fill="#475569"><tspan x="1492" dy="0">캐시 전환 시 재로그인이 필요할 수 있음</tspan></text>
+<rect x="72" y="932" width="1656" height="112" rx="20" fill="#173f66" stroke="none" stroke-width="2"/>
+<text x="104" y="970" text-anchor="start" font-size="22" font-weight="800" fill="#fff"><tspan x="104" dy="0">재해 복구 경계</tspan></text>
+<text x="104" y="1003" text-anchor="start" font-size="15" font-weight="600" fill="#fff"><tspan x="104" dy="0">동일 네트워크 구간의 단일 장비 장애 대응</tspan></text>
+<text x="424" y="1003" text-anchor="start" font-size="15" font-weight="600" fill="#fff"><tspan x="424" dy="0">고정 VIP로 연결 주소 변경 불필요</tspan></text>
+<text x="744" y="1003" text-anchor="start" font-size="15" font-weight="600" fill="#fff"><tspan x="744" dy="0">License는 한 번만 활성화</tspan></text>
+<text x="1064" y="1003" text-anchor="start" font-size="15" font-weight="600" fill="#fff"><tspan x="1064" dy="0">네트워크 분할 이중 Primary는 처리하지 않음</tspan></text>
+<text x="1384" y="1003" text-anchor="start" font-size="15" font-weight="600" fill="#fff"><tspan x="1384" dy="0">Redis는 데이터를 복제하지 않음</tspan></text>
+</svg>

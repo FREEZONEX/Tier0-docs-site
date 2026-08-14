@@ -119,9 +119,30 @@ import Default from '@astrojs/starlight/components/Head.astro';
 			});
 		}
 
+		function bindHeadingAnchorCopy() {
+			document.querySelectorAll('.sl-anchor-link[href^="#"]').forEach(function (link) {
+				if (link.dataset.t0CopyBound === '1') return;
+				link.dataset.t0CopyBound = '1';
+				link.setAttribute('title', 'Copy section link');
+				link.setAttribute('aria-label', 'Copy section link');
+				link.addEventListener('click', function (event) {
+					event.preventDefault();
+					var hash = link.getAttribute('href');
+					if (!hash) return;
+					var url = new URL(location.href);
+					url.hash = hash;
+					history.replaceState(null, '', url);
+					if (navigator.clipboard && navigator.clipboard.writeText) {
+						navigator.clipboard.writeText(url.toString()).catch(function () {});
+					}
+				});
+			});
+		}
+
 		function scan() {
 			scanSidebarToggle();
 			bindSidebarGroupHome();
+			bindHeadingAnchorCopy();
 			syncScrollClass();
 			if (!document.documentElement.classList.contains('t0-table-scroll')) return;
 			document.querySelectorAll('.sl-markdown-content table').forEach(bindTable);

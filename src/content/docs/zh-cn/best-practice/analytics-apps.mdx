@@ -197,6 +197,9 @@ flowchart LR
       ```
 
       </details>
+      :::tip[For external connections to UNS broker]
+      Refer to [Connecting MQTT Clients](../../using-tier0/working-with-uns-data/#connecting-mqtt-clients)
+      :::
     
 2. 进入 **数据流程**，创建 **数据连接**，连接原始数据并发布到 **UNS**。
 
@@ -396,6 +399,7 @@ flowchart LR
 </Steps>
 
 ## 在 Notebook 中构建分析应用
+<Steps>
 
 1. 在 Tier0 中进入 **Notebook**，创建一个新的 notebook。
 
@@ -485,6 +489,9 @@ flowchart LR
       ```
 
       </details>
+      :::tip[外部连接 UNS broker]
+      参考 [连接 MQTT 客户端](../../using-tier0/working-with-uns-data/#连接-mqtt-客户端)
+      :::
 
     - 单元 2 - 定义 Bayesian Network 拓扑、状态空间、CPT 生成器和概率规则。
 
@@ -1377,6 +1384,7 @@ flowchart LR
 
 3. 运行所有单元，然后进入 **UNS** 检查结果。
 
+</Steps>
 ## 构建 Bow-tie 应用
 <Steps>
 1. 在 Tier0 中进入 **Builder**。
@@ -1384,6 +1392,9 @@ flowchart LR
 
     <Aside type="caution" title="必须说明的内容">
       请告诉 agent 使用 UNS 中的数据，并提供具体 topic。否则 agent 可能难以展示正确的数据。
+    </Aside>
+    <Aside type="tip" title="如果你在另一个 Tier0 上构建应用">
+      使用不同的 **clientId**（添加不同后缀）连接 UNS broker，避免 client ID 冲突。
     </Aside>
 
     <details className="notebook-cell">

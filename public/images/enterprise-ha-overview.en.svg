@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="840" viewBox="0 0 1600 840" role="img" aria-label="Overall Topology">
+<defs><marker id="arrow" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto"><path d="M2,2 L10,6 L2,10 Z" fill="#475569"/></marker></defs>
+<style>text{font-family:IBM Plex Sans,Segoe UI,Arial,sans-serif}.label{fill:#475569}</style>
+<rect x="30" y="30" width="1540" height="780" rx="24" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2"/>
+<text x="800" y="75" text-anchor="middle" font-size="34" font-weight="700" fill="#0f172a"><tspan x="800" dy="0">Overall Topology</tspan></text>
+<rect x="650" y="105" width="300" height="86" rx="14" fill="#ffffff" stroke="#94a3b8" stroke-width="2"/>
+<text x="800" y="156" text-anchor="middle" font-size="22" font-weight="650" fill="#0f172a"><tspan x="800" dy="0">Clients / Site Systems</tspan></text>
+<line x1="800" y1="191" x2="800" y2="245" stroke="#475569" stroke-width="3" marker-end="url(#arrow)"/>
+<text x="890" y="230" text-anchor="start" font-size="18" font-weight="500" fill="#475569"><tspan x="890" dy="0">HTTPS / MQTT</tspan></text>
+<rect x="600" y="245" width="400" height="110" rx="14" fill="#fff7d6" stroke="#f59e0b" stroke-width="3"/>
+<text x="800" y="286" text-anchor="middle" font-size="22" font-weight="700" fill="#0f172a"><tspan x="800" dy="0">Business VIP</tspan><tspan x="800" dy="27.5">:8088</tspan><tspan x="800" dy="27.5">fixed business entry</tspan></text>
+<line x1="800" y1="355" x2="800" y2="420" stroke="#475569" stroke-width="3" marker-end="url(#arrow)"/>
+<rect x="570" y="420" width="460" height="115" rx="14" fill="#e8f2ff" stroke="#60a5fa" stroke-width="3"/>
+<text x="800" y="468" text-anchor="middle" font-size="23" font-weight="700" fill="#0f172a"><tspan x="800" dy="0">Current Active Enterprise</tspan><tspan x="800" dy="28.75">D / E / F</tspan></text>
+<line x1="800" y1="535" x2="350" y2="625" stroke="#475569" stroke-width="3" marker-end="url(#arrow)"/>
+<rect x="165" y="625" width="370" height="100" rx="14" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2"/>
+<text x="350" y="661" text-anchor="middle" font-size="20" font-weight="700" fill="#0f172a"><tspan x="350" dy="0">PostgreSQL VIP</tspan><tspan x="350" dy="25">:5432</tspan><tspan x="350" dy="25">D/E HAProxy</tspan></text>
+<line x1="350" y1="725" x2="350" y2="760" stroke="#475569" stroke-width="3" marker-end="url(#arrow)"/>
+<rect x="165" y="760" width="370" height="70" rx="14" fill="#f0fdf4" stroke="#86efac" stroke-width="2"/>
+<text x="350" y="803" text-anchor="middle" font-size="18" font-weight="600" fill="#0f172a"><tspan x="350" dy="0">A/B current writable Primary</tspan></text>
+<line x1="800" y1="535" x2="795" y2="625" stroke="#475569" stroke-width="3" marker-end="url(#arrow)"/>
+<rect x="610" y="625" width="370" height="100" rx="14" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2"/>
+<text x="795" y="661" text-anchor="middle" font-size="20" font-weight="700" fill="#0f172a"><tspan x="795" dy="0">Redis VIP</tspan><tspan x="795" dy="25">:6379</tspan><tspan x="795" dy="25">C or F</tspan></text>
+<line x1="795" y1="725" x2="795" y2="760" stroke="#475569" stroke-width="3" marker-end="url(#arrow)"/>
+<rect x="610" y="760" width="370" height="70" rx="14" fill="#f0fdf4" stroke="#86efac" stroke-width="2"/>
+<text x="795" y="803" text-anchor="middle" font-size="18" font-weight="600" fill="#0f172a"><tspan x="795" dy="0">C/F independent Redis</tspan></text>
+<line x1="800" y1="535" x2="1250" y2="625" stroke="#475569" stroke-width="3" marker-end="url(#arrow)"/>
+<rect x="1065" y="625" width="370" height="100" rx="14" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2"/>
+<text x="1250" y="661" text-anchor="middle" font-size="20" font-weight="700" fill="#0f172a"><tspan x="1250" dy="0">RustFS VIP</tspan><tspan x="1250" dy="25">:19000</tspan><tspan x="1250" dy="25">A/B HAProxy</tspan></text>
+<line x1="1250" y1="725" x2="1250" y2="760" stroke="#475569" stroke-width="3" marker-end="url(#arrow)"/>
+<rect x="1065" y="760" width="370" height="70" rx="14" fill="#f0fdf4" stroke="#86efac" stroke-width="2"/>
+<text x="1250" y="803" text-anchor="middle" font-size="18" font-weight="600" fill="#0f172a"><tspan x="1250" dy="0">C/D/E/F RustFS cluster</tspan></text>
+<rect x="260" y="765" width="1080" height="35" rx="18" fill="#e2e8f0" stroke="#cbd5e1" stroke-width="1"/>
+<text x="800" y="789" text-anchor="middle" font-size="17" font-weight="500" fill="#334155"><tspan x="800" dy="0">Clients and Enterprise always use fixed VIPs; backend role changes do not change connection addresses.</tspan></text>
+</svg>

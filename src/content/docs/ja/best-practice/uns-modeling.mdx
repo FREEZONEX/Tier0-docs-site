@@ -666,7 +666,7 @@ Tier0 uses 3 fixed topic types: `Metric`, `Action`, and `State` to avoid topic e
 - **高頻度リアルタイムデータには `Metric` を使う**
 
   高頻度の測定値やテレメトリは、各信号の詳細ごとに namespace を広げるのではなく `Metric` に配置します。
-
+  <div className="t0-topic-explosion-tabs">
   <Tabs syncKey="topic-explosion-metric">
     <TabItem label="Bad">
 
@@ -703,11 +703,12 @@ Tier0 uses 3 fixed topic types: `Metric`, `Action`, and `State` to avoid topic e
 
     </TabItem>
   </Tabs>
+  </div>
 
 - **低頻度ステータスデータには `State` を使う**
 
   低頻度の状態、スナップショット、現在の業務状態は `State` に配置します。ジョブ、バッチ、注文などの変化するエンティティごとに新しい topic を作らないようにします。
-
+  <div className="t0-topic-explosion-tabs">
   <Tabs syncKey="topic-explosion-state">
     <TabItem label="Bad">
 
@@ -741,11 +742,12 @@ Tier0 uses 3 fixed topic types: `Metric`, `Action`, and `State` to avoid topic e
 
     </TabItem>
   </Tabs>
+  </div>
 
 - **低頻度アクションデータには `Action` を使う**
 
   コマンド、リクエスト、オペレーター操作は `Action` に配置します。action の入力はパラメータごとに topic を作るのではなく、topic のフィールドとして保持します。
-
+  <div className="t0-topic-explosion-tabs">
   <Tabs syncKey="topic-explosion-action">
     <TabItem label="Bad">
 
@@ -780,6 +782,7 @@ Tier0 uses 3 fixed topic types: `Metric`, `Action`, and `State` to avoid topic e
 
     </TabItem>
   </Tabs>
+  </div>
 
 ## Payload 構造
 

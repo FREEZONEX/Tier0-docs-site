@@ -3,7 +3,7 @@ title: 用 Agents 操作 Tier0
 description: Tier0 Skill 能做什么，及如何安装。
 editions: [edge, cloud, enterprise]
 sidebar:
-  order: 6
+  order: 8
 ---
 
 import { Steps } from '@astrojs/starlight/components';
@@ -41,33 +41,27 @@ npx skills add FREEZONEX/Tier0-skill
 
 <Steps>
 1. 安装 `tier0` CLI binary。
-</Steps>
+    <Tabs syncKey="tier0-cli-binary-install">
+      <TabItem label="curl">
 
-<Tabs syncKey="tier0-cli-binary-install">
-  <TabItem label="curl">
+        ```bash
+        curl -fsSL https://raw.githubusercontent.com/FREEZONEX/Tier0-cli/main/install.sh | bash
+        ```
 
-    ```bash
-    curl -fsSL https://raw.githubusercontent.com/FREEZONEX/Tier0-cli/main/install.sh | bash
-    ```
+      </TabItem>
+      <TabItem label="iwr">
 
-  </TabItem>
-  <TabItem label="iwr">
+        ```powershell
+        iwr https://raw.githubusercontent.com/FREEZONEX/Tier0-cli/main/install.ps1 | iex
+        ```
 
-    ```powershell
-    iwr https://raw.githubusercontent.com/FREEZONEX/Tier0-cli/main/install.ps1 | iex
-    ```
-
-  </TabItem>
-</Tabs>
-
-<Steps>
+      </TabItem>
+    </Tabs>
 2. 安装 Agent Skills。
-
+    ```bash
+    tier0 skills update
+    ```
 </Steps>
-
-```bash
-tier0 skills update
-```
 
 ## Tier0 Skill 能做什么
 

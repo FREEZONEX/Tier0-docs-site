@@ -1,6 +1,6 @@
 ---
 title: Plan de despliegue de alta disponibilidad
-description: Plan de referencia para un entorno Tier0 Enterprise de alta disponibilidad.
+description: Plan de despliegue de referencia para un entorno Tier0 Enterprise de alta disponibilidad.
 sidebar:
   order: 3
 tableOfContents:
@@ -10,132 +10,274 @@ tableOfContents:
 
 ## Objetivo del plan
 
-Este plan despliega un entorno Tier0 Enterprise en una instalación offline o privada. La base usa 6 máquinas virtuales:
+Este plan V2 despliega un Tier0 Enterprise Fleet Center lógico en un entorno sin conexión o privado. Seis máquinas comparten los roles de negocio, middleware, base de datos, almacenamiento y agente. Los usuarios y los servicios internos de Enterprise siempre se conectan mediante direcciones VIP fijas. Cuando falla una máquina o un proxy, Keepalived, HAProxy, repmgr, RustFS y Fleet Agent toman el control en sus propias capas.
 
-- 3 nodos de aplicación forman el clúster `Docker Swarm` y ejecutan el servicio Tier0 Enterprise de réplica única y el servicio **EMQX** con estado.
-- 2 nodos de base de datos forman el clúster primario-en-espera de `PostgreSQL + TimescaleDB`.
-- 1 nodo `Witness` participa en la supervisión, arbitraje y failover de la base de datos.
+El plan cubre recuperación ante fallo de una sola máquina dentro de un mismo segmento de red. Es un diseño de recuperación activa/en espera, no un clúster de alta disponibilidad entre centros de datos, con elección por consenso o con pérdida cero de datos.
 
-:::note[Opcional]
-Se puede agregar almacenamiento compartido externo `NFS/NAS` y montarlo en los tres nodos Swarm. Se usa para archivos compartidos de Tier0 Enterprise entre nodos, es una dependencia externa y no cuenta como una de las 6 VM de negocio.
-:::
+- La entrada de Fleet Center puede moverse a un nodo Standby sano cuando falla el nodo de negocio actual.
+- PostgreSQL, Redis y RustFS usan VIP fijas, por lo que Enterprise no necesita cambiar `.env` cuando cambian los roles backend.
+- Los archivos locales de App, Flow, Marimo, License y otros activos de ejecución pueden sincronizarse de Active a Standby.
+- Una Cluster License corresponde a una instalación lógica y no se activa de nuevo después de cambiar el nodo de Enterprise.
+- Un deployer separado inicializa las seis máquinas, asigna roles, despliega servicios, monitorea el estado y valida el failover.
+- Se separan explícitamente el failover de VIP, la sincronización de archivos, Redis independiente, la replicación de base de datos y la redundancia de almacenamiento de objetos.
 
-:::tip[Cuando cambien los recursos de base de datos]
-Este plan asume que cada VM de base de datos tiene `4C / 8G / 500G`. Si el requisito es `4C / 8G / 500G` para todo el clúster de base de datos, la capacidad y el rendimiento deben recalcularse antes de la implementación.
-:::
-
-## Direcciones IP planificadas
-
-Las siguientes IP son ejemplos. Sustitúyelas por direcciones reales del sitio antes de implementar.
-
-| Tipo | Nombre | IP planificada | Descripción |
-| --- | --- | --- | --- |
-| Entrada lógica | APP VIP | `10.60.10.10` | Entrada de negocio unificada; puede hacer failover entre los 3 nodos Swarm. |
-| Dependencia externa | NFS/NAS | `10.60.40.10` | Almacenamiento compartido opcional; no cuenta como una de las 6 VM. |
-| Nodo de aplicación | ent-swarm-01 | `10.60.10.11` | Docker Swarm manager/worker; puede ser nodo EMQX fijo o nodo de clúster EMQX. |
-| Nodo de aplicación | ent-swarm-02 | `10.60.10.12` | Docker Swarm manager/worker; ejecuta servicios que pueden reprogramarse. |
-| Nodo de aplicación | ent-swarm-03 | `10.60.10.13` | Docker Swarm manager/worker; ejecuta servicios que pueden reprogramarse. |
-| Entrada lógica | DB VIP | `10.60.20.10` | Entrada de base de datos unificada; solo apunta al primario actual. |
-| Nodo de base de datos | ent-db-01 | `10.60.20.11` | Candidato primario PostgreSQL + TimescaleDB. |
-| Nodo de base de datos | ent-db-02 | `10.60.20.12` | Candidato standby PostgreSQL + TimescaleDB. |
-| Nodo de arbitraje | ent-db-witness-01 | `10.60.20.13` | repmgr witness / nodo de arbitraje y supervisión. |
+Este plan aplica solo a Fleet Center. Los nodos Branch Enterprise se instalan como despliegues normales de una sola máquina y no se unen a este diseño activo/en espera de seis máquinas.
 
 ## Topología general
 
-<img class="t0-topology" src="/images/enterprise-ha-topology.es.png" alt="tier0-enterprise ruta de datos norte-sur de seis VM" />
+<img class="t0-topology" src="/images/enterprise-ha-overview.es.svg" alt="Plan de despliegue de alta disponibilidad overall topology" />
 
-El diagrama muestra solo los enlaces principales:
+La ruta principal de solicitudes es:
 
-- Ruta de acceso de negocio: usuarios / sistemas del sitio -> `APP VIP` -> tres nodos `Docker Swarm` -> `DB VIP` -> base de datos primaria actual.
-- `APP VIP` distribuye tráfico a los tres nodos Swarm. Los nodos Swarm acceden a la base de datos mediante `DB VIP`.
-- `APP VIP` puede hacer failover entre los tres nodos Swarm. `DB VIP` sigue el rol PostgreSQL Primary actual y puede hacer failover entre los dos nodos de base de datos.
-- `Witness` solo participa en arbitraje, selección de primario y health checks. No está en la ruta de negocio.
-- `EMQX` es un servicio con estado. Por defecto debe fijarse a un nodo con almacenamiento persistente; si la capa de mensajería requiere HA, despliega un clúster EMQX de tres nodos.
+```text
+Clientes / sistemas del sitio
+    -> Business VIP :8088
+    -> Enterprise Active actual (D / E / F)
+    |-- PostgreSQL VIP :5432 -> D/E HAProxy -> Primary escribible actual A/B
+    |-- Redis VIP      :6379 -> Redis independiente C o F
+    `-- RustFS VIP     :19000 -> A/B HAProxy -> clúster RustFS C/D/E/F
+```
 
-## Supervisión y failover de base de datos
+Las cuatro VIP son entradas fijas en la configuración de negocio. Cuando Enterprise cambia de nodo o cambian los roles backend, los clientes y Enterprise no cambian las direcciones de conexión.
 
-| Fase | Enlace | Descripción |
+## Direcciones IP planificadas
+
+Las siguientes direcciones son solo ejemplos. Sustitúyalas por direcciones reales del mismo segmento IPv4 en sitio antes de implementar. Las cuatro VIP no deben estar ocupadas por DHCP, hosts estáticos u otras instancias VRRP.
+
+| Nombre | IP de ejemplo | Descripción |
 | --- | --- | --- |
-| Acceso normal | Réplica Tier0 Enterprise en un nodo Swarm -> `DB VIP` -> primario actual | La aplicación siempre conecta solo a `10.60.20.10:5432`. |
-| Replicación normal | Primario actual -> standby actual | Los datos se sincronizan con PostgreSQL WAL streaming replication. |
-| Supervisión normal | `DB-01` / `DB-02` -> `Witness` | `repmgrd` reporta estado y `Witness` participa en el arbitraje. |
-| Fallo del primario | Standby -> `Witness` | El standby solicita arbitraje para evitar split-brain. |
-| Promoción del standby | Standby `promote` | Tras la confirmación de `Witness`, el standby se convierte en el nuevo primario. |
-| Failover de VIP | `DB VIP` -> nuevo primario | `10.60.20.10` se vincula al nuevo primario. |
-| Recuperación de aplicación | Tier0 Enterprise -> `DB VIP` -> nuevo primario | El pool de conexiones reconecta y se restaura la lectura/escritura. |
+| deployer-controller | `10.60.10.20` | Deployer independiente; no cuenta como una de las seis máquinas de negocio |
+| ent-ha-01 / A | `10.60.10.11` | PostgreSQL Primary y roles relacionados |
+| ent-ha-02 / B | `10.60.10.12` | PostgreSQL Standby y roles relacionados |
+| ent-ha-03 / C | `10.60.10.13` | Witness, Redis-1, RustFS-1 |
+| ent-ha-04 / D | `10.60.10.14` | Enterprise Active inicial y roles relacionados |
+| ent-ha-05 / E | `10.60.10.15` | Enterprise Standby y roles relacionados |
+| ent-ha-06 / F | `10.60.10.16` | Enterprise Standby y roles relacionados |
+| Business VIP | `10.60.10.101` | Entrada unificada de Enterprise, valor predeterminado `8088` |
+| PostgreSQL VIP | `10.60.10.102` | Entrada unificada de base de datos, valor predeterminado `5432` |
+| Redis VIP | `10.60.10.103` | Entrada unificada de Redis, valor predeterminado `6379` |
+| RustFS VIP | `10.60.10.104` | Entrada unificada de S3, valor predeterminado `19000` |
 
-Límites clave:
+Antes de implementar, confirme el nombre de la NIC de negocio, prefijo IPv4, gateway, DNS, NTP, hostnames, usuario SSH, puntos de montaje de disco y reglas de firewall. Los scripts no deben adivinar VIP, IP de nodos ni NIC para usarlas directamente en producción.
 
-- Los servicios de negocio solo conectan a `DB VIP:5432`; no se permiten conexiones directas a `ent-db-01/02`.
-- `Witness` no almacena datos de negocio, no procesa lectura/escritura de negocio y no expone acceso de base de datos a aplicaciones.
-- `TimescaleDB` se despliega como extensión de PostgreSQL en ambos nodos de base de datos.
-- El diseño recomendado es `PostgreSQL streaming replication + repmgr + repmgr witness + keepalived DB VIP`.
-- El failover automático solo cubre indisponibilidad del primario. Cuando el primario original se recupere, debe volver primero como standby.
+## Responsabilidades de las seis máquinas
 
-## Lista de configuración de nodos
+<img class="t0-topology" src="/images/enterprise-ha-six-node.es.svg" alt="Plan de despliegue de alta disponibilidad six-machine architecture" />
 
-| Nodo | Rol | vCPU | Memoria | Almacenamiento | Componentes principales |
-| --- | --- | ---: | --- | --- | --- |
-| ent-swarm-01 | Swarm manager/worker | 8 | 32G | 100G | Docker Engine, Swarm, Keepalived, HAProxy/Nginx |
-| ent-swarm-02 | Swarm manager/worker | 8 | 32G | 100G | Docker Engine, Swarm, Keepalived, HAProxy/Nginx |
-| ent-swarm-03 | Swarm manager/worker | 8 | 32G | 100G | Docker Engine, Swarm, Keepalived, HAProxy/Nginx |
-| ent-db-01 | Candidato primario de base de datos | 4 | 8G | 500G | PostgreSQL, TimescaleDB, repmgr, keepalived |
-| ent-db-02 | Candidato standby de base de datos | 4 | 8G | 500G | PostgreSQL, TimescaleDB, repmgr, keepalived |
-| ent-db-witness-01 | Witness / arbitraje | 2 | 4G | 40G | repmgr witness, health check scripts |
-
-## Recomendaciones de despliegue
-
-- Despliega Tier0 Enterprise con `docker stack deploy`.
-- Usa `Docker config` para archivos de configuración y `Docker secret` para contraseñas, credenciales de base de datos y claves privadas de certificados.
-- Usa un registro interno de imágenes para evitar dependencias de red pública durante el despliegue.
-- Despliega `APP VIP` en los tres nodos Swarm con `keepalived + HAProxy` o `keepalived + Nginx`.
-- Usa `DB VIP` como entrada única de base de datos. Se recomienda un pool de conexiones para evitar demasiadas conexiones a la base de datos.
-- Usa NFS/NAS solo para archivos compartidos de Tier0 Enterprise entre nodos; no lo uses para directorios de datos de PostgreSQL/TimescaleDB ni para datos runtime centrales de EMQX.
-
-## Puertos y firewall
-
-Consulta la [lista estándar de puertos](../standard-port-list/) para el detalle completo.
-
-No abras por defecto:
-
-- API remota de Docker `2375` / `2376`, salvo que esté controlada y limitada a la red de O&M.
-- `80/443` en nodos de base de datos; esos nodos no alojan entradas Web.
-- Acceso de aplicaciones a `5432` en Witness; Witness no procesa SQL de negocio.
-
-## Capacidades HA y límites de fallo
-
-| Escenario | Comportamiento del sistema | Límite |
+| Máquina | Componentes desplegados por defecto | Responsabilidad clave |
 | --- | --- | --- |
-| Falla el nodo Swarm actual | Swarm reprograma el servicio de réplica única en otro nodo sano. | Hay que esperar reinicio de contenedor y reconexión de la aplicación. |
-| Falla EMQX en modo fijo de un nodo | Recupera primero el nodo original; si no es posible, restaura desde backup en un nodo nuevo. | La capa de mensajería se interrumpe y no hace failover sin pérdida como un servicio stateless. |
-| Falla un nodo en clúster EMQX de tres nodos | Los nodos restantes siguen atendiendo tráfico y el nodo fallido se reincorpora tras recuperarse. | Requiere configuración previa del clúster EMQX. |
-| Falla el primario actual | El standby se promueve tras arbitraje de Witness y `DB VIP` hace failover. | Interrupción de escritura de segundos a minutos; la aplicación debe reconectar. |
-| Falla el standby | El primario sigue atendiendo y se genera alerta de replicación. | Se reduce la capacidad de failover automático. |
-| Falla Witness | El primario actual sigue atendiendo. | Se reduce la capacidad de failover automático; recupera Witness primero. |
-| Falla NFS/NAS | Las funciones que dependen de archivos compartidos se ven afectadas. | La base de datos y procesos ya en memoria pueden no interrumpirse. |
+| A | PostgreSQL Primary, RustFS HAProxy, Keepalived | Primary inicial de base de datos; primer candidato de proxy RustFS |
+| B | PostgreSQL Standby, RustFS HAProxy, Keepalived | Standby de base de datos por streaming; segundo candidato de proxy RustFS |
+| C | PostgreSQL Witness, Redis-1, RustFS-1 | Witness/registro de estado de base de datos; nodo de datos Redis y RustFS |
+| D | PG HAProxy, Keepalived, RustFS-2, Enterprise, Fleet Agent, rsync | Active de negocio inicial; primer candidato de proxy PostgreSQL |
+| E | PG HAProxy, Keepalived, RustFS-3, Enterprise, Fleet Agent, rsync | Standby de negocio; segundo candidato de proxy PostgreSQL |
+| F | Redis-2, RustFS-4, Enterprise, Fleet Agent, rsync | Standby de negocio; segunda instancia Redis |
 
-## Backup, monitoreo e inspección
+Esta asignación busca tolerar el fallo de una sola máquina y equilibrar recursos entre las seis máquinas. El deployer mapea A-F por el orden natural de hostnames/IP y selecciona roles predeterminados, pero la asignación final debe revisarse con el diseño de discos y dominios de fallo del sitio.
 
-- Ejecuta backups diarios de base de datos y realiza backup obligatorio antes de cambios mayores.
-- Monitorea APP VIP, DB VIP, PostgreSQL replication lag, estado de nodos Swarm, estado de EMQX y uso de disco.
-- Ensaya periódicamente failover de primario, fallo de nodo de aplicación, restauración de backup y fallo de almacenamiento compartido.
-- Antes de salir a producción, confirma SSH sin contraseña, sincronización NTP, registro de imágenes, certificados, DNS, gateway y reglas de firewall.
+### Lista de configuración de máquinas
+
+La capa de negocio de Enterprise es activa/en espera. En cualquier momento, solo el nodo que mantiene la Business VIP atiende solicitudes. Escale esta capa verticalmente aumentando CPU, memoria y disco de un nodo de negocio; no estime concurrencia multiplicando el número de nodos Enterprise.
+
+| Máquina | Tipo de nodo | vCPU | Memoria | Almacenamiento base | Recomendación de disco |
+| --- | --- | --- | --- | --- | --- |
+| A | Nodo PostgreSQL Primary | 8C | 16G | 1T | `/` aprox. 80G; espacio restante para datos PostgreSQL, WAL y staging de backups |
+| B | Nodo PostgreSQL Standby | 8C | 16G | 1T | `/` aprox. 80G; espacio restante para datos PostgreSQL, WAL y staging de backups |
+| C | Nodo Witness / middleware | 4C | 8G | 500G | Asigne puntos de montaje fijos para sistema, Redis y datos RustFS |
+| D | Nodo Enterprise Active inicial | 8C | 32G | 500G | Asigne puntos de montaje fijos para sistema, contenedores, archivos sincronizados de Enterprise y datos RustFS |
+| E | Nodo Enterprise Standby | 8C | 32G | 500G | Igual que D |
+| F | Nodo Enterprise Standby | 8C | 32G | 500G | Igual que D |
+
+| Categoría | Cantidad | Especificación por nodo | Subtotal vCPU | Subtotal memoria | Subtotal almacenamiento |
+| --- | --- | --- | --- | --- | --- |
+| Nodos de base de datos PostgreSQL | 2 | `8C / 16G / 1T` | 16C | 32G | 2T |
+| Nodo Witness / middleware | 1 | `4C / 8G / 500G` | 4C | 8G | 500G |
+| Nodos de negocio Enterprise | 3 | `8C / 32G / 500G` | 24C | 96G | 1.5T |
+| **Total** | **6** | - | **44C** | **136G** | **4T** |
+
+## Resumen de configuración
+
+### Configuración unificada de conexión de Enterprise
+
+D, E y F mantienen la misma configuración de Enterprise.
+
+| Dependencia | Principio de configuración |
+| --- | --- |
+| PostgreSQL | Conectar a PostgreSQL VIP, no a las IP de los nodos A/B |
+| Redis | Conectar a Redis VIP, no a las IP de los nodos C/F |
+| File storage | Usar `FILESTORE_DRIVER=s3`; apuntar el endpoint S3 a RustFS VIP |
+| Fleet identity | Tres nodos comparten un `installationId` lógico; cada nodo tiene su propio `memberId` |
+| Fleet Agent | Un Fleet Agent de nivel proceso se ejecuta en cada nodo Enterprise |
+| License | Activar una vez mediante Business VIP; incluir el Bundle en el fileset HA |
+
+`installationId` y `memberId` son generados y persistidos por el proceso de instalación. Los operadores no deben inventarlos manualmente ni copiar `memberId` entre máquinas.
+
+### VIP y nodos candidatos
+
+| VIP | Nodos candidatos | Base de salud | Resultado de toma de control |
+| --- | --- | --- | --- |
+| Business VIP | D, E, F | Readiness de Fleet Agent, estado del contenedor de negocio, generación de sincronización | Solo el Owner inicia el grupo de negocio HA de Enterprise |
+| PostgreSQL VIP | D, E | Estado de HAProxy/Keepalived; HAProxy enruta solo al Primary escribible | Enterprise mantiene la misma dirección de base de datos |
+| Redis VIP | C, F | Redis `PING` y estado del servicio local | Cambia a la otra instancia independiente; la caché/sesión puede perderse |
+| RustFS VIP | A, B | Salud de HAProxy y del backend RustFS | La entrada proxy se mueve mientras la dirección S3 permanece sin cambios |
+
+## Diseño de despliegue de componentes
+
+### Enterprise, Fleet Agent y Business VIP
+
+- D, E y F instalan el mismo paquete ZIP offline completo de Enterprise.
+- Fleet Agent es un servicio de proceso del host, no un contenedor de negocio.
+- Keepalived gestiona la Business VIP y llama al endpoint de readiness de Fleet Agent para decidir si el nodo local puede mantener la VIP.
+- Solo el Owner de la Business VIP ejecuta el grupo de negocio; los otros dos nodos permanecen en Standby.
+- Un nodo que pierde la VIP debe detener el grupo de negocio. Un nodo recuperado debe reincorporarse primero como Standby.
+- EMQX se ejecuta como parte del grupo de negocio de instancia activa única. No lo reinicie fuera del control del Agent ni cree otro mecanismo de elección entre las tres máquinas.
+
+### PostgreSQL primario/en espera, Witness y entrada unificada
+
+- A inicia como Primary, B como Streaming Standby y C ejecuta repmgr Witness.
+- Witness registra el estado del clúster y participa en las decisiones de fallo. No almacena datos de negocio completos ni atiende lecturas o escrituras.
+- Cuando falla el Primary, repmgr promueve un Standby sano como nuevo Primary.
+- D/E HAProxy enruta el tráfico `5432` solo al Primary escribible actual.
+- La PostgreSQL VIP flota entre los nodos proxy D/E. El failover del proxy y el failover Primary/Standby de la base de datos están desacoplados.
+- La aceptación debe demostrar tanto "un único Primary escribible" como "el Standby reanuda streaming".
+
+### Instancias independientes de Redis
+
+- C y F ejecutan cada uno una instancia Redis independiente.
+- Las dos instancias Redis no forman Sentinel, Cluster ni replicación primaria/réplica.
+- La Redis VIP solo cambia la entrada de conexión. Cuando falla la instancia actual, la VIP se mueve a la otra instancia sana.
+- Redis solo debe almacenar datos que puedan perderse o reconstruirse. Caché vacía y nuevo inicio de sesión tras el cambio forman parte del límite de diseño.
+- Si Redis almacena en el futuro estado que no puede descartarse, se debe actualizar a un diseño con replicación/arbitraje en lugar de mantener la hipótesis de instancias independientes.
+
+### Clúster RustFS de cuatro nodos
+
+- C, D, E y F forman un clúster distribuido de almacenamiento de objetos RustFS de cuatro nodos.
+- HAProxy en A y B proxy todos los backends RustFS sanos.
+- La RustFS VIP flota entre A y B. Enterprise siempre accede a S3 mediante esta VIP.
+- El fallo de un nodo RustFS lo maneja el mecanismo del clúster; el fallo de un proxy lo maneja el failover de VIP.
+- No sincronice datos de objetos con rsync, copia en caliente ni edición directa de los directorios montados de RustFS.
+- Los límites de disponibilidad según cantidad de nodos, discos y erasure coding de RustFS deben seguir los resultados de comprobación del clúster de la versión desplegada.
+
+### Sincronización de archivos de App, Flow, Marimo y License
+
+Fleet Agent solo sincroniza archivos locales de negocio que no pueden colocarse directamente en PostgreSQL/RustFS pero deben existir en el nuevo nodo Active:
+
+- Directorios de ejecución de App y `node_modules`
+- Archivos locales de ejecución de Flow, Marimo, Notebook y relacionados
+- Bundle de License
+- Otros filesets HA registrados explícitamente por la implementación actual
+
+La sincronización usa `rsync` del sistema sobre confianza SSH administrada por el deployer entre nodos de negocio. Cada release crea una generation/manifest completa. Un Standby solo puede tomar el control después de confirmar que la generación está completa. Los directorios de datos de PostgreSQL, Redis y RustFS no forman parte de este alcance.
+
+## Métodos de conexión y base de red
+
+### Relaciones de acceso
+
+| Origen | Destino | Propósito |
+| --- | --- | --- |
+| Usuarios / sistemas del sitio | Business VIP | Acceso de negocio Web/API |
+| D/E/F Enterprise | PostgreSQL VIP | Lecturas/escrituras de base de datos de negocio |
+| D/E/F Enterprise | Redis VIP | Caché y sesión |
+| D/E/F Enterprise | RustFS VIP | Lecturas/escrituras de objetos S3 |
+| Controlador deployer | A-F | SSH, despliegue, recolección de estado, operaciones |
+| D/E/F | D/E/F | Sincronización de archivos rsync/SSH |
+| A/B/C | A/B/C | Replicación streaming PostgreSQL, repmgr, comunicación Witness |
+| RustFS members/proxies | C/D/E/F | Comunicación del clúster RustFS y backend S3 |
+| Nodos que comparten una VIP | Candidatos correspondientes | Anuncios VRRP y movimiento de VIP |
+
+### Puertos y protocolos
+
+Permita puertos según la relación mínima necesaria entre origen y destino. No exponga todos los puertos de administración directamente a la red de usuarios.
+
+| Puerto / protocolo | Lista permitida sugerida | Propósito |
+| --- | --- | --- |
+| `22/TCP` | Deployer -> A-F; sincronización mutua D/E/F | SSH, despliegue, rsync |
+| `8088/TCP` | Red de usuarios -> Business VIP | Entrada de negocio Enterprise |
+| `5432/TCP` | D/E/F -> PostgreSQL VIP; Acceso interno PG/proxy | PostgreSQL, replicación streaming, proxy |
+| `6379/TCP` | D/E/F -> Redis VIP; nodos de health check -> C/F | Acceso Redis y health checks |
+| `19000/TCP` | D/E/F -> RustFS VIP | Entrada S3 fija de Enterprise |
+| `9000/TCP` | A/B -> C/D/E/F; RustFS members | Comunicación backend/clúster S3 de RustFS; confirmar por versión |
+| `9001/TCP` | Red de operaciones controlada -> entrada admin de RustFS | Endpoint admin opcional de RustFS; no exponer a la red de usuarios |
+| `19731/TCP` | Localhost / Keepalived / red de operaciones controlada | Interfaz HTTP de salud y control de Fleet Agent |
+| `18080/TCP` | Red de operaciones -> controlador deployer | UI HTTPS del deployer |
+| `112/VRRP` | Nodos candidatos de cada VIP | Movimiento de VIP de Keepalived; es un número de protocolo IP, no TCP/UDP |
+| `1883/8883` | Red de dispositivos del sitio -> entrada de negocio, según configuración del producto | MQTT/MQTTS |
+
+## Conmutación por error y límites de capacidad
+
+| Escenario de fallo | Comportamiento esperado | Límite |
+| --- | --- | --- |
+| Falla el nodo de negocio Active D | La Business VIP se mueve a E o F; el nuevo Owner inicia el grupo de negocio después de pasar readiness | Requiere que la última generation del HA fileset esté completa en Standby |
+| Falla PostgreSQL Primary A | B se promueve a Primary; PostgreSQL VIP sigue enrutando al Primary escribible mediante el proxy D/E | La pérdida de datos depende del estado de la replicación streaming |
+| Falla el nodo Redis actual | Redis VIP se mueve a la otra instancia Redis independiente | La caché/sesión puede perderse |
+| Falla el proxy RustFS A o B | RustFS VIP se mueve al otro proxy | Los datos RustFS siguen dependiendo de la salud del clúster de cuatro nodos |
+| Falla un solo nodo de datos RustFS | El clúster RustFS continúa el servicio si se cumplen sus condiciones de redundancia | El límite real depende del número de discos y la configuración de erasure coding |
+
+Particiones de red, fallos simultáneos de varios nodos, prioridad VRRP incorrecta, discos llenos, deriva de reloj y cambios manuales fuera del deployer quedan fuera de la recuperación automática normal y deben cubrirse con procedimientos operativos.
+
+## Copia de seguridad, monitoreo e inspección
+
+- PostgreSQL requiere copias de seguridad lógicas o físicas independientes y verificación de restauración.
+- RustFS requiere monitoreo de capacidad, discos y salud del clúster.
+- Redis debe tratarse como caché/sesión salvo que se introduzca un diseño de replicación futuro.
+- El estado de Fleet Agent y Keepalived debe monitorearse en D/E/F.
+- Debe monitorearse el retraso de generation de rsync. Un Standby con una generation obsoleta no debe tomar el tráfico de negocio.
+- Los simulacros regulares de failover deben incluir Business VIP, promoción de PostgreSQL, cambio de Redis VIP, cambio de proxy RustFS y restauración desde backup.
+
+## Comprobaciones antes de producción
+
+- Las seis máquinas son accesibles por SSH desde el deployer controller.
+- Los nombres de host, direcciones IP, nombres de NIC, NTP, DNS y reglas de firewall están fijados y registrados.
+- Las cuatro VIP no están ocupadas y pueden moverse entre sus nodos candidatos.
+- Los puntos de montaje de disco están fijados y persisten tras reinicio.
+- Las configuraciones de Enterprise, PostgreSQL, Redis, RustFS, Keepalived, HAProxy, repmgr, Fleet Agent y rsync son generadas por el deployer y revisadas.
+- La Cluster License se activa una sola vez mediante la Business VIP.
+- Los pasos de backup y restauración se ensayan antes de introducir tráfico de producción.
 
 ## Secuencia de implementación
 
-1. Confirma red del sitio, VIP, DNS, NTP, certificados, registro de imágenes y políticas de firewall.
-2. Prepara el sistema operativo, discos, sincronización horaria y configuración básica de seguridad en las 6 VM.
-3. Si se usa NFS/NAS, valida directorios compartidos, permisos, montaje y montaje automático al reiniciar.
-4. Despliega el Docker Swarm de tres nodos.
-5. Despliega `APP VIP + HAProxy/Nginx`.
-6. Despliega EMQX en modo fijo de un nodo o como clúster de tres nodos.
-7. Despliega PostgreSQL + TimescaleDB primario-standby.
-8. Despliega repmgr witness, repmgrd y el script de failover de DB VIP.
-9. Publica el stack Tier0 Enterprise de réplica única.
+1. Prepare el deployer controller y las seis máquinas.
+2. Confirme la información de IP, VIP, NIC, disco, DNS, NTP, SSH y firewall.
+3. Cargue el paquete offline de Enterprise y los materiales de configuración.
+4. Despliegue PostgreSQL Primary/Standby y Witness.
+5. Despliegue las instancias Redis independientes y la Redis VIP.
+6. Despliegue el clúster RustFS de cuatro nodos y la RustFS VIP.
+7. Despliegue Enterprise en D/E/F, Fleet Agent, los filesets rsync y la Business VIP.
+8. Active la License mediante la Business VIP.
+9. Ejecute la validación funcional y los simulacros de failover.
+10. Registre la topología final, contraseñas/keys, política de backup, objetivos de monitoreo y procedimientos de recuperación.
 
-## Riesgos y elementos por confirmar
+## Criterios de aceptación
 
-- Confirma segmento de red, gateway, DNS, NTP, certificados y dirección del registro de imágenes.
-- Confirma si Tier0 Enterprise requiere persistencia local de archivos; si la requiere, agrega almacenamiento compartido u objeto.
-- El script de failover de `DB VIP` debe verificarse en sitio, especialmente si la plataforma de virtualización permite VRRP.
-- Si la red del sitio no permite VRRP, usa balanceador, cambio DNS o IP flotante de la plataforma de virtualización.
+### Aceptación funcional
+
+- Los usuarios pueden acceder a Enterprise mediante la Business VIP.
+- Enterprise lee y escribe PostgreSQL solo mediante la PostgreSQL VIP.
+- Enterprise usa Redis solo mediante la Redis VIP.
+- Enterprise usa RustFS solo mediante la RustFS VIP.
+- Los archivos de App, Flow, Marimo, Notebook y License están presentes en el nodo Active tras el failover.
+- Branch Enterprise puede seguir instalándose de forma independiente y no se une a este grupo HA de seis máquinas.
+
+### Aceptación de simulacros de failover
+
+- Detener el nodo de negocio Active: la Business VIP se mueve a un Standby sano y el grupo de negocio se inicia solo allí.
+- Detener PostgreSQL Primary: Standby se promueve y la PostgreSQL VIP sigue apuntando al Primary escribible.
+- Detener el owner de Redis VIP: la Redis VIP se mueve a la otra instancia, aceptando la pérdida de caché/sesión.
+- Detener el owner del proxy RustFS: la RustFS VIP se mueve al otro proxy.
+- Detener un nodo de datos RustFS: el acceso a objetos permanece dentro del límite real de redundancia de RustFS.
+- Recuperar nodos fallidos: vuelven como Standby o miembros sanos y no sobrescriben datos o archivos más nuevos.
+
+## Riesgos y puntos a confirmar en sitio
+
+- Si la red permite el protocolo VRRP `112`.
+- Si las cuatro direcciones VIP realmente no están ocupadas.
+- Si el diseño y la capacidad de montaje de discos cumplen los requisitos reales de retención de archivos y redundancia de RustFS.
+- Si Redis solo almacena datos descartables.
+- Si el retraso de replicación de PostgreSQL y la política de backup cumplen el RPO de negocio.
+- Si el personal de operaciones entiende la diferencia entre failover de VIP, sincronización de archivos, replicación de base de datos y redundancia de almacenamiento de objetos.
+
+## Conclusión
+
+El plan actual se centra en seis máquinas, cuatro VIP fijas y una Enterprise de instancia activa única, desacoplando respectivamente la entrada de negocio, la entrada de base de datos, la entrada de caché y la entrada de almacenamiento de objetos. Puede cubrir fallos comunes de una sola máquina dentro del mismo segmento de red y reduce significativamente el trabajo posterior al cambio: modificar la configuración de conexión, reactivar License y copiar manualmente archivos de App.
+
+Al mismo tiempo, se deben aceptar tres límites: Redis no replica datos, los filesets de negocio se sincronizan de forma asíncrona y una partición de red no cuenta con arbitraje de consenso. Por lo tanto, este plan debe definirse como **plan de recuperación ante desastres activo/en espera de seis máquinas y una sola Enterprise activa para Fleet Center**. No debe prometerse externamente cero interrupciones, cero pérdida de datos ni alta disponibilidad estricta entre centros de datos.

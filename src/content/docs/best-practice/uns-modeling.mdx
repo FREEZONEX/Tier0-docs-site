@@ -780,7 +780,7 @@ Tier0 uses three fixed topic types, `Metric`, `Action`, and `State`, to avoid to
 - **Use `Metric` for high-frequency real-time data**
 
   Put high-frequency measurements and telemetry under `Metric` instead of expanding the namespace for every signal detail.
-
+  <div className="t0-topic-explosion-tabs">
   <Tabs syncKey="topic-explosion">
     <TabItem label="Bad">
 
@@ -817,11 +817,12 @@ Tier0 uses three fixed topic types, `Metric`, `Action`, and `State`, to avoid to
 
     </TabItem>
   </Tabs>
+  </div>
 
 - **Use `State` for low-frequency status data**
 
   Put low-frequency status, snapshots, and current business state under `State`. Avoid creating a new topic for every changing entity such as jobs, batches, or orders.
-
+  <div className="t0-topic-explosion-tabs">
   <Tabs syncKey="topic-explosion">
     <TabItem label="Bad">
 
@@ -855,11 +856,12 @@ Tier0 uses three fixed topic types, `Metric`, `Action`, and `State`, to avoid to
 
     </TabItem>
   </Tabs>
+  </div>
 
 - **Use `Action` for low-frequency action data**
 
   Put commands, requests, and operator actions under `Action`. Keep action inputs as fields on a topic rather than creating one topic per parameter.
-
+  <div className="t0-topic-explosion-tabs">
   <Tabs syncKey="topic-explosion">
     <TabItem label="Bad">
 
@@ -894,3 +896,4 @@ Tier0 uses three fixed topic types, `Metric`, `Action`, and `State`, to avoid to
 
     </TabItem>
   </Tabs>
+  </div>

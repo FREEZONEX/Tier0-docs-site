@@ -9,9 +9,9 @@ import { Tabs, TabItem } from '@astrojs/starlight/components';
 import { Steps } from '@astrojs/starlight/components';
 
 Tier0 ships in three editions:
-- **Edge** - Open-source, runs locally with Docker.
 - **Cloud** - Managed SaaS, no infrastructure required.
 - **Enterprise** - Private deployment for enterprise environments.
+- **Edge** - Open-source, runs locally with Docker.
 
 See [Choosing the Best Version](../choosing-version/) to find the edition that best fits your requirements.
 
@@ -28,48 +28,6 @@ See [Choosing the Best Version](../choosing-version/) to find the edition that b
 		3. Create a workspace and start your trial.
 	</Steps>
 	
-	</TabItem>
-	<TabItem label="Edge">
-
-	#### Requirements
-	- Minimum 4-core CPU, 8 GB RAM, 100 GB disk
-	- Ubuntu 24.04 or Windows 10/11 with Docker and Git
-	#### Operations
-	<Steps>
-	1. Clone the Tier0-Edge repository from GitHub and access the project.
-
-		```bash
-		git clone https://github.com/FREEZONEX/Tier0-Edge
-		cd Tier0-Edge/deploy
-		```
-
-	2. Configure the parameters listed in the table below in `.env.default` according to your environment, and save the changes.
-	
-		```bash
-		vi .env.default
-		:wq!
-		```
-		:::note[Parameters to be configured]
-
-		| Field | Type | Description |
-		|------|------|-------------|
-		| VOLUMES_PATH | string | Storage path for project data |
-		| ENTRANCE_DOMAIN/ENTRANCE_PORT | string | Tier0 access endpoint (IP/domain + port) |
-		| OS_PLATFORM_TYPE | enum | OS where Tier0 is installed. Can be **linux** or **windows** |
-		| LANGUAGE | enum | zh-CN / en-US |
-
-		:::
-	3. Run the installation script.
-
-		```bash
-		bash bin/install.sh
-		```
-
-	</Steps>
-
-
-		
-
 	</TabItem>
 	<TabItem label="Enterprise">
 #### Requirements
@@ -141,6 +99,49 @@ Detailed deployment information is available in the [High Availability Deploymen
 
 
 </TabItem>
+	<TabItem label="Edge">
+
+	#### Requirements
+	- Minimum 4-core CPU, 8 GB RAM, 100 GB disk
+	- Ubuntu 24.04 or Windows 10/11 with Docker and Git
+	#### Operations
+	<Steps>
+	1. Clone the Tier0-Edge repository from GitHub and access the project.
+
+		```bash
+		git clone https://github.com/FREEZONEX/Tier0-Edge
+		cd Tier0-Edge/deploy
+		```
+
+	2. Configure the parameters listed in the table below in `.env.default` according to your environment, and save the changes.
+	
+		```bash
+		vi .env.default
+		:wq!
+		```
+		:::note[Parameters to be configured]
+
+		| Field | Type | Description |
+		|------|------|-------------|
+		| VOLUMES_PATH | string | Storage path for project data |
+		| ENTRANCE_DOMAIN/ENTRANCE_PORT | string | Tier0 access endpoint (IP/domain + port) |
+		| OS_PLATFORM_TYPE | enum | OS where Tier0 is installed. Can be **linux** or **windows** |
+		| LANGUAGE | enum | zh-CN / en-US |
+
+		:::
+	3. Run the installation script.
+
+		```bash
+		bash bin/install.sh
+		```
+
+	</Steps>
+
+
+		
+
+	</TabItem>
+	
 </Tabs>
 
 

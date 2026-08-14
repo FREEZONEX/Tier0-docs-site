@@ -1,6 +1,6 @@
----
-title: 高可用デプロイ計画
-description: 高可用な Tier0 Enterprise 環境向けの参照デプロイ計画。
+﻿---
+title: 高可用性デプロイ計画
+description: Tier0 Enterprise の高可用性環境向けリファレンスデプロイ計画。
 sidebar:
   order: 3
 tableOfContents:
@@ -10,132 +10,276 @@ tableOfContents:
 
 ## 計画の目的
 
-この計画は、オフラインまたはプライベート環境に 1 つの Tier0 Enterprise 環境をデプロイするためのものです。基本構成は 6 台の仮想マシンです。
+この V2 計画は、オフラインまたはプライベート環境に論理的な Tier0 Enterprise Fleet Center をデプロイするためのものです。6 台のマシンが、業務、ミドルウェア、データベース、ストレージ、Agent の役割を分担します。ユーザーと Enterprise 内部サービスは常に固定 VIP アドレスに接続します。1 台のマシンまたは 1 つのプロキシに障害が発生した場合、Keepalived、HAProxy、repmgr、RustFS、Fleet Agent がそれぞれのレイヤーで引き継ぎます。
 
-- 3 台のアプリケーションノードで `Docker Swarm` クラスターを構成し、単一レプリカの Tier0 Enterprise サービスとステートフルな **EMQX** サービスを実行します。
-- 2 台のデータベースノードで `PostgreSQL + TimescaleDB` の primary-standby クラスターを構成します。
-- 1 台の `Witness` ノードが、データベース監視、仲裁、フェイルオーバーに参加します。
+この計画は、同一ネットワークセグメント内の単一マシン障害からの復旧を対象にしています。これは Active/Standby の災害復旧設計であり、複数データセンター、合意ベースの選出、またはデータ損失ゼロを保証する厳密な高可用性クラスターではありません。
 
-:::note[任意]
-外部 `NFS/NAS` 共有ストレージを追加し、3 台の Swarm ノードからマウントできます。これは Tier0 Enterprise のノード間共有ファイルに使う外部依存であり、この計画の 6 台の業務 VM には含めません。
-:::
+設計目標は次のとおりです。
 
-:::tip[データベースリソースが変わる場合]
-この計画では、各データベース VM が `4C / 8G / 500G` であることを前提にしています。データベースクラスター全体で `4C / 8G / 500G` が要件の場合は、実装前に性能と容量を再計算してください。
-:::
+- 現在の業務ノードに障害が発生した後、Fleet Center の入口を健全な Standby ノードへ移動できる。
+- PostgreSQL、Redis、RustFS は固定 VIP アドレスを使用し、バックエンドの役割が変わっても Enterprise の `.env` を変更しない。
+- App、Flow、Marimo、License などのローカル業務ファイルを Active から Standby へ同期できる。
+- 1 つの Cluster License は 1 つの論理インストールに対応し、Enterprise が別ノードに切り替わっても再アクティベーションしない。
+- 独立した deployer が 6 台の初期化、ロール割り当て、デプロイ、状態監視、フェイルオーバー検証を行う。
+- VIP フェイルオーバー、ファイル同期、独立 Redis インスタンス、データベースレプリケーション、オブジェクトストレージ冗長性を明確に分離する。
 
-## 計画 IP アドレス
-
-以下の IP は例です。実装前に現地の実ネットワークアドレスへ置き換えてください。
-
-| 種別 | 名前 | 計画 IP | 説明 |
-| --- | --- | --- | --- |
-| 論理入口 | APP VIP | `10.60.10.10` | 統一業務入口。3 台の Swarm ノード間でフェイルオーバーできます。 |
-| 外部依存 | NFS/NAS | `10.60.40.10` | 任意の共有ストレージ。6 台の VM には含めません。 |
-| アプリケーションノード | ent-swarm-01 | `10.60.10.11` | Docker Swarm manager/worker。固定 EMQX ノードまたは EMQX クラスターノードとしても利用できます。 |
-| アプリケーションノード | ent-swarm-02 | `10.60.10.12` | Docker Swarm manager/worker。再スケジュール可能なサービスを実行します。 |
-| アプリケーションノード | ent-swarm-03 | `10.60.10.13` | Docker Swarm manager/worker。再スケジュール可能なサービスを実行します。 |
-| 論理入口 | DB VIP | `10.60.20.10` | 統一データベース入口。現在の primary のみを指します。 |
-| データベースノード | ent-db-01 | `10.60.20.11` | PostgreSQL + TimescaleDB primary 候補。 |
-| データベースノード | ent-db-02 | `10.60.20.12` | PostgreSQL + TimescaleDB standby 候補。 |
-| 仲裁ノード | ent-db-witness-01 | `10.60.20.13` | repmgr witness / 仲裁および監視ノード。 |
+この計画は Fleet Center のみに適用されます。Branch Enterprise ノードは通常の単一マシンデプロイとしてインストールされ、この 6 台 Active/Standby 設計には参加しません。
 
 ## 全体トポロジー
 
-<img class="t0-topology" src="/images/enterprise-ha-topology.ja.png" alt="tier0-enterprise 6 VM 南北方向データ経路" />
+<img class="t0-topology" src="/images/enterprise-ha-overview.ja.svg" alt="Tier0 Enterprise 全体トポロジー" />
 
-図は主要なリンクのみを示しています。
+主要なリクエスト経路は次のとおりです。
 
-- 業務アクセス経路: ユーザー / 現地システム -> `APP VIP` -> 3 台の `Docker Swarm` ノード -> `DB VIP` -> 現在の primary データベース。
-- `APP VIP` は 3 台の Swarm ノードへトラフィックを分配します。Swarm ノードは `DB VIP` 経由でデータベースへアクセスします。
-- `APP VIP` は 3 台の Swarm ノード間でフェイルオーバーできます。`DB VIP` は現在の PostgreSQL Primary ロールに追従し、2 台のデータベースノード間で切り替わります。
-- `Witness` はデータベース仲裁、primary 選択、ヘルスチェックのみに参加し、業務アクセス経路には入りません。
-- `EMQX` はステートフルサービスです。デフォルトでは永続ストレージを持つ 1 台のノードに固定します。メッセージング層にも HA が必要な場合は、3 ノード EMQX クラスターをデプロイしてください。
+```text
+クライアント / 現場システム
+    -> Business VIP :8088
+    -> 現在の Active Enterprise (D / E / F)
+    |-- PostgreSQL VIP :5432 -> D/E HAProxy -> A/B の現在の書き込み可能 Primary
+    |-- Redis VIP      :6379 -> C または F の独立 Redis
+    `-- RustFS VIP     :19000 -> A/B HAProxy -> C/D/E/F RustFS クラスター
+```
 
-## データベース監視とフェイルオーバー
+4 つの VIP は業務設定内の固定入口です。Enterprise がノードを切り替えたり、ミドルウェアのバックエンドロールが変わったりしても、クライアントと Enterprise は接続アドレスを変更しません。
 
-| フェーズ | リンク | 説明 |
+## 計画 IP アドレス
+
+次のアドレスは例です。実装前に、現場の同一 IPv4 サブネット内の実アドレスに置き換えてください。4 つの VIP は DHCP、静的ホスト、または他の VRRP インスタンスで使用されていてはいけません。
+
+| 名前 | 例 IP | 説明 |
 | --- | --- | --- |
-| 通常アクセス | Swarm ノード上の Tier0 Enterprise レプリカ -> `DB VIP` -> 現在の primary | アプリケーションは常に `10.60.20.10:5432` のみに接続します。 |
-| 通常レプリケーション | 現在の primary -> 現在の standby | PostgreSQL WAL streaming replication でデータを同期します。 |
-| 通常監視 | `DB-01` / `DB-02` -> `Witness` | `repmgrd` が状態を報告し、`Witness` が仲裁に参加します。 |
-| primary 障害 | standby -> `Witness` | standby が split-brain を避けるために仲裁を要求します。 |
-| standby 昇格 | standby `promote` | `Witness` 確認後、standby が新しい primary に昇格します。 |
-| VIP フェイルオーバー | `DB VIP` -> 新 primary | `10.60.20.10` を新しい primary に紐づけます。 |
-| アプリケーション復旧 | Tier0 Enterprise -> `DB VIP` -> 新 primary | 接続プールが再接続し、読み書きが復旧します。 |
+| deployer-controller | `10.60.10.20` | 独立 deployer。6 台の業務マシンには含めない |
+| ent-ha-01 / A | `10.60.10.11` | PostgreSQL Primary と関連ロール |
+| ent-ha-02 / B | `10.60.10.12` | PostgreSQL Standby と関連ロール |
+| ent-ha-03 / C | `10.60.10.13` | Witness、Redis-1、RustFS-1 |
+| ent-ha-04 / D | `10.60.10.14` | 初期 Active Enterprise と関連ロール |
+| ent-ha-05 / E | `10.60.10.15` | Enterprise Standby と関連ロール |
+| ent-ha-06 / F | `10.60.10.16` | Enterprise Standby と関連ロール |
+| Business VIP | `10.60.10.101` | Enterprise 統一入口、デフォルト `8088` |
+| PostgreSQL VIP | `10.60.10.102` | データベース統一入口、デフォルト `5432` |
+| Redis VIP | `10.60.10.103` | Redis 統一入口、デフォルト `6379` |
+| RustFS VIP | `10.60.10.104` | S3 統一入口、デフォルト `19000` |
 
-重要な境界:
+実装前に、業務 NIC 名、IPv4 プレフィックス、ゲートウェイ、DNS、NTP、ホスト名、SSH ユーザー、ディスクマウントポイント、ファイアウォール許可リストを確認してください。VIP、ノード IP、NIC をスクリプトで推測して本番に直接使用してはいけません。
 
-- 業務サービスは `DB VIP:5432` のみに接続し、`ent-db-01/02` への直接接続は許可しません。
-- `Witness` は業務データを保存せず、業務の読み書きを処理せず、アプリケーションへデータベースアクセスを公開しません。
-- `TimescaleDB` は両方のデータベースノードに PostgreSQL extension としてデプロイします。
-- 推奨構成は `PostgreSQL streaming replication + repmgr + repmgr witness + keepalived DB VIP` です。
-- 自動フェイルオーバーは primary の利用不可のみを扱います。元 primary が復旧した後は、まず standby として再参加させます。
+## 6 台の役割
 
-## ノード構成一覧
+<img class="t0-topology" src="/images/enterprise-ha-six-node.ja.svg" alt="Tier0 Enterprise 6 台 Active/Standby 構成" />
 
-| ノード | ロール | vCPU | メモリ | ストレージ | 主なコンポーネント |
-| --- | --- | ---: | --- | --- | --- |
-| ent-swarm-01 | Swarm manager/worker | 8 | 32G | 100G | Docker Engine, Swarm, Keepalived, HAProxy/Nginx |
-| ent-swarm-02 | Swarm manager/worker | 8 | 32G | 100G | Docker Engine, Swarm, Keepalived, HAProxy/Nginx |
-| ent-swarm-03 | Swarm manager/worker | 8 | 32G | 100G | Docker Engine, Swarm, Keepalived, HAProxy/Nginx |
-| ent-db-01 | データベース primary 候補 | 4 | 8G | 500G | PostgreSQL, TimescaleDB, repmgr, keepalived |
-| ent-db-02 | データベース standby 候補 | 4 | 8G | 500G | PostgreSQL, TimescaleDB, repmgr, keepalived |
-| ent-db-witness-01 | Witness / 仲裁 | 2 | 4G | 40G | repmgr witness, health check scripts |
-
-## デプロイ推奨事項
-
-- `docker stack deploy` で Tier0 Enterprise をデプロイします。
-- 設定ファイルには `Docker config`、パスワード、データベース認証情報、証明書秘密鍵には `Docker secret` を使います。
-- デプロイ時に公開ネットワークへ依存しないよう、現地の内部イメージレジストリを使います。
-- `APP VIP` は 3 台の Swarm ノード上に `keepalived + HAProxy` または `keepalived + Nginx` でデプロイします。
-- データベース入口は `DB VIP` に統一します。接続数が増えすぎないよう、アプリケーション側で接続プールを使うことを推奨します。
-- NFS/NAS は Tier0 Enterprise のノード間共有ファイル専用にし、PostgreSQL/TimescaleDB のデータディレクトリや EMQX の中核 runtime データには使わないでください。
-
-## ポートとファイアウォール
-
-完全なポート一覧は [標準ポート一覧](../standard-port-list/) を参照してください。
-
-デフォルトでは開けないポート:
-
-- Docker remote API `2375` / `2376`。使う場合も O&M ネットワークに限定してください。
-- データベースノードの `80/443`。データベースノードは Web 入口を提供しません。
-- アプリケーションから Witness への `5432`。Witness は業務 SQL を処理しません。
-
-## 高可用機能と障害境界
-
-| 障害シナリオ | システムの動作 | 境界 |
+| マシン | デフォルトでデプロイするコンポーネント | 主な責務 |
 | --- | --- | --- |
-| 現在の Swarm ノードが故障 | Swarm が単一レプリカサービスを別の正常ノードへ再スケジュールします。 | コンテナ再起動とアプリケーション再接続を待つ必要があります。 |
-| 単一ノード固定モードの EMQX が故障 | まず元ノードを復旧します。復旧できない場合はバックアップから新ノードへ復元します。 | メッセージング層は中断し、stateless サービスのような無損失切替はできません。 |
-| 3 ノード EMQX クラスターの 1 ノードが故障 | 残りのノードが継続してサービスし、復旧後に故障ノードが再参加します。 | EMQX クラスター構成を事前に完了しておく必要があります。 |
-| 現在の primary が故障 | standby が Witness 仲裁後に昇格し、`DB VIP` が切り替わります。 | 書き込みが数秒から数分中断します。アプリケーションは再接続が必要です。 |
-| standby が故障 | primary は継続してサービスし、レプリケーション中断アラートが出ます。 | 自動フェイルオーバー能力が低下します。 |
-| Witness が故障 | 現在の primary は継続してサービスします。 | 自動フェイルオーバー能力が低下するため、Witness を優先的に復旧します。 |
-| NFS/NAS が故障 | 共有ファイルに依存する機能が影響を受けます。 | データベースやメモリ上で動作中の業務プロセスは必ずしも中断しません。 |
+| A | PostgreSQL Primary、RustFS HAProxy、Keepalived | 初期データベース Primary、1 番目の RustFS プロキシ候補 |
+| B | PostgreSQL Standby、RustFS HAProxy、Keepalived | ストリーミング Standby、2 番目の RustFS プロキシ候補 |
+| C | PostgreSQL Witness、Redis-1、RustFS-1 | データベース Witness/状態記録、Redis と RustFS のデータノード |
+| D | PG HAProxy、Keepalived、RustFS-2、Enterprise、Fleet Agent、rsync | 初期業務 Active、1 番目の PostgreSQL プロキシ候補 |
+| E | PG HAProxy、Keepalived、RustFS-3、Enterprise、Fleet Agent、rsync | 業務 Standby、2 番目の PostgreSQL プロキシ候補 |
+| F | Redis-2、RustFS-4、Enterprise、Fleet Agent、rsync | 業務 Standby、2 番目の Redis インスタンス |
+
+この割り当ては単一マシン障害への耐性と、6 台全体のリソースバランスを目的としています。deployer はホスト名/IP アドレスの自然順でマシンを A-F に対応付け、デフォルトロールを選択しますが、最終割り当ては現場のディスク構成と障害ドメインに照らして確認する必要があります。
+
+### マシン構成チェックリスト
+
+Enterprise 業務レイヤーは Single Active/Standby です。任意の時点で、Business VIP を保持するノードだけが業務リクエストを処理します。業務レイヤーの拡張は、1 台の業務ノードの CPU、メモリ、ディスクを増強する垂直拡張で行います。Enterprise ノード数を掛け算して同時処理能力を見積もらないでください。
+
+| マシン | ノード種別 | vCPU | メモリ | 基本ストレージ | ディスク推奨 |
+| --- | --- | --- | --- | --- | --- |
+| A | PostgreSQL Primary ノード | 8C | 16G | 1T | `/` は約 80G、残りは PostgreSQL データ、WAL、バックアップ staging 用 |
+| B | PostgreSQL Standby ノード | 8C | 16G | 1T | `/` は約 80G、残りは PostgreSQL データ、WAL、バックアップ staging 用 |
+| C | Witness / ミドルウェアノード | 4C | 8G | 500G | システム、Redis、RustFS データ用の固定マウントポイントを割り当てる |
+| D | 初期 Active Enterprise ノード | 8C | 32G | 500G | システム、コンテナ、Enterprise 同期ファイル、RustFS データ用の固定マウントポイントを割り当てる |
+| E | Standby Enterprise ノード | 8C | 32G | 500G | D と同じ |
+| F | Standby Enterprise ノード | 8C | 32G | 500G | D と同じ |
+
+| カテゴリー | 台数 | 1 台あたり仕様 | vCPU 小計 | メモリ小計 | ストレージ小計 |
+| --- | --- | --- | --- | --- | --- |
+| PostgreSQL データベースノード | 2 | `8C / 16G / 1T` | 16C | 32G | 2T |
+| Witness / ミドルウェアノード | 1 | `4C / 8G / 500G` | 4C | 8G | 500G |
+| Enterprise 業務ノード | 3 | `8C / 32G / 500G` | 24C | 96G | 1.5T |
+| **合計** | **6** | - | **44C** | **136G** | **4T** |
+
+## 構成サマリー
+
+### Enterprise 統一接続設定
+
+D、E、F は同じ Enterprise 構成を保持します。
+
+| 依存先 | 構成方針 |
+| --- | --- |
+| PostgreSQL | A/B ノード IP ではなく PostgreSQL VIP に接続する |
+| Redis | C/F ノード IP ではなく Redis VIP に接続する |
+| File storage | `FILESTORE_DRIVER=s3` を使用し、S3 endpoint を RustFS VIP に向ける |
+| Fleet identity | 3 ノードが 1 つの論理 `installationId` を共有し、各ノードは独自の `memberId` を持つ |
+| Fleet Agent | 各 Enterprise ノードで 1 つのプロセスレベル Fleet Agent を実行する |
+| License | Business VIP 経由で 1 回だけアクティベートし、Bundle を HA fileset に含める |
+
+`installationId` と `memberId` はインストールプロセスで生成、永続化されます。運用者が手動で作成したり、マシン間で `memberId` をコピーしたりしないでください。
+
+### VIP と候補ノード
+
+| VIP | 候補ノード | ヘルス判定 | 引き継ぎ結果 |
+| --- | --- | --- | --- |
+| Business VIP | D, E, F | Fleet Agent readiness、業務コンテナ状態、同期 generation | Owner だけが Enterprise HA 業務グループを起動する |
+| PostgreSQL VIP | D, E | HAProxy/Keepalived 状態。HAProxy は書き込み可能 Primary のみにルーティングする | Enterprise は同じデータベースアドレスを使い続ける |
+| Redis VIP | C, F | Redis `PING` とローカルサービス状態 | もう一方の独立インスタンスへ切り替わる。キャッシュ/セッションは失われる可能性がある |
+| RustFS VIP | A, B | HAProxy と RustFS backend のヘルス | S3 アドレスを変えずにプロキシ入口だけが移動する |
+
+## コンポーネントデプロイ設計
+
+### Enterprise、Fleet Agent、Business VIP
+
+- D、E、F は同じ完全な Enterprise オフライン ZIP をインストールする。
+- Fleet Agent はホストレベルのプロセスサービスであり、業務コンテナではない。
+- Keepalived は Business VIP を管理し、Fleet Agent readiness endpoint を呼び出してローカルノードが VIP を保持できるか判断する。
+- Business VIP Owner だけが業務グループを実行し、他の 2 台は Standby にとどまる。
+- VIP を失ったノードは業務グループを停止しなければならない。復旧したノードはまず Standby として再参加する。
+- EMQX は Single Active 業務グループの一部として実行する。Agent 制御外で再起動したり、3 台間で別の選出機構を作ったりしない。
+
+### PostgreSQL Primary/Standby、Witness、統一入口
+
+- A は Primary、B は Streaming Standby、C は repmgr Witness として開始する。
+- Witness はクラスター状態を記録し、障害判断に参加する。完全な業務データは保存せず、読み書きも処理しない。
+- Primary に障害が発生した場合、repmgr は健全な Standby を新しい Primary に昇格させる。
+- D/E HAProxy は `5432` トラフィックを現在の書き込み可能 Primary のみにルーティングする。
+- PostgreSQL VIP は D/E プロキシノード間を移動する。プロキシフェイルオーバーとデータベース Primary/Standby フェイルオーバーは分離されている。
+- 受け入れでは「書き込み可能 Primary が 1 つだけであること」と「Standby が streaming を再開すること」の両方を証明する必要がある。
+
+### Redis 独立インスタンス
+
+- C と F はそれぞれ 1 つの standalone Redis インスタンスを実行する。
+- 2 つの Redis は Sentinel、Cluster、Primary/Replica レプリケーションを構成しない。
+- Redis VIP は接続入口だけを切り替える。現在のインスタンスに障害が発生すると、VIP はもう一方の健全なインスタンスへ移動する。
+- Redis には失われてもよい、または再構築できるデータだけを保存する。切り替え後の空キャッシュや再ログインは設計境界内である。
+- 将来 Redis が破棄できない状態を保存する場合は、独立インスタンス前提を維持せず、レプリケーション/仲裁設計へアップグレードする。
+
+### RustFS 4 ノードクラスター
+
+- C、D、E、F は 4 ノードの分散 RustFS オブジェクトストレージクラスターを構成する。
+- A と B の HAProxy は健全な RustFS backend へプロキシする。
+- RustFS VIP は A と B の間を移動する。Enterprise は常にこの VIP 経由で S3 にアクセスする。
+- 単一 RustFS ノード障害はクラスター機構で処理し、単一プロキシ障害は VIP フェイルオーバーで処理する。
+- オブジェクトデータを rsync、ホットコピー、または RustFS マウントディレクトリの直接編集で同期しない。
+- RustFS のノード数、ディスク数、erasure coding の可用性境界は、デプロイされたバージョンのクラスター検査結果に従う。
+
+### App、Flow、Marimo、License ファイル同期
+
+Fleet Agent は、PostgreSQL/RustFS に直接置けないが、新しい Active ノードに存在する必要があるローカル業務ファイルだけを同期します。
+
+- App runtime ディレクトリと `node_modules`
+- Flow、Marimo、Notebook、および関連するローカル runtime ファイル
+- License Bundle
+- 現在の実装で明示的に登録されたその他の HA fileset
+
+同期は、deployer が管理する業務ノード間の SSH trust 上で system `rsync` を使用します。各リリースは完全な generation/manifest を作成します。Standby ノードは generation が完全であることを確認してからのみ引き継げます。PostgreSQL データディレクトリ、Redis データディレクトリ、RustFS データディレクトリはこの同期範囲に含まれません。
+
+## 接続方法とネットワーク基準
+
+### アクセス関係
+
+| Source | Target | Purpose |
+| --- | --- | --- |
+| ユーザー / 現場システム | Business VIP | Web/API 業務アクセス |
+| D/E/F Enterprise | PostgreSQL VIP | 業務データベースの読み書き |
+| D/E/F Enterprise | Redis VIP | キャッシュとセッション |
+| D/E/F Enterprise | RustFS VIP | S3 オブジェクトの読み書き |
+| Deployer controller | A-F | SSH、デプロイ、状態収集、運用 |
+| D/E/F | D/E/F | rsync/SSH ファイル同期 |
+| A/B/C | A/B/C | PostgreSQL streaming replication、repmgr、Witness 通信 |
+| RustFS members/proxies | C/D/E/F | RustFS クラスターと S3 backend 通信 |
+| 同じ VIP を共有するノード | 対応する候補ノード | VRRP advertisement と VIP 移動 |
+
+### ポートとプロトコル
+
+ポートは、必要最小限の source-to-target 関係で許可してください。すべての管理ポートをユーザーネットワークへ直接公開しないでください。
+
+| Port / protocol | 推奨許可範囲 | 用途 |
+| --- | --- | --- |
+| `22/TCP` | Deployer -> A-F; D/E/F 相互同期 | SSH、デプロイ、rsync |
+| `8088/TCP` | ユーザーネットワーク -> Business VIP | Enterprise 業務入口 |
+| `5432/TCP` | D/E/F -> PostgreSQL VIP; PG/proxy 内部アクセス | PostgreSQL、streaming replication、proxy |
+| `6379/TCP` | D/E/F -> Redis VIP; health-check nodes -> C/F | Redis アクセスとヘルスチェック |
+| `19000/TCP` | D/E/F -> RustFS VIP | Enterprise 固定 S3 入口 |
+| `9000/TCP` | A/B -> C/D/E/F; RustFS members | RustFS S3 backend/cluster 通信。バージョンごとに確認 |
+| `9001/TCP` | 管理対象運用ネットワーク -> RustFS admin entry | 任意の RustFS admin endpoint。ユーザーネットワークへ公開しない |
+| `19731/TCP` | Localhost / Keepalived / 管理対象運用ネットワーク | Fleet Agent HTTP health/control interface |
+| `18080/TCP` | 運用ネットワーク -> deployer controller | Deployer HTTPS UI |
+| `112/VRRP` | 各 VIP の候補ノード | Keepalived VIP 移動。TCP/UDP ではなく IP プロトコル番号 |
+| `1883/8883` | 現場デバイスネットワーク -> 業務入口。製品設定に従う | MQTT/MQTTS |
+
+## フェイルオーバーと機能境界
+
+| 障害シナリオ | 期待される動作 | 境界 |
+| --- | --- | --- |
+| D Active 業務ノード障害 | Business VIP が E または F に移動し、新しい Owner が readiness 通過後に業務グループを起動する | Standby 上で最新 HA fileset generation が完了している必要がある |
+| PostgreSQL A Primary 障害 | B が Primary に昇格し、PostgreSQL VIP は D/E proxy 経由で書き込み可能 Primary にルーティングし続ける | データ損失は streaming replication の状態に依存する |
+| 現在の Redis ノード障害 | Redis VIP がもう一方の独立 Redis インスタンスへ移動する | キャッシュ/セッションは失われる可能性がある |
+| RustFS proxy A または B 障害 | RustFS VIP がもう一方の proxy へ移動する | RustFS データは 4 ノードクラスターの健全性に依存する |
+| 単一 RustFS データノード障害 | 冗長性条件が満たされていれば RustFS クラスターはサービスを継続する | 実際の境界はディスク数と erasure coding 構成に依存する |
+
+ネットワーク分断、複数ノード同時障害、誤った VRRP priority、ディスク満杯、時刻ずれ、deployer 外の手動変更は通常の自動復旧保証の範囲外であり、運用手順で扱う必要があります。
 
 ## バックアップ、監視、点検
 
-- データベースを毎日バックアップし、大きな変更前には必ずバックアップします。
-- APP VIP、DB VIP、PostgreSQL replication lag、Swarm ノード状態、EMQX 状態、ディスク使用率を監視します。
-- primary 切替、アプリケーションノード障害、バックアップ復元、共有ストレージ障害を定期的に演習します。
-- 本番前に、SSH パスワードレス接続、NTP 時刻同期、イメージレジストリ、証明書、DNS、gateway、ファイアウォールルールを確認します。
+- PostgreSQL は独立した論理または物理バックアップとリストア検証が必要です。
+- RustFS は容量、ディスク、クラスターのヘルス監視が必要です。
+- Redis は将来のレプリケーション設計が導入されるまではキャッシュ/セッションとして扱う必要があります。
+- D/E/F の Fleet Agent と Keepalived 状態を監視する必要があります。
+- rsync generation lag を監視する必要があります。古い generation の Standby は業務トラフィックを引き継いではいけません。
+- 定期フェイルオーバードリルには、Business VIP、PostgreSQL 昇格、Redis VIP 切り替え、RustFS proxy 切り替え、バックアップからの復元を含める必要があります。
 
-## 実装順序
+## 本番前チェック
 
-1. 現地ネットワーク、VIP、DNS、NTP、証明書、イメージレジストリ、ファイアウォールポリシーを確認します。
-2. 6 台の VM の OS、ディスク、時刻同期、基本セキュリティ設定を準備します。
-3. NFS/NAS を使う場合は、共有ディレクトリ、権限、マウント、再起動時の自動マウントを検証します。
-4. 3 ノード Docker Swarm をデプロイします。
-5. `APP VIP + HAProxy/Nginx` をデプロイします。
-6. 必要に応じて単一ノード固定 EMQX または 3 ノード EMQX クラスターをデプロイします。
-7. PostgreSQL + TimescaleDB primary-standby をデプロイします。
-8. repmgr witness、repmgrd、DB VIP フェイルオーバースクリプトをデプロイします。
-9. Tier0 Enterprise 単一レプリカ stack を公開します。
+- deployer controller から 6 台すべてへ SSH で到達できる。
+- ホスト名、IP アドレス、NIC 名、NTP、DNS、ファイアウォールルールが固定され、記録されている。
+- 4 つの VIP が未使用で、候補ノード間を移動できる。
+- ディスクマウントポイントが固定され、再起動後も維持される。
+- Enterprise、PostgreSQL、Redis、RustFS、Keepalived、HAProxy、repmgr、Fleet Agent、rsync の構成が deployer により生成され、レビューされている。
+- Cluster License が Business VIP 経由で 1 回だけアクティベートされている。
+- 本番トラフィック投入前にバックアップとリストア手順をリハーサルしている。
 
-## リスクと確認項目
+## 実装手順
 
-- 現地ネットワークセグメント、gateway、DNS、NTP、証明書、イメージレジストリのアドレスを確認してください。
-- Tier0 Enterprise がローカルファイル永続化を必要とするか確認してください。必要な場合は共有ストレージまたはオブジェクトストレージを追加します。
-- `DB VIP` フェイルオーバースクリプトは現地で検証してください。特に仮想化基盤が VRRP を許可するか確認が必要です。
-- 現地ネットワークで VRRP が許可されない場合は、ロードバランサー、DNS 切替、または仮想化基盤の floating IP を使ってください。
+1. deployer controller と 6 台のマシンを準備する。
+2. IP、VIP、NIC、ディスク、DNS、NTP、SSH、ファイアウォール情報を確認する。
+3. Enterprise オフラインパッケージと構成資料をアップロードする。
+4. PostgreSQL primary/standby と Witness をデプロイする。
+5. Redis 独立インスタンスと Redis VIP をデプロイする。
+6. RustFS 4 ノードクラスターと RustFS VIP をデプロイする。
+7. D/E/F に Enterprise、Fleet Agent、rsync fileset、Business VIP をデプロイする。
+8. Business VIP 経由で License をアクティベートする。
+9. 機能検証とフェイルオーバードリルを実行する。
+10. 最終トポロジー、パスワード/キー、バックアップポリシー、監視対象、復旧手順を記録する。
+
+## 受け入れ基準
+
+### 機能受け入れ
+
+- ユーザーは Business VIP 経由で Enterprise にアクセスできる。
+- Enterprise は PostgreSQL VIP 経由でのみ PostgreSQL を読み書きする。
+- Enterprise は Redis VIP 経由でのみ Redis を使用する。
+- Enterprise は RustFS VIP 経由でのみ RustFS を使用する。
+- フェイルオーバー後、App、Flow、Marimo、Notebook、License ファイルが Active ノードに存在する。
+- Branch Enterprise は引き続き独立してインストールでき、この 6 台 HA グループには参加しない。
+
+### フェイルオーバードリル受け入れ
+
+- Active 業務ノードを停止する: Business VIP が健全な Standby に移動し、業務グループはそこだけで起動する。
+- PostgreSQL Primary を停止する: Standby が昇格し、PostgreSQL VIP は書き込み可能 Primary を指し続ける。
+- Redis VIP owner を停止する: Redis VIP がもう一方のインスタンスへ移動し、キャッシュ/セッション損失を許容する。
+- RustFS proxy owner を停止する: RustFS VIP がもう一方の proxy へ移動する。
+- RustFS データノードを 1 台停止する: オブジェクトアクセスは実際の RustFS 冗長性境界内で維持される。
+- 障害ノードを復旧する: Standby または健全な member として復帰し、新しいデータやファイルを上書きしない。
+
+## リスクと現場確認項目
+
+- ネットワークが VRRP protocol `112` を許可するか。
+- 4 つの VIP アドレスが本当に未使用か。
+- ディスクマウント構成と容量が実際のファイル保持と RustFS 冗長性要件を満たすか。
+- Redis が破棄可能なデータだけを保存しているか。
+- PostgreSQL replication lag とバックアップポリシーが業務 RPO を満たすか。
+- 運用担当者が VIP フェイルオーバー、ファイル同期、データベースレプリケーション、オブジェクトストレージ冗長性の違いを理解しているか。
+
+## 結論
+
+現在の計画は、6 台のマシン、4 つの固定 VIP、Single Active Enterprise を中心にしています。業務入口、データベース入口、キャッシュ入口、オブジェクトストレージ入口を分離します。同一ネットワークセグメント内で一般的な単一マシン障害をカバーでき、フェイルオーバー後に接続構成を変更したり、License を再アクティベートしたり、App ファイルを手動コピーしたりする作業を大幅に減らします。
+
+同時に、3 つの境界を受け入れる必要があります。Redis はデータをレプリケートせず、業務 fileset は非同期で同期され、ネットワーク分断には合意仲裁がありません。したがって、この計画は **Fleet Center 6 台 Single Active Active/Standby 災害復旧計画** として定義するのが適切です。ゼロ中断、ゼロデータ損失、またはデータセンター間の厳密な高可用性を外部に約束してはいけません。

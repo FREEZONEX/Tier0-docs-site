@@ -213,6 +213,7 @@ header .right-group starlight-theme-select,
 header .right-group starlight-lang-select {
 	display: inline-flex;
 	align-items: center;
+	min-width: 0;
 }
 
 header .right-group starlight-theme-select label,
@@ -221,6 +222,26 @@ header .right-group starlight-lang-select label {
 	align-items: center;
 	gap: 4px;
 	margin: 0;
+	min-width: 0;
+}
+
+header .right-group starlight-theme-select label {
+	--sl-select-width: 4.75rem !important;
+}
+
+header .right-group starlight-lang-select label {
+	--sl-select-width: 7.25rem !important;
+}
+
+header .right-group starlight-lang-select {
+	max-width: 7.75rem;
+	overflow: visible;
+}
+
+header .right-group starlight-lang-select select {
+	max-width: 7.25rem;
+	overflow: hidden;
+	text-overflow: ellipsis;
 }
 
 /* Inner header row — replaces Starlight Header scoped flex once we override Header.astro */
@@ -844,9 +865,40 @@ main:not(:has(.t0-banner)) .content-panel {
 	margin-top: 0;
 }
 
+.t0-last-updated {
+	margin: 0.625rem 0 0.25rem;
+	padding-block: 0.25rem;
+	color: var(--sl-color-gray-3);
+	font-size: 0.875rem;
+	line-height: 1.4;
+}
+
+footer .last-updated {
+	display: none;
+}
+
 :root[data-theme='light'] .sl-markdown-content strong {
 	font-weight: 600;
 	color: #050b14;
+}
+
+starlight-tabs.t0-topic-explosion-tabs,
+.t0-topic-explosion-tabs starlight-tabs {
+	display: block;
+}
+
+.t0-topic-explosion-tabs [role='tablist'] > .tab:first-child > [role='tab'][aria-selected='true'] {
+	background: #f77c7c !important;
+	border-color: #f77c7c !important;
+	color: #050b14 !important;
+}
+
+:root[data-theme='dark']
+	.t0-topic-explosion-tabs
+	[role='tablist']
+	> .tab:first-child
+	> [role='tab'][aria-selected='true'] {
+	color: #ffffff !important;
 }
 
 /* ---------- Doc page vertical rhythm (Figma 4410:4133) ----------
@@ -858,6 +910,17 @@ main:not(:has(.t0-banner)) .content-panel {
 /* Keep heading anchor icon from covering heading text on hover */
 .sl-markdown-content .sl-heading-wrapper .sl-anchor-link {
 	margin-inline-start: 0.375rem;
+	font-size: 0.75em;
+	line-height: 1;
+	vertical-align: 0.05em;
+	transform: scale(0.82);
+	transform-origin: center;
+	opacity: 0.75;
+}
+
+.sl-markdown-content .sl-heading-wrapper .sl-anchor-link svg {
+	width: 0.85em;
+	height: 0.85em;
 }
 
 :root[data-theme='light'] .sl-markdown-content :not(.sl-heading-wrapper) + .sl-heading-wrapper {
@@ -2675,6 +2738,14 @@ main:has(.t0-banner) .t0-banner {
 	overflow-y: visible;
 	border-radius: 4px;
 	box-sizing: border-box;
+}
+
+.mermaid:not(:has(svg)) {
+	color: transparent;
+}
+
+.mermaid:not(:has(svg)) * {
+	color: transparent !important;
 }
 
 .mermaid svg {

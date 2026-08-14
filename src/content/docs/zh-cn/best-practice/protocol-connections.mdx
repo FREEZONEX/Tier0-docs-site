@@ -4,7 +4,6 @@ description: "使用 Node-RED 将 OPC UA、Modbus 和其他典型协议设备接
 editions: [edge, cloud, enterprise]
 sidebar:
   order: 2
-  label: 连接 OPC UA/Modbus/Rest API
 ---
 import { Steps } from '@astrojs/starlight/components';
 
@@ -20,7 +19,6 @@ import { Steps } from '@astrojs/starlight/components';
 3. 按顺序连接节点，并双击每个节点配置详细信息。
 </Steps>
 - `inject`
-    <Steps>
     1. 单击左下角 **add** 添加一条属性。
     2. 按照以下内容配置属性。
 
@@ -30,7 +28,6 @@ import { Steps } from '@astrojs/starlight/components';
           "msg.topic": "multiple"
         }
         ```
-    </Steps>
 - `OPC UA Client`
     ```json
     "Endpoint": "<OPC UA 服务器地址和端口>", //e.g. opc.tcp://127.0.0.1:4850
@@ -42,9 +39,7 @@ import { Steps } from '@astrojs/starlight/components';
     "Server": "<内置 UNS broker>", //与数据流同名
     "Topic": "<UNS 模型>",
     ```
-<Steps>
 4. 部署并触发数据流。
-</Steps>
 
 ### 数据流参考
 
@@ -202,7 +197,7 @@ import { Steps } from '@astrojs/starlight/components';
 
 ## Modbus
 ### 配置数据流
-<Steps>
+
 1. 在数据流中加入 `modbus-read` 和 `mqtt out` 节点。
 2. 双击节点配置信息。
     - `modbus-read`
@@ -221,7 +216,6 @@ import { Steps } from '@astrojs/starlight/components';
         "Topic": "<UNS 模型>",
         ```
 3. 部署数据流。
-</Steps>
 
 ### 数据流参考
 
@@ -384,7 +378,7 @@ import { Steps } from '@astrojs/starlight/components';
 
 ## API
 ### 配置数据流
-<Steps>
+
 1. 在数据流中加入 `inject`，`http request` 和 `mqtt out` 节点。
 2. 双击节点配置信息。
     - `http request`
@@ -400,7 +394,6 @@ import { Steps } from '@astrojs/starlight/components';
         "Topic": "<UNS 模型>",
         ```
 3. 部署数据流。
-</Steps>
 
 ### 数据流参考
 <details>

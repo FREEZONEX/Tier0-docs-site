@@ -1,7 +1,7 @@
 ---
 import Default from '@astrojs/starlight/components/PageTitle.astro';
 
-const { entry, lang } = Astro.locals.starlightRoute;
+const { entry, lang, lastUpdated } = Astro.locals.starlightRoute;
 const editions = entry.data.editions as
 	| Array<'edge' | 'cloud' | 'enterprise'>
 	| undefined;
@@ -18,14 +18,34 @@ const AVAILABLE_IN: Record<string, string> = {
 	'zh-CN': '适用版本',
 	ja: '対応エディション',
 	es: 'Disponible en',
+	ko: '지원 에디션',
 };
 const availableIn = AVAILABLE_IN[lang] ?? AVAILABLE_IN.en;
+const UPDATED_LABELS: Record<string, string> = {
+	en: 'Updated',
+	'zh-CN': '更新日期',
+	ja: '更新日',
+	es: 'Actualizado',
+	ko: '업데이트',
+};
+const updatedLabel = UPDATED_LABELS[lang] ?? UPDATED_LABELS.en;
+const updatedDate = lastUpdated
+	? lastUpdated.toLocaleDateString(lang, { dateStyle: 'medium', timeZone: 'UTC' })
+	: undefined;
 const orderedEditions = editions
 	? EDITION_ORDER.filter((edition) => editions.includes(edition))
 	: undefined;
 ---
 
 <Default><slot /></Default>
+{
+	lastUpdated && updatedDate && (
+		<p class="t0-last-updated">
+			{updatedLabel}{' '}
+			<time datetime={lastUpdated.toISOString()}>{updatedDate}</time>
+		</p>
+	)
+}
 {
 	orderedEditions && orderedEditions.length > 0 && (
 		<div class="t0-editions" aria-label={availableIn}>
