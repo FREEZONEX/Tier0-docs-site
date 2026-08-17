@@ -3,13 +3,9 @@ import { logos } from 'virtual:starlight/user-images';
 import config from 'virtual:starlight/user-config';
 
 const { siteTitle } = Astro.locals.starlightRoute;
-const firstSegment = Astro.url.pathname.split('/').filter(Boolean)[0];
-const localizedHome = ['zh-cn', 'ja', 'es', 'ko'].includes(firstSegment)
-	? `/${firstSegment}/`
-	: '/';
 ---
 
-<a href={localizedHome} class="site-title sl-flex">
+<a href="https://tier0.app/" class="site-title sl-flex">
 	{
 		config.logo && logos.dark && (
 			<>
