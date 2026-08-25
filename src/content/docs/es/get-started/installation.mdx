@@ -38,7 +38,7 @@ Consulta [Elegir la mejor versión](../choosing-version/) para encontrar la edic
 	- Ubuntu 24.04 o Windows 10/11 con Docker y Git
 	#### Operaciones
 	<Steps>
-	1. Clona el repositorio Tier0-Edge desde GitHub y entra al proyecto.
+	1. Clona el repositorio Tier0-Edge desde GitHub en tu servidor y entra al proyecto.
 
 		```bash
 		git clone https://github.com/FREEZONEX/Tier0-Edge
@@ -51,24 +51,34 @@ Consulta [Elegir la mejor versión](../choosing-version/) para encontrar la edic
 		vi .env.default
 		:wq!
 		```
-	3. Ejecuta el script de instalación.
+		:::note[Parámetros que deben configurarse]
+
+		| Campo | Tipo | Descripción | Ejemplo |
+		|------|------|-------------|---------|
+		| VOLUMES_PATH | string | Ruta de almacenamiento para los datos del proyecto | `/srv/tier0/data` en Linux; `D:/tier0/data` o `/d/tier0/data` en Windows Bash |
+		| ENTRANCE_DOMAIN/ENTRANCE_PORT | string | Endpoint de acceso a Tier0 (IP/dominio + puerto) | `192.168.1.10` / `8088` |
+		| LANGUAGE | enum | zh-CN / en-US | `en-US` |
+		| ADMIN_INIT_PASSWORD | string | Contraseña inicial del usuario administrador | Una contraseña privada y segura |
+		| COMPOSE_PROJECT_NAME/PORT_OFFSET | string | Aísla varias instancias en el mismo host | `edge_lab` / `100` |
+
+		:::
+	3. Ejecuta el script de instalación y revisa el estado de la instalación.
 
 		```bash
 		bash bin/install.sh
+		bash bin/compose.sh ps # Revisa el estado de los contenedores
+		bash bin/compose.sh logs -f backend # Revisa los logs del contenedor backend
+		curl -fsS http://127.0.0.1:8088/readyz # Revisa la readiness del servicio backend
 		```
 
+		:::caution
+		No edites `deploy/.env.runtime`; contiene secretos generados y valores de runtime resueltos.
+		:::
+	4. Accede a Tier0 con el endpoint configurado y la cuenta de administrador predeterminada:
+		- Usuario: `tier0`
+		- Contraseña: el valor de `ADMIN_INIT_PASSWORD` en `.env.default` o `tier0` si no se configuró.
+
 	</Steps>
-
-:::note[Parámetros que deben configurarse]
-
-| Campo | Tipo | Descripción |
-|------|------|-------------|
-| VOLUMES_PATH | string | Ruta de almacenamiento para los datos del proyecto |
-| ENTRANCE_DOMAIN/ENTRANCE_PORT | string | Endpoint de acceso a Tier0 (IP/dominio + puerto) |
-| OS_PLATFORM_TYPE | enum | Sistema operativo donde se instala Tier0. Puede ser **linux** o **windows** |
-| LANGUAGE | enum | zh-CN / en-US |
-
-:::
 		
 
 	</TabItem>

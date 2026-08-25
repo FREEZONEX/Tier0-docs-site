@@ -1,7 +1,7 @@
 ---
 const prodApiUrl = import.meta.env.PUBLIC_TIER0_CHAT_API_URL || 'https://docsbot.tier0.app/chat';
 const localApiUrl =
-	import.meta.env.PUBLIC_TIER0_CHAT_LOCAL_API_URL || 'https://docsbot.tier0.app/chat';
+	import.meta.env.PUBLIC_TIER0_CHAT_LOCAL_API_URL || '/docsbot-chat';
 const iconUrl =
 	import.meta.env.PUBLIC_TIER0_CHAT_ICON_URL ||
 	'https://enterpriseimage.oss-cn-hangzhou.aliyuncs.com/icon.png';
@@ -69,12 +69,11 @@ const iconUrl =
 				openLabel: 'Open AI documentation assistant',
 				closeLabel: 'Close AI documentation assistant',
 				suggestedQuestions: [
-					'How should I build a data model?',
-					'How do I connect data?',
-					'How can I do more advanced data analysis?',
-					'What is the basic workflow for using Tier0?',
-					'How do I create a dashboard?',
-					'How do I manage users and permissions?',
+					'How do I build a factory data foundation?',
+					'How can AI help me build an industrial app?',
+					'How do I create a 3D digital twin factory?',
+					'How do I connect OPC UA, Modbus, or API data?',
+					'How do I analyze factory data with Notebook?',
 				],
 			},
 			zh: {
@@ -93,20 +92,238 @@ const iconUrl =
 				openLabel: '打开 AI 文档助手',
 				closeLabel: '关闭 AI 文档助手',
 				suggestedQuestions: [
-					'我该怎么建模？',
-					'如何连接数据？',
-					'高级一点的数据分析怎么做？',
-					'Tier0 的基础操作顺序是什么？',
-					'如何创建仪表盘？',
-					'如何管理用户和权限？',
+					'如何建立工厂数据基座？',
+					'如何用 AI 构建工业应用？',
+					'如何创建 3D 数字孪生工厂？',
+					'如何接入 OPC UA、Modbus 或 API 数据？',
+					'如何用 Notebook 分析工厂数据？',
 				],
+			},
+			ja: {
+				entryTip: 'Tier0 を始める準備はできていますか？',
+				welcome:
+					'こんにちは。Tier0 Onboarding アシスタントです。ドキュメントに基づいて、製品理解、操作手順、トラブルシューティングを支援します。',
+				placeholder: 'Tier0 について質問してください...',
+				title: 'Tier0 Onboarding アシスタント',
+				subtitle: 'Tier0 ドキュメントに基づくガイド',
+				send: '送信',
+				thinking: '考えています...',
+				unavailable:
+					'申し訳ありません。ドキュメントアシスタントは一時的に利用できません。AI Bot API が実行中か確認してください。',
+				noAnswer: '回答が返されませんでした。',
+				references: '参考資料',
+				suggestedTitle: '質問例',
+				openLabel: 'AI ドキュメントアシスタントを開く',
+				closeLabel: 'AI ドキュメントアシスタントを閉じる',
+				suggestedQuestions: [
+					'工場データ基盤はどのように構築しますか？',
+					'AI を使って産業アプリを構築するには？',
+					'3D デジタルツイン工場はどう作成しますか？',
+					'OPC UA、Modbus、API データはどう接続しますか？',
+					'Notebook で工場データを分析するには？',
+				],
+			},
+			es: {
+				entryTip: '¿Listo para empezar con Tier0?',
+				welcome:
+					'Hola, soy el asistente de incorporación de Tier0. Puedo ayudarte a entender el producto, completar tareas y resolver problemas con base en la documentación.',
+				placeholder: 'Pregunta sobre Tier0...',
+				title: 'Asistente de incorporación de Tier0',
+				subtitle: 'Ayuda guiada basada en la documentación de Tier0',
+				send: 'Enviar',
+				thinking: 'Pensando...',
+				unavailable:
+					'Lo siento, el asistente de documentación no está disponible temporalmente. Comprueba si la API del bot de IA está en ejecución.',
+				noAnswer: 'No se devolvió ninguna respuesta.',
+				references: 'Referencias',
+				suggestedTitle: 'Prueba a preguntar',
+				openLabel: 'Abrir asistente de documentación con IA',
+				closeLabel: 'Cerrar asistente de documentación con IA',
+				suggestedQuestions: [
+					'¿Cómo construyo una base de datos de fábrica?',
+					'¿Cómo puede la IA ayudarme a crear una app industrial?',
+					'¿Cómo creo una fábrica 3D con digital twin?',
+					'¿Cómo conecto datos de OPC UA, Modbus o API?',
+					'¿Cómo analizo datos de fábrica con Notebook?',
+				],
+			},
+			ko: {
+				entryTip: 'Tier0를 시작할 준비가 되었나요?',
+				welcome:
+					'안녕하세요. Tier0 온보딩 어시스턴트입니다. 문서를 기반으로 제품 이해, 작업 수행, 문제 해결을 도와드립니다.',
+				placeholder: 'Tier0에 대해 질문하세요...',
+				title: 'Tier0 온보딩 어시스턴트',
+				subtitle: 'Tier0 문서 기반 안내',
+				send: '보내기',
+				thinking: '생각하는 중...',
+				unavailable:
+					'죄송합니다. 문서 어시스턴트를 일시적으로 사용할 수 없습니다. AI Bot API가 실행 중인지 확인하세요.',
+				noAnswer: '응답이 반환되지 않았습니다.',
+				references: '참고 문서',
+				suggestedTitle: '이렇게 질문해 보세요',
+				openLabel: 'AI 문서 어시스턴트 열기',
+				closeLabel: 'AI 문서 어시스턴트 닫기',
+				suggestedQuestions: [
+					'공장 데이터 기반은 어떻게 구축하나요?',
+					'AI로 산업용 앱을 어떻게 만들 수 있나요?',
+					'3D 디지털 트윈 공장은 어떻게 만들까요?',
+					'OPC UA, Modbus, API 데이터는 어떻게 연결하나요?',
+					'Notebook으로 공장 데이터를 어떻게 분석하나요?',
+				],
+			},
+		};
+
+		const DOC_TITLES = {
+			'get-started/choosing-version': {
+				en: 'Choosing the Best Product',
+				zh: '选择合适的版本',
+				ja: '最適なエディションの選択',
+				es: 'Elegir la mejor versión',
+				ko: '최적 버전 선택',
+			},
+			'get-started/installation': {
+				en: 'Installation',
+				zh: '安装',
+				ja: 'インストール',
+				es: 'Instalación',
+				ko: '설치',
+			},
+			'get-started/demo-factory': {
+				en: 'Try the Demo Factory',
+				zh: '体验演示工厂',
+				ja: 'デモファクトリーを試す',
+				es: 'Prueba la fábrica demo',
+				ko: '데모 팩토리 체험',
+			},
+			'using-tier0/uns-concepts': {
+				en: 'Factory Data Modeling',
+				zh: '工厂数据基础',
+				ja: '工場データ基盤',
+				es: 'Base de datos de fábrica',
+				ko: '공장 데이터 기반',
+			},
+			'using-tier0/connect-data': {
+				en: 'Preparing Data Foundation',
+				zh: '准备数据基础',
+				ja: 'データ基盤を準備する',
+				es: 'Preparar la base de datos',
+				ko: '데이터 기반 준비',
+			},
+			'using-tier0/working-with-uns-data': {
+				en: 'Working with Factory Data',
+				zh: '操作工厂数据',
+				ja: '工場データを扱う',
+				es: 'Trabajar con datos de fábrica',
+				ko: '공장 데이터 작업',
+			},
+			'using-tier0/build-apps': {
+				en: 'Building Apps',
+				zh: '构建应用',
+				ja: '工場データでアプリを構築',
+				es: 'Crear apps con datos de fábrica',
+				ko: '공장 데이터로 앱 구축하기',
+			},
+			'using-tier0/digital-twin': {
+				en: 'Visualizing Workshop',
+				zh: '可视化工厂',
+				ja: '工場を可視化する',
+				es: 'Visualizar la fábrica',
+				ko: '공장 시각화',
+			},
+			'using-tier0/analyze-data': {
+				en: 'Analyzing Data',
+				zh: '分析数据',
+				ja: '工場データを分析する',
+				es: 'Analizar datos de fábrica',
+				ko: '공장 데이터 분석',
+			},
+			'using-tier0/agents': {
+				en: 'Operating on Tier0 with Agents',
+				zh: '用 Agents 操作 Tier0',
+				ja: 'Agents で Tier0 を操作する',
+				es: 'Operar Tier0 con Agents',
+				ko: 'Agent로 Tier0 운영',
+			},
+			'best-practice/uns-modeling': {
+				en: 'Modeling Factory Data',
+				zh: '工厂数据建模',
+				ja: '工場データをモデリングする',
+				es: 'Modelar datos de fábrica',
+				ko: '공장 데이터 모델링',
+			},
+			'best-practice/protocol-connections': {
+				en: 'Connecting Industrial Protocols',
+				zh: '连接工业协议',
+				ja: '産業プロトコルの接続',
+				es: 'Conectar protocolos industriales',
+				ko: '산업 프로토콜 연결',
+			},
+			'best-practice/building-data-workflow-with-agent': {
+				en: 'Building Shopfloor Workflow with Agent',
+				zh: '用 Agent 构建车间工作流',
+				ja: 'Agent で現場ワークフローを構築する',
+				es: 'Crear flujos de planta con Agent',
+				ko: 'Agent로 현장 워크플로 구축하기',
+			},
+			'best-practice/analytics-apps': {
+				en: 'Building Analytics Apps',
+				zh: '构建分析应用',
+				ja: '分析アプリの構築',
+				es: 'Apps de analítica',
+				ko: '분석 앱 구축',
+			},
+			'best-practice/view-uns-with-digital-twin': {
+				en: 'Displaying Data with Digital Twin',
+				zh: '使用数字孪生展示工厂数据',
+				ja: 'Digital Twin で工場データを表示する',
+				es: 'Mostrar datos de fábrica con Digital Twin',
+				ko: 'Digital Twin으로 공장 데이터 표시하기',
+			},
+			'reference/api-reference': {
+				en: 'API Reference',
+				zh: 'API 参考',
+				ja: 'API リファレンス',
+				es: 'Referencia de API',
+				ko: 'API 참조',
+			},
+			'reference/skill-reference': {
+				en: 'CLI Command Reference',
+				zh: 'CLI 命令参考',
+				ja: 'CLI コマンドリファレンス',
+				es: 'Referencia de comandos CLI',
+				ko: 'CLI 명령 참조',
 			},
 		};
 
 		function getLang() {
 			const path = window.location.pathname.toLowerCase();
 			if (path.startsWith('/zh-cn') || path.startsWith('/zh')) return 'zh';
+			if (path.startsWith('/ja')) return 'ja';
+			if (path.startsWith('/es')) return 'es';
+			if (path.startsWith('/ko')) return 'ko';
 			return 'en';
+		}
+
+		function getLocale(lang) {
+			const locales = {
+				en: 'en',
+				zh: 'zh-CN',
+				ja: 'ja',
+				es: 'es',
+				ko: 'ko',
+			};
+			return locales[lang] || 'en';
+		}
+
+		function getLanguageInstruction(lang) {
+			const instructions = {
+				en: 'Reply in English. Keep product names, commands, API paths, and code unchanged.',
+				zh: '请使用简体中文回答。产品名称、命令、API 路径和代码请保持原样。',
+				ja: '日本語で回答してください。製品名、コマンド、API パス、コードは原文のまま保持してください。',
+				es: 'Responde en español. Mantén sin cambios los nombres de producto, comandos, rutas de API y código.',
+				ko: '한국어로 답변하세요. 제품명, 명령어, API 경로 및 코드는 그대로 유지하세요.',
+			};
+			return instructions[lang] || instructions.en;
 		}
 
 		function getApiUrl(root) {
@@ -130,6 +347,48 @@ const iconUrl =
 			const href = String(value || '').trim();
 			if (/^(https?:\/\/|\/)/i.test(href)) return href;
 			return '#';
+		}
+
+		function getInternalDocPath(value) {
+			const href = String(value || '').trim();
+			if (!href) return null;
+
+			let pathname = '';
+			try {
+				pathname = new URL(href, window.location.origin).pathname;
+			} catch (_) {
+				return null;
+			}
+
+			const parts = pathname
+				.replace(/^\/+|\/+$/g, '')
+				.split('/')
+				.filter(Boolean);
+			if (['zh-cn', 'zh', 'ja', 'es', 'ko'].includes(parts[0])) parts.shift();
+			const docPath = parts.join('/');
+			return DOC_TITLES[docPath] ? docPath : null;
+		}
+
+		function localizeInternalHref(value, lang) {
+			const href = String(value || '').trim();
+			const docPath = getInternalDocPath(href);
+			if (!docPath) return safeHref(href);
+
+			let hash = '';
+			try {
+				hash = new URL(href, window.location.origin).hash;
+			} catch (_) {
+				hash = '';
+			}
+
+			const prefix = lang === 'en' ? '' : lang === 'zh' ? '/zh-cn' : '/' + lang;
+			return prefix + '/' + docPath + '/' + hash;
+		}
+
+		function getReferenceTitle(ref, lang) {
+			const docPath = getInternalDocPath(ref.url);
+			if (!docPath) return ref.title || ref.url || 'Document';
+			return DOC_TITLES[docPath][lang] || DOC_TITLES[docPath].en;
 		}
 
 		function renderInlineMarkdown(text) {
@@ -322,13 +581,15 @@ const iconUrl =
 									'</div><ul>' +
 									refs
 										.map(function (ref) {
-											const title = escapeHtml(ref.title || ref.url || 'Document');
-											const section = ref.section
+											const internalDocPath = getInternalDocPath(ref.url);
+											const title = escapeHtml(getReferenceTitle(ref, lang));
+											const href = localizeInternalHref(ref.url, lang);
+											const section = ref.section && !internalDocPath
 												? ' <span class="doc-chatbot-section">/ ' + escapeHtml(ref.section) + '</span>'
 												: '';
 											return (
 												'<li><a href="' +
-												escapeHtml(safeHref(ref.url)) +
+												escapeHtml(href) +
 												'" target="_blank" rel="noreferrer">' +
 												title +
 												'</a>' +
@@ -400,23 +661,34 @@ const iconUrl =
 					render();
 
 					try {
+						const locale = getLocale(lang);
+						const messageWithLocale =
+							getLanguageInstruction(lang) +
+							'\n\nCurrent documentation page: ' +
+							window.location.href +
+							'\n\nUser question:\n' +
+							text;
 						const response = await fetch(apiUrl, {
 							method: 'POST',
 							headers: { 'Content-Type': 'application/json' },
-							body: JSON.stringify({ message: text, lang }),
+							body: JSON.stringify({
+								message: messageWithLocale,
+								originalMessage: text,
+								lang,
+								locale,
+								language: locale,
+								pageUrl: window.location.href,
+								pathname: window.location.pathname,
+							}),
 						});
 						if (!response.ok) throw new Error('Request failed: ' + response.status);
 
 						const data = await response.json();
-						const suggestedQuestions =
-							Array.isArray(data.suggested_questions) && data.suggested_questions.length > 0
-								? data.suggested_questions
-								: texts.suggestedQuestions;
 						messages.push({
 							role: 'assistant',
 							content: data.answer || texts.noAnswer,
 							references: Array.isArray(data.references) ? data.references : [],
-							suggestedQuestions,
+							suggestedQuestions: texts.suggestedQuestions,
 						});
 					} catch (_) {
 						messages.push({

@@ -1,0 +1,203 @@
+---
+title: Embedded Builder Skills
+description: Reference for the AI skills embedded in Tier0 Builder.
+sidebar:
+  order: 3
+---
+
+Tier0 App Builder currently includes 7 active embedded AI skills. These skills help the agent turn requirements into industrial applications, align applications with the Tier0 platform scaffold, repair UI issues, and keep preview environments stable.
+
+## `app-srs`
+
+**Meaning**: The requirements-analysis entry point for new industrial-enterprise apps. It is used for WMS, MES, ERP, CRM, QMS, EAM, approval, inventory, supplier, customer, scheduling, and similar enterprise workflows.
+
+**Example**:
+
+```text
+Use $app-srs to design a quality exception management system for an automotive parts factory.
+```
+
+Natural language can also trigger it:
+
+```text
+Generate a warehouse management app with receiving, putaway, picking, shipping, and inventory counting.
+```
+
+**What it does**:
+
+1. Analyzes business roles, workflows, states, and exceptions.
+2. Checks whether the requirement is clear enough.
+3. Generates a complete SRS.
+4. Saves it to `specs/spec.md` by default.
+5. Hands the result to `app-builder` by default unless the user asks for requirements only.
+
+## `app-builder`
+
+**Meaning**: The core skill for actually building the app.
+
+**Example**:
+
+```text
+Use $app-builder to build the first version from specs/spec.md.
+```
+
+**Internal work types**: The agent decides which work type to use based on the prompt and current project state.
+
+- **First Release**: Builds the first version from an SRS.
+- **Delta Feature**: Adds a substantial module or workflow to an existing app.
+- **Light Edit**: Handles small field, copy, style, or validation changes without running the full build flow.
+
+**What it checks**:
+
+- Visible entry points.
+- Executable user paths.
+- Data or state changes.
+- Role permissions.
+- Build and preview verification.
+
+:::tip
+If a first-time build has no `specs/spec.md`, the agent will create one with `app-srs` first.
+:::
+
+## `align-platform-app`
+
+**Meaning**: A migration skill for aligning an existing app with the Tier0 platform scaffold.
+
+```text
+Use $align-platform-app to migrate this old Vite React project into the Tier0 platform scaffold.
+```
+
+**Suitable sources**:
+
+- Vite, CRA, Next.js, React Router, static HTML, and full-stack Node/React apps.
+- Older Tier0 apps.
+- Apps that rely on LocalStorage, IndexedDB, Zustand persist, in-memory mocks, or simulated data.
+
+**What it does**:
+
+- Aligns the app to the Tier0 TanStack Start scaffold.
+- Migrates persistent business data to Drizzle/PostgreSQL.
+- Aligns routes, APIs, services, and database setup.
+- Removes app-owned login, logout, and role-switching flows.
+- Connects to Gateway-owned identity and roles.
+- Preserves platform contracts such as `/api/health`, `/api/manifest`, and `artifact.toml`.
+- Verifies preview and production startup.
+
+## `migrate-node-red-app`
+
+**Meaning**: A Node-RED migration skill for aligning a Node-RED application with the Tier0 platform scaffold. It is usually used together with `align-platform-app`.
+
+**Example**:
+
+```text
+Use $align-platform-app and $migrate-node-red-app to migrate this Node-RED backend into a Tier0 TanStack Start app.
+```
+
+**What it does**:
+
+- Inventories flows, subflows, function nodes, change nodes, and switch nodes.
+- Analyzes HTTP, MQTT, database, scheduled jobs, and external API calls.
+- Builds a migration mapping table.
+- Separates CRUD, workflow, scheduling, integration, and temporary simulation behavior.
+- Moves business logic into services.
+- Moves interfaces into API routes.
+- Moves state into PostgreSQL.
+- Moves long-running work and integrations into workers, queues, or external services.
+- Verifies browser, CRUD, workflow, and integration cutover separately.
+
+:::caution
+It does not handle ordinary preview or packaging issues by itself.
+:::
+
+## `ui-repair`
+
+**Meaning**: A repair skill for existing apps. It is used for UI quality issues, not for first-time app generation.
+
+**Example**:
+
+```text
+Use $ui-repair to fix overflow and form misalignment in the order edit dialog on small screens.
+```
+
+**Suitable issues**:
+
+- Misaligned forms or required markers.
+- Dialog or drawer overflow.
+- Accidental horizontal scrolling.
+- Clipped select menus or dropdowns.
+- Broken table or chart layout.
+- Flat pages with weak visual hierarchy.
+- Mixed UI languages.
+- PDA, kiosk, dashboard, and industrial interface layout problems.
+
+:::caution
+The skill should locate the smallest owning component and fix the affected surface without rebuilding the whole app. For complex responsive work, use `responsive-craft`.
+:::
+
+## `responsive-craft`
+
+**Meaning**: A responsive-layout skill for audits, new responsive builds, and multi-breakpoint previews.
+
+**Invocation modes**:
+
+- **audit**: Audits and repairs an existing responsive layout.
+- **build**: Builds a responsive page from scratch.
+- **preview**: Starts a multi-breakpoint live preview.
+
+**Examples**:
+
+```text
+Use $responsive-craft audit to fix the mobile layout of this dashboard.
+```
+
+```text
+Use $responsive-craft build to create an inventory workspace for phone, tablet, and desktop.
+```
+
+```text
+Use $responsive-craft preview to show 375, 768, 1024, and 1440 px breakpoints.
+```
+
+**Execution styles**:
+
+- **Adaptive**: Moves quickly and confirms design forks as they appear.
+- **Guided**: Writes responsive behavior specs for each component before implementation.
+
+## `preview-runtime-stability`
+
+**Meaning**: A runtime troubleshooting skill for preview failures during app development. It does not build business features.
+
+**Example**:
+
+```text
+Use $preview-runtime-stability to diagnose "Preview loading timed out".
+```
+
+**Suitable issues**:
+
+- Missing or partial `node_modules`.
+- npm `ERESOLVE`.
+- Vite or TanStack Start startup failures.
+- Port `5173` conflicts.
+- `/api/health` failures.
+- SDK SSR module errors.
+- `artifact.toml` preview port mismatch.
+- Frequent full-page reloads during HMR.
+- Stale Node or Vite processes that did not exit.
+
+**Standard flow**:
+
+1. Check dependency installation.
+2. Check port `5173`.
+3. Probe the health endpoint.
+4. Reuse the preview when it is healthy.
+5. Clean up the old preview when it is unhealthy.
+6. Restart and verify the port, health endpoint, and HMR behavior.
+
+
+## Skill Selection Guide
+
+- Use `app-srs` first when the requirement is unclear or when you need a durable specification. 
+- Use `app-builder` when the implementation scope is already clear. 
+- Use `align-platform-app` and `migrate-node-red-app` for migration work. 
+- Use `ui-repair`, `responsive-craft`, or `preview-runtime-stability` when the app already exists and the problem is visual, responsive, or runtime-specific.

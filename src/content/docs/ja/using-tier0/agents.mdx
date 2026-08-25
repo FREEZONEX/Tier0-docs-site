@@ -1,42 +1,39 @@
 ---
 title: Agents で Tier0 を操作する
-description: Tier0 Skill でできることとインストール方法。
+description: AI agents が Skills と CLI コマンドで Tier0 を操作する方法。
 editions: [edge, cloud, enterprise]
 sidebar:
   order: 8
 ---
 
-import { Steps } from '@astrojs/starlight/components';
-import { Tabs, TabItem } from '@astrojs/starlight/components';
+import {
+  Steps,
+  Tabs,
+  TabItem,
+} from '@astrojs/starlight/components';
 
-Tier0 は、agents が Tier0 を操作するための skills と CLI コマンドを提供します。
+import AgentIcons from '../../../../components/AgentIcons.astro';
+
+Tier0 は、AI agents がプラットフォームを操作するための Skills と CLI コマンドを提供します。
+
+<AgentIcons />
 
 ## Tier0 Skills のインストール
 
-> Required CLI version: `v0.4.6+`
-
-環境に合ったインストール方法を選択してください。
+環境に合うインストーラーを選択します。
 
 ### Node.js がある場合
 
-Node.js 16 以降を利用できる場合は、`npx` で CLI と skills をインストールします。
+Node.js 16 以降が利用できる場合は、`npx` で CLI と skills をインストールします。
 
 ```bash
-npx @tier0/cli@latest
+npx -y @tier0/cli@latest install
 ```
 
-このコマンドはフルインストーラーを実行し、次の 2 つを行います。
+このコマンドは完全なインストーラーを実行し、次の 2 つを行います。
 
 - `tier0` CLI binary を `~/.tier0/bin/` にインストールします。
-- `FREEZONEX/Tier0-skill` から Cursor/Claude Agent Skills をインストールします。
-
-:::tip[Agent Skill の登録が失敗した場合]
-Agent Skill の登録が失敗しても、CLI のインストールには影響しません。skills installer を手動で実行してください。
-
-```bash
-npx skills add FREEZONEX/Tier0-skill
-```
-:::
+- 組み込みの Tier0 Skill baseline をインストールし、Codex、Claude Code、Cursor など検出された agents に同期します。
 
 ### Node.js がない場合
 
@@ -58,42 +55,57 @@ npx skills add FREEZONEX/Tier0-skill
 
       </TabItem>
     </Tabs>
-2. Agent Skills をインストールします。
+2. 最新の Tier0 Skills をダウンロードし、検出された agents に同期します。
     ```bash
     tier0 skills update
     ```
+3. インストール済み Skill のバージョンと health を確認します。
+    ```bash
+    tier0 skills status
+    ```
 </Steps>
 
-## Tier0 Skill でできること
+### Skills の管理
+- インストール済み Skill のバージョンと health を確認します。
+    ```bash
+    tier0 skills status
+    ```
+- 欠落または破損した組み込み Skill baseline を修復します。
+    ```bash
+    tier0 skills install
+    ```
+- 最新の Tier0 Skill に更新します。
+    ```bash
+    tier0 skills update
+    ```
 
-Tier0 Skills は、agents が適切な CLI コマンドを選び、対応する reference を読み、`tier0` CLI で Tier0 を操作するための構造化された方法を提供します。
+## Agents で Tier0 を操作する
 
-### 操作インスタンスを設定する
-
+### 操作対象インスタンスの設定
 :::note
 Cloud はデフォルトで `https://tier0.dev` を使用するため、base URL の設定は不要です。
 :::
-
-Private deployments では、ログイン前に base URL を設定する必要があります。設定後、以降のコマンドはすべてそのインスタンスで実行されます。
+プライベートデプロイでは、ログイン前に base URL を設定する必要があります。設定後、以降のすべてのコマンドはそのインスタンスで実行されます。
 
 ```bash
 tier0 config --base-url https://your-tier0.example.com
+tier0 login # interactive browser login
 ```
 
-### ログイン
+### 認証
 
 <Tabs syncKey="tier0-login-method">
   <TabItem label="API key がある場合">
 
   <Steps>
-  1. 操作インスタンスの API key を設定します。
+  1. 操作対象の Tier0 インスタンスから取得した API key を設定します。
 
       ```bash
       tier0 config --api-key <api-key>
       ```
-  2. API key の ID と権限を確認します。
+  2. API key の identity と permissions を確認します。
       ```bash
-      tier0 auth whoami
+      tier0 auth whoami --json
       ```
   3. `tier0` CLI で他の操作を実行します。
   </Steps>
@@ -102,13 +114,13 @@ tier0 config --base-url https://your-tier0.example.com
   <TabItem label="API key がない場合">
 
   <Steps>
-  1. ブラウザログインを開始します。
+  1. ブラウザー認証リンクを取得します。
 
       ```bash
       tier0 login --no-wait --json
       ```
-  2. 返された `verification_url` にアクセスし、ブラウザで認証を完了します。
-  3. 返された `setup_code` でログイン結果を取得します。
+  2. 返された `verification_url` にアクセスし、ブラウザーで認証を完了します。
+  3. 返された `setup_code` でログイン結果を確認します。
       ```bash
       tier0 login --setup-code <setup_code>
       ```
@@ -117,27 +129,87 @@ tier0 config --base-url https://your-tier0.example.com
 </Tabs>
 
 :::caution[重要]
-API key を設定する前、またはブラウザログインを開始する前に、`config` で操作インスタンスを設定してください。そうしないと、CLI が誤ったインスタンスを操作する可能性があります。
+API key の設定やブラウザーログインを開始する前に、`config` を実行して操作対象インスタンスを設定してください。そうしないと、CLI が誤ったインスタンスを操作する可能性があります。
 :::
 
-## Tier0 Skills のアンインストール
+### 操作のプレビュー
+`--dry-run` を使用すると、対応する書き込み操作を Tier0 に送信せずに検証およびプレビューできます。
 
+#### 対応操作
+- UNS: `write/create/update/delete/restore`
+- Flow: `create/update/delete/deploy`
+
+#### 例
 ```bash
-# ローカル設定を残したまま Tier0 CLI を削除します。
+tier0 uns write --topic demo --value '{"value":1}' --dry-run
+tier0 flow deploy --id 1 --flows-file flows.json --dry-run --json
+tier0 api /openapi/v1/uns/write --body-file body.json --dry-run --json
+```
+:::note
+`--json` オプションはリクエストを JSON 形式で出力します。
+:::
+:::caution[request body には有効な JSON が必要です]
+有効な JSON が提供されていない場合、CLI は不正な JSON を推測したり書き換えたりしません。
+:::
+#### 返されるプレビュー
+
+:::note
+dry-run 出力では headers と API keys は表示されません。
+:::
+
+```json
+{
+  "ok": true,
+  "dry_run": true,
+  "data": {
+    "api": [
+      {"method": "POST", "url": "https://tier0.dev/openapi/v1/uns/write", "body": {}}
+    ]
+  }
+}
+```
+
+### エラー処理
+`--json` を使用すると、コマンド失敗時にエラーメッセージとコードを含む JSON object が返されます。
+
+```json
+{"ok":false,"error":{"type":"validation","subtype":"invalid_argument","param":"--qos","message":"--qos must be 0, 1, or 2"}}
+```
+
+## CLI と Skills のアンインストール
+
+- アンインストールコマンド
+```bash
+# Tier0 CLI を削除し、local configuration と skills は保持します。
 npx @tier0/cli@latest uninstall
 
-# Tier0 CLI を削除し、ローカル設定、認証情報、skills、cache も削除します。
+# Tier0 CLI を削除し、local configuration、credentials、cache を削除しますが、skills は保持します。
 npx @tier0/cli@latest uninstall --purge
+
+# skills を削除します
+npx @tier0/cli@latest uninstall --remove-skills
+
+# 上記すべてを削除します
+npx @tier0/cli@latest uninstall --purge --remove-skills
+```
+- Global NPM アンインストール
+```bash
+npm uninstall -g @tier0/cli
+```
+- 手動クリーンアップ
+```bash
+rm -rf ~/.tier0/bin/tier0 ~/.tier0/skills
+npx -y --package=skills -- skills remove tier0 -y -g
 ```
 
 ## Skill Reference
 
-[Tier0 Skill Reference](../../reference/skill-reference/) には、サポートされる操作対象、一般的なタスク、対応する CLI コマンドが一覧化されています。
+[Tier0 Skill Reference](../../reference/skill-reference/) には、対応する操作対象、一般的なタスク、対応する CLI コマンドが一覧化されています。
 
 :::tip[agent に repo を読ませる]
-コマンドを実行する前に、agent に [Tier0 Skill repo](https://github.com/FREEZONEX/Tier0-skill) を読ませてください。
+コマンドを実行する前に、agent に [Tier0 Skill repo](https://github.com/FREEZONEX/Tier0-skill) を読ませることができます。
 :::
 
 ## 次へ
 
-- [UNS データを扱う](../working-with-uns-data/) — MQTT と API を通じて UNS モデルを操作する方法。
+- [工場データを操作する](../working-with-uns-data/) — MQTT と API で工場データモデルを操作する方法。

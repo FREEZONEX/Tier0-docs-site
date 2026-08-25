@@ -106,7 +106,7 @@ Detailed deployment information is available in the [High Availability Deploymen
 	- Ubuntu 24.04 or Windows 10/11 with Docker and Git
 	#### Operations
 	<Steps>
-	1. Clone the Tier0-Edge repository from GitHub and access the project.
+	1. Clone the Tier0-Edge repository from GitHub to your server and access the project.
 
 		```bash
 		git clone https://github.com/FREEZONEX/Tier0-Edge
@@ -121,20 +121,30 @@ Detailed deployment information is available in the [High Availability Deploymen
 		```
 		:::note[Parameters to be configured]
 
-		| Field | Type | Description |
-		|------|------|-------------|
-		| VOLUMES_PATH | string | Storage path for project data |
-		| ENTRANCE_DOMAIN/ENTRANCE_PORT | string | Tier0 access endpoint (IP/domain + port) |
-		| OS_PLATFORM_TYPE | enum | OS where Tier0 is installed. Can be **linux** or **windows** |
-		| LANGUAGE | enum | zh-CN / en-US |
+		| Field | Type | Description | Example |
+		|------|------|-------------|---------|
+		| VOLUMES_PATH | string | Storage path for project data | `/srv/tier0/data` on Linux; `D:/tier0/data` or `/d/tier0/data` in Windows Bash |
+		| ENTRANCE_DOMAIN/ENTRANCE_PORT | string | Tier0 access endpoint (IP/domain + port) | `192.168.1.10` / `8088` |
+		| LANGUAGE | enum | zh-CN / en-US | `en-US` |
+		| ADMIN_INIT_PASSWORD | string | Initial password for the admin user | A strong private password |
+		| COMPOSE_PROJECT_NAME/PORT_OFFSET | string | Isolate multiple instances running on the same host | `edge_lab` / `100` |
 
 		:::
-	3. Run the installation script.
+	3. Run the installation script and check the installation status.
 
 		```bash
 		bash bin/install.sh
+		bash bin/compose.sh ps # Check the status of the containers
+		bash bin/compose.sh logs -f backend # Check the logs of the backend container
+		curl -fsS http://127.0.0.1:8088/readyz # Check the readiness of the backend service
 		```
 
+		:::caution
+		Do not edit `deploy/.env.runtime`; it contains generated secrets and resolved runtime values.
+		:::
+	4. Access Tier0 with the set endpoint and the default admin account:
+		- Username: `tier0`
+		- Password: The value of `ADMIN_INIT_PASSWORD` in `.env.default` or `tier0` if not set.
 	</Steps>
 
 

@@ -1,0 +1,1877 @@
+{
+  "schemaVersion": "2.0.0",
+  "title": "Tier0 CLI Reference",
+  "sourceOfTruth": {
+    "cliRepository": "FREEZONEX/Tier0-cli",
+    "cliBranch": "main",
+    "commandMetadata": "Cobra command definitions in cmd/",
+    "skillRepository": "FREEZONEX/Tier0-skill",
+    "skillRole": "Supplemental examples and workflow guidance only"
+  },
+  "globalFlags": [
+    {
+      "name": "--json",
+      "shorthand": null,
+      "type": "bool",
+      "required": false,
+      "repeatable": false,
+      "default": false,
+      "description": "Output raw JSON"
+    },
+    {
+      "name": "--debug",
+      "shorthand": null,
+      "type": "bool",
+      "required": false,
+      "repeatable": false,
+      "default": false,
+      "description": "Print HTTP request/response details"
+    }
+  ],
+  "groups": [
+    {
+      "id": "basic",
+      "name": "Basic operations",
+      "commands": [
+        {
+          "command": "tier0 doctor",
+          "cobraUse": "doctor",
+          "description": "Diagnose local Tier0 CLI connectivity and auth",
+          "usage": [
+            "tier0 doctor"
+          ],
+          "aliases": [],
+          "flags": [],
+          "examples": [
+            "tier0 doctor"
+          ],
+          "notes": [
+            "Checks local configuration, OpenAPI connectivity, API key presence, and API key identity."
+          ]
+        },
+        {
+          "command": "tier0 config",
+          "cobraUse": "config",
+          "description": "View or update configuration",
+          "usage": [
+            "tier0 config"
+          ],
+          "aliases": [],
+          "flags": [
+            {
+              "name": "--base-url",
+              "shorthand": null,
+              "type": "string",
+              "required": false,
+              "repeatable": false,
+              "default": "",
+              "description": "Set the platform base URL"
+            },
+            {
+              "name": "--api-key",
+              "shorthand": null,
+              "type": "string",
+              "required": false,
+              "repeatable": false,
+              "default": "",
+              "description": "Set the API key (alternative to tier0 login)"
+            },
+            {
+              "name": "--lang",
+              "shorthand": null,
+              "type": "string",
+              "required": false,
+              "repeatable": false,
+              "default": "",
+              "description": "Deprecated compatibility flag; CLI output is English-only",
+              "deprecated": true
+            }
+          ],
+          "examples": [
+            "tier0 config",
+            "tier0 config --base-url https://tier0.dev",
+            "tier0 config --api-key sk-per-xxxxxx"
+          ],
+          "notes": []
+        },
+        {
+          "command": "tier0 login",
+          "cobraUse": "login",
+          "description": "Authenticate via Device Flow",
+          "usage": [
+            "tier0 login"
+          ],
+          "aliases": [],
+          "flags": [
+            {
+              "name": "--no-wait",
+              "shorthand": null,
+              "type": "bool",
+              "required": false,
+              "repeatable": false,
+              "default": false,
+              "description": "Print the authorization URL and exit without polling"
+            },
+            {
+              "name": "--setup-code",
+              "shorthand": null,
+              "type": "string",
+              "required": false,
+              "repeatable": false,
+              "default": "",
+              "description": "Poll for an existing setup code instead of creating a new one"
+            },
+            {
+              "name": "--base-url",
+              "shorthand": null,
+              "type": "string",
+              "required": false,
+              "repeatable": false,
+              "default": "",
+              "description": "Override the platform base URL"
+            }
+          ],
+          "examples": [
+            "tier0 login",
+            "tier0 login --no-wait --json",
+            "tier0 login --setup-code <setup_code>"
+          ],
+          "notes": [
+            "Without --no-wait, the CLI polls every 5 seconds for up to 10 minutes.",
+            "With --no-wait --json, the CLI returns verification_url, setup_code, and expires_in."
+          ]
+        },
+        {
+          "command": "tier0 api",
+          "cobraUse": "api <endpoint>",
+          "description": "Call an API endpoint directly",
+          "usage": [
+            "tier0 api <endpoint>"
+          ],
+          "aliases": [],
+          "flags": [
+            {
+              "name": "--body",
+              "shorthand": null,
+              "type": "string",
+              "required": false,
+              "repeatable": false,
+              "default": "",
+              "description": "Request body JSON string"
+            },
+            {
+              "name": "--body-file",
+              "shorthand": null,
+              "type": "string",
+              "required": false,
+              "repeatable": false,
+              "default": "",
+              "description": "Read request body from file"
+            },
+            {
+              "name": "--method",
+              "shorthand": null,
+              "type": "string",
+              "required": false,
+              "repeatable": false,
+              "default": "POST",
+              "description": "HTTP method (GET|POST|PUT|DELETE)"
+            },
+            {
+              "name": "--dry-run",
+              "shorthand": null,
+              "type": "bool",
+              "required": false,
+              "repeatable": false,
+              "default": false,
+              "description": "Preview the request without executing it"
+            }
+          ],
+          "examples": [
+            "tier0 api /openapi/v1/uns/browse --body '{\"path\":\"/\"}'",
+            "tier0 api /openapi/v1/uns/read --body '{\"topics\":[\"demo\"]}'",
+            "tier0 api /openapi/v1/uns/write --body-file body.json"
+          ],
+          "notes": [
+            "--body and --body-file are mutually exclusive."
+          ]
+        },
+        {
+          "command": "tier0 upgrade",
+          "cobraUse": "upgrade",
+          "description": "Upgrade CLI to the latest version",
+          "usage": [
+            "tier0 upgrade"
+          ],
+          "aliases": [],
+          "flags": [
+            {
+              "name": "--dry-run",
+              "shorthand": null,
+              "type": "bool",
+              "required": false,
+              "repeatable": false,
+              "default": false,
+              "description": "Check for updates without installing"
+            },
+            {
+              "name": "--version",
+              "shorthand": "-v",
+              "type": "string",
+              "required": false,
+              "repeatable": false,
+              "default": "",
+              "description": "Upgrade to a specific version (default: latest)"
+            }
+          ],
+          "examples": [
+            "tier0 upgrade",
+            "tier0 upgrade --dry-run"
+          ],
+          "notes": []
+        },
+        {
+          "command": "tier0 uninstall",
+          "cobraUse": "uninstall",
+          "description": "Uninstall tier0 CLI",
+          "usage": [
+            "tier0 uninstall"
+          ],
+          "aliases": [],
+          "flags": [
+            {
+              "name": "--purge",
+              "shorthand": null,
+              "type": "bool",
+              "required": false,
+              "repeatable": false,
+              "default": false,
+              "description": "Also delete config file (credentials)"
+            },
+            {
+              "name": "--remove-skills",
+              "shorthand": null,
+              "type": "bool",
+              "required": false,
+              "repeatable": false,
+              "default": false,
+              "description": "Also remove the Tier0 Skill from detected AI agents"
+            },
+            {
+              "name": "--keep-skills",
+              "shorthand": null,
+              "type": "bool",
+              "required": false,
+              "repeatable": false,
+              "default": false,
+              "description": "Keep agent skills (deprecated; this is now the default)",
+              "deprecated": true
+            }
+          ],
+          "examples": [
+            "tier0 uninstall",
+            "tier0 uninstall --purge",
+            "tier0 uninstall --remove-skills",
+            "tier0 uninstall --purge --remove-skills"
+          ],
+          "notes": [
+            "Agent Skills and config are kept by default.",
+            "The local bundled skills directory is removed during CLI uninstall."
+          ]
+        },
+        {
+          "command": "tier0 version",
+          "cobraUse": "version",
+          "description": "Show version",
+          "usage": [
+            "tier0 version"
+          ],
+          "aliases": [],
+          "flags": [],
+          "examples": [
+            "tier0 version"
+          ],
+          "notes": []
+        }
+      ]
+    },
+    {
+      "id": "skills",
+      "name": "Skills",
+      "commands": [
+        {
+          "command": "tier0 skills install",
+          "cobraUse": "install",
+          "description": "Install or repair the Skill embedded in this CLI",
+          "usage": [
+            "tier0 skills install"
+          ],
+          "aliases": [],
+          "flags": [
+            {
+              "name": "--force",
+              "shorthand": null,
+              "type": "bool",
+              "required": false,
+              "repeatable": false,
+              "default": false,
+              "description": "Replace the active Skill with the embedded baseline"
+            },
+            {
+              "name": "--no-sync",
+              "shorthand": null,
+              "type": "bool",
+              "required": false,
+              "repeatable": false,
+              "default": false,
+              "description": "Install locally without syncing detected AI agents"
+            }
+          ],
+          "examples": [
+            "tier0 skills install",
+            "tier0 skills install --force"
+          ],
+          "notes": []
+        },
+        {
+          "command": "tier0 skills list",
+          "cobraUse": "list",
+          "description": "List installed skills",
+          "usage": [
+            "tier0 skills list"
+          ],
+          "aliases": [
+            "ls"
+          ],
+          "flags": [],
+          "examples": [
+            "tier0 skills list"
+          ],
+          "notes": []
+        },
+        {
+          "command": "tier0 skills update",
+          "cobraUse": "update",
+          "description": "Upgrade skills to the latest version",
+          "usage": [
+            "tier0 skills update"
+          ],
+          "aliases": [
+            "upgrade"
+          ],
+          "flags": [
+            {
+              "name": "--dry-run",
+              "shorthand": null,
+              "type": "bool",
+              "required": false,
+              "repeatable": false,
+              "default": false,
+              "description": "Check for updates without installing"
+            }
+          ],
+          "examples": [
+            "tier0 skills update",
+            "tier0 skills update --dry-run"
+          ],
+          "notes": []
+        },
+        {
+          "command": "tier0 skills version",
+          "cobraUse": "version",
+          "description": "Show skills version info",
+          "usage": [
+            "tier0 skills version"
+          ],
+          "aliases": [
+            "ver"
+          ],
+          "flags": [],
+          "examples": [
+            "tier0 skills version"
+          ],
+          "notes": []
+        },
+        {
+          "command": "tier0 skills status",
+          "cobraUse": "status",
+          "description": "Show active and embedded Skill status",
+          "usage": [
+            "tier0 skills status"
+          ],
+          "aliases": [],
+          "flags": [],
+          "examples": [
+            "tier0 skills status"
+          ],
+          "notes": []
+        },
+        {
+          "command": "tier0 skills sync",
+          "cobraUse": "sync",
+          "description": "Sync the active Skill to detected AI agents",
+          "usage": [
+            "tier0 skills sync"
+          ],
+          "aliases": [],
+          "flags": [],
+          "examples": [
+            "tier0 skills sync"
+          ],
+          "notes": []
+        }
+      ]
+    },
+    {
+      "id": "auth",
+      "name": "Auth",
+      "commands": [
+        {
+          "command": "tier0 auth whoami",
+          "cobraUse": "whoami",
+          "description": "Show current API key identity",
+          "usage": [
+            "tier0 auth whoami"
+          ],
+          "aliases": [],
+          "flags": [],
+          "examples": [
+            "tier0 auth whoami",
+            "tier0 auth whoami --json"
+          ],
+          "notes": [
+            "Shows user, workspace, key name, key type, roles, and permissions."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "uns",
+      "name": "UNS",
+      "commands": [
+        {
+          "command": "tier0 uns browse",
+          "cobraUse": "browse",
+          "description": "Browse UNS namespace tree",
+          "usage": [
+            "tier0 uns browse"
+          ],
+          "aliases": [],
+          "flags": [
+            {
+              "name": "--path",
+              "shorthand": "-p",
+              "type": "string",
+              "required": false,
+              "repeatable": false,
+              "default": "/",
+              "description": "Path to browse in the UNS tree"
+            },
+            {
+              "name": "--max-depth",
+              "shorthand": "-d",
+              "type": "int",
+              "required": false,
+              "repeatable": false,
+              "default": 1,
+              "description": "Max recursion depth (0 = unlimited)"
+            },
+            {
+              "name": "--include-metadata",
+              "shorthand": null,
+              "type": "bool",
+              "required": false,
+              "repeatable": false,
+              "default": false,
+              "description": "Include node metadata"
+            },
+            {
+              "name": "--include-leaf-value",
+              "shorthand": null,
+              "type": "bool",
+              "required": false,
+              "repeatable": false,
+              "default": false,
+              "description": "Include leaf node values"
+            }
+          ],
+          "examples": [
+            "tier0 uns browse",
+            "tier0 uns browse --path /devices",
+            "tier0 uns browse --path / --max-depth 2"
+          ],
+          "notes": []
+        },
+        {
+          "command": "tier0 uns search",
+          "cobraUse": "search",
+          "description": "Search UNS topics",
+          "usage": [
+            "tier0 uns search"
+          ],
+          "aliases": [],
+          "flags": [
+            {
+              "name": "--keyword",
+              "shorthand": "-k",
+              "type": "string",
+              "required": false,
+              "repeatable": false,
+              "default": "",
+              "description": "Search by name keyword"
+            },
+            {
+              "name": "--path-prefix",
+              "shorthand": null,
+              "type": "string",
+              "required": false,
+              "repeatable": false,
+              "default": "/",
+              "description": "Filter by path prefix"
+            },
+            {
+              "name": "--topic-type",
+              "shorthand": null,
+              "type": "string",
+              "required": false,
+              "repeatable": false,
+              "default": "",
+              "description": "Filter by topic type"
+            },
+            {
+              "name": "--page",
+              "shorthand": null,
+              "type": "int",
+              "required": false,
+              "repeatable": false,
+              "default": 1,
+              "description": "Page number"
+            },
+            {
+              "name": "--size",
+              "shorthand": "-l",
+              "type": "int",
+              "required": false,
+              "repeatable": false,
+              "default": 20,
+              "description": "Page size (max results)"
+            },
+            {
+              "name": "--include-metadata",
+              "shorthand": null,
+              "type": "bool",
+              "required": false,
+              "repeatable": false,
+              "default": false,
+              "description": "Include node metadata"
+            },
+            {
+              "name": "--include-leaf-value",
+              "shorthand": null,
+              "type": "bool",
+              "required": false,
+              "repeatable": false,
+              "default": false,
+              "description": "Include leaf node values"
+            }
+          ],
+          "examples": [
+            "tier0 uns search --keyword temp",
+            "tier0 uns search --path-prefix /devices --size 50",
+            "tier0 uns search --keyword temp --include-metadata"
+          ],
+          "notes": []
+        },
+        {
+          "command": "tier0 uns read",
+          "cobraUse": "read [topic...]",
+          "description": "Read current value of UNS topics",
+          "usage": [
+            "tier0 uns read [topic...]",
+            "tier0 uns read --topic <topic>"
+          ],
+          "aliases": [],
+          "flags": [
+            {
+              "name": "--topic",
+              "shorthand": "-t",
+              "type": "stringSlice",
+              "required": false,
+              "repeatable": true,
+              "default": null,
+              "description": "Topic name(s) to read (repeatable; positional args are also accepted)"
+            },
+            {
+              "name": "--include-metadata",
+              "shorthand": null,
+              "type": "bool",
+              "required": false,
+              "repeatable": false,
+              "default": false,
+              "description": "Include topic metadata (topicType, fields, description)"
+            },
+            {
+              "name": "--include-leaf-value",
+              "shorthand": null,
+              "type": "bool",
+              "required": false,
+              "repeatable": false,
+              "default": false,
+              "description": "Include leaf node values"
+            }
+          ],
+          "examples": [
+            "tier0 uns read demo",
+            "tier0 uns read --topic demo",
+            "tier0 uns read temp humidity",
+            "tier0 uns read --topic sensor1 --include-metadata"
+          ],
+          "notes": [
+            "At least one topic is required via positional args or --topic."
+          ]
+        },
+        {
+          "command": "tier0 uns write",
+          "cobraUse": "write",
+          "description": "Write value to a UNS topic",
+          "usage": [
+            "tier0 uns write"
+          ],
+          "aliases": [],
+          "flags": [
+            {
+              "name": "--topic",
+              "shorthand": "-t",
+              "type": "string",
+              "required": true,
+              "repeatable": false,
+              "default": "",
+              "description": "Topic name to write to (required)"
+            },
+            {
+              "name": "--value",
+              "shorthand": "-v",
+              "type": "string",
+              "required": false,
+              "repeatable": false,
+              "default": "",
+              "description": "JSON value string (mutually exclusive with --file)"
+            },
+            {
+              "name": "--file",
+              "shorthand": "-f",
+              "type": "string",
+              "required": false,
+              "repeatable": false,
+              "default": "",
+              "description": "Read value from file (mutually exclusive with --value)"
+            },
+            {
+              "name": "--qos",
+              "shorthand": null,
+              "type": "int",
+              "required": false,
+              "repeatable": false,
+              "default": 0,
+              "description": "MQTT QoS level (0/1/2)"
+            },
+            {
+              "name": "--retain",
+              "shorthand": null,
+              "type": "bool",
+              "required": false,
+              "repeatable": false,
+              "default": false,
+              "description": "Set MQTT retain flag"
+            },
+            {
+              "name": "--dry-run",
+              "shorthand": null,
+              "type": "bool",
+              "required": false,
+              "repeatable": false,
+              "default": false,
+              "description": "Preview the request without executing it"
+            }
+          ],
+          "examples": [
+            "tier0 uns write --topic demo --value '{\"temp\":25}'",
+            "tier0 uns write --topic demo --file payload.json",
+            "tier0 uns write --topic sensor1 --value '{\"on\":true}' --qos 1 --retain"
+          ],
+          "notes": [
+            "--value and --file are mutually exclusive.",
+            "The value must be a valid JSON object matching the topic fields."
+          ]
+        },
+        {
+          "command": "tier0 uns history",
+          "cobraUse": "history",
+          "description": "Query historical data for topics",
+          "usage": [
+            "tier0 uns history"
+          ],
+          "aliases": [],
+          "flags": [
+            {
+              "name": "--topic",
+              "shorthand": "-t",
+              "type": "stringSlice",
+              "required": true,
+              "repeatable": true,
+              "default": null,
+              "description": "Topic name(s) (repeatable, required)"
+            },
+            {
+              "name": "--start",
+              "shorthand": null,
+              "type": "string",
+              "required": true,
+              "repeatable": false,
+              "default": "",
+              "description": "Start time: relative (-1h/-30m/-7d), ISO 8601, or 'now' (required)"
+            },
+            {
+              "name": "--end",
+              "shorthand": null,
+              "type": "string",
+              "required": false,
+              "repeatable": false,
+              "default": "now",
+              "description": "End time: relative, ISO 8601, or 'now' (default: now)"
+            },
+            {
+              "name": "--page",
+              "shorthand": null,
+              "type": "int",
+              "required": false,
+              "repeatable": false,
+              "default": 1,
+              "description": "Page number"
+            },
+            {
+              "name": "--size",
+              "shorthand": "-l",
+              "type": "int",
+              "required": false,
+              "repeatable": false,
+              "default": 100,
+              "description": "Page size (max data points)"
+            },
+            {
+              "name": "--interval",
+              "shorthand": null,
+              "type": "string",
+              "required": false,
+              "repeatable": false,
+              "default": "",
+              "description": "Aggregation interval (e.g. 1m, 1h, 1d)"
+            },
+            {
+              "name": "--fn",
+              "shorthand": null,
+              "type": "string",
+              "required": false,
+              "repeatable": false,
+              "default": "",
+              "description": "Aggregation function (avg/max/min/sum/count)"
+            },
+            {
+              "name": "--field",
+              "shorthand": null,
+              "type": "string",
+              "required": false,
+              "repeatable": false,
+              "default": "",
+              "description": "Aggregation field name"
+            }
+          ],
+          "examples": [
+            "tier0 uns history -t demo --start -1h",
+            "tier0 uns history -t demo --start -24h --end now --fn avg --interval 1h",
+            "tier0 uns history -t demo --start 2026-01-01T00:00:00Z --end 2026-01-02T00:00:00Z"
+          ],
+          "notes": []
+        },
+        {
+          "command": "tier0 uns create",
+          "cobraUse": "create",
+          "description": "Create UNS namespace nodes",
+          "usage": [
+            "tier0 uns create"
+          ],
+          "aliases": [],
+          "flags": [
+            {
+              "name": "--topic",
+              "shorthand": "-t",
+              "type": "string",
+              "required": false,
+              "repeatable": false,
+              "default": "",
+              "description": "Topic path or leaf name (required if not using --file)"
+            },
+            {
+              "name": "--parent",
+              "shorthand": null,
+              "type": "string",
+              "required": false,
+              "repeatable": false,
+              "default": "",
+              "description": "Parent path prefix (optional, combined with --topic)"
+            },
+            {
+              "name": "--type",
+              "shorthand": null,
+              "type": "string",
+              "required": false,
+              "repeatable": false,
+              "default": "",
+              "description": "Node type: 'path' (folder) or 'topic' (data point)"
+            },
+            {
+              "name": "--display-name",
+              "shorthand": "-d",
+              "type": "string",
+              "required": false,
+              "repeatable": false,
+              "default": "",
+              "description": "Display name"
+            },
+            {
+              "name": "--description",
+              "shorthand": null,
+              "type": "string",
+              "required": false,
+              "repeatable": false,
+              "default": "",
+              "description": "Description"
+            },
+            {
+              "name": "--alias",
+              "shorthand": null,
+              "type": "string",
+              "required": false,
+              "repeatable": false,
+              "default": "",
+              "description": "Alias"
+            },
+            {
+              "name": "--file",
+              "shorthand": "-f",
+              "type": "string",
+              "required": false,
+              "repeatable": false,
+              "default": "",
+              "description": "Read namespace definition from JSON file ({\"namespace\":[]} or bare array)"
+            },
+            {
+              "name": "--topic-type",
+              "shorthand": null,
+              "type": "string",
+              "required": false,
+              "repeatable": false,
+              "default": "",
+              "description": "Deprecated: topic type is now derived from the path (Metric/Action/State folder before leaf)",
+              "deprecated": true
+            },
+            {
+              "name": "--fields",
+              "shorthand": null,
+              "type": "string",
+              "required": false,
+              "repeatable": false,
+              "default": "",
+              "description": "Schema fields JSON array"
+            },
+            {
+              "name": "--fields-file",
+              "shorthand": null,
+              "type": "string",
+              "required": false,
+              "repeatable": false,
+              "default": "",
+              "description": "Read schema fields JSON array from file"
+            },
+            {
+              "name": "--dry-run",
+              "shorthand": null,
+              "type": "bool",
+              "required": false,
+              "repeatable": false,
+              "default": false,
+              "description": "Preview the request without executing it"
+            }
+          ],
+          "examples": [
+            "tier0 uns create --topic Plant/Line1/Metric/Temperature --type topic",
+            "tier0 uns create --parent Factory1/Line1/Station1 --topic Metric/ProductionCount --type topic",
+            "tier0 uns create --topic Plant/Line1 --type path --display-name 'Line 1'",
+            "tier0 uns create --file namespace.json"
+          ],
+          "notes": [
+            "When not using --file, --topic and --type are required.",
+            "--fields and --fields-file are mutually exclusive.",
+            "For topic nodes, the segment immediately before the leaf must be Metric, Action, or State."
+          ]
+        },
+        {
+          "command": "tier0 uns update",
+          "cobraUse": "update",
+          "description": "Update UNS topic metadata",
+          "usage": [
+            "tier0 uns update"
+          ],
+          "aliases": [],
+          "flags": [
+            {
+              "name": "--path",
+              "shorthand": "-p",
+              "type": "string",
+              "required": true,
+              "repeatable": false,
+              "default": "",
+              "description": "Topic path to update (required)"
+            },
+            {
+              "name": "--name",
+              "shorthand": "-n",
+              "type": "string",
+              "required": false,
+              "repeatable": false,
+              "default": "",
+              "description": "New name"
+            },
+            {
+              "name": "--alias",
+              "shorthand": null,
+              "type": "string",
+              "required": false,
+              "repeatable": false,
+              "default": "",
+              "description": "New alias"
+            },
+            {
+              "name": "--description",
+              "shorthand": null,
+              "type": "string",
+              "required": false,
+              "repeatable": false,
+              "default": "",
+              "description": "New description"
+            },
+            {
+              "name": "--clear-description",
+              "shorthand": null,
+              "type": "bool",
+              "required": false,
+              "repeatable": false,
+              "default": false,
+              "description": "Clear the description without relying on an empty shell argument"
+            },
+            {
+              "name": "--display-name",
+              "shorthand": "-d",
+              "type": "string",
+              "required": false,
+              "repeatable": false,
+              "default": "",
+              "description": "New display name"
+            },
+            {
+              "name": "--extend-properties",
+              "shorthand": null,
+              "type": "string",
+              "required": false,
+              "repeatable": false,
+              "default": "",
+              "description": "Extended properties JSON object"
+            },
+            {
+              "name": "--fields",
+              "shorthand": null,
+              "type": "string",
+              "required": false,
+              "repeatable": false,
+              "default": "",
+              "description": "Schema fields JSON array"
+            },
+            {
+              "name": "--fields-file",
+              "shorthand": null,
+              "type": "string",
+              "required": false,
+              "repeatable": false,
+              "default": "",
+              "description": "Read schema fields JSON array from file"
+            },
+            {
+              "name": "--update-mask",
+              "shorthand": null,
+              "type": "stringSlice",
+              "required": false,
+              "repeatable": true,
+              "default": null,
+              "description": "Fields to update (repeatable, e.g. name,description,fields)"
+            },
+            {
+              "name": "--dry-run",
+              "shorthand": null,
+              "type": "bool",
+              "required": false,
+              "repeatable": false,
+              "default": false,
+              "description": "Preview the request without executing it"
+            }
+          ],
+          "examples": [
+            "tier0 uns update --path Plant/Line1/Metric/Temperature --display-name 'Line 1 Temp'",
+            "tier0 uns update --path Plant/Line1 --description 'Production line 1' --update-mask description",
+            "tier0 uns update --path Plant/Line1/Metric/Temperature --fields '[{\"name\":\"temp\",\"type\":\"float\",\"unit\":\"C\"}]' --update-mask fields"
+          ],
+          "notes": [
+            "--description and --clear-description are mutually exclusive.",
+            "--fields and --fields-file are mutually exclusive.",
+            "At least one field to update is required."
+          ]
+        },
+        {
+          "command": "tier0 uns delete",
+          "cobraUse": "delete",
+          "description": "Delete UNS node(s)",
+          "usage": [
+            "tier0 uns delete"
+          ],
+          "aliases": [],
+          "flags": [
+            {
+              "name": "--path",
+              "shorthand": "-p",
+              "type": "stringArray",
+              "required": true,
+              "repeatable": true,
+              "default": null,
+              "description": "Node path(s) to delete (repeatable, required)"
+            },
+            {
+              "name": "--hard",
+              "shorthand": null,
+              "type": "bool",
+              "required": false,
+              "repeatable": false,
+              "default": false,
+              "description": "Hard delete (irreversible)"
+            },
+            {
+              "name": "--yes",
+              "shorthand": "-y",
+              "type": "bool",
+              "required": true,
+              "repeatable": false,
+              "default": false,
+              "description": "Confirm high-risk operation (required)"
+            },
+            {
+              "name": "--dry-run",
+              "shorthand": null,
+              "type": "bool",
+              "required": false,
+              "repeatable": false,
+              "default": false,
+              "description": "Preview the request without executing it"
+            },
+            {
+              "name": "--topic",
+              "shorthand": null,
+              "type": "stringArray",
+              "required": false,
+              "repeatable": true,
+              "default": null,
+              "description": "Deprecated alias for --path",
+              "deprecated": true,
+              "hidden": true
+            }
+          ],
+          "examples": [
+            "tier0 uns delete --path factory/line1/sensor/temp --yes",
+            "tier0 uns delete --path factory/line1/sensor/temp --path factory/line1/sensor/humi --yes",
+            "tier0 uns delete --path factory/line1/sensor/temp --hard --yes"
+          ],
+          "notes": [
+            "Soft delete is the default and can be restored.",
+            "--hard is irreversible.",
+            "High-risk execution requires --yes unless using --dry-run."
+          ]
+        },
+        {
+          "command": "tier0 uns restore",
+          "cobraUse": "restore",
+          "description": "Restore topic from history",
+          "usage": [
+            "tier0 uns restore"
+          ],
+          "aliases": [],
+          "flags": [
+            {
+              "name": "--path",
+              "shorthand": "-p",
+              "type": "string",
+              "required": true,
+              "repeatable": false,
+              "default": "",
+              "description": "Topic path to restore (required)"
+            },
+            {
+              "name": "--yes",
+              "shorthand": "-y",
+              "type": "bool",
+              "required": true,
+              "repeatable": false,
+              "default": false,
+              "description": "Confirm high-risk operation (required)"
+            },
+            {
+              "name": "--dry-run",
+              "shorthand": null,
+              "type": "bool",
+              "required": false,
+              "repeatable": false,
+              "default": false,
+              "description": "Preview the request without executing it"
+            }
+          ],
+          "examples": [
+            "tier0 uns restore --path Plant/Line1/Metric/Temperature --yes"
+          ],
+          "notes": [
+            "High-risk execution requires --yes unless using --dry-run."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "flow",
+      "name": "Node-RED Flow",
+      "commands": [
+        {
+          "command": "tier0 flow list",
+          "cobraUse": "list",
+          "description": "List flows",
+          "usage": [
+            "tier0 flow list"
+          ],
+          "aliases": [
+            "ls"
+          ],
+          "flags": [
+            {
+              "name": "--keyword",
+              "shorthand": "-k",
+              "type": "string",
+              "required": false,
+              "repeatable": false,
+              "default": "",
+              "description": "Filter by name keyword"
+            },
+            {
+              "name": "--type",
+              "shorthand": "-t",
+              "type": "string",
+              "required": false,
+              "repeatable": false,
+              "default": "",
+              "description": "Filter by type (SourceFlow/EventFlow)"
+            },
+            {
+              "name": "--source",
+              "shorthand": null,
+              "type": "bool",
+              "required": false,
+              "repeatable": false,
+              "default": false,
+              "description": "Show SourceFlow only"
+            },
+            {
+              "name": "--event",
+              "shorthand": null,
+              "type": "bool",
+              "required": false,
+              "repeatable": false,
+              "default": false,
+              "description": "Show EventFlow only"
+            }
+          ],
+          "examples": [
+            "tier0 flow list",
+            "tier0 flow list --source --json"
+          ],
+          "notes": [
+            "--source and --event are mutually exclusive.",
+            "--type cannot be combined with --source or --event."
+          ]
+        },
+        {
+          "command": "tier0 flow get",
+          "cobraUse": "get",
+          "description": "Get flow details",
+          "usage": [
+            "tier0 flow get --id <id>",
+            "tier0 flow get <id>"
+          ],
+          "aliases": [],
+          "flags": [
+            {
+              "name": "--id",
+              "shorthand": null,
+              "type": "int64",
+              "required": false,
+              "repeatable": false,
+              "default": 0,
+              "description": "Flow ID"
+            }
+          ],
+          "examples": [
+            "tier0 flow get --id 1 --json",
+            "tier0 flow get 1 --json"
+          ],
+          "notes": [
+            "A positive Flow ID is required via --id or as a positional argument."
+          ]
+        },
+        {
+          "command": "tier0 flow create",
+          "cobraUse": "create",
+          "description": "Create a new flow",
+          "usage": [
+            "tier0 flow create"
+          ],
+          "aliases": [],
+          "flags": [
+            {
+              "name": "--name",
+              "shorthand": "-n",
+              "type": "string",
+              "required": true,
+              "repeatable": false,
+              "default": "",
+              "description": "Flow name (required)"
+            },
+            {
+              "name": "--type",
+              "shorthand": "-t",
+              "type": "string",
+              "required": true,
+              "repeatable": false,
+              "default": "",
+              "description": "Flow type: SourceFlow | EventFlow (required)"
+            },
+            {
+              "name": "--source",
+              "shorthand": null,
+              "type": "bool",
+              "required": false,
+              "repeatable": false,
+              "default": false,
+              "description": "Set type to SourceFlow"
+            },
+            {
+              "name": "--event",
+              "shorthand": null,
+              "type": "bool",
+              "required": false,
+              "repeatable": false,
+              "default": false,
+              "description": "Set type to EventFlow"
+            },
+            {
+              "name": "--desc",
+              "shorthand": null,
+              "type": "string",
+              "required": false,
+              "repeatable": false,
+              "default": "",
+              "description": "Description"
+            },
+            {
+              "name": "--template",
+              "shorthand": null,
+              "type": "string",
+              "required": false,
+              "repeatable": false,
+              "default": "",
+              "description": "Initial template JSON string"
+            },
+            {
+              "name": "--template-file",
+              "shorthand": null,
+              "type": "string",
+              "required": false,
+              "repeatable": false,
+              "default": "",
+              "description": "Read initial template from file"
+            },
+            {
+              "name": "--dry-run",
+              "shorthand": null,
+              "type": "bool",
+              "required": false,
+              "repeatable": false,
+              "default": false,
+              "description": "Preview the request without executing it"
+            }
+          ],
+          "examples": [
+            "tier0 flow create --name \"modbus-collector\" --source --desc \"Modbus TCP collector\"",
+            "tier0 flow create --name \"alert-handler\" --event --desc \"Temperature alarm processor\""
+          ],
+          "notes": [
+            "Use exactly one of --type, --source, or --event to select a Flow type.",
+            "--template and --template-file are mutually exclusive."
+          ]
+        },
+        {
+          "command": "tier0 flow update",
+          "cobraUse": "update",
+          "description": "Update flow metadata",
+          "usage": [
+            "tier0 flow update --id <id>",
+            "tier0 flow update <id>"
+          ],
+          "aliases": [],
+          "flags": [
+            {
+              "name": "--id",
+              "shorthand": null,
+              "type": "int64",
+              "required": false,
+              "repeatable": false,
+              "default": 0,
+              "description": "Flow ID (required)"
+            },
+            {
+              "name": "--name",
+              "shorthand": "-n",
+              "type": "string",
+              "required": false,
+              "repeatable": false,
+              "default": "",
+              "description": "New name"
+            },
+            {
+              "name": "--desc",
+              "shorthand": null,
+              "type": "string",
+              "required": false,
+              "repeatable": false,
+              "default": "",
+              "description": "New description"
+            },
+            {
+              "name": "--template",
+              "shorthand": null,
+              "type": "string",
+              "required": false,
+              "repeatable": false,
+              "default": "",
+              "description": "New template JSON string"
+            },
+            {
+              "name": "--template-file",
+              "shorthand": null,
+              "type": "string",
+              "required": false,
+              "repeatable": false,
+              "default": "",
+              "description": "Read new template from file"
+            },
+            {
+              "name": "--favorite",
+              "shorthand": null,
+              "type": "bool",
+              "required": false,
+              "repeatable": false,
+              "default": false,
+              "description": "Mark as favorite"
+            },
+            {
+              "name": "--unfavorite",
+              "shorthand": null,
+              "type": "bool",
+              "required": false,
+              "repeatable": false,
+              "default": false,
+              "description": "Remove from favorites"
+            },
+            {
+              "name": "--dry-run",
+              "shorthand": null,
+              "type": "bool",
+              "required": false,
+              "repeatable": false,
+              "default": false,
+              "description": "Preview the request without executing it"
+            }
+          ],
+          "examples": [
+            "tier0 flow update --id 1 --name \"line1-collector\"",
+            "tier0 flow update --id 1 --favorite"
+          ],
+          "notes": [
+            "A positive Flow ID is required via --id or as a positional argument.",
+            "--template and --template-file are mutually exclusive.",
+            "--favorite and --unfavorite are mutually exclusive.",
+            "At least one field to update is required."
+          ]
+        },
+        {
+          "command": "tier0 flow data",
+          "cobraUse": "data",
+          "description": "Get Node-RED canvas JSON",
+          "usage": [
+            "tier0 flow data --id <id>",
+            "tier0 flow data <id>"
+          ],
+          "aliases": [],
+          "flags": [
+            {
+              "name": "--id",
+              "shorthand": null,
+              "type": "int64",
+              "required": false,
+              "repeatable": false,
+              "default": 0,
+              "description": "Flow ID"
+            },
+            {
+              "name": "--out",
+              "shorthand": "-o",
+              "type": "string",
+              "required": false,
+              "repeatable": false,
+              "default": "",
+              "description": "Save output to file"
+            }
+          ],
+          "examples": [
+            "tier0 flow data --id 1 --out flows.json"
+          ],
+          "notes": [
+            "A positive Flow ID is required via --id or as a positional argument."
+          ]
+        },
+        {
+          "command": "tier0 flow deploy",
+          "cobraUse": "deploy",
+          "description": "Deploy Node-RED canvas JSON",
+          "usage": [
+            "tier0 flow deploy --id <id>",
+            "tier0 flow deploy <id>"
+          ],
+          "aliases": [],
+          "flags": [
+            {
+              "name": "--id",
+              "shorthand": null,
+              "type": "int64",
+              "required": false,
+              "repeatable": false,
+              "default": 0,
+              "description": "Flow ID (required)"
+            },
+            {
+              "name": "--flows-json",
+              "shorthand": null,
+              "type": "string",
+              "required": false,
+              "repeatable": false,
+              "default": "",
+              "description": "Node-RED canvas JSON string"
+            },
+            {
+              "name": "--flows-file",
+              "shorthand": "-f",
+              "type": "string",
+              "required": false,
+              "repeatable": false,
+              "default": "",
+              "description": "Read Node-RED canvas JSON from file (recommended)"
+            },
+            {
+              "name": "--yes",
+              "shorthand": "-y",
+              "type": "bool",
+              "required": true,
+              "repeatable": false,
+              "default": false,
+              "description": "Confirm high-risk operation (required)"
+            },
+            {
+              "name": "--dry-run",
+              "shorthand": null,
+              "type": "bool",
+              "required": false,
+              "repeatable": false,
+              "default": false,
+              "description": "Preview the request without executing it"
+            }
+          ],
+          "examples": [
+            "tier0 flow deploy --id 1 -f flows.json --dry-run --json",
+            "tier0 flow deploy --id 1 -f flows.json --yes"
+          ],
+          "notes": [
+            "A positive Flow ID is required via --id or as a positional argument.",
+            "--flows-json and --flows-file are mutually exclusive.",
+            "Deployment replaces all existing Node-RED nodes in the Flow.",
+            "High-risk execution requires --yes unless using --dry-run."
+          ]
+        },
+        {
+          "command": "tier0 flow delete",
+          "cobraUse": "delete",
+          "description": "Delete flow(s)",
+          "usage": [
+            "tier0 flow delete --id <id>",
+            "tier0 flow delete <id>[,<id>...]"
+          ],
+          "aliases": [
+            "del",
+            "rm"
+          ],
+          "flags": [
+            {
+              "name": "--id",
+              "shorthand": null,
+              "type": "int64Slice",
+              "required": false,
+              "repeatable": true,
+              "default": null,
+              "description": "Flow ID(s) to delete (repeatable)"
+            },
+            {
+              "name": "--yes",
+              "shorthand": "-y",
+              "type": "bool",
+              "required": true,
+              "repeatable": false,
+              "default": false,
+              "description": "Confirm high-risk operation (required)"
+            },
+            {
+              "name": "--dry-run",
+              "shorthand": null,
+              "type": "bool",
+              "required": false,
+              "repeatable": false,
+              "default": false,
+              "description": "Preview the request without executing it"
+            }
+          ],
+          "examples": [
+            "tier0 flow delete --id 1 --yes"
+          ],
+          "notes": [
+            "Positional arguments may contain comma-separated Flow IDs.",
+            "Deletion stops the Node-RED container(s) and cannot be undone.",
+            "High-risk execution requires --yes unless using --dry-run."
+          ]
+        },
+        {
+          "command": "tier0 flow nodes",
+          "cobraUse": "nodes [source|event]",
+          "description": "List available Node-RED node types",
+          "usage": [
+            "tier0 flow nodes [source|event]",
+            "tier0 flow nodes --type <SourceFlow|EventFlow>",
+            "tier0 flow nodes --source",
+            "tier0 flow nodes --event"
+          ],
+          "aliases": [],
+          "flags": [
+            {
+              "name": "--type",
+              "shorthand": "-t",
+              "type": "string",
+              "required": false,
+              "repeatable": false,
+              "default": "",
+              "description": "Flow type (SourceFlow/EventFlow)"
+            },
+            {
+              "name": "--source",
+              "shorthand": null,
+              "type": "bool",
+              "required": false,
+              "repeatable": false,
+              "default": false,
+              "description": "Show SourceFlow nodes"
+            },
+            {
+              "name": "--event",
+              "shorthand": null,
+              "type": "bool",
+              "required": false,
+              "repeatable": false,
+              "default": false,
+              "description": "Show EventFlow nodes"
+            }
+          ],
+          "examples": [
+            "tier0 flow nodes source --json",
+            "tier0 flow nodes --source --json",
+            "tier0 flow nodes --event --json"
+          ],
+          "notes": [
+            "Accepts at most one positional Flow type.",
+            "--source and --event are mutually exclusive.",
+            "Do not combine positional/type input with --source or --event."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "assets",
+      "name": "Assets",
+      "commands": [
+        {
+          "command": "tier0 assets upload",
+          "cobraUse": "upload <local-file>",
+          "description": "Upload a file to Tier0 object storage",
+          "usage": [
+            "tier0 assets upload <local-file>"
+          ],
+          "aliases": [],
+          "flags": [
+            {
+              "name": "--business",
+              "shorthand": null,
+              "type": "string",
+              "required": false,
+              "repeatable": false,
+              "default": "attachment",
+              "description": "Business scene"
+            },
+            {
+              "name": "--use-by",
+              "shorthand": null,
+              "type": "string",
+              "required": false,
+              "repeatable": false,
+              "default": "workspace",
+              "description": "Usage scope: user|workspace|platform"
+            },
+            {
+              "name": "--visibility",
+              "shorthand": null,
+              "type": "string",
+              "required": false,
+              "repeatable": false,
+              "default": "private",
+              "description": "Visibility: public|private"
+            },
+            {
+              "name": "--app-instance-id",
+              "shorthand": null,
+              "type": "string",
+              "required": false,
+              "repeatable": false,
+              "default": "",
+              "description": "AI app instance ID"
+            },
+            {
+              "name": "--session-id",
+              "shorthand": null,
+              "type": "string",
+              "required": false,
+              "repeatable": false,
+              "default": "",
+              "description": "AI session ID"
+            },
+            {
+              "name": "--multipart-size",
+              "shorthand": null,
+              "type": "string",
+              "required": false,
+              "repeatable": false,
+              "default": "CLI-defined default",
+              "description": "Multipart part size (e.g. 10MB, min 5MB)"
+            },
+            {
+              "name": "--concurrency",
+              "shorthand": null,
+              "type": "int",
+              "required": false,
+              "repeatable": false,
+              "default": 4,
+              "description": "Multipart upload concurrency (number of parallel parts)"
+            },
+            {
+              "name": "--resume",
+              "shorthand": null,
+              "type": "bool",
+              "required": false,
+              "repeatable": false,
+              "default": false,
+              "description": "Resume an interrupted multipart upload"
+            },
+            {
+              "name": "--abort",
+              "shorthand": null,
+              "type": "bool",
+              "required": false,
+              "repeatable": false,
+              "default": false,
+              "description": "Abort an interrupted multipart upload and clean up its state"
+            }
+          ],
+          "examples": [
+            "tier0 assets upload ./report.csv",
+            "tier0 assets upload ./report.csv --visibility public --business attachment",
+            "tier0 assets upload ./report.csv --use-by workspace --visibility private",
+            "tier0 assets upload ./large-backup.tar.gz",
+            "tier0 assets upload ./large-backup.tar.gz --resume",
+            "tier0 assets upload ./large-backup.tar.gz --abort",
+            "tier0 assets upload ./large-backup.tar.gz --multipart-size 20MB --concurrency 8"
+          ],
+          "notes": [
+            "Exactly one local file argument is required.",
+            "Files larger than 100MB automatically use multipart upload.",
+            "The CLI does not enforce a hard maximum file size; the server applies plan/quota limits."
+          ]
+        },
+        {
+          "command": "tier0 assets download",
+          "cobraUse": "download",
+          "description": "Download a file from Tier0 object storage",
+          "usage": [
+            "tier0 assets download"
+          ],
+          "aliases": [],
+          "flags": [
+            {
+              "name": "--file-path",
+              "shorthand": null,
+              "type": "string",
+              "required": true,
+              "repeatable": false,
+              "default": "",
+              "description": "File path returned by upload"
+            },
+            {
+              "name": "--output",
+              "shorthand": "-o",
+              "type": "string",
+              "required": false,
+              "repeatable": false,
+              "default": "",
+              "description": "Output file path (default: stdout)"
+            },
+            {
+              "name": "--content-disposition",
+              "shorthand": null,
+              "type": "string",
+              "required": false,
+              "repeatable": false,
+              "default": "",
+              "description": "Custom Content-Disposition"
+            }
+          ],
+          "examples": [
+            "tier0 assets download --file-path workspace/.../report.csv -o ./report.csv",
+            "tier0 assets download --file-path workspace/.../report.csv"
+          ],
+          "notes": []
+        },
+        {
+          "command": "tier0 assets url",
+          "cobraUse": "url",
+          "description": "Get file access URL from Tier0 object storage",
+          "usage": [
+            "tier0 assets url"
+          ],
+          "aliases": [],
+          "flags": [
+            {
+              "name": "--file-path",
+              "shorthand": null,
+              "type": "string",
+              "required": true,
+              "repeatable": false,
+              "default": "",
+              "description": "File path returned by upload"
+            },
+            {
+              "name": "--expired-sec",
+              "shorthand": null,
+              "type": "int",
+              "required": false,
+              "repeatable": false,
+              "default": 3600,
+              "description": "Presigned URL expiration seconds"
+            },
+            {
+              "name": "--content-disposition",
+              "shorthand": null,
+              "type": "string",
+              "required": false,
+              "repeatable": false,
+              "default": "",
+              "description": "Custom Content-Disposition"
+            }
+          ],
+          "examples": [
+            "tier0 assets url --file-path workspace/.../report.csv",
+            "tier0 assets url --file-path workspace/.../report.csv --expired-sec 300"
+          ],
+          "notes": []
+        },
+        {
+          "command": "tier0 assets delete",
+          "cobraUse": "delete",
+          "description": "Delete a file from Tier0 object storage",
+          "usage": [
+            "tier0 assets delete"
+          ],
+          "aliases": [],
+          "flags": [
+            {
+              "name": "--file-path",
+              "shorthand": null,
+              "type": "string",
+              "required": true,
+              "repeatable": false,
+              "default": "",
+              "description": "File path returned by upload"
+            },
+            {
+              "name": "--yes",
+              "shorthand": "-y",
+              "type": "bool",
+              "required": true,
+              "repeatable": false,
+              "default": false,
+              "description": "Confirm high-risk operation (required)"
+            },
+            {
+              "name": "--dry-run",
+              "shorthand": null,
+              "type": "bool",
+              "required": false,
+              "repeatable": false,
+              "default": false,
+              "description": "Preview the request without executing it"
+            }
+          ],
+          "examples": [
+            "tier0 assets delete --file-path workspace/.../report.csv --dry-run --json",
+            "tier0 assets delete --file-path workspace/.../report.csv --yes"
+          ],
+          "notes": [
+            "Deletion cannot be undone.",
+            "High-risk execution requires --yes unless using --dry-run."
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,202 @@
+---
+title: Skills integradas de Builder
+description: Referencia de las AI Skills integradas en Tier0 Builder.
+sidebar:
+  order: 3
+---
+
+Tier0 App Builder incluye actualmente 7 AI Skills integradas activas. Estas Skills ayudan al agent a convertir requisitos en aplicaciones industriales, alinear aplicaciones con el scaffold de la plataforma Tier0, reparar problemas de UI y mantener estables los entornos de preview.
+
+## `app-srs`
+
+**Significado**: Punto de entrada para el análisis de requisitos de nuevas aplicaciones empresariales industriales. Se usa para WMS, MES, ERP, CRM, QMS, EAM, aprobaciones, inventario, proveedores, clientes, planificación y workflows empresariales similares.
+
+**Ejemplo**:
+
+```text
+Usa $app-srs para diseñar un sistema de gestión de excepciones de calidad para una fábrica de autopartes.
+```
+
+También se puede activar con lenguaje natural:
+
+```text
+Genera una app de gestión de almacén con recepción, ubicación, picking, envío y conteo de inventario.
+```
+
+**Qué hace**:
+
+1. Analiza roles de negocio, workflows, estados y excepciones.
+2. Comprueba si el requisito es suficientemente claro.
+3. Genera un SRS completo.
+4. Lo guarda en `specs/spec.md` de forma predeterminada.
+5. Entrega el resultado a `app-builder` por defecto, salvo que el usuario pida solo los requisitos.
+
+## `app-builder`
+
+**Significado**: Skill principal para construir la aplicación.
+
+**Ejemplo**:
+
+```text
+Usa $app-builder para construir la primera versión desde specs/spec.md.
+```
+
+**Tipos internos de trabajo**: El agent decide qué tipo de trabajo usar según el prompt y el estado actual del project.
+
+- **First Release**: Construye la primera versión desde un SRS.
+- **Delta Feature**: Añade un módulo o workflow importante a una app existente.
+- **Light Edit**: Gestiona cambios pequeños de campos, texto, estilo o validación sin ejecutar todo el flujo de build.
+
+**Qué comprueba**:
+
+- Entradas visibles.
+- Rutas de usuario ejecutables.
+- Cambios de datos o estado.
+- Permisos de roles.
+- Verificación de build y preview.
+
+:::tip
+Si una primera construcción no tiene `specs/spec.md`, el agent lo creará primero con `app-srs`.
+:::
+
+## `align-platform-app`
+
+**Significado**: Skill de migración para alinear una app existente con el scaffold de la plataforma Tier0.
+
+```text
+Usa $align-platform-app para migrar este proyecto antiguo de Vite React al scaffold de la plataforma Tier0.
+```
+
+**Fuentes adecuadas**:
+
+- Apps Vite, CRA, Next.js, React Router, HTML estático y Node/React full-stack.
+- Apps antiguas de Tier0.
+- Apps que dependen de LocalStorage, IndexedDB, Zustand persist, mocks en memoria o datos simulados.
+
+**Qué hace**:
+
+- Alinea la app con el scaffold Tier0 TanStack Start.
+- Migra datos de negocio persistentes a Drizzle/PostgreSQL.
+- Alinea rutas, APIs, services y configuración de base de datos.
+- Elimina flujos de login, logout y cambio de roles propios de la app.
+- Conecta con identidad y roles gestionados por Gateway.
+- Conserva contratos de plataforma como `/api/health`, `/api/manifest` y `artifact.toml`.
+- Verifica preview y arranque en producción.
+
+## `migrate-node-red-app`
+
+**Significado**: Skill de migración de Node-RED para alinear una aplicación Node-RED con el scaffold de la plataforma Tier0. Normalmente se usa junto con `align-platform-app`.
+
+**Ejemplo**:
+
+```text
+Usa $align-platform-app y $migrate-node-red-app para migrar este backend Node-RED a una app Tier0 TanStack Start.
+```
+
+**Qué hace**:
+
+- Inventaría flows, subflows, function nodes, change nodes y switch nodes.
+- Analiza HTTP, MQTT, base de datos, tareas programadas y llamadas a APIs externas.
+- Crea una tabla de mapeo de migración.
+- Separa comportamiento CRUD, workflow, scheduling, integración y simulación temporal.
+- Mueve la lógica de negocio a services.
+- Mueve interfaces a API routes.
+- Mueve el estado a PostgreSQL.
+- Mueve trabajos largos e integraciones a workers, queues o servicios externos.
+- Verifica por separado browser, CRUD, workflow e integration cutover.
+
+:::caution
+No gestiona por sí sola problemas ordinarios de preview o empaquetado.
+:::
+
+## `ui-repair`
+
+**Significado**: Skill de reparación para apps existentes. Se usa para problemas de calidad de UI, no para generar apps por primera vez.
+
+**Ejemplo**:
+
+```text
+Usa $ui-repair para corregir overflow y desalineación de formulario en el diálogo de edición de órdenes en pantallas pequeñas.
+```
+
+**Problemas adecuados**:
+
+- Formularios o marcadores obligatorios desalineados.
+- Overflow en dialog o drawer.
+- Scroll horizontal accidental.
+- Menús select o dropdown recortados.
+- Layout roto en tablas o gráficos.
+- Páginas planas con jerarquía visual débil.
+- Idiomas mezclados en la UI.
+- Problemas de layout en PDA, kiosk, dashboards e interfaces industriales.
+
+:::caution
+La Skill debe localizar el componente responsable más pequeño y reparar la superficie afectada sin reconstruir toda la app. Para trabajo responsive complejo, usa `responsive-craft`.
+:::
+
+## `responsive-craft`
+
+**Significado**: Skill de layout responsive para auditorías, nuevas construcciones responsive y previews multi-breakpoint.
+
+**Modos de invocación**:
+
+- **audit**: Audita y repara un layout responsive existente.
+- **build**: Construye una página responsive desde cero.
+- **preview**: Inicia un preview en vivo multi-breakpoint.
+
+**Ejemplos**:
+
+```text
+Usa $responsive-craft audit para corregir el layout móvil de este dashboard.
+```
+
+```text
+Usa $responsive-craft build para crear un workspace de inventario para móvil, tablet y desktop.
+```
+
+```text
+Usa $responsive-craft preview para mostrar breakpoints de 375, 768, 1024 y 1440 px.
+```
+
+**Estilos de ejecución**:
+
+- **Adaptive**: Avanza rápido y confirma bifurcaciones de diseño cuando aparecen.
+- **Guided**: Escribe especificaciones de comportamiento responsive para cada componente antes de implementar.
+
+## `preview-runtime-stability`
+
+**Significado**: Skill de troubleshooting de runtime para fallos de preview durante el desarrollo de apps. No construye funcionalidades de negocio.
+
+**Ejemplo**:
+
+```text
+Usa $preview-runtime-stability para diagnosticar "Preview loading timed out".
+```
+
+**Problemas adecuados**:
+
+- `node_modules` faltantes o parciales.
+- npm `ERESOLVE`.
+- Fallos de arranque de Vite o TanStack Start.
+- Conflictos en el puerto `5173`.
+- Fallos de `/api/health`.
+- Errores de módulo SDK SSR.
+- Desajuste del puerto de preview en `artifact.toml`.
+- Recargas completas frecuentes durante HMR.
+- Procesos antiguos de Node o Vite que no salieron.
+
+**Flujo estándar**:
+
+1. Comprueba la instalación de dependencias.
+2. Comprueba el puerto `5173`.
+3. Prueba el health endpoint.
+4. Reutiliza el preview si está sano.
+5. Limpia el preview anterior si no está sano.
+6. Reinicia y verifica el puerto, el health endpoint y el comportamiento de HMR.
+
+## Guía de selección de Skills
+
+- Usa `app-srs` primero cuando el requisito no esté claro o necesites una especificación durable.
+- Usa `app-builder` cuando el alcance de implementación ya esté claro.
+- Usa `align-platform-app` y `migrate-node-red-app` para trabajos de migración.
+- Usa `ui-repair`, `responsive-craft` o `preview-runtime-stability` cuando la app ya exista y el problema sea visual, responsive o de runtime.

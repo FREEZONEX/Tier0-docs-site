@@ -14,6 +14,18 @@ const algoliaConfig = {
 export default defineConfig({
 	// Update if the docs are served elsewhere. Required by starlight-llms-txt.
 	site: 'https://docs.tier0.app',
+	vite: {
+		server: {
+			proxy: {
+				'/docsbot-chat': {
+					target: 'https://docsbot.tier0.app',
+					changeOrigin: true,
+					secure: true,
+					rewrite: (path) => path.replace(/^\/docsbot-chat/, '/chat'),
+				},
+			},
+		},
+	},
 	integrations: [
 		// Must come before starlight so it owns the mermaid code fences.
 		mermaid({
@@ -89,6 +101,11 @@ export default defineConfig({
 					collapsed: false,
 					items: [
 						{
+							label: 'Choosing the Best Product',
+							translations: { 'zh-CN': '选择合适的版本', ja: '最適なエディションの選択', es: 'Elegir la mejor versión', ko: '최적 버전 선택' },
+							slug: 'get-started/choosing-version',
+						},
+						{
 							label: 'Installation',
 							translations: { 'zh-CN': '安装', ja: 'インストール', es: 'Instalación', ko: '설치' },
 							slug: 'get-started/installation',
@@ -98,11 +115,7 @@ export default defineConfig({
 							translations: { 'zh-CN': '体验演示工厂', ja: 'デモファクトリーを試す', es: 'Prueba la fábrica demo', ko: '데모 팩토리 체험' },
 							slug: 'get-started/demo-factory',
 						},
-						{
-							label: 'Choosing the Best Version',
-							translations: { 'zh-CN': '选择合适的版本', ja: '最適なエディションの選択', es: 'Elegir la mejor versión', ko: '최적 버전 선택' },
-							slug: 'get-started/choosing-version',
-						},
+						
 					],
 				},
 				{
@@ -162,11 +175,11 @@ export default defineConfig({
 							translations: { 'zh-CN': '连接工业协议', ja: '産業プロトコルの接続', es: 'Conectar protocolos industriales', ko: '산업 프로토콜 연결' },
 							slug: 'best-practice/protocol-connections',
 						},
-						{
-							label: 'Building Shopfloor Workflow with Agent',
-							translations: { 'zh-CN': '用 Agent 构建车间工作流', ja: 'Agent で現場ワークフローを構築する', es: 'Crear flujos de planta con Agent', ko: 'Agent로 현장 워크플로 구축하기' },
-							slug: 'best-practice/building-data-workflow-with-agent',
-						},
+						// {
+						// 	label: 'Building Shopfloor Workflow with Agent',
+						// 	translations: { 'zh-CN': '用 Agent 构建车间工作流', ja: 'Agent で現場ワークフローを構築する', es: 'Crear flujos de planta con Agent', ko: 'Agent로 현장 워크플로 구축하기' },
+						// 	slug: 'best-practice/building-data-workflow-with-agent',
+						// },
 						{
 							label: 'Building Analytics Apps',
 							translations: { 'zh-CN': '构建分析应用', ja: '分析アプリの構築', es: 'Apps de analítica', ko: '분석 앱 구축' },
@@ -193,6 +206,11 @@ export default defineConfig({
 							label: 'CLI Command Reference',
 							translations: { 'zh-CN': 'CLI 命令参考', ja: 'CLI コマンドリファレンス', es: 'Referencia de comandos CLI', ko: 'CLI 명령 참조' },
 							slug: 'reference/skill-reference',
+						},
+						{
+							label: 'Embedded Builder Skills',
+							translations: { 'zh-CN': '内置 Builder Skills', ja: '組み込み Builder Skills', es: 'Skills integradas de Builder', ko: '내장 Builder Skills' },
+							slug: 'reference/embedded-builder-skills',
 						},
 						{
 							label: 'ISA-95 Equipment Hierarchy',

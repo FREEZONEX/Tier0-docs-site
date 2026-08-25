@@ -1,0 +1,1100 @@
+---
+import { Code } from '@astrojs/starlight/components';
+import cliReferenceData from '../../public/openapi/tier0-cli-reference.json';
+
+type CliFlag = {
+  name: string;
+  shorthand?: string | null;
+  type: string;
+  required: boolean;
+  repeatable: boolean;
+  default: string | number | boolean | null;
+  description: string;
+  deprecated?: boolean;
+  hidden?: boolean;
+};
+
+type CliCommand = {
+  command: string;
+  cobraUse: string;
+  description: string;
+  usage: string[];
+  aliases: string[];
+  flags: CliFlag[];
+  examples: string[];
+  notes: string[];
+};
+
+type CliGroup = {
+  id: string;
+  name: string;
+  commands: CliCommand[];
+};
+
+type CliReferenceData = {
+  schemaVersion: string;
+  title: string;
+  sourceOfTruth: {
+    cliRepository: string;
+    cliBranch: string;
+    commandMetadata: string;
+    skillRepository: string;
+    skillRole: string;
+  };
+  globalFlags: CliFlag[];
+  groups: CliGroup[];
+};
+
+const data =
+  cliReferenceData as CliReferenceData;
+
+const locale =
+  Astro.url.pathname.split('/')[1] ?? '';
+
+const textByLocale = {
+  'zh-cn': {
+    searchPlaceholder:
+      '搜索命令、参数或示例...',
+    globalFlags: '全局参数',
+    alias: '别名',
+    usage: '用法',
+    flags: '参数',
+    required: '必填',
+    repeatable: '可重复',
+    deprecated: '已弃用',
+    defaultValue: '默认值',
+    notes: '说明',
+    examples: '示例',
+    example: '示例',
+    empty: '没有匹配的 CLI 命令。',
+    commands: '个命令',
+    of: '/',
+  },
+  es: {
+    searchPlaceholder:
+      'Buscar comandos, opciones o ejemplos...',
+    globalFlags: 'Opciones globales',
+    alias: 'alias',
+    usage: 'Uso',
+    flags: 'Opciones',
+    required: 'obligatorio',
+    repeatable: 'repetible',
+    deprecated: 'obsoleto',
+    defaultValue: 'predeterminado',
+    notes: 'Notas',
+    examples: 'Ejemplos',
+    example: 'Ejemplo',
+    empty: 'No hay comandos CLI coincidentes.',
+    commands: 'comandos',
+    of: 'de',
+  },
+  ja: {
+    searchPlaceholder:
+      'コマンド、フラグ、例を検索...',
+    globalFlags: 'グローバルフラグ',
+    alias: 'エイリアス',
+    usage: '使用方法',
+    flags: 'フラグ',
+    required: '必須',
+    repeatable: '繰り返し可',
+    deprecated: '非推奨',
+    defaultValue: 'デフォルト',
+    notes: '注記',
+    examples: '例',
+    example: '例',
+    empty: '一致する CLI コマンドがありません。',
+    commands: '件のコマンド',
+    of: '/',
+  },
+  ko: {
+    searchPlaceholder:
+      '명령, 플래그 또는 예시 검색...',
+    globalFlags: '전역 플래그',
+    alias: '별칭',
+    usage: '사용법',
+    flags: '플래그',
+    required: '필수',
+    repeatable: '반복 가능',
+    deprecated: '지원 중단',
+    defaultValue: '기본값',
+    notes: '참고',
+    examples: '예시',
+    example: '예시',
+    empty: '일치하는 CLI 명령이 없습니다.',
+    commands: '개 명령',
+    of: '/',
+  },
+} as const;
+
+const text =
+  textByLocale[
+    locale as keyof typeof textByLocale
+  ] ?? {
+    searchPlaceholder:
+      'Search commands, flags, or examples...',
+    globalFlags: 'Global flags',
+    alias: 'alias',
+    usage: 'Usage',
+    flags: 'Flags',
+    required: 'required',
+    repeatable: 'repeatable',
+    deprecated: 'deprecated',
+    defaultValue: 'default',
+    notes: 'Notes',
+    examples: 'Examples',
+    example: 'Example',
+    empty: 'No matching CLI commands.',
+    commands: 'commands',
+    of: 'of',
+  };
+
+function flagName(flag: CliFlag): string {
+  if (flag.shorthand) {
+    return `${flag.shorthand}, ${flag.name}`;
+  }
+
+  return flag.name;
+}
+
+function formatDefault(flag: CliFlag): string | null {
+  if (
+    flag.default === null ||
+    flag.default === undefined ||
+    flag.default === ''
+  ) {
+    return null;
+  }
+
+  if (
+    flag.type === 'bool' &&
+    flag.default === false
+  ) {
+    return null;
+  }
+
+  return String(flag.default);
+}
+
+function commandSearchText(
+  command: CliCommand
+): string {
+  return [
+    command.command,
+    command.description,
+    ...(command.usage ?? []),
+    ...(command.aliases ?? []),
+    ...(command.examples ?? []),
+    ...(command.notes ?? []),
+    ...(command.flags ?? []).flatMap(
+      (flag: CliFlag) => [
+        flag.name,
+        flag.shorthand ?? '',
+        flag.description ?? '',
+      ]
+    ),
+  ]
+    .join(' ')
+    .toLowerCase();
+}
+---
+
+<div class="cli-reference not-content">
+  <div class="cli-intro">
+    <div class="cli-search-wrap">
+      <input
+        id="cli-search"
+        class="cli-search"
+        type="search"
+        placeholder={text.searchPlaceholder}
+        autocomplete="off"
+      />
+
+      <span
+        id="cli-result-count"
+        class="cli-result-count"
+      ></span>
+    </div>
+
+    {
+      data.globalFlags.length > 0 && (
+        <div class="global-flags">
+          <span class="global-flags-label">
+            {text.globalFlags}
+          </span>
+
+          <div class="global-flags-list">
+            {
+              data.globalFlags.map(
+                (flag: CliFlag) => (
+                  <span class="global-flag">
+                    <code>{flag.name}</code>
+                    <span>
+                      {flag.description}
+                    </span>
+                  </span>
+                )
+              )
+            }
+          </div>
+        </div>
+      )
+    }
+  </div>
+
+  <div id="cli-groups">
+    {
+      data.groups.map(
+        (group: CliGroup) => (
+          <section class="cli-group">
+            <h2>{group.name}</h2>
+
+            <div class="cli-command-list">
+              {
+                group.commands.map(
+                  (command: CliCommand) => (
+                    <details
+                      class="cli-item"
+                      data-search={commandSearchText(
+                        command
+                      )}
+                    >
+                      <summary>
+                        <code class="cli-command">
+                          {command.command}
+                        </code>
+
+                        <span class="cli-description">
+                          {command.description}
+                        </span>
+
+                        {
+                          command.aliases.length >
+                            0 && (
+                            <span class="cli-alias">
+                              {text.alias}:{' '}
+                              {command.aliases.join(
+                                ', '
+                              )}
+                            </span>
+                          )
+                        }
+                      </summary>
+
+                      <div class="cli-content">
+                        {
+                          command.usage.length >
+                            0 && (
+                            <section class="cli-detail">
+                              <h4>{text.usage}</h4>
+
+                              <div class="cli-code-list">
+                                {
+                                  command.usage.map(
+                                    (
+                                      usage: string
+                                    ) => (
+                                      <Code
+                                        code={usage}
+                                        lang="bash"
+                                      />
+                                    )
+                                  )
+                                }
+                              </div>
+                            </section>
+                          )
+                        }
+
+                        {
+                          command.flags.filter(
+                            (
+                              flag: CliFlag
+                            ) => !flag.hidden
+                          ).length > 0 && (
+                            <section class="cli-detail cli-flags">
+                              <h4>{text.flags}</h4>
+
+                              <dl>
+                                {
+                                  command.flags
+                                    .filter(
+                                      (
+                                        flag: CliFlag
+                                      ) =>
+                                        !flag.hidden
+                                    )
+                                    .map(
+                                      (
+                                        flag: CliFlag
+                                      ) => {
+                                        const defaultValue =
+                                          formatDefault(
+                                            flag
+                                          );
+
+                                        return (
+                                          <div class="cli-flag-row">
+                                            <dt>
+                                              <code>
+                                                {flagName(
+                                                  flag
+                                                )}
+                                              </code>
+                                            </dt>
+
+                                            <dd>
+                                              <span class="flag-description">
+                                                {
+                                                  flag.description
+                                                }
+                                              </span>
+
+                                              <span class="flag-meta">
+                                                {
+                                                  flag.required && (
+                                                    <span class="flag-required">
+                                                      {text.required}
+                                                    </span>
+                                                  )
+                                                }
+
+                                                {
+                                                  flag.repeatable && (
+                                                    <span>
+                                                      {text.repeatable}
+                                                    </span>
+                                                  )
+                                                }
+
+                                                {
+                                                  flag.deprecated && (
+                                                    <span class="flag-deprecated">
+                                                      {text.deprecated}
+                                                    </span>
+                                                  )
+                                                }
+
+                                                {
+                                                  defaultValue !==
+                                                    null && (
+                                                    <span>
+                                                      {text.defaultValue}:{' '}
+                                                      <code>
+                                                        {
+                                                          defaultValue
+                                                        }
+                                                      </code>
+                                                    </span>
+                                                  )
+                                                }
+                                              </span>
+                                            </dd>
+                                          </div>
+                                        );
+                                      }
+                                    )
+                                }
+                              </dl>
+                            </section>
+                          )
+                        }
+
+                        {
+                          command.notes.length >
+                            0 && (
+                            <section class="cli-detail cli-notes">
+                              <h4>{text.notes}</h4>
+
+                              <ul>
+                                {
+                                  command.notes.map(
+                                    (
+                                      note: string
+                                    ) => (
+                                      <li>
+                                        {note}
+                                      </li>
+                                    )
+                                  )
+                                }
+                              </ul>
+                            </section>
+                          )
+                        }
+
+                        {
+                          command.examples.length >
+                            0 && (
+                            <section class="cli-detail">
+                              <h4>
+                                {
+                                  command.examples
+                                    .length > 1
+                                    ? text.examples
+                                    : text.example
+                                }
+                              </h4>
+
+                              <div class="cli-code-list">
+                                {
+                                  command.examples.map(
+                                    (
+                                      example: string
+                                    ) => (
+                                      <Code
+                                        code={example}
+                                        lang="bash"
+                                      />
+                                    )
+                                  )
+                                }
+                              </div>
+                            </section>
+                          )
+                        }
+                      </div>
+                    </details>
+                  )
+                )
+              }
+            </div>
+          </section>
+        )
+      )
+    }
+  </div>
+
+  <div
+    id="cli-empty"
+    class="cli-empty"
+    hidden
+  >
+    {text.empty}
+  </div>
+</div>
+
+<script define:vars={{ countLabels: {
+  commands: text.commands,
+  of: text.of,
+} }}>
+  const searchInput =
+    document.querySelector<HTMLInputElement>(
+      '#cli-search'
+    );
+
+  const resultCount =
+    document.querySelector<HTMLSpanElement>(
+      '#cli-result-count'
+    );
+
+  const emptyState =
+    document.querySelector<HTMLDivElement>(
+      '#cli-empty'
+    );
+
+  const commandItems =
+    Array.from(
+      document.querySelectorAll<HTMLDetailsElement>(
+        '.cli-item'
+      )
+    );
+
+  const groups =
+    Array.from(
+      document.querySelectorAll<HTMLElement>(
+        '.cli-group'
+      )
+    );
+
+  function updateCount(): void {
+    const visible =
+      commandItems.filter(
+        (
+          item: HTMLDetailsElement
+        ) => !item.hidden
+      ).length;
+
+    const total =
+      commandItems.length;
+
+    if (resultCount) {
+      resultCount.textContent =
+        visible === total
+          ? `${total} ${countLabels.commands}`
+          : `${visible} ${countLabels.of} ${total} ${countLabels.commands}`;
+    }
+
+    if (emptyState) {
+      emptyState.hidden =
+        visible !== 0;
+    }
+  }
+
+  function filterCommands(
+    query: string
+  ): void {
+    const normalized =
+      query
+        .trim()
+        .toLowerCase();
+
+    commandItems.forEach(
+      (
+        item: HTMLDetailsElement
+      ) => {
+        const searchText =
+          item.dataset.search ?? '';
+
+        item.hidden =
+          normalized !== '' &&
+          !searchText.includes(
+            normalized
+          );
+      }
+    );
+
+    groups.forEach(
+      (group: HTMLElement) => {
+        const visibleCommands =
+          group.querySelectorAll(
+            '.cli-item:not([hidden])'
+          );
+
+        group.hidden =
+          visibleCommands.length === 0;
+      }
+    );
+
+    updateCount();
+  }
+
+  searchInput?.addEventListener(
+    'input',
+    (
+      event: Event
+    ) => {
+      const target =
+        event.currentTarget as HTMLInputElement;
+
+      filterCommands(
+        target.value
+      );
+    }
+  );
+
+  updateCount();
+</script>
+
+<style>
+  .cli-reference {
+    width: 100%;
+  }
+
+  .cli-intro {
+    margin-bottom: 2.5rem;
+  }
+
+  .cli-search-wrap {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+
+    margin-bottom: 0.9rem;
+  }
+
+  .cli-search {
+    flex: 1;
+
+    min-width: 0;
+
+    padding:
+      0.68rem
+      0.85rem;
+
+    border:
+      1px
+      solid
+      var(--sl-color-gray-5);
+
+    border-radius:
+      0.45rem;
+
+    background:
+      var(--sl-color-bg-nav);
+
+    color:
+      var(--sl-color-text);
+
+    font: inherit;
+  }
+
+  .cli-search:focus {
+    outline:
+      2px
+      solid
+      var(--sl-color-accent);
+
+    outline-offset:
+      1px;
+  }
+
+  .cli-result-count {
+    flex:
+      0
+      0
+      auto;
+
+    color:
+      var(--sl-color-gray-2);
+
+    font-size:
+      0.8rem;
+  }
+
+  .global-flags {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.8rem;
+
+    color:
+      var(--sl-color-gray-2);
+
+    font-size:
+      0.8rem;
+  }
+
+  .global-flags-label {
+    flex:
+      0
+      0
+      auto;
+
+    padding-top:
+      0.1rem;
+
+    font-weight:
+      600;
+  }
+
+  .global-flags-list {
+    display: flex;
+    flex-wrap: wrap;
+
+    gap:
+      0.35rem
+      1rem;
+  }
+
+  .global-flag {
+    display:
+      inline-flex;
+
+    align-items:
+      baseline;
+
+    gap:
+      0.4rem;
+  }
+
+  .global-flag code {
+    color:
+      var(--sl-color-text);
+  }
+
+  .cli-group + .cli-group {
+    margin-top:
+      2.8rem;
+  }
+
+  .cli-group > h2 {
+    margin:
+      0
+      0
+      0.85rem;
+  }
+
+  .cli-item {
+    border-top:
+      1px
+      solid
+      var(--sl-color-gray-5);
+  }
+
+  .cli-item:last-child {
+    border-bottom:
+      1px
+      solid
+      var(--sl-color-gray-5);
+  }
+
+  .cli-item[hidden],
+  .cli-group[hidden] {
+    display: none;
+  }
+
+  .cli-item summary {
+    display: flex;
+    align-items: center;
+
+    gap:
+      0.75rem;
+
+    min-height:
+      2.9rem;
+
+    padding:
+      0.75rem
+      0;
+
+    cursor:
+      pointer;
+
+    list-style:
+      none;
+  }
+
+  .cli-item summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .cli-item summary::before {
+    content: '›';
+
+    flex:
+      0
+      0
+      auto;
+
+    width:
+      0.8rem;
+
+    font-size:
+      1.15rem;
+
+    line-height:
+      1;
+
+    transform:
+      rotate(0deg);
+
+    transition:
+      transform
+      0.15s
+      ease;
+  }
+
+  .cli-item[open]
+    summary::before {
+    transform:
+      rotate(90deg);
+  }
+
+  .cli-command {
+    flex:
+      0
+      0
+      auto;
+
+    font-size:
+      0.86rem;
+
+    font-weight:
+      700;
+
+    white-space:
+      nowrap;
+  }
+
+  .cli-description {
+    min-width:
+      0;
+
+    color:
+      var(--sl-color-gray-2);
+
+    font-size:
+      0.86rem;
+
+    overflow:
+      hidden;
+
+    text-overflow:
+      ellipsis;
+
+    white-space:
+      nowrap;
+  }
+
+  .cli-alias {
+    margin-left:
+      auto;
+
+    color:
+      var(--sl-color-gray-3);
+
+    font-size:
+      0.72rem;
+
+    white-space:
+      nowrap;
+  }
+
+  .cli-content {
+    padding:
+      0.25rem
+      0
+      1.55rem
+      1.55rem;
+  }
+
+  .cli-detail {
+    margin: 0;
+  }
+
+  .cli-detail + .cli-detail {
+    margin-top:
+      1.25rem;
+  }
+
+  .cli-detail h4 {
+    margin:
+      0
+      0
+      0.45rem;
+
+    font-size:
+      0.82rem;
+
+    font-weight:
+      650;
+  }
+
+  .cli-code-list {
+    display: flex;
+    flex-direction:
+      column;
+
+    gap:
+      0.6rem;
+
+    max-width:
+      900px;
+  }
+
+  .cli-code-list
+    :global(.expressive-code) {
+    margin: 0;
+  }
+
+  .cli-flags {
+    max-width:
+      620px;
+  }
+
+  .cli-flags dl {
+    margin: 0;
+  }
+
+  .cli-flag-row {
+    display: grid;
+
+    grid-template-columns:
+      minmax(145px, 190px)
+      minmax(0, 1fr);
+
+    gap:
+      0.7rem;
+
+    padding:
+      0.28rem
+      0;
+  }
+
+  .cli-flag-row dt,
+  .cli-flag-row dd {
+    margin: 0;
+  }
+
+  .cli-flag-row dt code {
+    font-size:
+      0.8rem;
+
+    font-weight:
+      600;
+
+    white-space:
+      nowrap;
+  }
+
+  .cli-flag-row dd {
+    display: flex;
+
+    flex-direction:
+      column;
+
+    gap:
+      0.12rem;
+
+    min-width:
+      0;
+
+    color:
+      var(--sl-color-gray-2);
+
+    font-size:
+      0.79rem;
+
+    line-height:
+      1.35;
+  }
+
+  .flag-description {
+    max-width:
+      380px;
+  }
+
+  .flag-meta {
+    display: flex;
+    flex-wrap: wrap;
+
+    gap:
+      0.18rem
+      0.5rem;
+
+    color:
+      var(--sl-color-gray-3);
+
+    font-size:
+      0.69rem;
+  }
+
+  .flag-required {
+    color:
+      var(--sl-color-orange);
+  }
+
+  .flag-deprecated {
+    color:
+      var(--sl-color-red);
+  }
+
+  .flag-meta code {
+    font-size:
+      inherit;
+  }
+
+  .cli-notes {
+    max-width:
+      680px;
+  }
+
+  .cli-notes ul {
+    margin: 0;
+
+    padding-left:
+      1.1rem;
+
+    color:
+      var(--sl-color-gray-2);
+
+    font-size:
+      0.82rem;
+
+    line-height:
+      1.45;
+  }
+
+  .cli-notes li + li {
+    margin-top:
+      0.2rem;
+  }
+
+  .cli-empty {
+    padding:
+      2rem
+      0;
+
+    color:
+      var(--sl-color-gray-2);
+
+    text-align:
+      center;
+  }
+
+  @media (
+    max-width:
+      760px
+  ) {
+    .cli-search-wrap {
+      align-items:
+        stretch;
+
+      flex-direction:
+        column;
+
+      gap:
+        0.4rem;
+    }
+
+    .global-flags {
+      flex-direction:
+        column;
+
+      gap:
+        0.25rem;
+    }
+
+    .cli-item summary {
+      align-items:
+        flex-start;
+
+      flex-wrap:
+        wrap;
+    }
+
+    .cli-description {
+      flex-basis:
+        calc(
+          100% - 2.5rem
+        );
+
+      margin-left:
+        1.55rem;
+
+      white-space:
+        normal;
+    }
+
+    .cli-alias {
+      margin-left:
+        1.55rem;
+    }
+
+    .cli-content {
+      padding-left:
+        1.25rem;
+    }
+
+    .cli-flags {
+      max-width:
+        100%;
+    }
+
+    .cli-flag-row {
+      grid-template-columns:
+        1fr;
+
+      gap:
+        0.1rem;
+
+      padding:
+        0.4rem
+        0;
+    }
+
+    .flag-description {
+      max-width:
+        none;
+    }
+  }
+</style>

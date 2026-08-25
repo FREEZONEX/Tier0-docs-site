@@ -1,0 +1,194 @@
+---
+import {
+  siAnthropic,
+  siGoogle,
+  siCursor,
+  siGithubcopilot,
+} from 'simple-icons';
+
+type BrandAgent = {
+  name: string;
+  type: 'brand';
+  icon: {
+    path: string;
+  };
+};
+
+type FallbackAgent = {
+  name: string;
+  type: 'fallback';
+};
+
+type Agent =
+  | BrandAgent
+  | FallbackAgent;
+
+const agents: Agent[] = [
+  {
+    name: 'Claude Code',
+    type: 'brand',
+    icon: siAnthropic,
+  },
+  {
+    name: 'Codex',
+    type: 'fallback',
+  },
+  {
+    name: 'Gemini CLI',
+    type: 'brand',
+    icon: siGoogle,
+  },
+  {
+    name: 'Cursor',
+    type: 'brand',
+    icon: siCursor,
+  },
+  {
+    name: 'GitHub Copilot',
+    type: 'brand',
+    icon: siGithubcopilot,
+  },
+];
+
+const locale =
+  Astro.url.pathname.split('/')[1] ?? '';
+
+const introByLocale: Record<string, string> = {
+  'zh-cn': '使用你偏好的 AI agent 操作 Tier0。',
+  es: 'Trabaja en Tier0 con tu AI agent preferido.',
+  ja: '好みの AI agent で Tier0 を操作します。',
+  ko: '선호하는 AI agent로 Tier0를 운영하세요.',
+};
+
+const introText =
+  introByLocale[locale] ??
+  'Work on Tier0 with your preferred AI agent.';
+---
+
+<div class="agent-support not-content">
+  <div class="agent-intro">
+    <strong>
+      {introText}
+    </strong>
+
+  </div>
+
+  <div class="agent-list">
+    {
+      agents.map((agent: Agent) => (
+        <div class="agent-item">
+          {
+            agent.type === 'brand' ? (
+              <svg
+                class="agent-icon"
+                viewBox="0 0 24 24"
+                aria-hidden="true"
+              >
+                <path d={agent.icon.path} />
+              </svg>
+            ) : (
+              <svg
+                class="agent-icon"
+                viewBox="0 0 24 24"
+                aria-hidden="true"
+              >
+                <path
+                  d="M8 9l3 3-3 3M13 15h3M5 4h14a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2Z"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.8"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+              </svg>
+            )
+          }
+
+          <span>
+            {agent.name}
+          </span>
+        </div>
+      ))
+    }
+  </div>
+</div>
+
+<style>
+  .agent-support {
+    margin: 1.25rem 0 2.25rem;
+
+    padding: 1.15rem 1.25rem;
+
+    background:
+      var(--sl-color-gray-7);
+
+    border-radius: 0.7rem;
+  }
+
+  .agent-intro {
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+
+    gap: 0.35rem;
+
+    margin-bottom: 0.9rem;
+
+    font-size: 0.86rem;
+  }
+
+  .agent-intro strong {
+    font-weight: 650;
+  }
+
+  .agent-intro span {
+    color:
+      var(--sl-color-gray-2);
+  }
+
+  .agent-list {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+
+    gap: 0.7rem 1.4rem;
+  }
+
+  .agent-item {
+    display: inline-flex;
+    align-items: center;
+
+    gap: 0.42rem;
+
+    color:
+      var(--sl-color-gray-2);
+
+    font-size: 0.84rem;
+  }
+
+  .agent-icon {
+    width: 1.2rem;
+    height: 1.2rem;
+
+    flex: 0 0 auto;
+
+    fill: currentColor;
+  }
+
+  @media (max-width: 640px) {
+    .agent-support {
+      padding: 1rem;
+    }
+
+    .agent-intro {
+      flex-direction: column;
+      align-items: flex-start;
+
+      gap: 0.15rem;
+    }
+
+    .agent-list {
+      gap: 0.6rem 1rem;
+    }
+  }
+</style>

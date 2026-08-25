@@ -1,0 +1,202 @@
+---
+title: 内置 Builder Skills
+description: Tier0 Builder 内置 AI Skills 的参考。
+sidebar:
+  order: 3
+---
+
+Tier0 App Builder 当前包含 7 个 active 的内置 AI Skills。这些 Skills 帮助 agent 将需求转化为工业应用、对齐 Tier0 平台脚手架、修复 UI 问题，并保持预览环境稳定。
+
+## `app-srs`
+
+**含义**：新建工业企业应用的需求分析入口。适用于 WMS、MES、ERP、CRM、QMS、EAM、审批、库存、供应商、客户、排程等企业工作流。
+
+**示例**：
+
+```text
+使用 $app-srs 为汽车零部件工厂设计一个质量异常管理系统。
+```
+
+也可以用自然语言触发：
+
+```text
+生成一个仓库管理应用，包含收货、上架、拣货、发货和库存盘点。
+```
+
+**它会做什么**：
+
+1. 分析业务角色、工作流、状态和异常。
+2. 检查需求是否足够清晰。
+3. 生成完整 SRS。
+4. 默认保存到 `specs/spec.md`。
+5. 除非用户只要求写需求，否则默认把结果交给 `app-builder`。
+
+## `app-builder`
+
+**含义**：实际构建应用的核心 Skill。
+
+**示例**：
+
+```text
+使用 $app-builder 根据 specs/spec.md 构建第一版应用。
+```
+
+**内部工作类型**：agent 会根据 prompt 和当前项目状态决定使用哪种工作类型。
+
+- **First Release**：根据 SRS 构建首版应用。
+- **Delta Feature**：为已有应用增加较大的模块或工作流。
+- **Light Edit**：处理小字段、文案、样式或校验调整，不运行完整构建流程。
+
+**它会检查什么**：
+
+- 可见入口。
+- 可执行的用户路径。
+- 数据或状态变化。
+- 角色权限。
+- 构建和预览验证。
+
+:::tip
+如果首次构建时没有 `specs/spec.md`，agent 会先用 `app-srs` 创建一个。
+:::
+
+## `align-platform-app`
+
+**含义**：用于将已有应用对齐到 Tier0 平台脚手架的迁移 Skill。
+
+```text
+使用 $align-platform-app 将这个旧 Vite React 项目迁移到 Tier0 平台脚手架。
+```
+
+**适用来源**：
+
+- Vite、CRA、Next.js、React Router、静态 HTML 和全栈 Node/React 应用。
+- 旧版 Tier0 应用。
+- 依赖 LocalStorage、IndexedDB、Zustand persist、内存 mock 或模拟数据的应用。
+
+**它会做什么**：
+
+- 对齐 Tier0 TanStack Start 脚手架。
+- 将持久业务数据迁移到 Drizzle/PostgreSQL。
+- 对齐路由、API、service 和数据库设置。
+- 移除应用自己实现的登录、退出和角色切换流程。
+- 接入 Gateway 管理的身份和角色。
+- 保留 `/api/health`、`/api/manifest` 和 `artifact.toml` 等平台契约。
+- 验证 preview 和生产启动。
+
+## `migrate-node-red-app`
+
+**含义**：用于将 Node-RED 应用对齐到 Tier0 平台脚手架的迁移 Skill，通常与 `align-platform-app` 一起使用。
+
+**示例**：
+
+```text
+使用 $align-platform-app 和 $migrate-node-red-app 将这个 Node-RED 后端迁移成 Tier0 TanStack Start 应用。
+```
+
+**它会做什么**：
+
+- 盘点 flow、subflow、function node、change node 和 switch node。
+- 分析 HTTP、MQTT、数据库、定时任务和外部 API 调用。
+- 建立迁移映射表。
+- 区分 CRUD、工作流、调度、集成和临时模拟行为。
+- 将业务逻辑迁移到 services。
+- 将接口迁移到 API routes。
+- 将状态迁移到 PostgreSQL。
+- 将长任务和集成迁移到 workers、queues 或外部服务。
+- 分别验证浏览器、CRUD、工作流和集成切换。
+
+:::caution
+它不会单独处理普通 preview 或打包问题。
+:::
+
+## `ui-repair`
+
+**含义**：用于已有应用的修复 Skill。它处理 UI 质量问题，不用于首次生成应用。
+
+**示例**：
+
+```text
+使用 $ui-repair 修复订单编辑弹窗在小屏幕上的溢出和表单错位。
+```
+
+**适合的问题**：
+
+- 表单或必填标记错位。
+- Dialog 或 drawer 溢出。
+- 意外的横向滚动。
+- Select 菜单或下拉菜单被裁剪。
+- 表格或图表布局异常。
+- 页面层级弱、视觉过平。
+- UI 语言混杂。
+- PDA、kiosk、看板和工业界面布局问题。
+
+:::caution
+该 Skill 应定位最小责任组件并修复受影响的界面，不应重建整个应用。复杂响应式问题请使用 `responsive-craft`。
+:::
+
+## `responsive-craft`
+
+**含义**：用于响应式布局审计、新建响应式页面和多断点预览的 Skill。
+
+**调用模式**：
+
+- **audit**：审计并修复已有响应式布局。
+- **build**：从零构建响应式页面。
+- **preview**：启动多断点实时预览。
+
+**示例**：
+
+```text
+使用 $responsive-craft audit 修复这个 dashboard 的移动端布局。
+```
+
+```text
+使用 $responsive-craft build 创建一个适配手机、平板和桌面的库存工作台。
+```
+
+```text
+使用 $responsive-craft preview 展示 375、768、1024 和 1440 px 断点。
+```
+
+**执行方式**：
+
+- **Adaptive**：快速推进，并在出现设计分叉时确认。
+- **Guided**：先为每个组件编写响应式行为规格，再实现。
+
+## `preview-runtime-stability`
+
+**含义**：用于应用开发过程中 preview 失败的运行时排障 Skill。它不构建业务功能。
+
+**示例**：
+
+```text
+使用 $preview-runtime-stability 诊断 "Preview loading timed out"。
+```
+
+**适合的问题**：
+
+- `node_modules` 缺失或安装不完整。
+- npm `ERESOLVE`。
+- Vite 或 TanStack Start 启动失败。
+- 端口 `5173` 冲突。
+- `/api/health` 失败。
+- SDK SSR 模块错误。
+- `artifact.toml` preview 端口不一致。
+- HMR 期间频繁整页刷新。
+- 旧 Node 或 Vite 进程未退出。
+
+**标准流程**：
+
+1. 检查依赖安装。
+2. 检查端口 `5173`。
+3. 探测健康接口。
+4. preview 健康时复用。
+5. preview 不健康时清理旧 preview。
+6. 重启并验证端口、健康接口和 HMR 行为。
+
+## Skill 选择指南
+
+- 需求不清晰或需要稳定规格文档时，先使用 `app-srs`。
+- 实现范围已经清楚时，使用 `app-builder`。
+- 迁移工作使用 `align-platform-app` 和 `migrate-node-red-app`。
+- 应用已存在且问题属于视觉、响应式或运行时问题时，使用 `ui-repair`、`responsive-craft` 或 `preview-runtime-stability`。

@@ -1,0 +1,202 @@
+---
+title: 組み込み Builder Skills
+description: Tier0 Builder に組み込まれた AI Skills のリファレンス。
+sidebar:
+  order: 3
+---
+
+Tier0 App Builder には現在、7 個の active な組み込み AI Skills があります。これらの Skills は、agent が要件を産業アプリケーションに変換し、Tier0 platform scaffold に合わせ、UI の問題を修復し、preview 環境を安定させるために使われます。
+
+## `app-srs`
+
+**意味**：新しい産業向け enterprise app の requirements analysis entry point です。WMS、MES、ERP、CRM、QMS、EAM、承認、在庫、サプライヤー、顧客、スケジューリングなどの enterprise workflow に使用します。
+
+**例**：
+
+```text
+$app-srs を使用して、自動車部品工場向けの品質異常管理システムを設計してください。
+```
+
+自然言語でも起動できます：
+
+```text
+入荷、棚入れ、ピッキング、出荷、棚卸しを含む倉庫管理アプリを生成してください。
+```
+
+**実行内容**：
+
+1. 業務ロール、workflow、状態、例外を分析します。
+2. 要件が十分に明確か確認します。
+3. 完全な SRS を生成します。
+4. デフォルトで `specs/spec.md` に保存します。
+5. ユーザーが要件のみを求めない限り、結果を `app-builder` に渡します。
+
+## `app-builder`
+
+**意味**：アプリケーションを実際に構築する core skill です。
+
+**例**：
+
+```text
+$app-builder を使用して specs/spec.md から最初のバージョンを構築してください。
+```
+
+**内部作業タイプ**：agent は prompt と現在の project state に基づいて使用する work type を決定します。
+
+- **First Release**：SRS から最初のバージョンを構築します。
+- **Delta Feature**：既存アプリに大きな module または workflow を追加します。
+- **Light Edit**：小さな field、copy、style、validation の変更を、完全な build flow なしで処理します。
+
+**確認項目**：
+
+- 見える入口。
+- 実行可能なユーザーパス。
+- データまたは状態の変化。
+- ロール権限。
+- build と preview の検証。
+
+:::tip
+初回 build で `specs/spec.md` がない場合、agent は先に `app-srs` で作成します。
+:::
+
+## `align-platform-app`
+
+**意味**：既存アプリを Tier0 platform scaffold に合わせるための migration skill です。
+
+```text
+$align-platform-app を使用して、この古い Vite React project を Tier0 platform scaffold に移行してください。
+```
+
+**適用できる source**：
+
+- Vite、CRA、Next.js、React Router、static HTML、full-stack Node/React apps。
+- 旧 Tier0 apps。
+- LocalStorage、IndexedDB、Zustand persist、in-memory mocks、simulated data に依存する apps。
+
+**実行内容**：
+
+- Tier0 TanStack Start scaffold に合わせます。
+- 永続的な業務データを Drizzle/PostgreSQL に移行します。
+- routes、APIs、services、database setup を合わせます。
+- app 独自の login、logout、role switching flow を削除します。
+- Gateway が管理する identity と roles に接続します。
+- `/api/health`、`/api/manifest`、`artifact.toml` などの platform contracts を保持します。
+- preview と production startup を検証します。
+
+## `migrate-node-red-app`
+
+**意味**：Node-RED application を Tier0 platform scaffold に合わせるための migration skill です。通常は `align-platform-app` と一緒に使います。
+
+**例**：
+
+```text
+$align-platform-app と $migrate-node-red-app を使用して、この Node-RED backend を Tier0 TanStack Start app に移行してください。
+```
+
+**実行内容**：
+
+- flows、subflows、function nodes、change nodes、switch nodes を棚卸しします。
+- HTTP、MQTT、database、scheduled jobs、external API calls を分析します。
+- migration mapping table を作成します。
+- CRUD、workflow、scheduling、integration、一時的な simulation behavior を分離します。
+- business logic を services に移します。
+- interfaces を API routes に移します。
+- state を PostgreSQL に移します。
+- long-running work と integrations を workers、queues、または external services に移します。
+- browser、CRUD、workflow、integration cutover を個別に検証します。
+
+:::caution
+通常の preview や packaging の問題は単独では扱いません。
+:::
+
+## `ui-repair`
+
+**意味**：既存アプリ向けの repair skill です。初回 app generation ではなく、UI quality issues に使います。
+
+**例**：
+
+```text
+$ui-repair を使用して、小さい画面での注文編集 dialog の overflow と form misalignment を修正してください。
+```
+
+**適した問題**：
+
+- form や required marker のずれ。
+- dialog または drawer の overflow。
+- 予期しない horizontal scrolling。
+- select menu または dropdown の clipping。
+- table または chart layout の崩れ。
+- visual hierarchy が弱い flat page。
+- UI language の混在。
+- PDA、kiosk、dashboard、industrial interface layout の問題。
+
+:::caution
+この Skill は最小の owning component を特定し、該当 surface を修復します。app 全体を作り直すものではありません。複雑な responsive work には `responsive-craft` を使ってください。
+:::
+
+## `responsive-craft`
+
+**意味**：responsive layout の audit、新規 responsive build、multi-breakpoint preview のための skill です。
+
+**呼び出しモード**：
+
+- **audit**：既存の responsive layout を audit して修復します。
+- **build**：responsive page をゼロから構築します。
+- **preview**：multi-breakpoint live preview を開始します。
+
+**例**：
+
+```text
+$responsive-craft audit を使用して、この dashboard の mobile layout を修正してください。
+```
+
+```text
+$responsive-craft build を使用して、phone、tablet、desktop に対応する inventory workspace を作成してください。
+```
+
+```text
+$responsive-craft preview を使用して、375、768、1024、1440 px の breakpoints を表示してください。
+```
+
+**実行スタイル**：
+
+- **Adaptive**：すばやく進め、design fork が出た時点で確認します。
+- **Guided**：実装前に各 component の responsive behavior spec を書きます。
+
+## `preview-runtime-stability`
+
+**意味**：app development 中の preview failure を診断する runtime troubleshooting skill です。business feature は構築しません。
+
+**例**：
+
+```text
+$preview-runtime-stability を使用して "Preview loading timed out" を診断してください。
+```
+
+**適した問題**：
+
+- `node_modules` の欠落または不完全な install。
+- npm `ERESOLVE`。
+- Vite または TanStack Start の startup failure。
+- port `5173` conflict。
+- `/api/health` failure。
+- SDK SSR module error。
+- `artifact.toml` preview port mismatch。
+- HMR 中の frequent full-page reload。
+- stale Node または Vite process が終了していない。
+
+**標準フロー**：
+
+1. dependency installation を確認します。
+2. port `5173` を確認します。
+3. health endpoint を probe します。
+4. preview が healthy なら再利用します。
+5. unhealthy なら old preview を cleanup します。
+6. restart して port、health endpoint、HMR behavior を検証します。
+
+## Skill 選択ガイド
+
+- 要件が不明確、または durable specification が必要な場合は、まず `app-srs` を使います。
+- implementation scope が明確な場合は `app-builder` を使います。
+- migration work には `align-platform-app` と `migrate-node-red-app` を使います。
+- 既存 app の visual、responsive、runtime 問題には `ui-repair`、`responsive-craft`、`preview-runtime-stability` を使います。

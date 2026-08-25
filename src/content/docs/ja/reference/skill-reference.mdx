@@ -1,33 +1,10 @@
 ---
-title: Skill Reference
-description: CLI と agent skill の command reference。
+title: CLI コマンドリファレンス
+description: CLI と Agent Skill のコマンドリファレンス。
 sidebar:
   order: 2
 ---
 
-このページは documentation に含まれ、PDF 出力にも含まれます。単独の Web reference としてもここから開けます。
+import CliReference from '../../../../components/CliReference.astro';
 
-[Tier0 Skill Reference を開く](../skill-reference/)
-
-## コマンド
-
-| 対象 | タスク | コマンド |
-|---|---|---|
-| 基本操作 | CLI と service health を確認 | `tier0 doctor` |
-| 基本操作 | service connectivity と gateway info を確認 | `tier0 api /openapi/v1/info --body '{}' --json` |
-| 基本操作 | CLI と skills を upgrade | `tier0 upgrade` と `tier0 skills update` |
-| UNS | path を参照 | `tier0 uns browse --path /` または `tier0 uns browse --path Plant/Line1 --json` |
-| UNS | keyword で topic を検索 | `tier0 uns search --keyword temp --json` または `tier0 uns search --path-prefix Plant/Line1 --size 50 --json` |
-| UNS | current values を読む | `tier0 uns read Plant/Line1/Metric/Temperature --json` または `tier0 uns read --topic 'Plant/+/Metric/Temperature' --json` |
-| UNS | values を書き込む | `tier0 uns write --topic Plant/Line1/Metric/Temperature --value '{"temperature":27.5}'` |
-| UNS | history を query | `tier0 uns history -t Plant/Line1/Metric/Temperature --start -1h --json` |
-| UNS | paths または topics を作成 | `tier0 uns create --topic Plant/Line1 --type path` または `tier0 uns create --file namespace.json --json` |
-| UNS | metadata または fields を更新 | `tier0 uns update --path Plant/Line1/Metric/Temperature --description "Line 1 temperature" --update-mask description` |
-| UNS | nodes を削除または restore | `tier0 uns delete --path Plant/Line1/Metric/Temperature --yes` または `tier0 uns restore --path Plant/Line1/Metric/Temperature --yes` |
-| Node-RED Flow | Flows を list または inspect | `tier0 flow list`, `tier0 flow list --source --json`, または `tier0 flow get --id 1 --json` |
-| Node-RED Flow | Source Flow または Event Flow を作成 | `tier0 flow create --name "modbus-collector" --source --desc "Modbus TCP collector"` または `tier0 flow create --name "alert-handler" --event --desc "Temperature alarm processor"` |
-| Node-RED Flow | Flow metadata を更新 | `tier0 flow update --id 1 --name "line1-collector"` または `tier0 flow update --id 1 --favorite` |
-| Node-RED Flow | canvas JSON を export | `tier0 flow data --id 1 --out flows.json` |
-| Node-RED Flow | canvas JSON を deploy | `tier0 flow deploy --id 1 -f flows.json --yes` |
-| Node-RED Flow | Flows を削除 | `tier0 flow delete --id 1 --yes` |
-| Node-RED Flow | available node types を確認 | `tier0 flow nodes --source --json` または `tier0 flow nodes --event --json` |
+<CliReference />

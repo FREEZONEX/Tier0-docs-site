@@ -38,7 +38,7 @@ Tier0 には 3 つのエディションがあります。
 	- Ubuntu 24.04、または Docker と Git をインストールした Windows 10/11
 	#### 操作
 	<Steps>
-	1. GitHub から Tier0-Edge リポジトリをクローンし、プロジェクトに移動します。
+	1. GitHub から Tier0-Edge リポジトリをサーバーにクローンし、プロジェクトに移動します。
 
 		```bash
 		git clone https://github.com/FREEZONEX/Tier0-Edge
@@ -51,24 +51,34 @@ Tier0 には 3 つのエディションがあります。
 		vi .env.default
 		:wq!
 		```
-	3. インストールスクリプトを実行します。
+		:::note[設定が必要なパラメータ]
+
+		| フィールド | 型 | 説明 | 例 |
+		|------|------|------|------|
+		| VOLUMES_PATH | string | プロジェクトデータの保存パス | Linux では `/srv/tier0/data`、Windows Bash では `D:/tier0/data` または `/d/tier0/data` |
+		| ENTRANCE_DOMAIN/ENTRANCE_PORT | string | Tier0 のアクセスエンドポイント（IP/ドメイン + ポート） | `192.168.1.10` / `8088` |
+		| LANGUAGE | enum | zh-CN / en-US | `en-US` |
+		| ADMIN_INIT_PASSWORD | string | 管理者ユーザーの初期パスワード | 強力な非公開パスワード |
+		| COMPOSE_PROJECT_NAME/PORT_OFFSET | string | 同じホスト上で実行する複数インスタンスを分離 | `edge_lab` / `100` |
+
+		:::
+	3. インストールスクリプトを実行し、インストール状態を確認します。
 
 		```bash
 		bash bin/install.sh
+		bash bin/compose.sh ps # コンテナの状態を確認
+		bash bin/compose.sh logs -f backend # backend コンテナのログを確認
+		curl -fsS http://127.0.0.1:8088/readyz # backend サービスの readiness を確認
 		```
 
+		:::caution
+		`deploy/.env.runtime` は編集しないでください。生成済みの secrets と解決済み runtime 値が含まれます。
+		:::
+	4. 設定した endpoint とデフォルト管理者アカウントで Tier0 にアクセスします。
+		- Username: `tier0`
+		- Password: `.env.default` の `ADMIN_INIT_PASSWORD` の値。未設定の場合は `tier0`。
+
 	</Steps>
-
-:::note[設定が必要なパラメータ]
-
-| フィールド | 型 | 説明 |
-|------|------|-------------|
-| VOLUMES_PATH | string | プロジェクトデータの保存パス |
-| ENTRANCE_DOMAIN/ENTRANCE_PORT | string | Tier0 のアクセスエンドポイント（IP/ドメイン + ポート） |
-| OS_PLATFORM_TYPE | enum | Tier0 をインストールする OS。**linux** または **windows** |
-| LANGUAGE | enum | zh-CN / en-US |
-
-:::
 		
 
 	</TabItem>

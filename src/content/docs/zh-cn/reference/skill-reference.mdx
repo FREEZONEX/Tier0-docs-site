@@ -5,23 +5,6 @@ sidebar:
   order: 2
 ---
 
-| 对象 | 任务 | 命令 |
-|---|---|---|
-| 基础操作 | 检查 CLI 和服务健康状态 | `tier0 doctor` |
-| 基础操作 | 检查服务连接性和 gateway 信息 | `tier0 api /openapi/v1/info --body '{}' --json` |
-| 基础操作 | 升级 CLI 和 skills | `tier0 upgrade` 和 `tier0 skills update` |
-| UNS | 浏览路径 | `tier0 uns browse --path /` 或 `tier0 uns browse --path Plant/Line1 --json` |
-| UNS | 按关键词搜索 topic | `tier0 uns search --keyword temp --json` 或 `tier0 uns search --path-prefix Plant/Line1 --size 50 --json` |
-| UNS | 读取当前值 | `tier0 uns read Plant/Line1/Metric/Temperature --json` 或 `tier0 uns read --topic 'Plant/+/Metric/Temperature' --json` |
-| UNS | 写入值 | `tier0 uns write --topic Plant/Line1/Metric/Temperature --value '{"temperature":27.5}'` |
-| UNS | 查询历史 | `tier0 uns history -t Plant/Line1/Metric/Temperature --start -1h --json` |
-| UNS | 创建 path 或 topic | `tier0 uns create --topic Plant/Line1 --type path` 或 `tier0 uns create --file namespace.json --json` |
-| UNS | 更新元数据或字段 | `tier0 uns update --path Plant/Line1/Metric/Temperature --description "Line 1 temperature" --update-mask description` |
-| UNS | 删除或恢复节点 | `tier0 uns delete --path Plant/Line1/Metric/Temperature --yes` 或 `tier0 uns restore --path Plant/Line1/Metric/Temperature --yes` |
-| Node-RED Flow | 列出或查看 Flow 详情 | `tier0 flow list`、`tier0 flow list --source --json` 或 `tier0 flow get --id 1 --json` |
-| Node-RED Flow | 创建数据连接或事件流程 | `tier0 flow create --name "modbus-collector" --source --desc "Modbus TCP collector"` 或 `tier0 flow create --name "alert-handler" --event --desc "Temperature alarm processor"` |
-| Node-RED Flow | 更新 Flow 元数据 | `tier0 flow update --id 1 --name "line1-collector"` 或 `tier0 flow update --id 1 --favorite` |
-| Node-RED Flow | 导出 canvas JSON | `tier0 flow data --id 1 --out flows.json` |
-| Node-RED Flow | 部署 canvas JSON | `tier0 flow deploy --id 1 -f flows.json --yes` |
-| Node-RED Flow | 删除 Flow | `tier0 flow delete --id 1 --yes` |
-| Node-RED Flow | 检查可用节点类型 | `tier0 flow nodes --source --json` 或 `tier0 flow nodes --event --json` |
+import CliReference from '../../../../components/CliReference.astro';
+
+<CliReference />

@@ -1,0 +1,202 @@
+---
+title: 내장 Builder Skills
+description: Tier0 Builder에 내장된 AI Skills 참조입니다.
+sidebar:
+  order: 3
+---
+
+Tier0 App Builder에는 현재 7개의 active 내장 AI Skills가 포함되어 있습니다. 이 Skills는 agent가 요구사항을 산업용 애플리케이션으로 전환하고, 애플리케이션을 Tier0 platform scaffold에 맞추며, UI 문제를 복구하고, preview 환경을 안정적으로 유지하도록 돕습니다.
+
+## `app-srs`
+
+**의미**: 새로운 산업용 enterprise app의 requirements analysis entry point입니다. WMS, MES, ERP, CRM, QMS, EAM, 승인, 재고, 공급업체, 고객, 스케줄링 및 유사한 enterprise workflow에 사용합니다.
+
+**예시**:
+
+```text
+$app-srs를 사용해 자동차 부품 공장을 위한 품질 예외 관리 시스템을 설계해 주세요.
+```
+
+자연어로도 트리거할 수 있습니다:
+
+```text
+입고, 적치, 피킹, 출고, 재고 실사를 포함한 창고 관리 앱을 생성해 주세요.
+```
+
+**수행 작업**:
+
+1. 비즈니스 역할, workflow, 상태, 예외를 분석합니다.
+2. 요구사항이 충분히 명확한지 확인합니다.
+3. 완전한 SRS를 생성합니다.
+4. 기본적으로 `specs/spec.md`에 저장합니다.
+5. 사용자가 요구사항만 요청하지 않는 한 기본적으로 결과를 `app-builder`에 전달합니다.
+
+## `app-builder`
+
+**의미**: 실제로 앱을 구축하는 핵심 Skill입니다.
+
+**예시**:
+
+```text
+$app-builder를 사용해 specs/spec.md에서 첫 번째 버전을 구축해 주세요.
+```
+
+**내부 작업 유형**: agent는 prompt와 현재 project state를 기준으로 사용할 work type을 결정합니다.
+
+- **First Release**: SRS에서 첫 번째 버전을 구축합니다.
+- **Delta Feature**: 기존 앱에 큰 module 또는 workflow를 추가합니다.
+- **Light Edit**: 전체 build flow를 실행하지 않고 작은 field, copy, style, validation 변경을 처리합니다.
+
+**확인 항목**:
+
+- 보이는 진입점.
+- 실행 가능한 사용자 경로.
+- 데이터 또는 상태 변화.
+- 역할 권한.
+- build 및 preview 검증.
+
+:::tip
+첫 build에 `specs/spec.md`가 없으면 agent가 먼저 `app-srs`로 생성합니다.
+:::
+
+## `align-platform-app`
+
+**의미**: 기존 앱을 Tier0 platform scaffold에 맞추는 migration skill입니다.
+
+```text
+$align-platform-app를 사용해 이 오래된 Vite React project를 Tier0 platform scaffold로 마이그레이션해 주세요.
+```
+
+**적합한 source**:
+
+- Vite, CRA, Next.js, React Router, static HTML, full-stack Node/React apps.
+- 이전 Tier0 apps.
+- LocalStorage, IndexedDB, Zustand persist, in-memory mocks, simulated data에 의존하는 apps.
+
+**수행 작업**:
+
+- 앱을 Tier0 TanStack Start scaffold에 맞춥니다.
+- 영속 비즈니스 데이터를 Drizzle/PostgreSQL로 마이그레이션합니다.
+- routes, APIs, services, database setup을 정렬합니다.
+- 앱 자체 login, logout, role-switching flows를 제거합니다.
+- Gateway가 관리하는 identity와 roles에 연결합니다.
+- `/api/health`, `/api/manifest`, `artifact.toml` 같은 platform contracts를 유지합니다.
+- preview 및 production startup을 검증합니다.
+
+## `migrate-node-red-app`
+
+**의미**: Node-RED application을 Tier0 platform scaffold에 맞추는 Node-RED migration skill입니다. 보통 `align-platform-app`와 함께 사용합니다.
+
+**예시**:
+
+```text
+$align-platform-app와 $migrate-node-red-app를 사용해 이 Node-RED backend를 Tier0 TanStack Start app으로 마이그레이션해 주세요.
+```
+
+**수행 작업**:
+
+- flows, subflows, function nodes, change nodes, switch nodes를 인벤토리화합니다.
+- HTTP, MQTT, database, scheduled jobs, external API calls를 분석합니다.
+- migration mapping table을 만듭니다.
+- CRUD, workflow, scheduling, integration, temporary simulation behavior를 분리합니다.
+- business logic을 services로 옮깁니다.
+- interfaces를 API routes로 옮깁니다.
+- state를 PostgreSQL로 옮깁니다.
+- long-running work와 integrations를 workers, queues 또는 external services로 옮깁니다.
+- browser, CRUD, workflow, integration cutover를 별도로 검증합니다.
+
+:::caution
+일반적인 preview 또는 packaging 문제는 단독으로 처리하지 않습니다.
+:::
+
+## `ui-repair`
+
+**의미**: 기존 앱을 위한 repair skill입니다. 최초 app generation이 아니라 UI quality issues에 사용합니다.
+
+**예시**:
+
+```text
+$ui-repair를 사용해 작은 화면에서 주문 편집 dialog의 overflow와 form misalignment를 수정해 주세요.
+```
+
+**적합한 문제**:
+
+- form 또는 required marker 정렬 불량.
+- dialog 또는 drawer overflow.
+- 의도하지 않은 horizontal scrolling.
+- select menu 또는 dropdown clipping.
+- table 또는 chart layout 깨짐.
+- visual hierarchy가 약한 flat page.
+- UI language 혼재.
+- PDA, kiosk, dashboard, industrial interface layout 문제.
+
+:::caution
+이 Skill은 가장 작은 owning component를 찾고 영향을 받은 surface를 수정해야 하며, 전체 앱을 다시 구축하지 않습니다. 복잡한 responsive work에는 `responsive-craft`를 사용하세요.
+:::
+
+## `responsive-craft`
+
+**의미**: responsive layout audit, 신규 responsive build, multi-breakpoint preview를 위한 skill입니다.
+
+**호출 모드**:
+
+- **audit**: 기존 responsive layout을 audit하고 복구합니다.
+- **build**: responsive page를 처음부터 구축합니다.
+- **preview**: multi-breakpoint live preview를 시작합니다.
+
+**예시**:
+
+```text
+$responsive-craft audit를 사용해 이 dashboard의 mobile layout을 수정해 주세요.
+```
+
+```text
+$responsive-craft build를 사용해 phone, tablet, desktop용 inventory workspace를 만들어 주세요.
+```
+
+```text
+$responsive-craft preview를 사용해 375, 768, 1024, 1440 px breakpoints를 표시해 주세요.
+```
+
+**실행 스타일**:
+
+- **Adaptive**: 빠르게 진행하고 design fork가 나타나면 확인합니다.
+- **Guided**: 구현 전에 각 component의 responsive behavior spec을 작성합니다.
+
+## `preview-runtime-stability`
+
+**의미**: app development 중 preview failure를 해결하기 위한 runtime troubleshooting skill입니다. business feature를 구축하지 않습니다.
+
+**예시**:
+
+```text
+$preview-runtime-stability를 사용해 "Preview loading timed out"을 진단해 주세요.
+```
+
+**적합한 문제**:
+
+- 누락되었거나 부분적인 `node_modules`.
+- npm `ERESOLVE`.
+- Vite 또는 TanStack Start startup failures.
+- port `5173` 충돌.
+- `/api/health` 실패.
+- SDK SSR module errors.
+- `artifact.toml` preview port mismatch.
+- HMR 중 frequent full-page reloads.
+- 종료되지 않은 stale Node 또는 Vite processes.
+
+**표준 흐름**:
+
+1. dependency installation을 확인합니다.
+2. port `5173`을 확인합니다.
+3. health endpoint를 probe합니다.
+4. healthy preview는 재사용합니다.
+5. unhealthy preview는 정리합니다.
+6. restart 후 port, health endpoint, HMR behavior를 검증합니다.
+
+## Skill 선택 가이드
+
+- 요구사항이 불명확하거나 durable specification이 필요하면 먼저 `app-srs`를 사용합니다.
+- implementation scope가 이미 명확하면 `app-builder`를 사용합니다.
+- migration work에는 `align-platform-app`와 `migrate-node-red-app`를 사용합니다.
+- 앱이 이미 있고 문제가 visual, responsive, runtime 관련이면 `ui-repair`, `responsive-craft`, `preview-runtime-stability`를 사용합니다.
