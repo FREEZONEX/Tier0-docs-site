@@ -1,0 +1,325 @@
+---
+import baseSpec from '../../public/openapi/tier0-openapi.json';
+
+type Locale = 'en' | 'zh-cn' | 'ja' | 'es' | 'ko';
+
+const locale = (Astro.props.locale ?? 'en') as Locale;
+
+const pageText = {
+  en: {
+    lang: 'en',
+    title: 'Tier0 OpenAPI Reference',
+    back: 'Back to Working with Factory Data',
+    backHref: '/using-tier0/working-with-uns-data/',
+  },
+  'zh-cn': {
+    lang: 'zh-CN',
+    title: 'Tier0 OpenAPI 参考',
+    back: '返回“操作工厂数据”',
+    backHref: '/zh-cn/using-tier0/working-with-uns-data/',
+  },
+  ja: {
+    lang: 'ja',
+    title: 'Tier0 OpenAPI リファレンス',
+    back: '「工場データの操作」に戻る',
+    backHref: '/ja/using-tier0/working-with-uns-data/',
+  },
+  es: {
+    lang: 'es',
+    title: 'Referencia OpenAPI de Tier0',
+    back: 'Volver a Trabajar con datos de fábrica',
+    backHref: '/es/using-tier0/working-with-uns-data/',
+  },
+  ko: {
+    lang: 'ko',
+    title: 'Tier0 OpenAPI 레퍼런스',
+    back: 'Factory Data 작업으로 돌아가기',
+    backHref: '/ko/using-tier0/working-with-uns-data/',
+  },
+} as const;
+
+const apiTranslations: Record<
+  Exclude<Locale, 'en'>,
+  Record<string, string>
+> = {
+  'zh-cn': {
+    'Tier0 OpenAPI': 'Tier0 OpenAPI',
+    'A successful response.': '请求成功的响应。',
+    'Response code': '响应代码',
+    'Response message': '响应消息',
+    'Request file upload': '请求上传文件',
+    'Download file': '下载文件',
+    'Redirect to the final download URL.': '重定向到最终下载 URL。',
+    'Final download URL.': '最终下载 URL。',
+    'Get file URL': '获取文件 URL',
+    'Delete file': '删除文件',
+    'Initialize multipart upload': '初始化分片上传',
+    'Get multipart upload URLs': '获取分片上传 URL',
+    'Complete multipart upload': '完成分片上传',
+    'Abort multipart upload': '中止分片上传',
+    'Create MQTT Auth': '创建 MQTT 认证',
+    'Delete MQTT Auth': '删除 MQTT 认证',
+    'OpenAPI API Key': 'OpenAPI API Key',
+    'Downloads a file by returning an HTTP 302 redirect. The Location header points to the final download URL: a presigned URL for private files or a persistent direct URL for public files. No JSON body is returned. Security note: when following the redirect, clients should not forward custom credential headers such as x-api-key to a cross-origin destination. The Tier0 SDK already handles this behavior.':
+      '通过返回 HTTP 302 重定向下载文件。Location header 指向最终下载 URL：私有文件使用预签名 URL，公开文件使用持久直连 URL。不会返回 JSON body。安全说明：跟随重定向时，客户端不应把 x-api-key 等自定义凭据 header 转发到跨域目标。Tier0 SDK 已经处理了这个行为。',
+    'Initializes a multipart upload for large files (>100 MB). The server creates the multipart upload, reserves quota, and returns uploadId, partSize, and partCount.':
+      '初始化大文件（>100 MB）的分片上传。服务器会创建分片上传任务、预留配额，并返回 uploadId、partSize 和 partCount。',
+    'Returns presigned PUT URLs for the requested parts so file data can be uploaded directly to object storage. Supports resumable uploads.':
+      '返回指定分片的预签名 PUT URL，使文件数据可以直接上传到对象存储。支持断点续传。',
+    'Completes a multipart upload. The server validates the authoritative uploaded size using ListParts, reconciles any quota difference, and changes the upload from temporary to active.':
+      '完成分片上传。服务器会通过 ListParts 校验实际上传大小，调整配额差异，并将上传状态从临时改为可用。',
+    'Aborts a multipart upload, removes remaining uploaded parts, and releases the reserved quota.':
+      '中止分片上传，删除剩余已上传分片，并释放预留配额。',
+    'Creates a standard MQTT Auth credential equivalent to one created manually in the UI. The password is returned only once in the successful creation response and should be stored securely immediately. This OpenAPI does not provide an endpoint to retrieve or return the password again. Only full_access API Keys can call this endpoint.':
+      '创建一个标准 MQTT Auth 凭据，效果等同于在 UI 中手动创建。密码只会在创建成功的响应中返回一次，应立即安全保存。此 OpenAPI 不提供再次获取或返回密码的 endpoint。只有 full_access API Key 可以调用此 endpoint。',
+    'Idempotently deletes a standard MQTT Auth credential. Nonexistent, already deleted, or non-standard credential IDs return success and do not delete system credentials such as Flow or EdgeNode credentials. Only full_access API Keys can call this endpoint.':
+      '以幂等方式删除标准 MQTT Auth 凭据。不存在、已删除或非标准凭据 ID 会返回成功，不会删除 Flow 或 EdgeNode 凭据等系统凭据。只有 full_access API Key 可以调用此 endpoint。',
+    'Bound Source Flow ID. 0 means no Source Flow is bound.':
+      '已绑定的 Source Flow ID。0 表示未绑定 Source Flow。',
+    'Bound Event Flow ID. 0 means no Event Flow is bound.':
+      '已绑定的 Event Flow ID。0 表示未绑定 Event Flow。',
+    'Abort result: 1 = aborted (including idempotent replay success), 2 = not aborted.':
+      '中止结果：1 = 已中止（包含幂等重试成功），2 = 未中止。',
+  },
+  ja: {
+    'Tier0 OpenAPI': 'Tier0 OpenAPI',
+    'A successful response.': '成功時のレスポンス。',
+    'Response code': 'レスポンスコード',
+    'Response message': 'レスポンスメッセージ',
+    'Request file upload': 'ファイルアップロードを要求',
+    'Download file': 'ファイルをダウンロード',
+    'Redirect to the final download URL.': '最終ダウンロード URL にリダイレクトします。',
+    'Final download URL.': '最終ダウンロード URL。',
+    'Get file URL': 'ファイル URL を取得',
+    'Delete file': 'ファイルを削除',
+    'Initialize multipart upload': 'マルチパートアップロードを初期化',
+    'Get multipart upload URLs': 'マルチパートアップロード URL を取得',
+    'Complete multipart upload': 'マルチパートアップロードを完了',
+    'Abort multipart upload': 'マルチパートアップロードを中止',
+    'Create MQTT Auth': 'MQTT 認証を作成',
+    'Delete MQTT Auth': 'MQTT 認証を削除',
+    'OpenAPI API Key': 'OpenAPI API Key',
+    'Downloads a file by returning an HTTP 302 redirect. The Location header points to the final download URL: a presigned URL for private files or a persistent direct URL for public files. No JSON body is returned. Security note: when following the redirect, clients should not forward custom credential headers such as x-api-key to a cross-origin destination. The Tier0 SDK already handles this behavior.':
+      'HTTP 302 リダイレクトを返してファイルをダウンロードします。Location ヘッダーは最終ダウンロード URL を指します。非公開ファイルは署名付き URL、公開ファイルは永続的な直接 URL です。JSON body は返りません。セキュリティ上の注意: リダイレクトに従うとき、クライアントは x-api-key などのカスタム認証ヘッダーをクロスオリジンの宛先へ転送しないでください。Tier0 SDK はこの動作をすでに処理しています。',
+    'Initializes a multipart upload for large files (>100 MB). The server creates the multipart upload, reserves quota, and returns uploadId, partSize, and partCount.':
+      '大容量ファイル（>100 MB）のマルチパートアップロードを初期化します。サーバーはマルチパートアップロードを作成し、容量枠を予約し、uploadId、partSize、partCount を返します。',
+    'Returns presigned PUT URLs for the requested parts so file data can be uploaded directly to object storage. Supports resumable uploads.':
+      '指定されたパートの署名付き PUT URL を返し、ファイルデータをオブジェクトストレージへ直接アップロードできるようにします。再開可能なアップロードをサポートします。',
+    'Completes a multipart upload. The server validates the authoritative uploaded size using ListParts, reconciles any quota difference, and changes the upload from temporary to active.':
+      'マルチパートアップロードを完了します。サーバーは ListParts で実際のアップロードサイズを検証し、容量差分を調整して、アップロードを一時状態から有効状態へ変更します。',
+    'Aborts a multipart upload, removes remaining uploaded parts, and releases the reserved quota.':
+      'マルチパートアップロードを中止し、残っているアップロード済みパートを削除して、予約済み容量を解放します。',
+    'Creates a standard MQTT Auth credential equivalent to one created manually in the UI. The password is returned only once in the successful creation response and should be stored securely immediately. This OpenAPI does not provide an endpoint to retrieve or return the password again. Only full_access API Keys can call this endpoint.':
+      'UI で手動作成するものと同等の標準 MQTT Auth 認証情報を作成します。パスワードは作成成功レスポンスで一度だけ返されるため、すぐに安全に保存してください。この OpenAPI にはパスワードを再取得または再返却する endpoint はありません。full_access API Key のみがこの endpoint を呼び出せます。',
+    'Idempotently deletes a standard MQTT Auth credential. Nonexistent, already deleted, or non-standard credential IDs return success and do not delete system credentials such as Flow or EdgeNode credentials. Only full_access API Keys can call this endpoint.':
+      '標準 MQTT Auth 認証情報を冪等に削除します。存在しない ID、削除済み ID、または非標準の認証情報 ID は成功を返し、Flow や EdgeNode 認証情報などのシステム認証情報は削除しません。full_access API Key のみがこの endpoint を呼び出せます。',
+    'Bound Source Flow ID. 0 means no Source Flow is bound.':
+      'バインド済み Source Flow ID。0 は Source Flow が未バインドであることを示します。',
+    'Bound Event Flow ID. 0 means no Event Flow is bound.':
+      'バインド済み Event Flow ID。0 は Event Flow が未バインドであることを示します。',
+    'Abort result: 1 = aborted (including idempotent replay success), 2 = not aborted.':
+      '中止結果: 1 = 中止済み（冪等な再実行成功を含む）、2 = 中止されていません。',
+  },
+  es: {
+    'Tier0 OpenAPI': 'Tier0 OpenAPI',
+    'A successful response.': 'Respuesta correcta.',
+    'Response code': 'Código de respuesta',
+    'Response message': 'Mensaje de respuesta',
+    'Request file upload': 'Solicitar carga de archivo',
+    'Download file': 'Descargar archivo',
+    'Redirect to the final download URL.': 'Redirige a la URL final de descarga.',
+    'Final download URL.': 'URL final de descarga.',
+    'Get file URL': 'Obtener URL del archivo',
+    'Delete file': 'Eliminar archivo',
+    'Initialize multipart upload': 'Inicializar carga multipart',
+    'Get multipart upload URLs': 'Obtener URL de carga multipart',
+    'Complete multipart upload': 'Completar carga multipart',
+    'Abort multipart upload': 'Cancelar carga multipart',
+    'Create MQTT Auth': 'Crear autenticación MQTT',
+    'Delete MQTT Auth': 'Eliminar autenticación MQTT',
+    'OpenAPI API Key': 'API Key de OpenAPI',
+    'Downloads a file by returning an HTTP 302 redirect. The Location header points to the final download URL: a presigned URL for private files or a persistent direct URL for public files. No JSON body is returned. Security note: when following the redirect, clients should not forward custom credential headers such as x-api-key to a cross-origin destination. The Tier0 SDK already handles this behavior.':
+      'Descarga un archivo devolviendo una redirección HTTP 302. El encabezado Location apunta a la URL final de descarga: una URL prefirmada para archivos privados o una URL directa persistente para archivos públicos. No se devuelve ningún body JSON. Nota de seguridad: al seguir la redirección, los clientes no deben reenviar encabezados de credenciales personalizados, como x-api-key, a un destino de otro origen. El SDK de Tier0 ya gestiona este comportamiento.',
+    'Initializes a multipart upload for large files (>100 MB). The server creates the multipart upload, reserves quota, and returns uploadId, partSize, and partCount.':
+      'Inicializa una carga multipart para archivos grandes (>100 MB). El servidor crea la carga multipart, reserva cuota y devuelve uploadId, partSize y partCount.',
+    'Returns presigned PUT URLs for the requested parts so file data can be uploaded directly to object storage. Supports resumable uploads.':
+      'Devuelve URL PUT prefirmadas para las partes solicitadas, de modo que los datos del archivo puedan subirse directamente al almacenamiento de objetos. Admite cargas reanudables.',
+    'Completes a multipart upload. The server validates the authoritative uploaded size using ListParts, reconciles any quota difference, and changes the upload from temporary to active.':
+      'Completa una carga multipart. El servidor valida el tamaño real subido con ListParts, ajusta cualquier diferencia de cuota y cambia la carga de temporal a activa.',
+    'Aborts a multipart upload, removes remaining uploaded parts, and releases the reserved quota.':
+      'Cancela una carga multipart, elimina las partes subidas restantes y libera la cuota reservada.',
+    'Creates a standard MQTT Auth credential equivalent to one created manually in the UI. The password is returned only once in the successful creation response and should be stored securely immediately. This OpenAPI does not provide an endpoint to retrieve or return the password again. Only full_access API Keys can call this endpoint.':
+      'Crea una credencial MQTT Auth estándar equivalente a la creada manualmente en la UI. La contraseña se devuelve solo una vez en la respuesta de creación correcta y debe guardarse de forma segura de inmediato. Esta OpenAPI no proporciona un endpoint para recuperar o devolver la contraseña de nuevo. Solo las API Keys full_access pueden llamar a este endpoint.',
+    'Idempotently deletes a standard MQTT Auth credential. Nonexistent, already deleted, or non-standard credential IDs return success and do not delete system credentials such as Flow or EdgeNode credentials. Only full_access API Keys can call this endpoint.':
+      'Elimina de forma idempotente una credencial MQTT Auth estándar. Los ID inexistentes, ya eliminados o no estándar devuelven éxito y no eliminan credenciales del sistema, como credenciales de Flow o EdgeNode. Solo las API Keys full_access pueden llamar a este endpoint.',
+    'Bound Source Flow ID. 0 means no Source Flow is bound.':
+      'ID de Source Flow vinculado. 0 significa que no hay Source Flow vinculado.',
+    'Bound Event Flow ID. 0 means no Event Flow is bound.':
+      'ID de Event Flow vinculado. 0 significa que no hay Event Flow vinculado.',
+    'Abort result: 1 = aborted (including idempotent replay success), 2 = not aborted.':
+      'Resultado de cancelación: 1 = cancelado (incluye repetición idempotente correcta), 2 = no cancelado.',
+  },
+  ko: {
+    'Tier0 OpenAPI': 'Tier0 OpenAPI',
+    'A successful response.': '성공 응답입니다.',
+    'Response code': '응답 코드',
+    'Response message': '응답 메시지',
+    'Request file upload': '파일 업로드 요청',
+    'Download file': '파일 다운로드',
+    'Redirect to the final download URL.': '최종 다운로드 URL로 리디렉션합니다.',
+    'Final download URL.': '최종 다운로드 URL입니다.',
+    'Get file URL': '파일 URL 가져오기',
+    'Delete file': '파일 삭제',
+    'Initialize multipart upload': '멀티파트 업로드 초기화',
+    'Get multipart upload URLs': '멀티파트 업로드 URL 가져오기',
+    'Complete multipart upload': '멀티파트 업로드 완료',
+    'Abort multipart upload': '멀티파트 업로드 중단',
+    'Create MQTT Auth': 'MQTT 인증 생성',
+    'Delete MQTT Auth': 'MQTT 인증 삭제',
+    'OpenAPI API Key': 'OpenAPI API Key',
+    'Downloads a file by returning an HTTP 302 redirect. The Location header points to the final download URL: a presigned URL for private files or a persistent direct URL for public files. No JSON body is returned. Security note: when following the redirect, clients should not forward custom credential headers such as x-api-key to a cross-origin destination. The Tier0 SDK already handles this behavior.':
+      'HTTP 302 리디렉션을 반환해 파일을 다운로드합니다. Location 헤더는 최종 다운로드 URL을 가리킵니다. 비공개 파일은 사전 서명 URL을 사용하고, 공개 파일은 영구 직접 URL을 사용합니다. JSON body는 반환되지 않습니다. 보안 참고: 리디렉션을 따라갈 때 클라이언트는 x-api-key 같은 사용자 지정 인증 헤더를 다른 origin 대상에 전달하지 않아야 합니다. Tier0 SDK는 이 동작을 이미 처리합니다.',
+    'Initializes a multipart upload for large files (>100 MB). The server creates the multipart upload, reserves quota, and returns uploadId, partSize, and partCount.':
+      '대용량 파일(>100 MB)의 멀티파트 업로드를 초기화합니다. 서버는 멀티파트 업로드를 생성하고 할당량을 예약한 뒤 uploadId, partSize, partCount를 반환합니다.',
+    'Returns presigned PUT URLs for the requested parts so file data can be uploaded directly to object storage. Supports resumable uploads.':
+      '요청한 파트에 대한 사전 서명 PUT URL을 반환하여 파일 데이터를 객체 스토리지에 직접 업로드할 수 있게 합니다. 재개 가능한 업로드를 지원합니다.',
+    'Completes a multipart upload. The server validates the authoritative uploaded size using ListParts, reconciles any quota difference, and changes the upload from temporary to active.':
+      '멀티파트 업로드를 완료합니다. 서버는 ListParts로 실제 업로드 크기를 검증하고 할당량 차이를 조정한 뒤 업로드 상태를 임시에서 활성으로 변경합니다.',
+    'Aborts a multipart upload, removes remaining uploaded parts, and releases the reserved quota.':
+      '멀티파트 업로드를 중단하고 남은 업로드 파트를 삭제한 뒤 예약된 할당량을 해제합니다.',
+    'Creates a standard MQTT Auth credential equivalent to one created manually in the UI. The password is returned only once in the successful creation response and should be stored securely immediately. This OpenAPI does not provide an endpoint to retrieve or return the password again. Only full_access API Keys can call this endpoint.':
+      'UI에서 수동으로 만든 것과 동일한 표준 MQTT Auth 자격 증명을 생성합니다. 비밀번호는 생성 성공 응답에서 한 번만 반환되므로 즉시 안전하게 저장해야 합니다. 이 OpenAPI는 비밀번호를 다시 조회하거나 반환하는 endpoint를 제공하지 않습니다. full_access API Key만 이 endpoint를 호출할 수 있습니다.',
+    'Idempotently deletes a standard MQTT Auth credential. Nonexistent, already deleted, or non-standard credential IDs return success and do not delete system credentials such as Flow or EdgeNode credentials. Only full_access API Keys can call this endpoint.':
+      '표준 MQTT Auth 자격 증명을 멱등 방식으로 삭제합니다. 존재하지 않거나 이미 삭제되었거나 표준이 아닌 자격 증명 ID는 성공을 반환하며, Flow 또는 EdgeNode 자격 증명 같은 시스템 자격 증명은 삭제하지 않습니다. full_access API Key만 이 endpoint를 호출할 수 있습니다.',
+    'Bound Source Flow ID. 0 means no Source Flow is bound.':
+      '바인딩된 Source Flow ID입니다. 0은 Source Flow가 바인딩되지 않았음을 의미합니다.',
+    'Bound Event Flow ID. 0 means no Event Flow is bound.':
+      '바인딩된 Event Flow ID입니다. 0은 Event Flow가 바인딩되지 않았음을 의미합니다.',
+    'Abort result: 1 = aborted (including idempotent replay success), 2 = not aborted.':
+      '중단 결과: 1 = 중단됨(멱등 재시도 성공 포함), 2 = 중단되지 않음.',
+  },
+};
+
+function translateApiText(value: unknown): unknown {
+  if (typeof value !== 'string' || locale === 'en') {
+    return value;
+  }
+
+  return apiTranslations[locale]?.[value] ?? value;
+}
+
+function localizeSpec(input: unknown): unknown {
+  const copy = JSON.parse(JSON.stringify(input));
+
+  function visit(value: unknown): void {
+    if (!value || typeof value !== 'object') return;
+
+    const record = value as Record<string, unknown>;
+    for (const key of ['title', 'summary', 'description']) {
+      if (typeof record[key] === 'string') {
+        record[key] = translateApiText(record[key]);
+      }
+    }
+
+    Object.values(record).forEach(visit);
+  }
+
+  visit(copy);
+  return copy;
+}
+
+const currentText = pageText[locale] ?? pageText.en;
+const spec = localizeSpec(baseSpec);
+---
+
+<!doctype html>
+<html lang={currentText.lang}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="algolia-site-verification" content="958EE07D47EDCCC6" />
+    <title>{currentText.title}</title>
+    <link rel="stylesheet" href="https://unpkg.com/swagger-ui-dist@5/swagger-ui.css" />
+    <style>
+      :root {
+        color-scheme: light;
+        font-family:
+          Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+          sans-serif;
+      }
+
+      body {
+        margin: 0;
+        background: #f7f8fa;
+      }
+
+      .api-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        padding: 1rem 1.5rem;
+        border-bottom: 1px solid #dde2ea;
+        background: #fff;
+      }
+
+      .api-header h1 {
+        margin: 0;
+        color: #111827;
+        font-size: 1.125rem;
+        font-weight: 650;
+        letter-spacing: 0;
+      }
+
+      .api-header a {
+        color: #2563eb;
+        font-size: 0.875rem;
+        text-decoration: none;
+      }
+
+      .api-header a:hover {
+        text-decoration: underline;
+      }
+
+      #swagger-ui {
+        max-width: 1280px;
+        margin: 0 auto;
+        padding: 1rem;
+      }
+
+      .swagger-ui .topbar,
+      .swagger-ui .models {
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    <header class="api-header">
+      <h1>{currentText.title}</h1>
+      <a href={currentText.backHref}>{currentText.back}</a>
+    </header>
+    <main id="swagger-ui"></main>
+
+    <script is:inline src="https://unpkg.com/swagger-ui-dist@5/swagger-ui-bundle.js"></script>
+    <script is:inline src="https://unpkg.com/swagger-ui-dist@5/swagger-ui-standalone-preset.js"></script>
+    <script is:inline define:vars={{ spec }}>
+      window.addEventListener('load', () => {
+        if (!window.SwaggerUIBundle) {
+          document.querySelector('#swagger-ui').innerHTML =
+            '<p style="padding:1rem;background:#fff;border:1px solid #dde2ea;border-radius:8px;color:#b91c1c;">Swagger UI failed to load. Check network access to unpkg.com.</p>';
+          return;
+        }
+
+        window.ui = SwaggerUIBundle({
+          spec,
+          dom_id: '#swagger-ui',
+          deepLinking: true,
+          defaultModelsExpandDepth: -1,
+          displayRequestDuration: true,
+          presets: [SwaggerUIBundle.presets.apis, SwaggerUIStandalonePreset],
+          layout: 'BaseLayout',
+        });
+      });
+    </script>
+  </body>
+</html>

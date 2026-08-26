@@ -148,6 +148,1050 @@ const text =
     of: 'of',
   };
 
+const cliTextTranslations: Record<
+  string,
+  Record<string, string>
+> = {
+  'zh-cn': {
+    'Basic operations': '基础操作',
+    Skills: 'Skills',
+    Auth: '认证',
+    UNS: 'UNS',
+    'Node-RED Flow': 'Node-RED Flow',
+    Assets: '文件资源',
+    'Output raw JSON': '输出原始 JSON',
+    'Print HTTP request/response details': '打印 HTTP 请求/响应详情',
+    'Diagnose local Tier0 CLI connectivity and auth':
+      '诊断本地 Tier0 CLI 连接和认证',
+    'Checks local configuration, OpenAPI connectivity, API key presence, and API key identity.':
+      '检查本地配置、OpenAPI 连通性、API key 是否存在以及 API key 身份。',
+    'View or update configuration': '查看或更新配置',
+    'Set the platform base URL': '设置平台 base URL',
+    'Set the API key (alternative to tier0 login)':
+      '设置 API key（可替代 tier0 login）',
+    'Deprecated compatibility flag; CLI output is English-only':
+      '已弃用的兼容参数；CLI 输出仅支持英文',
+    'Authenticate via Device Flow': '通过 Device Flow 认证',
+    'Without --no-wait, the CLI polls every 5 seconds for up to 10 minutes.':
+      '未使用 --no-wait 时，CLI 每 5 秒轮询一次，最长 10 分钟。',
+    'With --no-wait --json, the CLI returns verification_url, setup_code, and expires_in.':
+      '使用 --no-wait --json 时，CLI 会返回 verification_url、setup_code 和 expires_in。',
+    'Print the authorization URL and exit without polling':
+      '打印授权 URL 后退出，不进行轮询',
+    'Poll for an existing setup code instead of creating a new one':
+      '使用已有 setup code 轮询，而不是创建新的 setup code',
+    'Override the platform base URL': '覆盖平台 base URL',
+    'Call an API endpoint directly': '直接调用 API endpoint',
+    '--body and --body-file are mutually exclusive.':
+      '--body 和 --body-file 互斥。',
+    'Request body JSON string': '请求体 JSON 字符串',
+    'Read request body from file': '从文件读取请求体',
+    'HTTP method (GET|POST|PUT|DELETE)': 'HTTP 方法（GET|POST|PUT|DELETE）',
+    'Preview the request without executing it': '预览请求但不执行',
+    'Upgrade CLI to the latest version': '将 CLI 升级到最新版本',
+    'Check for updates without installing': '检查更新但不安装',
+    'Upgrade to a specific version (default: latest)':
+      '升级到指定版本（默认 latest）',
+    'Uninstall tier0 CLI': '卸载 tier0 CLI',
+    'Agent Skills and config are kept by default.':
+      '默认保留 Agent Skills 和配置。',
+    'The local bundled skills directory is removed during CLI uninstall.':
+      'CLI 卸载时会删除本地内置 skills 目录。',
+    'Also delete config file (credentials)': '同时删除配置文件（凭据）',
+    'Also remove the Tier0 Skill from detected AI agents':
+      '同时从检测到的 AI agents 中移除 Tier0 Skill',
+    'Keep agent skills (deprecated; this is now the default)':
+      '保留 agent skills（已弃用；现在默认如此）',
+    'Show version': '显示版本',
+    'Install or repair the Skill embedded in this CLI':
+      '安装或修复 CLI 内置的 Skill',
+    'Replace the active Skill with the embedded baseline':
+      '用内置基线替换当前启用的 Skill',
+    'Install locally without syncing detected AI agents':
+      '仅本地安装，不同步到检测到的 AI agents',
+    'List installed skills': '列出已安装的 skills',
+    'Upgrade skills to the latest version': '将 skills 升级到最新版本',
+    'Show skills version info': '显示 skills 版本信息',
+    'Show active and embedded Skill status': '显示当前启用和内置 Skill 状态',
+    'Sync the active Skill to detected AI agents':
+      '将当前启用的 Skill 同步到检测到的 AI agents',
+    'Show current API key identity': '显示当前 API key 身份',
+    'Shows user, workspace, key name, key type, roles, and permissions.':
+      '显示用户、workspace、key 名称、key 类型、角色和权限。',
+    'Browse UNS namespace tree': '浏览 UNS namespace 树',
+    'Path to browse in the UNS tree': '要浏览的 UNS 树路径',
+    'Max recursion depth (0 = unlimited)': '最大递归深度（0 = 不限制）',
+    'Include node metadata': '包含节点元数据',
+    'Include leaf node values': '包含叶子节点值',
+    'Search UNS topics': '搜索 UNS topics',
+    'Search by name keyword': '按名称关键字搜索',
+    'Filter by path prefix': '按路径前缀过滤',
+    'Filter by topic type': '按 topic type 过滤',
+    'Page number': '页码',
+    'Page size (max results)': '每页数量（最大结果数）',
+    'Read current value of UNS topics': '读取 UNS topics 的当前值',
+    'At least one topic is required via positional args or --topic.':
+      '必须通过位置参数或 --topic 提供至少一个 topic。',
+    'Topic name(s) to read (repeatable; positional args are also accepted)':
+      '要读取的 topic 名称（可重复；也接受位置参数）',
+    'Include topic metadata (topicType, fields, description)':
+      '包含 topic 元数据（topicType、fields、description）',
+    'Write value to a UNS topic': '向 UNS topic 写入值',
+    '--value and --file are mutually exclusive.': '--value 和 --file 互斥。',
+    'The value must be a valid JSON object matching the topic fields.':
+      '值必须是符合 topic fields 的有效 JSON object。',
+    'Topic name to write to (required)': '要写入的 topic 名称（必填）',
+    'JSON value string (mutually exclusive with --file)':
+      'JSON 值字符串（与 --file 互斥）',
+    'Read value from file (mutually exclusive with --value)':
+      '从文件读取值（与 --value 互斥）',
+    'MQTT QoS level (0/1/2)': 'MQTT QoS 等级（0/1/2）',
+    'Set MQTT retain flag': '设置 MQTT retain flag',
+    'Query historical data for topics': '查询 topics 历史数据',
+    'Topic name(s) (repeatable, required)': 'topic 名称（可重复，必填）',
+    "Start time: relative (-1h/-30m/-7d), ISO 8601, or 'now' (required)":
+      "开始时间：相对时间（-1h/-30m/-7d）、ISO 8601 或 'now'（必填）",
+    "End time: relative, ISO 8601, or 'now' (default: now)":
+      "结束时间：相对时间、ISO 8601 或 'now'（默认 now）",
+    'Page size (max data points)': '每页数量（最大数据点数）',
+    'Aggregation interval (e.g. 1m, 1h, 1d)':
+      '聚合间隔（例如 1m、1h、1d）',
+    'Aggregation function (avg/max/min/sum/count)':
+      '聚合函数（avg/max/min/sum/count）',
+    'Aggregation field name': '聚合字段名',
+    'Create UNS namespace nodes': '创建 UNS namespace 节点',
+    'Update UNS topic metadata': '更新 UNS topic 元数据',
+    'Delete UNS node(s)': '删除 UNS 节点',
+    'Restore topic from history': '从历史记录恢复 topic',
+    'List flows': '列出 flows',
+    'Get flow details': '获取 flow 详情',
+    'Create a new flow': '创建新 flow',
+    'Update flow metadata': '更新 flow 元数据',
+    'Get Node-RED canvas JSON': '获取 Node-RED canvas JSON',
+    'Deploy Node-RED canvas JSON': '部署 Node-RED canvas JSON',
+    'Delete flow(s)': '删除 flow',
+    'List available Node-RED node types': '列出可用的 Node-RED 节点类型',
+    'Upload a file to Tier0 object storage':
+      '上传文件到 Tier0 object storage',
+    'Download a file from Tier0 object storage':
+      '从 Tier0 object storage 下载文件',
+    'Get file access URL from Tier0 object storage':
+      '获取 Tier0 object storage 文件访问 URL',
+    'Delete a file from Tier0 object storage':
+      '删除 Tier0 object storage 文件',
+    'Deletion cannot be undone.': '删除无法撤销。',
+  },
+  ja: {
+    'Basic operations': '基本操作',
+    Skills: 'Skills',
+    Auth: '認証',
+    UNS: 'UNS',
+    'Node-RED Flow': 'Node-RED Flow',
+    Assets: 'ファイル',
+    'Output raw JSON': '生の JSON を出力',
+    'Print HTTP request/response details': 'HTTP リクエスト/レスポンス詳細を出力',
+    'Diagnose local Tier0 CLI connectivity and auth':
+      'ローカル Tier0 CLI の接続と認証を診断',
+    'Checks local configuration, OpenAPI connectivity, API key presence, and API key identity.':
+      'ローカル設定、OpenAPI 接続、API key の有無、API key の識別情報を確認します。',
+    'View or update configuration': '設定を表示または更新',
+    'Set the platform base URL': 'プラットフォームの base URL を設定',
+    'Set the API key (alternative to tier0 login)':
+      'API key を設定（tier0 login の代替）',
+    'Deprecated compatibility flag; CLI output is English-only':
+      '非推奨の互換フラグ。CLI 出力は英語のみです',
+    'Authenticate via Device Flow': 'Device Flow で認証',
+    'Print the authorization URL and exit without polling':
+      '認証 URL を出力し、ポーリングせずに終了',
+    'Poll for an existing setup code instead of creating a new one':
+      '新規作成せず既存の setup code をポーリング',
+    'Override the platform base URL': 'プラットフォームの base URL を上書き',
+    'Call an API endpoint directly': 'API endpoint を直接呼び出す',
+    'Request body JSON string': 'リクエストボディの JSON 文字列',
+    'Read request body from file': 'ファイルからリクエストボディを読み込む',
+    'HTTP method (GET|POST|PUT|DELETE)': 'HTTP メソッド（GET|POST|PUT|DELETE）',
+    'Preview the request without executing it': '実行せずにリクエストをプレビュー',
+    'Upgrade CLI to the latest version': 'CLI を最新バージョンにアップグレード',
+    'Check for updates without installing': 'インストールせず更新を確認',
+    'Uninstall tier0 CLI': 'tier0 CLI をアンインストール',
+    'Also delete config file (credentials)': '設定ファイル（認証情報）も削除',
+    'Show version': 'バージョンを表示',
+    'Install or repair the Skill embedded in this CLI':
+      'CLI に内蔵された Skill をインストールまたは修復',
+    'List installed skills': 'インストール済み skills を一覧表示',
+    'Upgrade skills to the latest version': 'skills を最新バージョンに更新',
+    'Show current API key identity': '現在の API key の識別情報を表示',
+    'Browse UNS namespace tree': 'UNS namespace ツリーを参照',
+    'Search UNS topics': 'UNS topics を検索',
+    'Read current value of UNS topics': 'UNS topics の現在値を読み取る',
+    'Write value to a UNS topic': 'UNS topic に値を書き込む',
+    'Query historical data for topics': 'topics の履歴データを照会',
+    'Create UNS namespace nodes': 'UNS namespace ノードを作成',
+    'Update UNS topic metadata': 'UNS topic のメタデータを更新',
+    'Delete UNS node(s)': 'UNS ノードを削除',
+    'Restore topic from history': '履歴から topic を復元',
+    'List flows': 'flows を一覧表示',
+    'Get flow details': 'flow の詳細を取得',
+    'Create a new flow': '新しい flow を作成',
+    'Update flow metadata': 'flow メタデータを更新',
+    'Get Node-RED canvas JSON': 'Node-RED canvas JSON を取得',
+    'Deploy Node-RED canvas JSON': 'Node-RED canvas JSON をデプロイ',
+    'Delete flow(s)': 'flow を削除',
+    'Upload a file to Tier0 object storage':
+      'Tier0 object storage にファイルをアップロード',
+    'Download a file from Tier0 object storage':
+      'Tier0 object storage からファイルをダウンロード',
+    'Get file access URL from Tier0 object storage':
+      'Tier0 object storage のファイルアクセス URL を取得',
+    'Delete a file from Tier0 object storage':
+      'Tier0 object storage のファイルを削除',
+    'Deletion cannot be undone.': '削除は元に戻せません。',
+  },
+  es: {
+    'Basic operations': 'Operaciones básicas',
+    Skills: 'Skills',
+    Auth: 'Autenticación',
+    UNS: 'UNS',
+    'Node-RED Flow': 'Node-RED Flow',
+    Assets: 'Archivos',
+    'Output raw JSON': 'Genera JSON sin procesar',
+    'Print HTTP request/response details': 'Muestra detalles de solicitud/respuesta HTTP',
+    'Diagnose local Tier0 CLI connectivity and auth':
+      'Diagnostica la conexión y autenticación local del CLI de Tier0',
+    'Checks local configuration, OpenAPI connectivity, API key presence, and API key identity.':
+      'Comprueba la configuración local, la conectividad OpenAPI, la presencia de API key y la identidad de la API key.',
+    'View or update configuration': 'Ver o actualizar configuración',
+    'Set the platform base URL': 'Configurar la base URL de la plataforma',
+    'Set the API key (alternative to tier0 login)':
+      'Configurar la API key (alternativa a tier0 login)',
+    'Deprecated compatibility flag; CLI output is English-only':
+      'Flag de compatibilidad obsoleto; la salida del CLI solo está en inglés',
+    'Authenticate via Device Flow': 'Autenticarse mediante Device Flow',
+    'Print the authorization URL and exit without polling':
+      'Imprime la URL de autorización y sale sin sondeo',
+    'Poll for an existing setup code instead of creating a new one':
+      'Sondea un setup code existente en lugar de crear uno nuevo',
+    'Override the platform base URL': 'Sobrescribir la base URL de la plataforma',
+    'Call an API endpoint directly': 'Llamar directamente a un API endpoint',
+    'Request body JSON string': 'Cadena JSON del cuerpo de la solicitud',
+    'Read request body from file': 'Leer el cuerpo de la solicitud desde un archivo',
+    'HTTP method (GET|POST|PUT|DELETE)': 'Método HTTP (GET|POST|PUT|DELETE)',
+    'Preview the request without executing it': 'Previsualizar la solicitud sin ejecutarla',
+    'Upgrade CLI to the latest version': 'Actualizar el CLI a la última versión',
+    'Check for updates without installing': 'Comprobar actualizaciones sin instalar',
+    'Uninstall tier0 CLI': 'Desinstalar tier0 CLI',
+    'Also delete config file (credentials)': 'Eliminar también el archivo de configuración (credenciales)',
+    'Show version': 'Mostrar versión',
+    'Install or repair the Skill embedded in this CLI':
+      'Instalar o reparar la Skill integrada en este CLI',
+    'List installed skills': 'Listar skills instaladas',
+    'Upgrade skills to the latest version': 'Actualizar skills a la última versión',
+    'Show current API key identity': 'Mostrar la identidad de la API key actual',
+    'Browse UNS namespace tree': 'Explorar el árbol de namespace de UNS',
+    'Search UNS topics': 'Buscar topics de UNS',
+    'Read current value of UNS topics': 'Leer el valor actual de topics de UNS',
+    'Write value to a UNS topic': 'Escribir un valor en un topic de UNS',
+    'Query historical data for topics': 'Consultar datos históricos de topics',
+    'Create UNS namespace nodes': 'Crear nodos de namespace de UNS',
+    'Update UNS topic metadata': 'Actualizar metadatos de topic UNS',
+    'Delete UNS node(s)': 'Eliminar nodo(s) UNS',
+    'Restore topic from history': 'Restaurar topic desde el historial',
+    'List flows': 'Listar flows',
+    'Get flow details': 'Obtener detalles del flow',
+    'Create a new flow': 'Crear un nuevo flow',
+    'Update flow metadata': 'Actualizar metadatos del flow',
+    'Get Node-RED canvas JSON': 'Obtener JSON del canvas de Node-RED',
+    'Deploy Node-RED canvas JSON': 'Desplegar JSON del canvas de Node-RED',
+    'Delete flow(s)': 'Eliminar flow(s)',
+    'Upload a file to Tier0 object storage':
+      'Subir un archivo a Tier0 object storage',
+    'Download a file from Tier0 object storage':
+      'Descargar un archivo desde Tier0 object storage',
+    'Get file access URL from Tier0 object storage':
+      'Obtener la URL de acceso del archivo en Tier0 object storage',
+    'Delete a file from Tier0 object storage':
+      'Eliminar un archivo de Tier0 object storage',
+    'Deletion cannot be undone.': 'La eliminación no se puede deshacer.',
+  },
+  ko: {
+    'Basic operations': '기본 작업',
+    Skills: 'Skills',
+    Auth: '인증',
+    UNS: 'UNS',
+    'Node-RED Flow': 'Node-RED Flow',
+    Assets: '파일',
+    'Output raw JSON': '원본 JSON 출력',
+    'Print HTTP request/response details': 'HTTP 요청/응답 상세 출력',
+    'Diagnose local Tier0 CLI connectivity and auth':
+      '로컬 Tier0 CLI 연결 및 인증 진단',
+    'Checks local configuration, OpenAPI connectivity, API key presence, and API key identity.':
+      '로컬 설정, OpenAPI 연결, API key 존재 여부와 API key 신원을 확인합니다.',
+    'View or update configuration': '설정 보기 또는 업데이트',
+    'Set the platform base URL': '플랫폼 base URL 설정',
+    'Set the API key (alternative to tier0 login)':
+      'API key 설정(tier0 login 대체 가능)',
+    'Deprecated compatibility flag; CLI output is English-only':
+      '지원 중단된 호환성 플래그입니다. CLI 출력은 영어만 지원합니다',
+    'Authenticate via Device Flow': 'Device Flow로 인증',
+    'Print the authorization URL and exit without polling':
+      '인증 URL을 출력하고 폴링 없이 종료',
+    'Poll for an existing setup code instead of creating a new one':
+      '새로 만들지 않고 기존 setup code로 폴링',
+    'Override the platform base URL': '플랫폼 base URL 재정의',
+    'Call an API endpoint directly': 'API endpoint 직접 호출',
+    'Request body JSON string': '요청 본문 JSON 문자열',
+    'Read request body from file': '파일에서 요청 본문 읽기',
+    'HTTP method (GET|POST|PUT|DELETE)': 'HTTP 메서드(GET|POST|PUT|DELETE)',
+    'Preview the request without executing it': '실행하지 않고 요청 미리보기',
+    'Upgrade CLI to the latest version': 'CLI를 최신 버전으로 업그레이드',
+    'Check for updates without installing': '설치하지 않고 업데이트 확인',
+    'Uninstall tier0 CLI': 'tier0 CLI 제거',
+    'Also delete config file (credentials)': '설정 파일(자격 증명)도 삭제',
+    'Show version': '버전 표시',
+    'Install or repair the Skill embedded in this CLI':
+      '이 CLI에 내장된 Skill 설치 또는 복구',
+    'List installed skills': '설치된 skills 목록 표시',
+    'Upgrade skills to the latest version': 'skills를 최신 버전으로 업데이트',
+    'Show current API key identity': '현재 API key 신원 표시',
+    'Browse UNS namespace tree': 'UNS namespace 트리 탐색',
+    'Search UNS topics': 'UNS topics 검색',
+    'Read current value of UNS topics': 'UNS topics의 현재 값 읽기',
+    'Write value to a UNS topic': 'UNS topic에 값 쓰기',
+    'Query historical data for topics': 'topics의 이력 데이터 조회',
+    'Create UNS namespace nodes': 'UNS namespace 노드 생성',
+    'Update UNS topic metadata': 'UNS topic 메타데이터 업데이트',
+    'Delete UNS node(s)': 'UNS 노드 삭제',
+    'Restore topic from history': '이력에서 topic 복원',
+    'List flows': 'flows 목록 표시',
+    'Get flow details': 'flow 상세 정보 가져오기',
+    'Create a new flow': '새 flow 생성',
+    'Update flow metadata': 'flow 메타데이터 업데이트',
+    'Get Node-RED canvas JSON': 'Node-RED canvas JSON 가져오기',
+    'Deploy Node-RED canvas JSON': 'Node-RED canvas JSON 배포',
+    'Delete flow(s)': 'flow 삭제',
+    'Upload a file to Tier0 object storage':
+      'Tier0 object storage에 파일 업로드',
+    'Download a file from Tier0 object storage':
+      'Tier0 object storage에서 파일 다운로드',
+    'Get file access URL from Tier0 object storage':
+      'Tier0 object storage 파일 접근 URL 가져오기',
+    'Delete a file from Tier0 object storage':
+      'Tier0 object storage 파일 삭제',
+    'Deletion cannot be undone.': '삭제는 되돌릴 수 없습니다.',
+  },
+};
+
+const supplementalCliTextTranslations: Record<
+  string,
+  Record<string, string>
+> = {
+  'zh-cn': {
+    Skills: '技能',
+    'Node-RED Flow': 'Node-RED 流程',
+    'When not using --file, --topic and --type are required.':
+      '不使用 --file 时，必须提供 --topic 和 --type。',
+    '--fields and --fields-file are mutually exclusive.':
+      '--fields 和 --fields-file 互斥。',
+    'For topic nodes, the segment immediately before the leaf must be Metric, Action, or State.':
+      '对于 topic 节点，叶子节点前一级路径必须是 Metric、Action 或 State。',
+    'Topic path or leaf name (required if not using --file)':
+      'topic 路径或叶子名称（不使用 --file 时必填）',
+    'Parent path prefix (optional, combined with --topic)':
+      '父级路径前缀（可选，会与 --topic 组合）',
+    "Node type: 'path' (folder) or 'topic' (data point)":
+      "节点类型：'path'（文件夹）或 'topic'（数据点）",
+    'Display name': '显示名称',
+    Description: '描述',
+    Alias: '别名',
+    'Read namespace definition from JSON file ({"namespace":[]} or bare array)':
+      '从 JSON 文件读取 namespace 定义（{"namespace":[]} 或裸数组）',
+    'Deprecated: topic type is now derived from the path (Metric/Action/State folder before leaf)':
+      '已弃用：topic type 现在由路径推导（叶子节点前的 Metric/Action/State 文件夹）',
+    'Schema fields JSON array': 'schema fields JSON 数组',
+    'Read schema fields JSON array from file':
+      '从文件读取 schema fields JSON 数组',
+    '--description and --clear-description are mutually exclusive.':
+      '--description 和 --clear-description 互斥。',
+    'At least one field to update is required.':
+      '至少需要提供一个要更新的字段。',
+    'Topic path to update (required)': '要更新的 topic 路径（必填）',
+    'New name': '新名称',
+    'New alias': '新别名',
+    'New description': '新描述',
+    'Clear the description without relying on an empty shell argument':
+      '清空描述，不依赖空 shell 参数',
+    'New display name': '新的显示名称',
+    'Extended properties JSON object': '扩展属性 JSON 对象',
+    'Fields to update (repeatable, e.g. name,description,fields)':
+      '要更新的字段（可重复，例如 name、description、fields）',
+    'Soft delete is the default and can be restored.':
+      '默认执行软删除，可以恢复。',
+    '--hard is irreversible.': '--hard 不可恢复。',
+    'High-risk execution requires --yes unless using --dry-run.':
+      '高风险操作需要 --yes，除非使用 --dry-run。',
+    'Node path(s) to delete (repeatable, required)':
+      '要删除的节点路径（可重复，必填）',
+    'Hard delete (irreversible)': '硬删除（不可恢复）',
+    'Confirm high-risk operation (required)': '确认高风险操作（必填）',
+    'Deprecated alias for --path': '--path 的已弃用别名',
+    'Topic path to restore (required)': '要恢复的 topic 路径（必填）',
+    '--source and --event are mutually exclusive.':
+      '--source 和 --event 互斥。',
+    '--type cannot be combined with --source or --event.':
+      '--type 不能与 --source 或 --event 同时使用。',
+    'Filter by name keyword': '按名称关键字过滤',
+    'Filter by type (SourceFlow/EventFlow)':
+      '按类型过滤（SourceFlow/EventFlow）',
+    'Show SourceFlow only': '只显示 SourceFlow',
+    'Show EventFlow only': '只显示 EventFlow',
+    'A positive Flow ID is required via --id or as a positional argument.':
+      '必须通过 --id 或位置参数提供正数 Flow ID。',
+    'Flow ID': 'Flow ID',
+    'Use exactly one of --type, --source, or --event to select a Flow type.':
+      '必须且只能使用 --type、--source 或 --event 之一选择 Flow 类型。',
+    '--template and --template-file are mutually exclusive.':
+      '--template 和 --template-file 互斥。',
+    'Flow name (required)': 'Flow 名称（必填）',
+    'Flow type: SourceFlow | EventFlow (required)':
+      'Flow 类型：SourceFlow | EventFlow（必填）',
+    'Set type to SourceFlow': '设置类型为 SourceFlow',
+    'Set type to EventFlow': '设置类型为 EventFlow',
+    'Initial template JSON string': '初始模板 JSON 字符串',
+    'Read initial template from file': '从文件读取初始模板',
+    '--favorite and --unfavorite are mutually exclusive.':
+      '--favorite 和 --unfavorite 互斥。',
+    'Flow ID (required)': 'Flow ID（必填）',
+    'New template JSON string': '新模板 JSON 字符串',
+    'Read new template from file': '从文件读取新模板',
+    'Mark as favorite': '标记为收藏',
+    'Remove from favorites': '取消收藏',
+    'Save output to file': '保存输出到文件',
+    '--flows-json and --flows-file are mutually exclusive.':
+      '--flows-json 和 --flows-file 互斥。',
+    'Deployment replaces all existing Node-RED nodes in the Flow.':
+      '部署会替换该 Flow 中所有现有 Node-RED 节点。',
+    'Node-RED canvas JSON string': 'Node-RED 画布 JSON 字符串',
+    'Read Node-RED canvas JSON from file (recommended)':
+      '从文件读取 Node-RED 画布 JSON（推荐）',
+    'Positional arguments may contain comma-separated Flow IDs.':
+      '位置参数可以包含逗号分隔的 Flow ID。',
+    'Deletion stops the Node-RED container(s) and cannot be undone.':
+      '删除会停止 Node-RED 容器，且无法撤销。',
+    'Flow ID(s) to delete (repeatable)': '要删除的 Flow ID（可重复）',
+    'Accepts at most one positional Flow type.':
+      '最多接受一个位置参数形式的 Flow 类型。',
+    'Do not combine positional/type input with --source or --event.':
+      '不要将位置参数/类型输入与 --source 或 --event 同时使用。',
+    'Flow type (SourceFlow/EventFlow)': 'Flow 类型（SourceFlow/EventFlow）',
+    'Show SourceFlow nodes': '显示 SourceFlow 节点',
+    'Show EventFlow nodes': '显示 EventFlow 节点',
+    'Exactly one local file argument is required.':
+      '必须提供且只能提供一个本地文件参数。',
+    'Files larger than 100MB automatically use multipart upload.':
+      '超过 100MB 的文件会自动使用分片上传。',
+    'The CLI does not enforce a hard maximum file size; the server applies plan/quota limits.':
+      'CLI 不强制限制最大文件大小；服务器会按套餐和配额限制处理。',
+    'Business scene': '业务场景',
+    'Usage scope: user|workspace|platform':
+      '使用范围：user|workspace|platform',
+    'Visibility: public|private': '可见性：public|private',
+    'AI app instance ID': 'AI 应用实例 ID',
+    'AI session ID': 'AI 会话 ID',
+    'Multipart part size (e.g. 10MB, min 5MB)':
+      '分片大小（例如 10MB，最小 5MB）',
+    'Multipart upload concurrency (number of parallel parts)':
+      '分片上传并发数（并行分片数量）',
+    'Resume an interrupted multipart upload': '恢复中断的分片上传',
+    'Abort an interrupted multipart upload and clean up its state':
+      '中止中断的分片上传并清理其状态',
+    'File path returned by upload': '上传返回的文件路径',
+    'Output file path (default: stdout)': '输出文件路径（默认 stdout）',
+    'Custom Content-Disposition': '自定义 Content-Disposition',
+    'Presigned URL expiration seconds': '预签名 URL 过期秒数',
+  },
+  ja: {
+    Skills: 'スキル',
+    'Node-RED Flow': 'Node-RED フロー',
+    'Without --no-wait, the CLI polls every 5 seconds for up to 10 minutes.':
+      '--no-wait を指定しない場合、CLI は最大 10 分間、5 秒ごとにポーリングします。',
+    'With --no-wait --json, the CLI returns verification_url, setup_code, and expires_in.':
+      '--no-wait --json を指定すると、CLI は verification_url、setup_code、expires_in を返します。',
+    '--body and --body-file are mutually exclusive.':
+      '--body と --body-file は同時に指定できません。',
+    'Upgrade to a specific version (default: latest)':
+      '指定バージョンへアップグレード（デフォルト: latest）',
+    'Agent Skills and config are kept by default.':
+      'Agent Skills と設定はデフォルトで保持されます。',
+    'The local bundled skills directory is removed during CLI uninstall.':
+      'CLI のアンインストール時に、ローカルの内蔵 skills ディレクトリは削除されます。',
+    'Also remove the Tier0 Skill from detected AI agents':
+      '検出された AI agents から Tier0 Skill も削除',
+    'Keep agent skills (deprecated; this is now the default)':
+      'agent skills を保持（非推奨。現在はこれがデフォルトです）',
+    'Replace the active Skill with the embedded baseline':
+      '有効な Skill を内蔵ベースラインで置き換える',
+    'Install locally without syncing detected AI agents':
+      '検出された AI agents に同期せず、ローカルのみにインストール',
+    'Show skills version info': 'skills のバージョン情報を表示',
+    'Show active and embedded Skill status':
+      '有効な Skill と内蔵 Skill の状態を表示',
+    'Sync the active Skill to detected AI agents':
+      '有効な Skill を検出された AI agents に同期',
+    'Shows user, workspace, key name, key type, roles, and permissions.':
+      'ユーザー、workspace、key 名、key タイプ、ロール、権限を表示します。',
+    'Path to browse in the UNS tree': 'UNS ツリーで参照するパス',
+    'Max recursion depth (0 = unlimited)': '最大再帰深度（0 = 無制限）',
+    'Include node metadata': 'ノードメタデータを含める',
+    'Include leaf node values': 'リーフノードの値を含める',
+    'Search by name keyword': '名前キーワードで検索',
+    'Filter by path prefix': 'パス接頭辞でフィルタ',
+    'Filter by topic type': 'topic type でフィルタ',
+    'Page number': 'ページ番号',
+    'Page size (max results)': 'ページサイズ（最大件数）',
+    'At least one topic is required via positional args or --topic.':
+      '位置引数または --topic で少なくとも 1 つの topic が必要です。',
+    'Topic name(s) to read (repeatable; positional args are also accepted)':
+      '読み取る topic 名（繰り返し可。位置引数も使用できます）',
+    'Include topic metadata (topicType, fields, description)':
+      'topic メタデータ（topicType、fields、description）を含める',
+    '--value and --file are mutually exclusive.':
+      '--value と --file は同時に指定できません。',
+    'The value must be a valid JSON object matching the topic fields.':
+      '値は topic fields に一致する有効な JSON object である必要があります。',
+    'Topic name to write to (required)': '書き込み先 topic 名（必須）',
+    'JSON value string (mutually exclusive with --file)':
+      'JSON 値文字列（--file と同時指定不可）',
+    'Read value from file (mutually exclusive with --value)':
+      'ファイルから値を読み込む（--value と同時指定不可）',
+    'MQTT QoS level (0/1/2)': 'MQTT QoS レベル（0/1/2）',
+    'Set MQTT retain flag': 'MQTT retain フラグを設定',
+    'Topic name(s) (repeatable, required)': 'topic 名（繰り返し可、必須）',
+    "Start time: relative (-1h/-30m/-7d), ISO 8601, or 'now' (required)":
+      "開始時刻: 相対指定（-1h/-30m/-7d）、ISO 8601、または 'now'（必須）",
+    "End time: relative, ISO 8601, or 'now' (default: now)":
+      "終了時刻: 相対指定、ISO 8601、または 'now'（デフォルト: now）",
+    'Page size (max data points)': 'ページサイズ（最大データポイント数）',
+    'Aggregation interval (e.g. 1m, 1h, 1d)':
+      '集計間隔（例: 1m、1h、1d）',
+    'Aggregation function (avg/max/min/sum/count)':
+      '集計関数（avg/max/min/sum/count）',
+    'Aggregation field name': '集計フィールド名',
+    'When not using --file, --topic and --type are required.':
+      '--file を使用しない場合、--topic と --type が必要です。',
+    '--fields and --fields-file are mutually exclusive.':
+      '--fields と --fields-file は同時に指定できません。',
+    'For topic nodes, the segment immediately before the leaf must be Metric, Action, or State.':
+      'topic ノードでは、リーフ直前のパス要素が Metric、Action、または State である必要があります。',
+    'Topic path or leaf name (required if not using --file)':
+      'topic パスまたはリーフ名（--file を使用しない場合は必須）',
+    'Parent path prefix (optional, combined with --topic)':
+      '親パス接頭辞（任意。--topic と組み合わせます）',
+    "Node type: 'path' (folder) or 'topic' (data point)":
+      "ノードタイプ: 'path'（フォルダー）または 'topic'（データポイント）",
+    'Display name': '表示名',
+    Description: '説明',
+    Alias: 'エイリアス',
+    'Read namespace definition from JSON file ({"namespace":[]} or bare array)':
+      'JSON ファイルから namespace 定義を読み込む（{"namespace":[]} または配列のみ）',
+    'Deprecated: topic type is now derived from the path (Metric/Action/State folder before leaf)':
+      '非推奨: topic type は現在、パス（リーフ直前の Metric/Action/State フォルダー）から推定されます',
+    'Schema fields JSON array': 'schema fields の JSON 配列',
+    'Read schema fields JSON array from file':
+      'ファイルから schema fields の JSON 配列を読み込む',
+    '--description and --clear-description are mutually exclusive.':
+      '--description と --clear-description は同時に指定できません。',
+    'At least one field to update is required.':
+      '更新するフィールドを少なくとも 1 つ指定する必要があります。',
+    'Topic path to update (required)': '更新する topic パス（必須）',
+    'New name': '新しい名前',
+    'New alias': '新しいエイリアス',
+    'New description': '新しい説明',
+    'Clear the description without relying on an empty shell argument':
+      '空の shell 引数に依存せず説明をクリアする',
+    'New display name': '新しい表示名',
+    'Extended properties JSON object': '拡張プロパティ JSON object',
+    'Fields to update (repeatable, e.g. name,description,fields)':
+      '更新するフィールド（繰り返し可。例: name、description、fields）',
+    'Soft delete is the default and can be restored.':
+      'デフォルトはソフト削除で、復元できます。',
+    '--hard is irreversible.': '--hard は元に戻せません。',
+    'High-risk execution requires --yes unless using --dry-run.':
+      '--dry-run を使用しない限り、高リスク操作には --yes が必要です。',
+    'Node path(s) to delete (repeatable, required)':
+      '削除するノードパス（繰り返し可、必須）',
+    'Hard delete (irreversible)': 'ハード削除（元に戻せません）',
+    'Confirm high-risk operation (required)': '高リスク操作を確認（必須）',
+    'Deprecated alias for --path': '--path の非推奨エイリアス',
+    'Topic path to restore (required)': '復元する topic パス（必須）',
+    '--source and --event are mutually exclusive.':
+      '--source と --event は同時に指定できません。',
+    '--type cannot be combined with --source or --event.':
+      '--type は --source または --event と同時に指定できません。',
+    'Filter by name keyword': '名前キーワードでフィルタ',
+    'Filter by type (SourceFlow/EventFlow)':
+      'タイプでフィルタ（SourceFlow/EventFlow）',
+    'Show SourceFlow only': 'SourceFlow のみ表示',
+    'Show EventFlow only': 'EventFlow のみ表示',
+    'A positive Flow ID is required via --id or as a positional argument.':
+      '--id または位置引数で正の Flow ID を指定する必要があります。',
+    'Flow ID': 'Flow ID',
+    'Use exactly one of --type, --source, or --event to select a Flow type.':
+      'Flow タイプの選択には --type、--source、--event のいずれか 1 つだけを使用してください。',
+    '--template and --template-file are mutually exclusive.':
+      '--template と --template-file は同時に指定できません。',
+    'Flow name (required)': 'Flow 名（必須）',
+    'Flow type: SourceFlow | EventFlow (required)':
+      'Flow タイプ: SourceFlow | EventFlow（必須）',
+    'Set type to SourceFlow': 'タイプを SourceFlow に設定',
+    'Set type to EventFlow': 'タイプを EventFlow に設定',
+    'Initial template JSON string': '初期テンプレート JSON 文字列',
+    'Read initial template from file': 'ファイルから初期テンプレートを読み込む',
+    '--favorite and --unfavorite are mutually exclusive.':
+      '--favorite と --unfavorite は同時に指定できません。',
+    'Flow ID (required)': 'Flow ID（必須）',
+    'New template JSON string': '新しいテンプレート JSON 文字列',
+    'Read new template from file': 'ファイルから新しいテンプレートを読み込む',
+    'Mark as favorite': 'お気に入りに追加',
+    'Remove from favorites': 'お気に入りから削除',
+    'Save output to file': '出力をファイルに保存',
+    '--flows-json and --flows-file are mutually exclusive.':
+      '--flows-json と --flows-file は同時に指定できません。',
+    'Deployment replaces all existing Node-RED nodes in the Flow.':
+      'デプロイすると、この Flow 内の既存の Node-RED ノードがすべて置き換えられます。',
+    'Node-RED canvas JSON string': 'Node-RED canvas JSON 文字列',
+    'Read Node-RED canvas JSON from file (recommended)':
+      'ファイルから Node-RED canvas JSON を読み込む（推奨）',
+    'Positional arguments may contain comma-separated Flow IDs.':
+      '位置引数にはカンマ区切りの Flow ID を含められます。',
+    'Deletion stops the Node-RED container(s) and cannot be undone.':
+      '削除すると Node-RED コンテナーが停止し、元に戻せません。',
+    'Flow ID(s) to delete (repeatable)': '削除する Flow ID（繰り返し可）',
+    'Accepts at most one positional Flow type.':
+      '位置引数の Flow タイプは最大 1 つまで指定できます。',
+    'Do not combine positional/type input with --source or --event.':
+      '位置引数/タイプ入力を --source または --event と併用しないでください。',
+    'Flow type (SourceFlow/EventFlow)': 'Flow タイプ（SourceFlow/EventFlow）',
+    'Show SourceFlow nodes': 'SourceFlow ノードを表示',
+    'Show EventFlow nodes': 'EventFlow ノードを表示',
+    'List available Node-RED node types':
+      '利用可能な Node-RED ノードタイプを一覧表示',
+    'Exactly one local file argument is required.':
+      'ローカルファイル引数を 1 つだけ指定する必要があります。',
+    'Files larger than 100MB automatically use multipart upload.':
+      '100MB を超えるファイルは自動的にマルチパートアップロードを使用します。',
+    'The CLI does not enforce a hard maximum file size; the server applies plan/quota limits.':
+      'CLI は厳密な最大ファイルサイズを強制しません。サーバー側でプラン/クォータ制限が適用されます。',
+    'Business scene': '業務シーン',
+    'Usage scope: user|workspace|platform':
+      '使用範囲: user|workspace|platform',
+    'Visibility: public|private': '可視性: public|private',
+    'AI app instance ID': 'AI アプリインスタンス ID',
+    'AI session ID': 'AI セッション ID',
+    'Multipart part size (e.g. 10MB, min 5MB)':
+      'マルチパートのパートサイズ（例: 10MB、最小 5MB）',
+    'Multipart upload concurrency (number of parallel parts)':
+      'マルチパートアップロードの同時実行数（並列パート数）',
+    'Resume an interrupted multipart upload':
+      '中断されたマルチパートアップロードを再開',
+    'Abort an interrupted multipart upload and clean up its state':
+      '中断されたマルチパートアップロードを中止し、状態をクリーンアップ',
+    'File path returned by upload': 'アップロードで返されたファイルパス',
+    'Output file path (default: stdout)':
+      '出力ファイルパス（デフォルト: stdout）',
+    'Custom Content-Disposition': 'カスタム Content-Disposition',
+    'Presigned URL expiration seconds': '署名付き URL の有効期限（秒）',
+  },
+  es: {
+    Skills: 'Skills',
+    'Node-RED Flow': 'Flujo Node-RED',
+    'Without --no-wait, the CLI polls every 5 seconds for up to 10 minutes.':
+      'Sin --no-wait, el CLI consulta cada 5 segundos durante un máximo de 10 minutos.',
+    'With --no-wait --json, the CLI returns verification_url, setup_code, and expires_in.':
+      'Con --no-wait --json, el CLI devuelve verification_url, setup_code y expires_in.',
+    '--body and --body-file are mutually exclusive.':
+      '--body y --body-file son mutuamente excluyentes.',
+    'Upgrade to a specific version (default: latest)':
+      'Actualizar a una versión específica (predeterminado: latest)',
+    'Agent Skills and config are kept by default.':
+      'Las Agent Skills y la configuración se conservan de forma predeterminada.',
+    'The local bundled skills directory is removed during CLI uninstall.':
+      'El directorio local de skills integradas se elimina durante la desinstalación del CLI.',
+    'Also remove the Tier0 Skill from detected AI agents':
+      'Eliminar también la Tier0 Skill de los AI agents detectados',
+    'Keep agent skills (deprecated; this is now the default)':
+      'Conservar agent skills (obsoleto; ahora es el comportamiento predeterminado)',
+    'Replace the active Skill with the embedded baseline':
+      'Reemplazar la Skill activa con la línea base integrada',
+    'Install locally without syncing detected AI agents':
+      'Instalar localmente sin sincronizar con los AI agents detectados',
+    'Show skills version info': 'Mostrar información de versión de las skills',
+    'Show active and embedded Skill status':
+      'Mostrar el estado de la Skill activa e integrada',
+    'Sync the active Skill to detected AI agents':
+      'Sincronizar la Skill activa con los AI agents detectados',
+    'Shows user, workspace, key name, key type, roles, and permissions.':
+      'Muestra usuario, workspace, nombre de key, tipo de key, roles y permisos.',
+    'Path to browse in the UNS tree': 'Ruta para explorar en el árbol UNS',
+    'Max recursion depth (0 = unlimited)': 'Profundidad máxima de recursión (0 = ilimitado)',
+    'Include node metadata': 'Incluir metadatos del nodo',
+    'Include leaf node values': 'Incluir valores de nodos hoja',
+    'Search by name keyword': 'Buscar por palabra clave de nombre',
+    'Filter by path prefix': 'Filtrar por prefijo de ruta',
+    'Filter by topic type': 'Filtrar por topic type',
+    'Page number': 'Número de página',
+    'Page size (max results)': 'Tamaño de página (resultados máximos)',
+    'At least one topic is required via positional args or --topic.':
+      'Se requiere al menos un topic mediante argumentos posicionales o --topic.',
+    'Topic name(s) to read (repeatable; positional args are also accepted)':
+      'Nombre(s) de topic para leer (repetible; también se aceptan argumentos posicionales)',
+    'Include topic metadata (topicType, fields, description)':
+      'Incluir metadatos del topic (topicType, fields, description)',
+    '--value and --file are mutually exclusive.':
+      '--value y --file son mutuamente excluyentes.',
+    'The value must be a valid JSON object matching the topic fields.':
+      'El valor debe ser un JSON object válido que coincida con los topic fields.',
+    'Topic name to write to (required)': 'Nombre del topic en el que escribir (obligatorio)',
+    'JSON value string (mutually exclusive with --file)':
+      'Cadena de valor JSON (mutuamente excluyente con --file)',
+    'Read value from file (mutually exclusive with --value)':
+      'Leer valor desde archivo (mutuamente excluyente con --value)',
+    'MQTT QoS level (0/1/2)': 'Nivel MQTT QoS (0/1/2)',
+    'Set MQTT retain flag': 'Configurar flag retain de MQTT',
+    'Topic name(s) (repeatable, required)': 'Nombre(s) de topic (repetible, obligatorio)',
+    "Start time: relative (-1h/-30m/-7d), ISO 8601, or 'now' (required)":
+      "Hora de inicio: relativa (-1h/-30m/-7d), ISO 8601 o 'now' (obligatorio)",
+    "End time: relative, ISO 8601, or 'now' (default: now)":
+      "Hora de fin: relativa, ISO 8601 o 'now' (predeterminado: now)",
+    'Page size (max data points)': 'Tamaño de página (máximo de puntos de datos)',
+    'Aggregation interval (e.g. 1m, 1h, 1d)':
+      'Intervalo de agregación (por ejemplo, 1m, 1h, 1d)',
+    'Aggregation function (avg/max/min/sum/count)':
+      'Función de agregación (avg/max/min/sum/count)',
+    'Aggregation field name': 'Nombre del campo de agregación',
+    'When not using --file, --topic and --type are required.':
+      'Si no se usa --file, --topic y --type son obligatorios.',
+    '--fields and --fields-file are mutually exclusive.':
+      '--fields y --fields-file son mutuamente excluyentes.',
+    'For topic nodes, the segment immediately before the leaf must be Metric, Action, or State.':
+      'En nodos topic, el segmento inmediatamente anterior a la hoja debe ser Metric, Action o State.',
+    'Topic path or leaf name (required if not using --file)':
+      'Ruta del topic o nombre de hoja (obligatorio si no se usa --file)',
+    'Parent path prefix (optional, combined with --topic)':
+      'Prefijo de ruta padre (opcional, se combina con --topic)',
+    "Node type: 'path' (folder) or 'topic' (data point)":
+      "Tipo de nodo: 'path' (carpeta) o 'topic' (punto de datos)",
+    'Display name': 'Nombre visible',
+    Description: 'Descripción',
+    Alias: 'Alias',
+    'Read namespace definition from JSON file ({"namespace":[]} or bare array)':
+      'Leer definición de namespace desde archivo JSON ({"namespace":[]} o un array directo)',
+    'Deprecated: topic type is now derived from the path (Metric/Action/State folder before leaf)':
+      'Obsoleto: el topic type ahora se deriva de la ruta (carpeta Metric/Action/State antes de la hoja)',
+    'Schema fields JSON array': 'Array JSON de schema fields',
+    'Read schema fields JSON array from file':
+      'Leer array JSON de schema fields desde archivo',
+    '--description and --clear-description are mutually exclusive.':
+      '--description y --clear-description son mutuamente excluyentes.',
+    'At least one field to update is required.':
+      'Se requiere al menos un campo para actualizar.',
+    'Topic path to update (required)': 'Ruta del topic a actualizar (obligatorio)',
+    'New name': 'Nuevo nombre',
+    'New alias': 'Nuevo alias',
+    'New description': 'Nueva descripción',
+    'Clear the description without relying on an empty shell argument':
+      'Borrar la descripción sin depender de un argumento vacío del shell',
+    'New display name': 'Nuevo nombre visible',
+    'Extended properties JSON object': 'JSON object de propiedades extendidas',
+    'Fields to update (repeatable, e.g. name,description,fields)':
+      'Campos a actualizar (repetible, por ejemplo name,description,fields)',
+    'Soft delete is the default and can be restored.':
+      'El borrado suave es el predeterminado y se puede restaurar.',
+    '--hard is irreversible.': '--hard es irreversible.',
+    'High-risk execution requires --yes unless using --dry-run.':
+      'Las operaciones de alto riesgo requieren --yes salvo que se use --dry-run.',
+    'Node path(s) to delete (repeatable, required)':
+      'Ruta(s) de nodo a eliminar (repetible, obligatorio)',
+    'Hard delete (irreversible)': 'Borrado definitivo (irreversible)',
+    'Confirm high-risk operation (required)': 'Confirmar operación de alto riesgo (obligatorio)',
+    'Deprecated alias for --path': 'Alias obsoleto de --path',
+    'Topic path to restore (required)': 'Ruta del topic a restaurar (obligatorio)',
+    '--source and --event are mutually exclusive.':
+      '--source y --event son mutuamente excluyentes.',
+    '--type cannot be combined with --source or --event.':
+      '--type no puede combinarse con --source ni --event.',
+    'Filter by name keyword': 'Filtrar por palabra clave de nombre',
+    'Filter by type (SourceFlow/EventFlow)':
+      'Filtrar por tipo (SourceFlow/EventFlow)',
+    'Show SourceFlow only': 'Mostrar solo SourceFlow',
+    'Show EventFlow only': 'Mostrar solo EventFlow',
+    'A positive Flow ID is required via --id or as a positional argument.':
+      'Se requiere un Flow ID positivo mediante --id o como argumento posicional.',
+    'Flow ID': 'Flow ID',
+    'Use exactly one of --type, --source, or --event to select a Flow type.':
+      'Use exactamente uno de --type, --source o --event para seleccionar el tipo de Flow.',
+    '--template and --template-file are mutually exclusive.':
+      '--template y --template-file son mutuamente excluyentes.',
+    'Flow name (required)': 'Nombre del Flow (obligatorio)',
+    'Flow type: SourceFlow | EventFlow (required)':
+      'Tipo de Flow: SourceFlow | EventFlow (obligatorio)',
+    'Set type to SourceFlow': 'Definir tipo como SourceFlow',
+    'Set type to EventFlow': 'Definir tipo como EventFlow',
+    'Initial template JSON string': 'Cadena JSON de plantilla inicial',
+    'Read initial template from file': 'Leer plantilla inicial desde archivo',
+    '--favorite and --unfavorite are mutually exclusive.':
+      '--favorite y --unfavorite son mutuamente excluyentes.',
+    'Flow ID (required)': 'Flow ID (obligatorio)',
+    'New template JSON string': 'Nueva cadena JSON de plantilla',
+    'Read new template from file': 'Leer nueva plantilla desde archivo',
+    'Mark as favorite': 'Marcar como favorito',
+    'Remove from favorites': 'Quitar de favoritos',
+    'Save output to file': 'Guardar salida en archivo',
+    '--flows-json and --flows-file are mutually exclusive.':
+      '--flows-json y --flows-file son mutuamente excluyentes.',
+    'Deployment replaces all existing Node-RED nodes in the Flow.':
+      'El despliegue reemplaza todos los nodos Node-RED existentes en el Flow.',
+    'Node-RED canvas JSON string': 'Cadena JSON del canvas de Node-RED',
+    'Read Node-RED canvas JSON from file (recommended)':
+      'Leer JSON del canvas de Node-RED desde archivo (recomendado)',
+    'Positional arguments may contain comma-separated Flow IDs.':
+      'Los argumentos posicionales pueden contener Flow IDs separados por comas.',
+    'Deletion stops the Node-RED container(s) and cannot be undone.':
+      'La eliminación detiene los contenedores Node-RED y no se puede deshacer.',
+    'Flow ID(s) to delete (repeatable)': 'Flow ID(s) a eliminar (repetible)',
+    'Accepts at most one positional Flow type.':
+      'Acepta como máximo un tipo de Flow posicional.',
+    'Do not combine positional/type input with --source or --event.':
+      'No combine entrada posicional/de tipo con --source o --event.',
+    'Flow type (SourceFlow/EventFlow)': 'Tipo de Flow (SourceFlow/EventFlow)',
+    'Show SourceFlow nodes': 'Mostrar nodos SourceFlow',
+    'Show EventFlow nodes': 'Mostrar nodos EventFlow',
+    'List available Node-RED node types':
+      'Listar tipos de nodos Node-RED disponibles',
+    'Exactly one local file argument is required.':
+      'Se requiere exactamente un argumento de archivo local.',
+    'Files larger than 100MB automatically use multipart upload.':
+      'Los archivos mayores de 100MB usan automáticamente carga multipart.',
+    'The CLI does not enforce a hard maximum file size; the server applies plan/quota limits.':
+      'El CLI no impone un tamaño máximo estricto; el servidor aplica límites de plan/cuota.',
+    'Business scene': 'Escena de negocio',
+    'Usage scope: user|workspace|platform':
+      'Ámbito de uso: user|workspace|platform',
+    'Visibility: public|private': 'Visibilidad: public|private',
+    'AI app instance ID': 'ID de instancia de app AI',
+    'AI session ID': 'ID de sesión AI',
+    'Multipart part size (e.g. 10MB, min 5MB)':
+      'Tamaño de parte multipart (por ejemplo 10MB, mínimo 5MB)',
+    'Multipart upload concurrency (number of parallel parts)':
+      'Concurrencia de carga multipart (número de partes paralelas)',
+    'Resume an interrupted multipart upload': 'Reanudar una carga multipart interrumpida',
+    'Abort an interrupted multipart upload and clean up its state':
+      'Cancelar una carga multipart interrumpida y limpiar su estado',
+    'File path returned by upload': 'Ruta de archivo devuelta por la carga',
+    'Output file path (default: stdout)': 'Ruta del archivo de salida (predeterminado: stdout)',
+    'Custom Content-Disposition': 'Content-Disposition personalizado',
+    'Presigned URL expiration seconds': 'Segundos de expiración de la URL prefirmada',
+  },
+  ko: {
+    Skills: '스킬',
+    'Node-RED Flow': 'Node-RED 플로우',
+    'Without --no-wait, the CLI polls every 5 seconds for up to 10 minutes.':
+      '--no-wait를 사용하지 않으면 CLI가 최대 10분 동안 5초마다 폴링합니다.',
+    'With --no-wait --json, the CLI returns verification_url, setup_code, and expires_in.':
+      '--no-wait --json을 사용하면 CLI가 verification_url, setup_code, expires_in을 반환합니다.',
+    '--body and --body-file are mutually exclusive.':
+      '--body와 --body-file은 함께 사용할 수 없습니다.',
+    'Upgrade to a specific version (default: latest)':
+      '특정 버전으로 업그레이드(기본값: latest)',
+    'Agent Skills and config are kept by default.':
+      'Agent Skills와 설정은 기본적으로 유지됩니다.',
+    'The local bundled skills directory is removed during CLI uninstall.':
+      'CLI 제거 중에는 로컬 내장 skills 디렉터리가 삭제됩니다.',
+    'Also remove the Tier0 Skill from detected AI agents':
+      '감지된 AI agents에서도 Tier0 Skill 제거',
+    'Keep agent skills (deprecated; this is now the default)':
+      'agent skills 유지(지원 중단됨. 현재는 기본 동작)',
+    'Replace the active Skill with the embedded baseline':
+      '활성 Skill을 내장 기준 버전으로 교체',
+    'Install locally without syncing detected AI agents':
+      '감지된 AI agents와 동기화하지 않고 로컬에만 설치',
+    'Show skills version info': 'skills 버전 정보 표시',
+    'Show active and embedded Skill status':
+      '활성 Skill과 내장 Skill 상태 표시',
+    'Sync the active Skill to detected AI agents':
+      '활성 Skill을 감지된 AI agents에 동기화',
+    'Shows user, workspace, key name, key type, roles, and permissions.':
+      '사용자, workspace, key 이름, key 유형, 역할 및 권한을 표시합니다.',
+    'Path to browse in the UNS tree': 'UNS 트리에서 탐색할 경로',
+    'Max recursion depth (0 = unlimited)': '최대 재귀 깊이(0 = 무제한)',
+    'Include node metadata': '노드 메타데이터 포함',
+    'Include leaf node values': '리프 노드 값 포함',
+    'Search by name keyword': '이름 키워드로 검색',
+    'Filter by path prefix': '경로 접두사로 필터링',
+    'Filter by topic type': 'topic type으로 필터링',
+    'Page number': '페이지 번호',
+    'Page size (max results)': '페이지 크기(최대 결과 수)',
+    'At least one topic is required via positional args or --topic.':
+      '위치 인수 또는 --topic으로 최소 하나의 topic이 필요합니다.',
+    'Topic name(s) to read (repeatable; positional args are also accepted)':
+      '읽을 topic 이름(반복 가능, 위치 인수도 허용)',
+    'Include topic metadata (topicType, fields, description)':
+      'topic 메타데이터(topicType, fields, description) 포함',
+    '--value and --file are mutually exclusive.':
+      '--value와 --file은 함께 사용할 수 없습니다.',
+    'The value must be a valid JSON object matching the topic fields.':
+      '값은 topic fields와 일치하는 유효한 JSON object여야 합니다.',
+    'Topic name to write to (required)': '쓸 대상 topic 이름(필수)',
+    'JSON value string (mutually exclusive with --file)':
+      'JSON 값 문자열(--file과 함께 사용할 수 없음)',
+    'Read value from file (mutually exclusive with --value)':
+      '파일에서 값 읽기(--value와 함께 사용할 수 없음)',
+    'MQTT QoS level (0/1/2)': 'MQTT QoS 레벨(0/1/2)',
+    'Set MQTT retain flag': 'MQTT retain 플래그 설정',
+    'Topic name(s) (repeatable, required)': 'topic 이름(반복 가능, 필수)',
+    "Start time: relative (-1h/-30m/-7d), ISO 8601, or 'now' (required)":
+      "시작 시간: 상대값(-1h/-30m/-7d), ISO 8601 또는 'now'(필수)",
+    "End time: relative, ISO 8601, or 'now' (default: now)":
+      "종료 시간: 상대값, ISO 8601 또는 'now'(기본값: now)",
+    'Page size (max data points)': '페이지 크기(최대 데이터 포인트 수)',
+    'Aggregation interval (e.g. 1m, 1h, 1d)':
+      '집계 간격(예: 1m, 1h, 1d)',
+    'Aggregation function (avg/max/min/sum/count)':
+      '집계 함수(avg/max/min/sum/count)',
+    'Aggregation field name': '집계 필드 이름',
+    'When not using --file, --topic and --type are required.':
+      '--file을 사용하지 않으면 --topic과 --type이 필요합니다.',
+    '--fields and --fields-file are mutually exclusive.':
+      '--fields와 --fields-file은 함께 사용할 수 없습니다.',
+    'For topic nodes, the segment immediately before the leaf must be Metric, Action, or State.':
+      'topic 노드에서는 리프 바로 앞 경로 세그먼트가 Metric, Action 또는 State여야 합니다.',
+    'Topic path or leaf name (required if not using --file)':
+      'topic 경로 또는 리프 이름(--file을 사용하지 않을 때 필수)',
+    'Parent path prefix (optional, combined with --topic)':
+      '상위 경로 접두사(선택 사항, --topic과 결합)',
+    "Node type: 'path' (folder) or 'topic' (data point)":
+      "노드 유형: 'path'(폴더) 또는 'topic'(데이터 포인트)",
+    'Display name': '표시 이름',
+    Description: '설명',
+    Alias: '별칭',
+    'Read namespace definition from JSON file ({"namespace":[]} or bare array)':
+      'JSON 파일에서 namespace 정의 읽기({"namespace":[]} 또는 배열만)',
+    'Deprecated: topic type is now derived from the path (Metric/Action/State folder before leaf)':
+      '지원 중단: topic type은 이제 경로(리프 앞의 Metric/Action/State 폴더)에서 파생됩니다.',
+    'Schema fields JSON array': 'schema fields JSON 배열',
+    'Read schema fields JSON array from file':
+      '파일에서 schema fields JSON 배열 읽기',
+    '--description and --clear-description are mutually exclusive.':
+      '--description과 --clear-description은 함께 사용할 수 없습니다.',
+    'At least one field to update is required.':
+      '업데이트할 필드를 하나 이상 지정해야 합니다.',
+    'Topic path to update (required)': '업데이트할 topic 경로(필수)',
+    'New name': '새 이름',
+    'New alias': '새 별칭',
+    'New description': '새 설명',
+    'Clear the description without relying on an empty shell argument':
+      '빈 shell 인수에 의존하지 않고 설명 지우기',
+    'New display name': '새 표시 이름',
+    'Extended properties JSON object': '확장 속성 JSON object',
+    'Fields to update (repeatable, e.g. name,description,fields)':
+      '업데이트할 필드(반복 가능, 예: name,description,fields)',
+    'Soft delete is the default and can be restored.':
+      '기본값은 소프트 삭제이며 복원할 수 있습니다.',
+    '--hard is irreversible.': '--hard는 되돌릴 수 없습니다.',
+    'High-risk execution requires --yes unless using --dry-run.':
+      '--dry-run을 사용하지 않는 한 고위험 작업에는 --yes가 필요합니다.',
+    'Node path(s) to delete (repeatable, required)':
+      '삭제할 노드 경로(반복 가능, 필수)',
+    'Hard delete (irreversible)': '하드 삭제(되돌릴 수 없음)',
+    'Confirm high-risk operation (required)': '고위험 작업 확인(필수)',
+    'Deprecated alias for --path': '--path의 지원 중단된 별칭',
+    'Topic path to restore (required)': '복원할 topic 경로(필수)',
+    '--source and --event are mutually exclusive.':
+      '--source와 --event는 함께 사용할 수 없습니다.',
+    '--type cannot be combined with --source or --event.':
+      '--type은 --source 또는 --event와 함께 사용할 수 없습니다.',
+    'Filter by name keyword': '이름 키워드로 필터링',
+    'Filter by type (SourceFlow/EventFlow)':
+      '유형별 필터링(SourceFlow/EventFlow)',
+    'Show SourceFlow only': 'SourceFlow만 표시',
+    'Show EventFlow only': 'EventFlow만 표시',
+    'A positive Flow ID is required via --id or as a positional argument.':
+      '--id 또는 위치 인수로 양수 Flow ID를 지정해야 합니다.',
+    'Flow ID': 'Flow ID',
+    'Use exactly one of --type, --source, or --event to select a Flow type.':
+      'Flow 유형을 선택하려면 --type, --source, --event 중 정확히 하나만 사용해야 합니다.',
+    '--template and --template-file are mutually exclusive.':
+      '--template과 --template-file은 함께 사용할 수 없습니다.',
+    'Flow name (required)': 'Flow 이름(필수)',
+    'Flow type: SourceFlow | EventFlow (required)':
+      'Flow 유형: SourceFlow | EventFlow(필수)',
+    'Set type to SourceFlow': '유형을 SourceFlow로 설정',
+    'Set type to EventFlow': '유형을 EventFlow로 설정',
+    'Initial template JSON string': '초기 템플릿 JSON 문자열',
+    'Read initial template from file': '파일에서 초기 템플릿 읽기',
+    '--favorite and --unfavorite are mutually exclusive.':
+      '--favorite과 --unfavorite은 함께 사용할 수 없습니다.',
+    'Flow ID (required)': 'Flow ID(필수)',
+    'New template JSON string': '새 템플릿 JSON 문자열',
+    'Read new template from file': '파일에서 새 템플릿 읽기',
+    'Mark as favorite': '즐겨찾기로 표시',
+    'Remove from favorites': '즐겨찾기에서 제거',
+    'Save output to file': '출력을 파일에 저장',
+    '--flows-json and --flows-file are mutually exclusive.':
+      '--flows-json과 --flows-file은 함께 사용할 수 없습니다.',
+    'Deployment replaces all existing Node-RED nodes in the Flow.':
+      '배포하면 해당 Flow의 기존 Node-RED 노드가 모두 교체됩니다.',
+    'Node-RED canvas JSON string': 'Node-RED canvas JSON 문자열',
+    'Read Node-RED canvas JSON from file (recommended)':
+      '파일에서 Node-RED canvas JSON 읽기(권장)',
+    'Positional arguments may contain comma-separated Flow IDs.':
+      '위치 인수에는 쉼표로 구분된 Flow ID가 포함될 수 있습니다.',
+    'Deletion stops the Node-RED container(s) and cannot be undone.':
+      '삭제하면 Node-RED 컨테이너가 중지되며 되돌릴 수 없습니다.',
+    'Flow ID(s) to delete (repeatable)': '삭제할 Flow ID(반복 가능)',
+    'Accepts at most one positional Flow type.':
+      '위치 인수 Flow 유형은 최대 하나만 허용됩니다.',
+    'Do not combine positional/type input with --source or --event.':
+      '위치/유형 입력을 --source 또는 --event와 함께 사용하지 마세요.',
+    'Flow type (SourceFlow/EventFlow)': 'Flow 유형(SourceFlow/EventFlow)',
+    'Show SourceFlow nodes': 'SourceFlow 노드 표시',
+    'Show EventFlow nodes': 'EventFlow 노드 표시',
+    'List available Node-RED node types':
+      '사용 가능한 Node-RED 노드 유형 목록 표시',
+    'Exactly one local file argument is required.':
+      '로컬 파일 인수는 정확히 하나만 필요합니다.',
+    'Files larger than 100MB automatically use multipart upload.':
+      '100MB보다 큰 파일은 자동으로 멀티파트 업로드를 사용합니다.',
+    'The CLI does not enforce a hard maximum file size; the server applies plan/quota limits.':
+      'CLI는 엄격한 최대 파일 크기를 강제하지 않으며, 서버가 플랜/할당량 제한을 적용합니다.',
+    'Business scene': '비즈니스 장면',
+    'Usage scope: user|workspace|platform':
+      '사용 범위: user|workspace|platform',
+    'Visibility: public|private': '가시성: public|private',
+    'AI app instance ID': 'AI 앱 인스턴스 ID',
+    'AI session ID': 'AI 세션 ID',
+    'Multipart part size (e.g. 10MB, min 5MB)':
+      '멀티파트 파트 크기(예: 10MB, 최소 5MB)',
+    'Multipart upload concurrency (number of parallel parts)':
+      '멀티파트 업로드 동시성(병렬 파트 수)',
+    'Resume an interrupted multipart upload': '중단된 멀티파트 업로드 재개',
+    'Abort an interrupted multipart upload and clean up its state':
+      '중단된 멀티파트 업로드를 중단하고 상태 정리',
+    'File path returned by upload': '업로드에서 반환된 파일 경로',
+    'Output file path (default: stdout)': '출력 파일 경로(기본값: stdout)',
+    'Custom Content-Disposition': '사용자 지정 Content-Disposition',
+    'Presigned URL expiration seconds': '사전 서명 URL 만료 시간(초)',
+  },
+};
+
+function translateCliText(value: string): string {
+  const translations =
+    cliTextTranslations[locale] ?? {};
+  const supplemental =
+    supplementalCliTextTranslations[locale] ?? {};
+
+  return supplemental[value] ?? translations[value] ?? value;
+}
+
 function flagName(flag: CliFlag): string {
   if (flag.shorthand) {
     return `${flag.shorthand}, ${flag.name}`;
@@ -180,16 +1224,20 @@ function commandSearchText(
 ): string {
   return [
     command.command,
-    command.description,
+    translateCliText(command.description),
     ...(command.usage ?? []),
     ...(command.aliases ?? []),
     ...(command.examples ?? []),
-    ...(command.notes ?? []),
+    ...(command.notes ?? []).map((note) =>
+      translateCliText(note)
+    ),
     ...(command.flags ?? []).flatMap(
       (flag: CliFlag) => [
         flag.name,
         flag.shorthand ?? '',
-        flag.description ?? '',
+        translateCliText(
+          flag.description ?? ''
+        ),
       ]
     ),
   ]
@@ -229,7 +1277,9 @@ function commandSearchText(
                   <span class="global-flag">
                     <code>{flag.name}</code>
                     <span>
-                      {flag.description}
+                      {translateCliText(
+                        flag.description
+                      )}
                     </span>
                   </span>
                 )
@@ -246,7 +1296,7 @@ function commandSearchText(
       data.groups.map(
         (group: CliGroup) => (
           <section class="cli-group">
-            <h2>{group.name}</h2>
+            <h2>{translateCliText(group.name)}</h2>
 
             <div class="cli-command-list">
               {
@@ -264,7 +1314,9 @@ function commandSearchText(
                         </code>
 
                         <span class="cli-description">
-                          {command.description}
+                          {translateCliText(
+                            command.description
+                          )}
                         </span>
 
                         {
@@ -345,7 +1397,9 @@ function commandSearchText(
                                             <dd>
                                               <span class="flag-description">
                                                 {
-                                                  flag.description
+                                                  translateCliText(
+                                                    flag.description
+                                                  )
                                                 }
                                               </span>
 
@@ -412,7 +1466,9 @@ function commandSearchText(
                                       note: string
                                     ) => (
                                       <li>
-                                        {note}
+                                        {translateCliText(
+                                          note
+                                        )}
                                       </li>
                                     )
                                   )
