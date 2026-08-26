@@ -65,7 +65,7 @@ import { Tabs, TabItem } from '@astrojs/starlight/components';
 请在 prompt 中说明角色和权限范围，agent 会将其与自动生成的角色进行比较。当你的角色与生成的角色冲突时，agent 会向你确认。
 :::
 :::caution[必须分配应用角色]
-要访问应用，必须分配应用角色。即使是项目所有者，如果没有应用角色，也无法在 **应用中心** 中看到该应用。
+要在 **应用中心** 中访问应用，必须分配应用角色。即使是 workspace/project 所有者，如果没有应用角色，也无法看到该应用。
 :::
 
 ### 版本管理
@@ -85,6 +85,10 @@ import { Tabs, TabItem } from '@astrojs/starlight/components';
 
 - **下载源代码**：导出应用源代码，用于二次开发。
 - **导出运行包**：专门用于在 **Tier0 Enterprise** 本地导入。
+
+:::tip[下载快照的源代码]
+保存快照后再下载，即可获取该快照版本的源代码。
+:::
 
 ## 下一步
 
