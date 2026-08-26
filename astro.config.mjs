@@ -140,12 +140,12 @@ export default defineConfig({
 						},
 						{
 							label: 'Building Apps',
-							translations: { 'zh-CN': '构建应用', ja: '工場データでアプリを構築', es: 'Crear apps con datos de fábrica', ko: '공장 데이터로 앱 구축하기' },
+							translations: { 'zh-CN': '构建应用', ja: 'アプリを構築する', es: 'Crear apps', ko: '앱 구축하기' },
 							slug: 'using-tier0/build-apps',
 						},
 						{
-							label: 'Visualizing Workshop',
-							translations: { 'zh-CN': '可视化工厂', ja: '工場を可視化する', es: 'Visualizar la fábrica', ko: '공장 시각화' },
+							label: 'Visualizing Data',
+							translations: { 'zh-CN': '可视化数据', ja: 'データを可視化する', es: 'Visualizar datos', ko: '데이터 시각화' },
 							slug: 'using-tier0/digital-twin',
 						},
 						{

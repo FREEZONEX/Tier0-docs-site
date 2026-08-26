@@ -40,6 +40,11 @@ flowchart BT
 1. モデル構造を設計し、topic を追加する前に順序どおりに path を追加します。
 2. [データ特性](../uns-concepts/#metric-state-action)に基づいて、**Metric**、**State**、**Action** から **Topic Type** を設定します。
 3. **Mock Data** を選択してモデルへシミュレーションデータを送信し、**Enable History** を有効にしてデータをデータベースへ保存します。
+    
+    :::note
+    シミュレーションデータをモデルへ送信する flow が **Flows** に作成されます。
+    :::
+
 4. **Auto Parsing** または **Pre-defined** を使って、正しいデータ型のフィールドを topic に追加します。
     - **Auto Parsing**：JSON テキストからフィールドを一括で自動変換します。
     - **Pre-defined**：topic のフィールドを 1 つずつ手動で設定します。

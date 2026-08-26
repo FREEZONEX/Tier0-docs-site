@@ -44,6 +44,11 @@ flowchart BT
 1. 设计模型结构，先按顺序创建路径，再创建 topic。
 2. 根据[数据特征](../uns-concepts/#metric-state-action)，在 **Metric**、**State** 和 **Action** 中选择 **Topic Type**。
 3. 选择 **Mock Data** 向模型发送模拟数据，并启用 **Enable History** 将数据存入数据库。
+    
+    :::note
+    系统会在 **数据流程** 中创建一个 flow，用来向模型发送模拟数据。
+    :::
+
 4. 通过 **Auto Parsing** 或 **Pre-defined** 为 topic 添加正确数据类型的字段。
     - **Auto Parsing**：从 JSON 文本中批量自动转换字段。
 

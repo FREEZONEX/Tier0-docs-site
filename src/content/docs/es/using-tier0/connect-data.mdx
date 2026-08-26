@@ -40,6 +40,11 @@ Define la jerarquía de datos como un mapa de árbol según:
 1. Diseña la estructura del modelo y añade las rutas en orden antes de añadir el topic.
 2. Configura **Topic Type** entre **Metric**, **State** y **Action** según las [características de los datos](../uns-concepts/#metric-state-action).
 3. Selecciona **Mock Data** para enviar datos simulados al modelo y **Enable History** para guardar los datos en la base de datos.
+    
+    :::note
+    Se creará un flow en **Flows** para enviar datos simulados al modelo.
+    :::
+
 4. Añade campos de datos al topic con los tipos correctos mediante **Auto Parsing** o **Pre-defined**.
     - **Auto Parsing**: Convierte automáticamente campos desde texto JSON por lotes.
     - **Pre-defined**: Configura manualmente los campos del topic uno por uno.
