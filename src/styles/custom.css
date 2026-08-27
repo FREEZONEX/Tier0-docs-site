@@ -3456,7 +3456,7 @@ main:has(.t0-banner) .t0-banner {
 }
 
 :root[data-theme='light'] .starlight-aside--tip .starlight-aside__content {
-	color: #1d1d1d;
+	color: #4b4f4d;
 }
 
 :root[data-theme='light'] .starlight-aside--tip .starlight-aside__content a {
@@ -3540,7 +3540,7 @@ main:has(.t0-banner) .t0-banner {
 }
 
 :root[data-theme='light'] .starlight-aside--note .starlight-aside__content {
-	color: #050b14;
+	color: #4b4f4d;
 }
 
 :root[data-theme='light'] .starlight-aside--note .starlight-aside__content a {
@@ -3624,7 +3624,7 @@ main:has(.t0-banner) .t0-banner {
 }
 
 :root[data-theme='light'] .starlight-aside--caution .starlight-aside__content {
-	color: #050b14;
+	color: #4b4f4d;
 }
 
 :root[data-theme='light'] .starlight-aside--caution .starlight-aside__content a {
