@@ -163,6 +163,47 @@ header site-search button[data-open-modal] kbd {
 	padding: 0 6px;
 }
 
+/* Algolia DocSearch: white field, gray keycap, lime only as hover feedback. */
+header sl-doc-search .DocSearch-Button {
+	background: #ffffff;
+	border: 1px solid #d4d9cd;
+	border-radius: 4px;
+	box-shadow: none;
+	color: #454c57;
+	padding-inline: 13px 9px;
+}
+
+header sl-doc-search .DocSearch-Button:hover {
+	background: #fbfff4;
+	border-color: #a7cf3a;
+	color: #171a22;
+}
+
+header sl-doc-search .DocSearch-Button-Keys {
+	display: flex;
+	align-items: center;
+	gap: 0.2rem;
+	min-height: 21px;
+	padding: 0 6px;
+	border-radius: 4px;
+	background: #e2e6de;
+	color: #707780;
+}
+
+header sl-doc-search .DocSearch-Button-Keys::before {
+	display: none;
+}
+
+header sl-doc-search .DocSearch-Button-Key {
+	display: inline;
+	padding: 0;
+	border: 0;
+	background: transparent;
+	box-shadow: none;
+	color: inherit;
+	font: inherit;
+}
+
 /* Right cluster — Figma 4410:4481: gap 16px, items-center; icons 16px.
    Do NOT set display here: Starlight uses `sl-hidden md:sl-flex` so this
    cluster stays in the header only on desktop; phone/iPad use MobileMenuFooter. */
@@ -302,6 +343,23 @@ header.header > .header .title-wrapper {
 	color: #bdbdbd;
 }
 
+:root[data-theme='dark'] header sl-doc-search .DocSearch-Button {
+	background: #1f1f1f;
+	border-color: #3a3a3a;
+	color: #d5d5d5;
+}
+
+:root[data-theme='dark'] header sl-doc-search .DocSearch-Button:hover {
+	background: #243014;
+	border-color: #73b200;
+	color: #f4f4f4;
+}
+
+:root[data-theme='dark'] header sl-doc-search .DocSearch-Button-Keys {
+	background: #2a2a2a;
+	color: #bdbdbd;
+}
+
 /* Mobile menu toggle — match search: square + stroked border, no pill/shadow.
    Do NOT set display here: Starlight uses `sl-flex md:sl-hidden` so the button
    stays hidden on desktop (≥50rem) and only appears on tablet/phone. */
@@ -359,7 +417,7 @@ header .astro-r2p65idu {
 	:root[data-has-sidebar] header.header .header {
 		display: grid;
 		grid-template-columns: var(--t0-sidebar-width) minmax(0, 1fr) auto;
-		gap: var(--sl-nav-gap, 1rem);
+		gap: 16px;
 		align-items: center;
 	}
 
@@ -377,22 +435,24 @@ header .astro-r2p65idu {
 		max-width: none;
 	}
 
-	:root[data-has-sidebar] header.header .header > .sl-flex:has(site-search) {
+	:root[data-has-sidebar] header.header .header > .sl-flex:has(site-search),
+	:root[data-has-sidebar] header.header .header > .sl-flex:has(sl-doc-search) {
 		grid-column: 2;
 		display: flex;
 		justify-content: flex-end;
 		min-width: 0;
-		padding-inline-end: 0.75rem;
 	}
 
-	:root[data-has-sidebar] header.header site-search {
+	:root[data-has-sidebar] header.header site-search,
+	:root[data-has-sidebar] header.header sl-doc-search {
 		display: flex;
 		justify-content: flex-end;
 		width: 100%;
 		min-width: 0;
 	}
 
-	:root[data-has-sidebar] header.header site-search button[data-open-modal] {
+	:root[data-has-sidebar] header.header site-search button[data-open-modal],
+	:root[data-has-sidebar] header.header sl-doc-search .DocSearch-Button {
 		width: min(22rem, 100%);
 	}
 
@@ -431,7 +491,13 @@ header .astro-r2p65idu {
 }
 
 .t0-sidebar-toggle[aria-expanded='false'] {
-	background: #f7f8f4;
+	background: #ffffff;
+	border-color: #ebebeb;
+	color: #343434;
+}
+
+.t0-sidebar-toggle[aria-expanded='false']:hover {
+	background: #f7fde8;
 	border-color: #73b200;
 	color: #4a7300;
 }
@@ -447,6 +513,12 @@ header .astro-r2p65idu {
 }
 
 :root[data-theme='dark'] .t0-sidebar-toggle[aria-expanded='false'] {
+	background: #1f1f1f;
+	border-color: #3a3a3a;
+	color: #d5d5d5;
+}
+
+:root[data-theme='dark'] .t0-sidebar-toggle[aria-expanded='false']:hover {
 	background: #243014;
 	border-color: #73b200;
 	color: #b2ed1d;
@@ -513,7 +585,7 @@ header .astro-r2p65idu {
 		justify-content: center;
 	}
 
-	.site-title::after {
+	.docs-home-link {
 		display: none;
 	}
 }
@@ -653,6 +725,33 @@ site-search button[data-close-modal]:hover {
 #starlight__sidebar {
 	background: #fcfcfc;
 	border-inline-end: 1px solid #ebebeb;
+	scrollbar-width: thin;
+	scrollbar-color: transparent transparent;
+}
+
+#starlight__sidebar:hover,
+#starlight__sidebar:focus-within {
+	scrollbar-color: #c7c7c7 transparent;
+}
+
+#starlight__sidebar::-webkit-scrollbar {
+	width: 10px;
+}
+
+#starlight__sidebar::-webkit-scrollbar-track {
+	background: transparent;
+}
+
+#starlight__sidebar::-webkit-scrollbar-thumb {
+	border: 3px solid transparent;
+	border-radius: 999px;
+	background: transparent;
+	background-clip: content-box;
+}
+
+#starlight__sidebar:hover::-webkit-scrollbar-thumb,
+#starlight__sidebar:focus-within::-webkit-scrollbar-thumb {
+	background-color: #c7c7c7;
 }
 
 #starlight__sidebar summary {
@@ -668,20 +767,6 @@ site-search button[data-close-modal]:hover {
 	letter-spacing: normal;
 	text-transform: uppercase;
 	color: #878787;
-}
-
-#starlight__sidebar .t0-sidebar-group-home-link {
-	cursor: pointer;
-	border-radius: 4px;
-}
-
-#starlight__sidebar .t0-sidebar-group-home-link:hover .large {
-	color: #5f9900;
-}
-
-#starlight__sidebar .t0-sidebar-group-home-link:focus-visible {
-	outline: 2px solid #73b200;
-	outline-offset: 2px;
 }
 
 #starlight__sidebar details ul {
@@ -720,6 +805,16 @@ site-search button[data-close-modal]:hover {
 :root[data-theme='dark'] #starlight__sidebar {
 	background: #202020;
 	border-inline-end-color: #2e2e2e;
+}
+
+:root[data-theme='dark'] #starlight__sidebar:hover,
+:root[data-theme='dark'] #starlight__sidebar:focus-within {
+	scrollbar-color: #595959 transparent;
+}
+
+:root[data-theme='dark'] #starlight__sidebar:hover::-webkit-scrollbar-thumb,
+:root[data-theme='dark'] #starlight__sidebar:focus-within::-webkit-scrollbar-thumb {
+	background-color: #595959;
 }
 
 :root[data-theme='dark'] #starlight__sidebar summary,
@@ -877,8 +972,11 @@ footer .last-updated {
 	display: none;
 }
 
+:root[data-theme] .sl-markdown-content strong {
+	font-weight: 500;
+}
+
 :root[data-theme='light'] .sl-markdown-content strong {
-	font-weight: 600;
 	color: #050b14;
 }
 
@@ -888,9 +986,9 @@ starlight-tabs.t0-topic-explosion-tabs,
 }
 
 .t0-topic-explosion-tabs [role='tablist'] > .tab:first-child > [role='tab'][aria-selected='true'] {
-	background: #f77c7c !important;
-	border-color: #f77c7c !important;
-	color: #050b14 !important;
+	background: #dc2626 !important;
+	border-color: #dc2626 !important;
+	color: #ffffff !important;
 }
 
 :root[data-theme='dark']
@@ -907,20 +1005,102 @@ starlight-tabs.t0-topic-explosion-tabs,
 	margin: 0;
 }
 
-/* Keep heading anchor icon from covering heading text on hover */
+/* Figma 4410:4168 — heading link button, revealed by the heading row. */
+.sl-markdown-content .sl-heading-wrapper {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	width: fit-content;
+	max-width: 100%;
+}
+
+.sl-markdown-content .sl-heading-wrapper > :first-child {
+	display: block;
+	min-width: 0;
+	padding-inline-end: 0;
+}
+
 .sl-markdown-content .sl-heading-wrapper .sl-anchor-link {
-	margin-inline-start: 0.375rem;
-	font-size: 0.75em;
+	display: inline-flex;
+	flex: 0 0 30px;
+	align-items: center;
+	justify-content: center;
+	box-sizing: border-box;
+	width: 30px;
+	height: 30px;
+	margin: 0;
+	padding: 6px;
+	border: 1px solid #ebebeb;
+	border-radius: 4px;
+	background: #ffffff;
+	color: #1c1f1e;
 	line-height: 1;
-	vertical-align: 0.05em;
-	transform: scale(0.82);
-	transform-origin: center;
-	opacity: 0.75;
+	transform: none;
+	transition: border-color 0.15s ease, color 0.15s ease, opacity 0.15s ease;
+}
+
+.sl-markdown-content .sl-heading-wrapper .sl-anchor-link::after {
+	inset: 0;
+}
+
+.sl-markdown-content .sl-heading-wrapper .sl-anchor-icon {
+	display: flex;
+	width: 16px;
+	height: 16px;
 }
 
 .sl-markdown-content .sl-heading-wrapper .sl-anchor-link svg {
-	width: 0.85em;
-	height: 0.85em;
+	display: block;
+	width: 16px;
+	height: 16px;
+	transform: none;
+}
+
+:root[data-theme='light'] .sl-markdown-content .sl-heading-wrapper .sl-anchor-icon,
+:root[data-theme='light'] .sl-markdown-content .sl-heading-wrapper .sl-anchor-link svg {
+	color: #1c1f1e;
+	fill: #1c1f1e;
+}
+
+.sl-markdown-content .sl-heading-wrapper .sl-anchor-link:hover {
+	border-color: #d4d4d4;
+}
+
+.sl-markdown-content .sl-heading-wrapper .sl-anchor-link:active,
+.sl-markdown-content .sl-heading-wrapper .sl-anchor-link.t0-anchor-copied {
+	border-color: #b2ed1d;
+	color: #1c1f1e;
+}
+
+@media (hover: hover) {
+	.sl-markdown-content .sl-heading-wrapper .sl-anchor-link {
+		opacity: 0;
+		pointer-events: none;
+	}
+
+	.sl-markdown-content .sl-heading-wrapper:hover .sl-anchor-link,
+	.sl-markdown-content .sl-heading-wrapper:focus-within .sl-anchor-link {
+		opacity: 1;
+		pointer-events: auto;
+	}
+}
+
+:root[data-theme='dark'] .sl-markdown-content .sl-heading-wrapper .sl-anchor-link {
+	border-color: #3a3a3a;
+	background: #1f1f1f;
+	color: #e8e8e8;
+}
+
+:root[data-theme='dark'] .sl-markdown-content .sl-heading-wrapper .sl-anchor-icon,
+:root[data-theme='dark'] .sl-markdown-content .sl-heading-wrapper .sl-anchor-link svg {
+	color: #e8e8e8;
+	fill: #e8e8e8;
+}
+
+:root[data-theme='dark'] .sl-markdown-content .sl-heading-wrapper .sl-anchor-link:active,
+:root[data-theme='dark'] .sl-markdown-content .sl-heading-wrapper .sl-anchor-link.t0-anchor-copied {
+	border-color: #b2ed1d;
+	color: #b2ed1d;
 }
 
 :root[data-theme='light'] .sl-markdown-content :not(.sl-heading-wrapper) + .sl-heading-wrapper {
@@ -931,17 +1111,17 @@ starlight-tabs.t0-topic-explosion-tabs,
 	margin-top: 2.5rem;
 }
 
-:root[data-theme='light'] .sl-markdown-content > :is(p, ul, ol, .expressive-code, starlight-tabs, .starlight-aside, blockquote, table) {
+:root[data-theme='light'] .sl-markdown-content > :is(p, ul, ol, details, .expressive-code, starlight-tabs, .starlight-aside, blockquote, table) {
 	margin-block: 0;
 }
 
-:root[data-theme='light'] .sl-markdown-content .sl-heading-wrapper + :is(p, ul, ol, .expressive-code, starlight-tabs, .starlight-aside, blockquote, table) {
+:root[data-theme='light'] .sl-markdown-content .sl-heading-wrapper + :is(p, ul, ol, details, .expressive-code, starlight-tabs, .starlight-aside, blockquote, table) {
 	margin-top: 1rem;
 }
 
 :root[data-theme='light'] .sl-markdown-content
-	:is(p, .expressive-code, starlight-tabs, .starlight-aside, ul, ol, blockquote, table)
-	+ :is(p, .expressive-code, starlight-tabs, .starlight-aside, ul, ol, blockquote, table) {
+	:is(p, details, .expressive-code, starlight-tabs, .starlight-aside, ul, ol, blockquote, table)
+	+ :is(p, details, .expressive-code, starlight-tabs, .starlight-aside, ul, ol, blockquote, table) {
 	margin-top: 1rem;
 }
 
@@ -1161,6 +1341,10 @@ starlight-tabs.t0-topic-explosion-tabs,
 }
 
 /* Nested steps under list labels (e.g. protocol-connections node configs) */
+:root[data-theme] .sl-markdown-content li > .expressive-code {
+	margin-top: 0.75rem;
+}
+
 .sl-markdown-content ul > li > .sl-steps {
 	padding-top: 0.75rem;
 }
@@ -1684,20 +1868,20 @@ starlight-tabs.t0-topic-explosion-tabs,
 }
 
 .t0-edition--edge {
-	color: #242424;
-	border-color: #d9d9d9;
-	background: #f9f9f9;
+	color: #343434;
+	border-color: #878787;
+	background: #f7f7f7;
 }
 
 .t0-edition--cloud {
-	color: #65a30d;
-	border-color: #73b200;
-	background: #fcfef8;
+	color: #365500;
+	border-color: #65a000;
+	background: #f7fde8;
 }
 
 .t0-edition--enterprise {
-	color: #050b14;
-	border-color: #050b14;
+	color: #343434;
+	border-color: #454545;
 	background: rgb(205 206 208 / 30%);
 }
 
@@ -1707,8 +1891,8 @@ starlight-tabs.t0-topic-explosion-tabs,
 
 :root[data-theme='dark'] .t0-edition--edge {
 	color: #e7e7e7;
-	border-color: #5a5a5a;
-	background: #2b2b2b;
+	border-color: #8f8f8f;
+	background: #242424;
 }
 
 :root[data-theme='dark'] .t0-edition--cloud {
@@ -1723,7 +1907,8 @@ starlight-tabs.t0-topic-explosion-tabs,
 	background: rgb(205 206 208 / 26%);
 }
 
-/* ---------- Site title: compact wordmark + "developer" ---------- */
+/* ---------- Site title: wordmark to tier0.app + locale-aware docs home ---------- */
+.site-brand,
 .site-title {
 	gap: 0.625rem;
 	align-items: center;
@@ -1734,8 +1919,7 @@ starlight-tabs.t0-topic-explosion-tabs,
 	width: auto;
 }
 
-.site-title::after {
-	content: 'Documentation';
+.docs-home-link {
 	font-family: var(--sl-font);
 	font-size: 0.875rem;
 	font-weight: 500;
@@ -1743,18 +1927,12 @@ starlight-tabs.t0-topic-explosion-tabs,
 	padding-inline-start: 0.625rem;
 	border-inline-start: 1px solid var(--t0-header-divider, var(--sl-color-gray-5));
 	line-height: 1.2;
+	text-decoration: none;
+	transition: color 0.15s ease;
 }
 
-html[lang='zh-CN'] .site-title::after {
-	content: '文档';
-}
-
-html[lang='ja'] .site-title::after {
-	content: 'ドキュメント';
-}
-
-html[lang='es'] .site-title::after {
-	content: 'Documentación';
+.docs-home-link:hover {
+	color: var(--sl-color-accent-high);
 }
 
 /* ---------- Sidebar: nav link sizing (weight set above) ---------- */
@@ -2185,8 +2363,8 @@ main:has(.t0-banner) .t0-banner {
 }
 
 .t0-cell:hover {
-	border-color: #dfe3d8;
-	background: #fcfcfc;
+	border-color: #b2ed1d;
+	background: #f7fde8;
 }
 
 .t0-cell .t0-tag {
@@ -3214,6 +3392,15 @@ main:has(.t0-banner) .t0-banner {
 }
 
 /* ---------- Asides: tip green frame, note blue frame, caution warning frame ---------- */
+:root[data-theme] .sl-markdown-content .starlight-aside__title :is(strong, b) {
+	color: inherit;
+	font-weight: 600;
+}
+
+:root[data-theme] .sl-markdown-content :is(h1, h2, h3, h4, h5, h6) :is(strong, b) {
+	font-weight: 600;
+}
+
 :root[data-theme='light'] {
 	--t0-aside-tip-border: #bdd88a;
 	--t0-aside-tip-accent: #73a022;
@@ -3270,6 +3457,15 @@ main:has(.t0-banner) .t0-banner {
 
 :root[data-theme='light'] .starlight-aside--tip .starlight-aside__content {
 	color: #1d1d1d;
+}
+
+:root[data-theme='light'] .starlight-aside--tip .starlight-aside__content a {
+	color: inherit;
+	text-decoration-color: var(--t0-aside-tip-accent);
+}
+
+:root[data-theme='light'] .starlight-aside--tip .starlight-aside__content a:hover {
+	color: var(--t0-aside-tip-accent);
 }
 
 :root[data-theme='light'] .starlight-aside--tip code:not(pre code) {
@@ -3347,6 +3543,15 @@ main:has(.t0-banner) .t0-banner {
 	color: #050b14;
 }
 
+:root[data-theme='light'] .starlight-aside--note .starlight-aside__content a {
+	color: inherit;
+	text-decoration-color: var(--t0-aside-note-accent);
+}
+
+:root[data-theme='light'] .starlight-aside--note .starlight-aside__content a:hover {
+	color: var(--t0-aside-note-accent);
+}
+
 :root[data-theme='light'] .starlight-aside--note code:not(pre code) {
 	background: var(--t0-aside-note-code-bg);
 	color: #050b14;
@@ -3420,6 +3625,15 @@ main:has(.t0-banner) .t0-banner {
 
 :root[data-theme='light'] .starlight-aside--caution .starlight-aside__content {
 	color: #050b14;
+}
+
+:root[data-theme='light'] .starlight-aside--caution .starlight-aside__content a {
+	color: inherit;
+	text-decoration-color: #6b5a25;
+}
+
+:root[data-theme='light'] .starlight-aside--caution .starlight-aside__content a:hover {
+	color: #6b5a25;
 }
 
 :root[data-theme='light'] .starlight-aside--caution code:not(pre code) {
@@ -3497,6 +3711,15 @@ main:has(.t0-banner) .t0-banner {
 	color: #dbeafe;
 }
 
+:root[data-theme='dark'] .starlight-aside--note .starlight-aside__content a {
+	color: inherit;
+	text-decoration-color: var(--t0-aside-note-accent);
+}
+
+:root[data-theme='dark'] .starlight-aside--note .starlight-aside__content a:hover {
+	color: var(--t0-aside-note-accent);
+}
+
 :root[data-theme='dark'] .starlight-aside--note code:not(pre code) {
 	background: var(--t0-aside-note-code-bg);
 	color: #eff6ff;
@@ -3572,6 +3795,15 @@ main:has(.t0-banner) .t0-banner {
 	color: #ece0bf;
 }
 
+:root[data-theme='dark'] .starlight-aside--caution .starlight-aside__content a {
+	color: inherit;
+	text-decoration-color: #e6cf8b;
+}
+
+:root[data-theme='dark'] .starlight-aside--caution .starlight-aside__content a:hover {
+	color: #e6cf8b;
+}
+
 :root[data-theme='dark'] .starlight-aside--caution code:not(pre code) {
 	background: #3b3120;
 	color: #f5e7bd;
@@ -3645,6 +3877,15 @@ main:has(.t0-banner) .t0-banner {
 
 :root[data-theme='dark'] .starlight-aside--tip .starlight-aside__content {
 	color: #d8e8bd;
+}
+
+:root[data-theme='dark'] .starlight-aside--tip .starlight-aside__content a {
+	color: inherit;
+	text-decoration-color: #b2ed1d;
+}
+
+:root[data-theme='dark'] .starlight-aside--tip .starlight-aside__content a:hover {
+	color: #b2ed1d;
 }
 
 :root[data-theme='dark'] .starlight-aside--tip code:not(pre code) {
