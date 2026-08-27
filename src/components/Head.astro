@@ -18,7 +18,11 @@ import Default from '@astrojs/starlight/components/Head.astro';
 <script is:inline>
 	(function () {
 		try {
-			if (localStorage.getItem('t0-sidebar-collapsed') === '1') {
+			var isHomePage = /^\/(?:zh-cn|ja|es|ko)?\/?$/.test(location.pathname);
+			if (isHomePage) {
+				localStorage.setItem('t0-sidebar-collapsed', '0');
+				document.documentElement.classList.remove('t0-sidebar-collapsed');
+			} else if (localStorage.getItem('t0-sidebar-collapsed') === '1') {
 				document.documentElement.classList.add('t0-sidebar-collapsed');
 			}
 		} catch (_) {}
@@ -90,35 +94,6 @@ import Default from '@astrojs/starlight/components/Head.astro';
 			);
 		}
 
-		function getLocalePrefix() {
-			var firstSegment = location.pathname.split('/').filter(Boolean)[0];
-			return ['zh-cn', 'ja', 'es', 'ko'].includes(firstSegment) ? '/' + firstSegment : '';
-		}
-
-		function bindSidebarGroupHome() {
-			var firstGroup = document.querySelector(
-				'#starlight__sidebar .top-level > li:first-child summary .group-label',
-			);
-			if (!firstGroup || firstGroup.dataset.t0HomeBound === '1') return;
-			firstGroup.dataset.t0HomeBound = '1';
-			firstGroup.classList.add('t0-sidebar-group-home-link');
-			firstGroup.setAttribute('role', 'link');
-			firstGroup.setAttribute('tabindex', '0');
-			firstGroup.setAttribute('aria-label', 'Open Get Started overview');
-
-			function openHome(event) {
-				event.preventDefault();
-				event.stopPropagation();
-				location.href = getLocalePrefix() + '/get-started/';
-			}
-
-			firstGroup.addEventListener('click', openHome);
-			firstGroup.addEventListener('keydown', function (event) {
-				if (event.key !== 'Enter' && event.key !== ' ') return;
-				openHome(event);
-			});
-		}
-
 		function bindHeadingAnchorCopy() {
 			document.querySelectorAll('.sl-anchor-link[href^="#"]').forEach(function (link) {
 				if (link.dataset.t0CopyBound === '1') return;
@@ -129,6 +104,10 @@ import Default from '@astrojs/starlight/components/Head.astro';
 					event.preventDefault();
 					var hash = link.getAttribute('href');
 					if (!hash) return;
+					link.classList.add('t0-anchor-copied');
+					window.setTimeout(function () {
+						link.classList.remove('t0-anchor-copied');
+					}, 1200);
 					var url = new URL(location.href);
 					url.hash = hash;
 					history.replaceState(null, '', url);
@@ -141,7 +120,6 @@ import Default from '@astrojs/starlight/components/Head.astro';
 
 		function scan() {
 			scanSidebarToggle();
-			bindSidebarGroupHome();
 			bindHeadingAnchorCopy();
 			syncScrollClass();
 			if (!document.documentElement.classList.contains('t0-table-scroll')) return;
