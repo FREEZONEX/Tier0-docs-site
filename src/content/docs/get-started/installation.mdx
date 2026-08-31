@@ -116,7 +116,8 @@ Detailed deployment information is available in the [High Availability Deploymen
 	2. Configure the parameters listed in the table below in `.env.default` according to your environment, and save the changes.
 	
 		```bash
-		vi .env.default
+		cp .env.default .env
+		vi .env
 		:wq!
 		```
 		:::note[Parameters to be configured]
@@ -144,7 +145,7 @@ Detailed deployment information is available in the [High Availability Deploymen
 		:::
 	4. Access Tier0 with the set endpoint and the default admin account:
 		- Username: `tier0`
-		- Password: The value of `ADMIN_INIT_PASSWORD` in `.env.default` or `tier0` if not set.
+		- Password: The value of `ADMIN_INIT_PASSWORD` in `.env` or `tier0` if not set.
 	</Steps>
 
 

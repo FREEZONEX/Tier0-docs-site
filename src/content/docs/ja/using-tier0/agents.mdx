@@ -18,7 +18,7 @@ Tier0 は、AI agents がプラットフォームを操作するための Skills
 
 <AgentIcons />
 
-## Tier0 Skills のインストール
+## Skills と CLI のインストール
 
 環境に合うインストーラーを選択します。
 
@@ -33,7 +33,7 @@ npx -y @tier0/cli@latest install
 このコマンドは完全なインストーラーを実行し、次の 2 つを行います。
 
 - `tier0` CLI binary を `~/.tier0/bin/` にインストールします。
-- 組み込みの Tier0 Skill baseline をインストールし、Codex、Claude Code、Cursor など検出された agents に同期します。
+- 組み込みの Tier0 Skill baseline をインストールし、Codex、Claude Code など検出された agents に同期します。
 
 ### Node.js がない場合
 
@@ -79,7 +79,33 @@ npx -y @tier0/cli@latest install
     tier0 skills update
     ```
 
-## Agents で Tier0 を操作する
+## Skills と CLI の連携
+Tier0 CLI は実行可能なコマンドを提供し、Skills は agents がそれらのコマンドを選択して安全に使うためのガイドを提供します。
+:::note
+Tier0 Skills は prompt によって自動的に起動され、agents に何をすべきか、どのコマンドを使うべきかを案内するように設計されています。
+:::
+
+### 例
+- Prompt：`Plant/Line1/Metric/Temperature` の現在温度を確認します。
+- Skill
+  - `tier0-uns`
+  - 現在値は完全な topic path から読み取る必要があることを agent に伝え、適切な UNS read 操作を選択します。
+- CLI：`tier0 uns read Plant/Line1/Metric/Temperature --json`
+
+### Skills
+| Skill | 目的 |
+| --- | --- |
+| `tier0` | Tier0 タスクを適切な skill にルーティングし、共通のセットアップ、認証、安全ルールを提供します。 |
+| `tier0-uns` | Browse、read、write、history、search、create、update、delete、restore などの UNS 操作を agents に案内します。 |
+| `tier0-flow` | SourceFlow と EventFlow の管理を agents に案内します。これには確認、エクスポート、作成、更新、デプロイ、削除が含まれます。 |
+| `tier0-mqtt` | MQTT 認証情報の管理、publish、範囲を限定したリアルタイム subscribe を agents に案内します。 |
+| `tier0-files` | Upload、download、アクセス URL 生成、delete などの Tier0 ファイル操作を agents に案内します。 |
+
+:::tip[agent に skill repo を読ませる]
+詳細については、agent に [Tier0 Skill repo](https://github.com/FREEZONEX/Tier0-Skills) を読ませてください。
+:::
+
+## CLI 操作
 
 ### 操作対象インスタンスの設定
 :::note
@@ -138,12 +164,17 @@ API key の設定やブラウザーログインを開始する前に、`config` 
 #### 対応操作
 - UNS: `write/create/update/delete/restore`
 - Flow: `create/update/delete/deploy`
+- API: `tier0 api`
+- MQTT: `auth create/auth delete/publish`
+- Files: `delete`
 
 #### 例
 ```bash
 tier0 uns write --topic demo --value '{"value":1}' --dry-run
 tier0 flow deploy --id 1 --flows-file flows.json --dry-run --json
 tier0 api /openapi/v1/uns/write --body-file body.json --dry-run --json
+tier0 mqtt auth create --name my-client --save my-client --dry-run --json
+tier0 assets delete --file-path workspace/path/to/file.csv --dry-run --json
 ```
 :::note
 `--json` オプションはリクエストを JSON 形式で出力します。
@@ -176,7 +207,7 @@ dry-run 出力では headers と API keys は表示されません。
 {"ok":false,"error":{"type":"validation","subtype":"invalid_argument","param":"--qos","message":"--qos must be 0, 1, or 2"}}
 ```
 
-## CLI と Skills のアンインストール
+## Skills と CLI のアンインストール
 
 - アンインストールコマンド
 ```bash
@@ -202,13 +233,9 @@ rm -rf ~/.tier0/bin/tier0 ~/.tier0/skills
 npx -y --package=skills -- skills remove tier0 -y -g
 ```
 
-## Skill Reference
+## CLI Reference
 
-[Tier0 Skill Reference](../../reference/skill-reference/) には、対応する操作対象、一般的なタスク、対応する CLI コマンドが一覧化されています。
-
-:::tip[agent に repo を読ませる]
-コマンドを実行する前に、agent に [Tier0 Skill repo](https://github.com/FREEZONEX/Tier0-skill) を読ませることができます。
-:::
+[Tier0 CLI Reference](../../reference/skill-reference/) には、すべての CLI コマンドが一覧化されています。
 
 ## 次へ
 

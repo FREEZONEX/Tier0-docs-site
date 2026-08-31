@@ -18,7 +18,7 @@ Tier0 提供 Skills 和 CLI 命令，让 AI agents 可以操作平台。
 
 <AgentIcons />
 
-## 安装 Tier0 Skills
+## 安装 Skills 和 CLI
 
 请选择与你的环境匹配的安装方式。
 
@@ -33,7 +33,7 @@ npx -y @tier0/cli@latest install
 该命令会运行完整安装器，并完成两件事：
 
 - 将 `tier0` CLI binary 安装到 `~/.tier0/bin/`。
-- 安装内置的 Tier0 Skill 基线，并同步到检测到的 agents，例如 Codex、Claude Code 和 Cursor。
+- 安装内置的 Tier0 Skill 基线，并同步到检测到的 agents，例如 Codex、Claude Code 等。
 
 ### 没有 Node.js
 
@@ -79,7 +79,33 @@ npx -y @tier0/cli@latest install
     tier0 skills update
     ```
 
-## 用 Agents 操作 Tier0
+## Skills 和 CLI 如何协作
+Tier0 CLI 提供可执行命令，Skills 指导 agents 选择并安全使用这些命令。
+:::note
+Tier0 Skills 设计为由 prompt 自动触发，并指导 agents 应该做什么、使用哪些命令。
+:::
+
+### 示例
+- Prompt：检查 `Plant/Line1/Metric/Temperature` 的当前温度。
+- Skill
+  - `tier0-uns`
+  - 它会告诉 agent 当前值应从完整 topic path 读取，并选择合适的 UNS read 操作。
+- CLI：`tier0 uns read Plant/Line1/Metric/Temperature --json`
+
+### Skills
+| Skill | 用途 |
+| --- | --- |
+| `tier0` | 将 Tier0 任务路由到合适的 skill，并提供共享的设置、认证和安全规则。 |
+| `tier0-uns` | 指导 agents 执行 UNS 操作，包括 browse、read、write、history、search、create、update、delete 和 restore。 |
+| `tier0-flow` | 指导 agents 管理 SourceFlow 和 EventFlow，包括检查、导出、创建、更新、部署和删除。 |
+| `tier0-mqtt` | 指导 agents 管理 MQTT 凭证、发布消息，以及进行有边界的实时订阅。 |
+| `tier0-files` | 指导 agents 执行 Tier0 文件操作，包括上传、下载、生成访问 URL 和删除。 |
+
+:::tip[让 agent 读取 skill repo]
+可以让你的 agent 读取 [Tier0 Skill repo](https://github.com/FREEZONEX/Tier0-Skills) 了解详情。
+:::
+
+## CLI 操作
 
 ### 设置操作实例
 :::note
@@ -138,12 +164,17 @@ tier0 login # interactive browser login
 #### 支持的操作
 - UNS：`write/create/update/delete/restore`
 - Flow：`create/update/delete/deploy`
+- API：`tier0 api`
+- MQTT：`auth create/auth delete/publish`
+- Files：`delete`
 
 #### 示例
 ```bash
 tier0 uns write --topic demo --value '{"value":1}' --dry-run
 tier0 flow deploy --id 1 --flows-file flows.json --dry-run --json
 tier0 api /openapi/v1/uns/write --body-file body.json --dry-run --json
+tier0 mqtt auth create --name my-client --save my-client --dry-run --json
+tier0 assets delete --file-path workspace/path/to/file.csv --dry-run --json
 ```
 :::note
 `--json` 选项会以 JSON 格式输出请求。
@@ -176,7 +207,7 @@ dry-run 输出不会泄露 headers 和 API keys。
 {"ok":false,"error":{"type":"validation","subtype":"invalid_argument","param":"--qos","message":"--qos must be 0, 1, or 2"}}
 ```
 
-## 卸载 CLI 和 Skills
+## 卸载 Skills 和 CLI
 
 - 卸载命令
 ```bash
@@ -202,13 +233,9 @@ rm -rf ~/.tier0/bin/tier0 ~/.tier0/skills
 npx -y --package=skills -- skills remove tier0 -y -g
 ```
 
-## Skill 参考
+## CLI 参考
 
-[Tier0 Skill 参考](../../reference/skill-reference/) 列出了支持的操作对象、常见任务和对应 CLI 命令。
-
-:::tip[让 agent 读取 repo]
-在运行命令前，可以让你的 agent 先读取 [Tier0 Skill repo](https://github.com/FREEZONEX/Tier0-skill)。
-:::
+[Tier0 CLI 参考](../../reference/skill-reference/) 列出了全部 CLI 命令。
 
 ## 下一步
 

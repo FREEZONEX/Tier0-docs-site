@@ -56,6 +56,9 @@ const textByLocale = {
     searchPlaceholder:
       '搜索命令、参数或示例...',
     globalFlags: '全局参数',
+    globalFlagsHintBefore:
+      '这些参数可以用于任何',
+    globalFlagsHintAfter: '命令。',
     alias: '别名',
     usage: '用法',
     flags: '参数',
@@ -74,6 +77,9 @@ const textByLocale = {
     searchPlaceholder:
       'Buscar comandos, opciones o ejemplos...',
     globalFlags: 'Opciones globales',
+    globalFlagsHintBefore:
+      'Estas opciones se pueden usar con cualquier comando',
+    globalFlagsHintAfter: '.',
     alias: 'alias',
     usage: 'Uso',
     flags: 'Opciones',
@@ -92,6 +98,10 @@ const textByLocale = {
     searchPlaceholder:
       'コマンド、フラグ、例を検索...',
     globalFlags: 'グローバルフラグ',
+    globalFlagsHintBefore:
+      'これらのフラグは任意の',
+    globalFlagsHintAfter:
+      'コマンドで使用できます。',
     alias: 'エイリアス',
     usage: '使用方法',
     flags: 'フラグ',
@@ -110,6 +120,10 @@ const textByLocale = {
     searchPlaceholder:
       '명령, 플래그 또는 예시 검색...',
     globalFlags: '전역 플래그',
+    globalFlagsHintBefore:
+      '이 플래그는 모든',
+    globalFlagsHintAfter:
+      '명령에서 사용할 수 있습니다.',
     alias: '별칭',
     usage: '사용법',
     flags: '플래그',
@@ -133,6 +147,9 @@ const text =
     searchPlaceholder:
       'Search commands, flags, or examples...',
     globalFlags: 'Global flags',
+    globalFlagsHintBefore:
+      'These flags can be used with any',
+    globalFlagsHintAfter: 'command.',
     alias: 'alias',
     usage: 'Usage',
     flags: 'Flags',
@@ -1192,6 +1209,42 @@ function translateCliText(value: string): string {
   return supplemental[value] ?? translations[value] ?? value;
 }
 
+function noteInlineParts(value: string) {
+  const parts: Array<{
+    type: 'text' | 'code';
+    value: string;
+  }> = [];
+  const tokenPattern =
+    /`([^`]+)`|(--[a-z0-9][a-z0-9-]*)|(\b[a-z][a-z0-9]+(?:_[a-z0-9]+)+\b)/gi;
+  let lastIndex = 0;
+  let match: RegExpExecArray | null;
+
+  while ((match = tokenPattern.exec(value))) {
+    if (match.index > lastIndex) {
+      parts.push({
+        type: 'text',
+        value: value.slice(lastIndex, match.index),
+      });
+    }
+
+    parts.push({
+      type: 'code',
+      value: match[1] ?? match[2] ?? match[3],
+    });
+    lastIndex =
+      match.index + match[0].length;
+  }
+
+  if (lastIndex < value.length) {
+    parts.push({
+      type: 'text',
+      value: value.slice(lastIndex),
+    });
+  }
+
+  return parts;
+}
+
 function flagName(flag: CliFlag): string {
   if (flag.shorthand) {
     return `${flag.shorthand}, ${flag.name}`;
@@ -1266,9 +1319,16 @@ function commandSearchText(
     {
       data.globalFlags.length > 0 && (
         <div class="global-flags">
-          <span class="global-flags-label">
-            {text.globalFlags}
-          </span>
+          <div class="global-flags-heading">
+            <span class="global-flags-label">
+              {text.globalFlags}
+            </span>
+            <span class="global-flags-hint">
+              {text.globalFlagsHintBefore}{' '}
+              <code>tier0</code>{' '}
+              {text.globalFlagsHintAfter}
+            </span>
+          </div>
 
           <div class="global-flags-list">
             {
@@ -1466,9 +1526,25 @@ function commandSearchText(
                                       note: string
                                     ) => (
                                       <li>
-                                        {translateCliText(
-                                          note
-                                        )}
+                                        {
+                                          noteInlineParts(
+                                            translateCliText(
+                                              note
+                                            )
+                                          ).map(
+                                            (part) =>
+                                              part.type ===
+                                              'code' ? (
+                                                <code>
+                                                  {
+                                                    part.value
+                                                  }
+                                                </code>
+                                              ) : (
+                                                part.value
+                                              )
+                                          )
+                                        }
                                       </li>
                                     )
                                   )
@@ -1709,8 +1785,10 @@ function commandSearchText(
 
   .global-flags {
     display: flex;
-    align-items: flex-start;
-    gap: 0.8rem;
+    flex-direction: column;
+
+    gap:
+      0.45rem;
 
     color:
       var(--sl-color-gray-2);
@@ -1719,17 +1797,29 @@ function commandSearchText(
       0.8rem;
   }
 
+  .global-flags-heading {
+    display:
+      flex;
+
+    flex-wrap:
+      wrap;
+
+    gap:
+      0.4rem
+      0.75rem;
+
+    align-items:
+      baseline;
+  }
+
   .global-flags-label {
-    flex:
-      0
-      0
-      auto;
-
-    padding-top:
-      0.1rem;
-
     font-weight:
       600;
+  }
+
+  .global-flags-hint code {
+    color:
+      var(--sl-color-text);
   }
 
   .global-flags-list {

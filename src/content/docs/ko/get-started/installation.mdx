@@ -49,7 +49,8 @@ Tier0는 세 가지 edition으로 사용할 수 있습니다.
     2. 배포 전에 `.env.default`에서 필요한 environment parameter를 수정합니다.
 
         ```bash
-        vi .env.default
+        cp .env.default .env
+        vi .env
         :wq!
         ```
         :::note[설정 가능한 parameters]
@@ -77,7 +78,7 @@ Tier0는 세 가지 edition으로 사용할 수 있습니다.
         :::
     4. 설정한 endpoint와 기본 admin account로 Tier0에 접속합니다.
         - Username: `tier0`
-        - Password: `.env.default`의 `ADMIN_INIT_PASSWORD` 값. 설정하지 않았다면 `tier0`.
+        - Password: `.env`의 `ADMIN_INIT_PASSWORD` 값. 설정하지 않았다면 `tier0`.
 
     </Steps>
 

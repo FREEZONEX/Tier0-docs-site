@@ -48,7 +48,8 @@ Consulta [Elegir la mejor versión](../choosing-version/) para encontrar la edic
 	2. Configura en `.env.default` los parámetros de la tabla según tu entorno.
 	
 		```bash
-		vi .env.default
+		cp .env.default .env
+		vi .env
 		:wq!
 		```
 		:::note[Parámetros que deben configurarse]
@@ -76,7 +77,7 @@ Consulta [Elegir la mejor versión](../choosing-version/) para encontrar la edic
 		:::
 	4. Accede a Tier0 con el endpoint configurado y la cuenta de administrador predeterminada:
 		- Usuario: `tier0`
-		- Contraseña: el valor de `ADMIN_INIT_PASSWORD` en `.env.default` o `tier0` si no se configuró.
+		- Contraseña: el valor de `ADMIN_INIT_PASSWORD` en `.env` o `tier0` si no se configuró.
 
 	</Steps>
 		

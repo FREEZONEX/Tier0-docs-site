@@ -18,7 +18,7 @@ Tier0 proporciona Skills y comandos CLI que permiten a los AI agents operar la p
 
 <AgentIcons />
 
-## Instalar Tier0 Skills
+## Instalar Skills y CLI
 
 Elige el instalador que coincida con tu entorno.
 
@@ -33,7 +33,7 @@ npx -y @tier0/cli@latest install
 Esto ejecuta el instalador completo y hace dos cosas:
 
 - Instala el binario CLI `tier0` en `~/.tier0/bin/`.
-- Instala la base integrada de Tier0 Skill y la sincroniza con agents detectados como Codex, Claude Code y Cursor.
+- Instala la base integrada de Tier0 Skill y la sincroniza con agents detectados como Codex, Claude Code y más.
 
 ### Sin Node.js
 
@@ -79,7 +79,33 @@ Esto ejecuta el instalador completo y hace dos cosas:
     tier0 skills update
     ```
 
-## Operar Tier0 con Agents
+## Cómo trabajan juntos Skills y CLI
+Tier0 CLI proporciona comandos ejecutables, y las Skills guían a los agents para elegir y usar esos comandos de forma segura.
+:::note
+Tier0 Skills están diseñadas para activarse automáticamente mediante prompts y guiar a los agents sobre qué hacer y qué comandos usar.
+:::
+
+### Ejemplo
+- Prompt: Comprueba la temperatura actual de `Plant/Line1/Metric/Temperature`.
+- Skill
+  - `tier0-uns`
+  - Indica al agent que el valor actual debe leerse desde un topic path completo y selecciona la operación de lectura UNS adecuada.
+- CLI: `tier0 uns read Plant/Line1/Metric/Temperature --json`
+
+### Skills
+| Skill | Propósito |
+| --- | --- |
+| `tier0` | Enruta tareas de Tier0 al skill adecuado y proporciona reglas compartidas de configuración, autenticación y seguridad. |
+| `tier0-uns` | Guía a los agents en operaciones UNS, como browse, read, write, history, search, create, update, delete y restore. |
+| `tier0-flow` | Guía a los agents en la gestión de SourceFlow y EventFlow, como inspección, exportación, creación, actualización, despliegue y eliminación. |
+| `tier0-mqtt` | Guía a los agents en la gestión de credenciales MQTT, publicación y suscripciones en tiempo real acotadas. |
+| `tier0-files` | Guía a los agents en operaciones de archivos de Tier0, como upload, download, generación de URL de acceso y delete. |
+
+:::tip[Usa un agent para leer el skill repo]
+Pide a tu agent que lea el [Tier0 Skill repo](https://github.com/FREEZONEX/Tier0-Skills) para ver los detalles.
+:::
+
+## Operaciones CLI
 
 ### Configurar la instancia operativa
 :::note
@@ -138,12 +164,17 @@ Usa `--dry-run` para validar y previsualizar operaciones de escritura compatible
 #### Operaciones compatibles
 - UNS: `write/create/update/delete/restore`
 - Flow: `create/update/delete/deploy`
+- API: `tier0 api`
+- MQTT: `auth create/auth delete/publish`
+- Files: `delete`
 
 #### Ejemplos
 ```bash
 tier0 uns write --topic demo --value '{"value":1}' --dry-run
 tier0 flow deploy --id 1 --flows-file flows.json --dry-run --json
 tier0 api /openapi/v1/uns/write --body-file body.json --dry-run --json
+tier0 mqtt auth create --name my-client --save my-client --dry-run --json
+tier0 assets delete --file-path workspace/path/to/file.csv --dry-run --json
 ```
 :::note
 La opción `--json` genera la solicitud en formato JSON.
@@ -176,7 +207,7 @@ Con `--json`, los fallos de comando devuelven un objeto JSON con el mensaje y el
 {"ok":false,"error":{"type":"validation","subtype":"invalid_argument","param":"--qos","message":"--qos must be 0, 1, or 2"}}
 ```
 
-## Desinstalar CLI y Skills
+## Desinstalar Skills y CLI
 
 - Comandos de desinstalación
 ```bash
@@ -202,13 +233,9 @@ rm -rf ~/.tier0/bin/tier0 ~/.tier0/skills
 npx -y --package=skills -- skills remove tier0 -y -g
 ```
 
-## Referencia de Skill
+## Referencia CLI
 
-[Referencia de Skill de Tier0](../../reference/skill-reference/) lista los objetivos de operación compatibles, las tareas comunes y los comandos CLI correspondientes.
-
-:::tip[Haz que un agent lea el repo]
-Pide a tu agent que lea el [Tier0 Skill repo](https://github.com/FREEZONEX/Tier0-skill) antes de ejecutar comandos.
-:::
+[Referencia CLI de Tier0](../../reference/skill-reference/) lista todos los comandos CLI.
 
 ## Siguiente
 

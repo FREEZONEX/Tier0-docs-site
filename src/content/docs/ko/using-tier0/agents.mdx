@@ -18,7 +18,7 @@ Tier0는 AI agents가 플랫폼을 운영할 수 있도록 Skills와 CLI 명령�
 
 <AgentIcons />
 
-## Tier0 Skills 설치
+## Skills와 CLI 설치
 
 환경에 맞는 설치 방식을 선택하세요.
 
@@ -33,7 +33,7 @@ npx -y @tier0/cli@latest install
 이 명령은 전체 설치 프로그램을 실행하며 다음 두 가지를 수행합니다.
 
 - `tier0` CLI binary를 `~/.tier0/bin/`에 설치합니다.
-- 내장 Tier0 Skill baseline을 설치하고 Codex, Claude Code, Cursor 등 감지된 agents에 동기화합니다.
+- 내장 Tier0 Skill baseline을 설치하고 Codex, Claude Code 등 감지된 agents에 동기화합니다.
 
 ### Node.js가 없는 경우
 
@@ -79,7 +79,33 @@ npx -y @tier0/cli@latest install
     tier0 skills update
     ```
 
-## Agents로 Tier0 운영하기
+## Skills와 CLI가 함께 작동하는 방식
+Tier0 CLI는 실행 가능한 명령을 제공하고, Skills는 agents가 이 명령을 선택하고 안전하게 사용하도록 안내합니다.
+:::note
+Tier0 Skills는 prompt에 의해 자동으로 트리거되어 agents에게 무엇을 해야 하는지, 어떤 명령을 사용해야 하는지 안내하도록 설계되었습니다.
+:::
+
+### 예시
+- Prompt: `Plant/Line1/Metric/Temperature`의 현재 온도를 확인합니다.
+- Skill
+  - `tier0-uns`
+  - 현재 값은 전체 topic path에서 읽어야 한다고 agent에게 알려 주고 적절한 UNS read 작업을 선택합니다.
+- CLI: `tier0 uns read Plant/Line1/Metric/Temperature --json`
+
+### Skills
+| Skill | 목적 |
+| --- | --- |
+| `tier0` | Tier0 작업을 적절한 skill로 라우팅하고 공통 설정, 인증, 안전 규칙을 제공합니다. |
+| `tier0-uns` | Browse, read, write, history, search, create, update, delete, restore를 포함한 UNS 작업을 agents에게 안내합니다. |
+| `tier0-flow` | SourceFlow와 EventFlow 관리를 agents에게 안내합니다. 여기에는 검사, 내보내기, 생성, 업데이트, 배포, 삭제가 포함됩니다. |
+| `tier0-mqtt` | MQTT 자격 증명 관리, publish, 범위가 제한된 실시간 subscribe를 agents에게 안내합니다. |
+| `tier0-files` | Upload, download, 접근 URL 생성, delete를 포함한 Tier0 파일 작업을 agents에게 안내합니다. |
+
+:::tip[agent가 skill repo를 읽게 하기]
+자세한 내용은 agent가 [Tier0 Skill repo](https://github.com/FREEZONEX/Tier0-Skills)를 읽게 하세요.
+:::
+
+## CLI 작업
 
 ### 운영 인스턴스 설정
 :::note
@@ -138,12 +164,17 @@ API key를 설정하거나 브라우저 로그인을 시작하기 전에 `config
 #### 지원 작업
 - UNS: `write/create/update/delete/restore`
 - Flow: `create/update/delete/deploy`
+- API: `tier0 api`
+- MQTT: `auth create/auth delete/publish`
+- Files: `delete`
 
 #### 예시
 ```bash
 tier0 uns write --topic demo --value '{"value":1}' --dry-run
 tier0 flow deploy --id 1 --flows-file flows.json --dry-run --json
 tier0 api /openapi/v1/uns/write --body-file body.json --dry-run --json
+tier0 mqtt auth create --name my-client --save my-client --dry-run --json
+tier0 assets delete --file-path workspace/path/to/file.csv --dry-run --json
 ```
 :::note
 `--json` 옵션은 요청을 JSON 형식으로 출력합니다.
@@ -176,7 +207,7 @@ dry-run 출력에는 headers와 API keys가 노출되지 않습니다.
 {"ok":false,"error":{"type":"validation","subtype":"invalid_argument","param":"--qos","message":"--qos must be 0, 1, or 2"}}
 ```
 
-## CLI와 Skills 제거
+## Skills와 CLI 제거
 
 - 제거 명령
 ```bash
@@ -202,13 +233,9 @@ rm -rf ~/.tier0/bin/tier0 ~/.tier0/skills
 npx -y --package=skills -- skills remove tier0 -y -g
 ```
 
-## Skill Reference
+## CLI Reference
 
-[Tier0 Skill Reference](../../reference/skill-reference/)에는 지원되는 operation target, common task, 해당 CLI command가 정리되어 있습니다.
-
-:::tip[agent가 repo를 읽게 하기]
-명령을 실행하기 전에 agent가 [Tier0 Skill repo](https://github.com/FREEZONEX/Tier0-skill)를 먼저 읽게 할 수 있습니다.
-:::
+[Tier0 CLI Reference](../../reference/skill-reference/)에는 모든 CLI 명령이 정리되어 있습니다.
 
 ## 다음
 

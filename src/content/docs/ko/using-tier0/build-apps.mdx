@@ -29,13 +29,13 @@ Agent 가 요구 사항에 더 잘 맞는 애플리케이션을 생성할 수 �
 
     <Tabs>
     <TabItem label="Platform Plan">
-    [UNS 에 데이터 연결](../connect-data/)을 수행하고 prompt 에 UNS topic 을 명시합니다.
+    Prompt 에 UNS topic 을 명시하면 애플리케이션은 UNS 에서 데이터를 소비하고 UNS 로 데이터를 게시할 수 있습니다.
     ```text
-    이 애플리케이션은 xxx UNS model 의 설비 상태, 알람 기록, 유지보수 이력을 사용해야 합니다.
+    이 애플리케이션은 xxx UNS model 의 설비 상태, 알람 기록, 유지보수 이력을 사용하고, 업데이트를 xxx UNS topic 으로 게시해야 합니다.
     ```
     </TabItem>
     <TabItem label="Builder Plan">
-    Agent 는 초기화 중 시작에 필요한 데이터를 자동으로 시뮬레이션합니다.
+    애플리케이션은 UNS 에 연결되지 않습니다. 애플리케이션 사용 중 생성되는 데이터는 데이터베이스에 저장됩니다.
     </TabItem>
     </Tabs>
 - **애플리케이션 기능**: 애플리케이션은 무엇을 해야 하나요?
@@ -53,20 +53,22 @@ Agent 가 요구 사항에 더 잘 맞는 애플리케이션을 생성할 수 �
 :::
 
 ### 접근 제어
-역할 기반 접근 제어는 project 와 애플리케이션 모두에 적용됩니다.
+역할 기반 접근 제어는 projects 와 애플리케이션 모두에 적용됩니다.
 
-- Project roles
+- Project access levels
+    - **Owner**: project 에 대한 전체 접근 권한입니다.
     - **Can Edit**: project 삭제를 제외한 전체 접근 권한입니다.
     - **Can Launch**: **Launchpad** 에서 project 를 보고 허용된 애플리케이션만 사용할 수 있습니다.
 - Application roles
-    - 애플리케이션의 비즈니스 로직에 따라 agent 가 자동 생성합니다.
-    - Project 멤버로 추가된 후에만 할당할 수 있습니다.
+    - 명시적으로 정의하지 않은 경우 애플리케이션의 비즈니스 로직에 따라 agent 가 자동 생성합니다. 책임 범위가 일치하면 다른 애플리케이션의 기존 역할을 재사용할 수 있습니다.
+    - Project 멤버에게만 할당할 수 있습니다.
+    - Prompt 에 역할이 필요 없다고 명시하면 애플리케이션은 모든 project 멤버에게 열립니다.
 
 :::tip[직접 역할을 지정하려는 경우]
-Prompt 에 역할과 권한 범위를 명시하세요. Agent 는 이를 자동 생성된 역할과 비교합니다. 지정한 역할이 생성된 역할과 충돌하면 agent 가 확인을 요청합니다.
+Prompt 에 역할과 권한 범위를 명시하세요. Agent 는 이를 다른 애플리케이션에서 생성된 기존 역할과 비교합니다. 충돌이 있으면 agent 가 확인을 요청합니다.
 :::
-:::caution[애플리케이션 역할 할당은 필수입니다]
-**Launchpad** 에서 애플리케이션에 접근하려면 애플리케이션 역할이 반드시 할당되어야 합니다. Workspace/project owner 라도 애플리케이션 역할이 없으면 해당 애플리케이션을 볼 수 없습니다.
+:::caution[역할로 제어되는 애플리케이션에는 애플리케이션 역할 할당이 필수입니다]
+**Launchpad** 에서 역할로 제어되는 애플리케이션에 접근하려면 애플리케이션 역할이 반드시 할당되어야 합니다. Workspace/project owner 라도 애플리케이션 역할이 없으면 해당 애플리케이션에 접근할 수 없습니다.
 :::
 
 ### 버전 관리
@@ -93,5 +95,5 @@ Snapshot 을 저장한 후 다운로드하면 해당 snapshot 버전의 소스 �
 
 ## 다음
 
-- [UNS 데이터 분석](../analyze-data/) - Marimo Notebook 과 Python 으로 UNS 데이터를 분석합니다.
+- [데이터 분석](../analyze-data/) - Marimo Notebook 과 Python 으로 UNS 데이터를 분석합니다.
 - [베스트 프랙티스: 산업 프로토콜 연결](../../best-practice/protocol-connections/) - 일반적인 데이터 소스 연결 예시입니다.

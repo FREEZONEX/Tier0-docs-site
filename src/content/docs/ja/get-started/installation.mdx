@@ -48,7 +48,8 @@ Tier0 には 3 つのエディションがあります。
 	2. 環境に合わせて、下表のパラメータを `.env.default` に設定します。
 	
 		```bash
-		vi .env.default
+		cp .env.default .env
+		vi .env
 		:wq!
 		```
 		:::note[設定が必要なパラメータ]
@@ -76,7 +77,7 @@ Tier0 には 3 つのエディションがあります。
 		:::
 	4. 設定した endpoint とデフォルト管理者アカウントで Tier0 にアクセスします。
 		- Username: `tier0`
-		- Password: `.env.default` の `ADMIN_INIT_PASSWORD` の値。未設定の場合は `tier0`。
+		- Password: `.env` の `ADMIN_INIT_PASSWORD` の値。未設定の場合は `tier0`。
 
 	</Steps>
 		

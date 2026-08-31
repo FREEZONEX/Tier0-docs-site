@@ -28,13 +28,13 @@ import { Tabs, TabItem } from '@astrojs/starlight/components';
 
     <Tabs>
     <TabItem label="Platform 套餐">
-    [连接数据到 UNS](../connect-data/)，并在 prompt 中说明 UNS topic。
+    在 prompt 中说明 UNS topic 后，应用可以从 UNS 消费数据，也可以向 UNS 发布数据。
     ```text
-    该应用应使用 xxx UNS 模型库中的设备状态、报警记录和维护历史数据。
+    该应用应使用 xxx UNS 模型中的设备状态、报警记录和维护历史数据，并将更新发布到 xxx UNS topic。
     ```
     </TabItem>
     <TabItem label="Builder 套餐">
-    Agent 会在初始化时自动模拟启动所需的数据。
+    应用不会连接 UNS。应用使用过程中产生的数据会存储在数据库中。
     </TabItem>
     </Tabs>
 - **应用功能**：应用需要做什么？
@@ -52,20 +52,22 @@ import { Tabs, TabItem } from '@astrojs/starlight/components';
 :::
 
 ### 访问控制
-项目和应用都采用了基于角色的访问控制。
+基于角色的访问控制会同时应用于项目和应用。
 
-- 项目角色
+- 项目访问级别
+    - **Owner**：拥有项目的完整访问权限。
     - **可编辑**：拥有项目的完整访问权限，但不能删除项目。
     - **可启动**：只能在 **应用中心** 中看到该项目，并使用已被授权的应用。
 - 应用角色
-    - 由 agent 根据应用的业务逻辑自动生成。
-    - 只有先被添加为项目成员后，才能分配应用角色。
+    - 如果没有显式定义，agent 会根据应用的业务逻辑自动生成。其他应用中已有且职责匹配的角色也可以复用。
+    - 只能分配给项目成员。
+    - 如果 prompt 明确说明不需要角色，则该应用会对所有项目成员开放。
 
 :::tip[如果你想自行指定角色]
-请在 prompt 中说明角色和权限范围，agent 会将其与自动生成的角色进行比较。当你的角色与生成的角色冲突时，agent 会向你确认。
+请在 prompt 中说明角色和权限范围，agent 会将其与其他应用已生成的现有角色进行比较。如果存在冲突，agent 会向你确认。
 :::
-:::caution[必须分配应用角色]
-要在 **应用中心** 中访问应用，必须分配应用角色。即使是 workspace/project 所有者，如果没有应用角色，也无法看到该应用。
+:::caution[受角色控制的应用必须分配应用角色]
+要在 **应用中心** 中访问受角色控制的应用，必须分配应用角色。即使是 workspace/project 所有者，如果没有应用角色，也无法访问该应用。
 :::
 
 ### 版本管理
@@ -92,5 +94,5 @@ import { Tabs, TabItem } from '@astrojs/starlight/components';
 
 ## 下一步
 
-- [分析 UNS 数据](../analyze-data/) - 使用 Marimo Notebook 和 Python 分析 UNS 数据。
+- [分析数据](../analyze-data/) - 使用 Marimo Notebook 和 Python 分析 UNS 数据。
 - [最佳实践：连接工业协议](../../best-practice/protocol-connections/) - 常见数据源连接示例。

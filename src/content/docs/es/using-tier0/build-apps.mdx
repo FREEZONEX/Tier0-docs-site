@@ -29,13 +29,13 @@ Para que el agent genere una aplicación que se ajuste mejor a tus requisitos, a
 
     <Tabs>
     <TabItem label="Platform Plan">
-    [Conecta datos a UNS](../connect-data/) e indica el UNS topic en el prompt.
+    Las aplicaciones pueden consumir datos de UNS y publicar datos en UNS indicando el UNS topic en el prompt.
     ```text
-    La aplicación debe usar el estado de los equipos, los registros de alarmas y el historial de mantenimiento del modelo UNS xxx.
+    La aplicación debe usar el estado de los equipos, los registros de alarmas y el historial de mantenimiento del modelo UNS xxx, y publicar actualizaciones en el UNS topic xxx.
     ```
     </TabItem>
     <TabItem label="Builder Plan">
-    El agent simulará automáticamente los datos necesarios para el arranque durante la inicialización.
+    La aplicación no se conecta a UNS. Los datos generados durante el uso de la aplicación se almacenan en la base de datos.
     </TabItem>
     </Tabs>
 - **Función de la aplicación**: ¿Qué debe hacer la aplicación?
@@ -53,20 +53,22 @@ El plan **Builder** actualmente no admite UNS, pero los datos simulados están d
 :::
 
 ### Control de acceso
-El control de acceso basado en roles se aplica tanto al project como a la aplicación.
+El control de acceso basado en roles se aplica tanto a los projects como a las aplicaciones.
 
-- Roles del project
+- Niveles de acceso del project
+    - **Owner**: Acceso completo al project.
     - **Can Edit**: Acceso completo al project, excepto eliminarlo.
     - **Can Launch**: Solo puede ver el project en **Launchpad** y usar las aplicaciones permitidas.
 - Roles de la aplicación
-    - El agent los genera automáticamente según la lógica de negocio de la aplicación.
-    - Solo pueden asignarse después de añadir al usuario como miembro del project.
+    - El agent los genera automáticamente según la lógica de negocio de la aplicación cuando no se definen explícitamente. También se pueden reutilizar roles existentes de otras aplicaciones cuando sus responsabilidades coinciden.
+    - Solo pueden asignarse a miembros del project.
+    - La aplicación queda abierta a todos los miembros del project si el prompt especifica explícitamente que no se requieren roles.
 
 :::tip[Si quieres asignar tus propios roles]
-Indica los roles y el alcance de permisos en el prompt. El agent los comparará con los roles generados automáticamente. Si tu rol entra en conflicto con el rol generado, el agent te pedirá confirmación.
+Indica los roles y el alcance de permisos en el prompt. El agent los comparará con los roles existentes generados desde otras aplicaciones. Si hay un conflicto, el agent te pedirá confirmación.
 :::
-:::caution[La asignación de roles de aplicación es obligatoria]
-Para acceder a una aplicación en **Launchpad**, debes tener roles de aplicación asignados. Incluso el workspace/project owner no puede ver la aplicación sin roles de aplicación.
+:::caution[La asignación de roles de aplicación es obligatoria para aplicaciones controladas por roles]
+Para acceder a una aplicación controlada por roles en **Launchpad**, debes tener roles de aplicación asignados. Incluso un workspace/project owner no puede acceder a la aplicación sin un rol de aplicación.
 :::
 
 ### Gestión de versiones
@@ -93,5 +95,5 @@ Descarga el snapshot después de guardarlo para obtener el código fuente de esa
 
 ## Siguiente
 
-- [Analizar datos UNS](../analyze-data/) - Analiza datos UNS con Marimo Notebook y Python.
+- [Analizar datos](../analyze-data/) - Analiza datos UNS con Marimo Notebook y Python.
 - [Mejor práctica: conectar protocolos industriales](../../best-practice/protocol-connections/) - Ejemplos de conexión de fuentes de datos comunes.

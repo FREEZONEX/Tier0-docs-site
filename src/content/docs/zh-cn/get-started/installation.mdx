@@ -110,7 +110,8 @@ Enterprise 的硬件要求会随部署场景变化。
 	2. 根据你的环境，在 `.env.default` 中按需编辑下表列出的参数。
 	
 		```bash
-		vi .env.default
+		cp .env.default .env
+		vi .env
 		:wq!
 		```
 
@@ -139,7 +140,7 @@ Enterprise 的硬件要求会随部署场景变化。
 		:::
 	4. 使用配置好的访问入口和默认管理员账号访问 Tier0：
 		- 用户名：`tier0`
-		- 密码：`.env.default` 中 `ADMIN_INIT_PASSWORD` 的值；如果未设置，则为 `tier0`。
+		- 密码：`.env` 中 `ADMIN_INIT_PASSWORD` 的值；如果未设置，则为 `tier0`。
 
 	</Steps>
 		
