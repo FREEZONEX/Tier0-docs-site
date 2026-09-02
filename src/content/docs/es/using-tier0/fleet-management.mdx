@@ -1,0 +1,33 @@
+---
+title: Gestionar datos del centro al edge
+description: Gestiona sin interrupciones los datos de los nodos edge conectados desde un nodo central.
+editions: [cloud, enterprise]
+sidebar:
+  order: 3
+---
+
+import { Steps } from '@astrojs/starlight/components';
+
+En una fábrica real, los datos suelen recopilarse mediante dispositivos edge y gestionarse desde un nodo central para reducir el uso del ancho de banda de red y mejorar la seguridad de los datos.
+Tier0 ofrece una solución de Fleet Management para gestionar desde un nodo central los datos que se encuentran en los nodos edge.
+
+## Conectar nodos edge al nodo central
+
+<Steps>
+1. Crea nodos Fleet en el nodo central antes de establecer conexiones desde los nodos edge.
+
+        :::note
+        Tanto Tier0 Cloud como Enterprise pueden utilizarse como nodos centrales, pero el número de nodos edge que se pueden conectar depende del plan y de la licencia.
+        :::
+2. Utiliza el token del nodo central para establecer la conexión en cada nodo edge.
+</Steps>
+
+## Sincronizar datos entre el edge y el centro
+
+- Los datos UNS solo se pueden seleccionar y sincronizar desde los nodos edge al nodo central.
+- Desde el nodo central, puedes asignar usuarios a los nodos edge para gestionarlos.
+
+## Siguiente
+
+- [Modelar datos de fábrica](../../best-practice/uns-modeling/) — Aprende a modelar datos de fábrica en UNS.
+- [Preparar la base de datos](../connect-data/) — Modela tu namespace y conecta los datos de origen.

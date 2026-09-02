@@ -1,0 +1,34 @@
+---
+title: Manage Data from Center to Edge
+description: Seamlessly manage data on connected edge nodes from a central node.
+editions: [cloud, enterprise]
+sidebar:
+  order: 3
+---
+
+import { Steps } from '@astrojs/starlight/components';
+
+In a real factory, data is often collected by edge devices and managed from a central node to reduce network bandwidth usage and improve data security.
+Tier0 provides a fleet management solution to manage data on edge nodes from a central node.
+
+## Connecting Edge Nodes to the Center
+
+<Steps>
+1. Create fleet nodes on the central node before establishing connections from the edge nodes.
+
+        :::note
+        Both Tier0 Cloud and Enterprise can be used as central nodes, but the number of edge nodes that can be connected depends on the plan and license.
+        :::
+2. Use the token from the central node to establish the connection on each edge node.
+</Steps>
+
+## Syncing Data between Edge and Center
+
+- UNS data can be selected and synced only from edge nodes to the central node.
+- From the central node, you can assign users to edge nodes for node management.
+
+
+## Next
+
+- [Modeling Factory Data](../../best-practice/uns-modeling/) — Learn how to model factory data in UNS.
+- [Preparing Data Foundation](../connect-data/) — Model your namespace and connect source data.

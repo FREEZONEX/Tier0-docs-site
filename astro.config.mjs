@@ -134,6 +134,11 @@ export default defineConfig({
 							slug: 'using-tier0/connect-data',
 						},
 						{
+							label: 'Manage Data from Center to Edge',
+							translations: { 'zh-CN': '从中心到边缘管理数据', ja: 'センターからエッジのデータを管理する', es: 'Gestionar datos del centro al edge', ko: '센터에서 엣지까지 데이터 관리' },
+							slug: 'using-tier0/fleet-management',
+						},
+						{
 							label: 'Working with Factory Data',
 							translations: { 'zh-CN': '操作工厂数据', ja: '工場データを扱う', es: 'Trabajar con datos de fábrica', ko: '공장 데이터 작업' },
 							slug: 'using-tier0/working-with-uns-data',

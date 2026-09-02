@@ -1,0 +1,33 @@
+---
+title: 从中心到边缘管理数据
+description: 从中心节点无缝管理已连接边缘节点上的数据。
+editions: [cloud, enterprise]
+sidebar:
+  order: 3
+---
+
+import { Steps } from '@astrojs/starlight/components';
+
+在真实工厂中，数据通常由边缘设备采集，并从中心节点统一管理，从而减少网络带宽占用并提升数据安全性。
+Tier0 提供 Fleet Management 解决方案，让你可以从中心节点管理边缘节点上的数据。
+
+## 将边缘节点连接到中心节点
+
+<Steps>
+1. 在从边缘节点建立连接之前，先在中心节点上创建 Fleet 节点。
+
+        :::note
+        Tier0 Cloud 和 Enterprise 都可以作为中心节点，但可连接的边缘节点数量取决于套餐和许可证。
+        :::
+2. 使用中心节点提供的 Token，在每个边缘节点上建立连接。
+</Steps>
+
+## 在边缘与中心之间同步数据
+
+- UNS 数据只能从边缘节点选择并同步到中心节点。
+- 你可以从中心节点为边缘节点分配用户，以便进行节点管理。
+
+## 下一步
+
+- [工厂数据建模](../../best-practice/uns-modeling/) — 了解如何在 UNS 中构建工厂数据模型。
+- [准备数据基础](../connect-data/) — 构建 namespace 模型并连接源数据。
