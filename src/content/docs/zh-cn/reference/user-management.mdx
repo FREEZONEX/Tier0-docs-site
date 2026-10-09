@@ -1,0 +1,40 @@
+---
+title: 用户管理
+description: Tier0 通过成员资格、License 和自定义用户账号，由购买方管理平台使用资格与访问权限。
+editions: [cloud, enterprise]
+---
+
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+
+Tier0 用户权限管理和访问控制依据不同版本通过不通方式实现。
+- 云版通过 Workspace 成员邀请管理使用资格；
+- 企业版由管理员分配用户账号和角色，控制用户可访问的功能模块。
+
+## 访问控制
+<Tabs syncKey="edition">
+  <TabItem label="云版">
+
+- Workspace 创建者或现有成员通过电话或邮箱向新成员发起邀请。新成员收到邀请码或邀请链接后，注册账号并加入 Workspace。
+- 账号注册须经过双重验证。
+
+:::caution
+获得 Workspace 成员资格后，用户仍需注册账号才能使用平台。
+:::
+
+:::note
+注册账号后，用户也可以自行申请新建 Workspace。
+:::
+
+  </TabItem>
+  <TabItem label="企业版">
+
+- 管理员使用默认账号首次登录后，修改密码，并在设置中添加用户账号、配置角色。
+- 企业通过分配账号决定谁可以使用平台，通过角色决定用户可访问的功能范围：
+
+    - **Admin**：可访问所有功能模块。
+    - **Operator**：仅可访问应用中心。
+:::note
+用户使用管理员创建的账号登录平台，在所配置角色的权限范围内使用功能。
+:::
+  </TabItem>
+</Tabs>

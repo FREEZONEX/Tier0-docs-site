@@ -1,0 +1,31 @@
+---
+title: 分析数据
+description: 在 Tier0 Notebook 中查询 live namespace 数据，并构建交互式分析或机器学习应用。Cloud 和 Enterprise 可用。
+editions: [cloud, enterprise]
+sidebar:
+  order: 7
+---
+
+import { Steps } from '@astrojs/starlight/components';
+
+Tier0 中使用 Marimo Notebook，基于已建模并连接到 UNS 的工厂数据，通过 **Python** 脚本进行高级数据分析。
+
+:::tip[开始前须知]
+只有开启 **Enable History** 的 UNS 数据，才会作为可用数据源出现在 **Notebook** 中。
+:::
+
+<Steps>
+1. 在 UNS 数据中选择 **VARIABLES** > **PostgreSQL** > **tenant_id** > **uns**。
+2. 单击 **GENERATE WITH AI**，然后使用 **@** 选择要分析的变量。Notebook 支持 fuzzy match 来帮助查找变量。
+3. 根据需要继续分析，或回滚生成结果。
+</Steps>
+
+:::tip[Notebook 中的 AI 辅助]
+- Tier0 Cloud 可以直接使用 AI 辅助。
+- Tier0 Enterprise 需要配置自己的 AI key。
+:::
+
+## 下一步
+
+- [基于工厂数据构建应用](../building-apps/) - 使用 UNS 数据构建工业应用。
+- [工厂数据基础](../factory-data-foundation/) - 理解 Unified Namespace 的数据建模基础。

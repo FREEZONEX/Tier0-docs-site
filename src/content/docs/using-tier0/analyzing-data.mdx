@@ -1,0 +1,29 @@
+---
+title: Analyzing Data
+description: Query live namespace data in Tier0 Notebook and build interactive analyses and machine-learning apps. Available in Cloud and Enterprise.
+editions: [cloud, enterprise]
+sidebar:
+  order: 7
+---
+import { Steps } from '@astrojs/starlight/components';
+
+Marimo Notebook is used in Tier0 for advanced data analysis with **Python** scripts based on the factory data modeled and connected to UNS.
+
+:::tip[Know before you start]
+Data connected to UNS models with **Enable History** selected is available as an existing data source in **Notebook**.
+:::
+<Steps>
+1. UNS data is under **VARIABLES** > **PostgreSQL** > **tenant_id** > **uns**.
+2. Use **@** to include data sources when you **GENERATE WITH AI**, and fuzzy match is available for data sources searching.
+3. Save versions of your analysis for future rollbacks.
+</Steps>
+
+:::tip[AI assist in Notebook]
+- AI assist is available in Tier0 Cloud.
+- You need to provide key for AI assist in Tier0 Enterprise.
+:::
+
+## Next
+
+- [Build Apps on UNS](../building-apps/) — Build industrial applications with UNS data.
+- [UNS Concepts](../factory-data-foundation/) — Understand data modeling in Unified Namespace.

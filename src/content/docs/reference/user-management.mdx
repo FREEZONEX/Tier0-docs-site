@@ -1,0 +1,42 @@
+---
+title: User Management
+description: Tier0 uses membership, licenses, and custom user accounts to let customers manage platform access and user permissions.
+editions: [cloud, enterprise]
+---
+
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+
+Tier0 manages user permissions and access differently across editions.
+- Cloud uses Workspace member invitations to manage who can access a Workspace.
+- Enterprise admin assigns user accounts and roles to determine correspondingly accessible functions.
+
+## Access Control
+<Tabs syncKey="edition">
+  <TabItem label="Cloud">
+
+- Workspace owner or existing members can invite new members by phone or email.
+- After receiving an invitation code or link, new members register an account and join the Workspace.
+- Account registration requires two-step verification.
+
+:::caution
+Workspace membership does not automatically grant access to the platform; users must register the invited phone or email to use the platform.
+:::
+
+:::note
+After registering an account, you can also apply for a new Workspace.
+:::
+
+  </TabItem>
+  <TabItem label="Enterprise">
+
+- After signing in for the first time with the default account, the admin changes the password, then adds user accounts and assigns roles in **Settings**.
+- Admin determines who can use the platform by assigning accounts, and which functions the account can access by assigning roles:
+
+    - **Admin**: Can access all functional modules.
+    - **Operator**: Can only access the **Launchpad** where all accessible applications are listed.
+
+:::note
+Sign in with the account created by the admin and use functions within the permissions of the assigned role.
+:::
+  </TabItem>
+</Tabs>

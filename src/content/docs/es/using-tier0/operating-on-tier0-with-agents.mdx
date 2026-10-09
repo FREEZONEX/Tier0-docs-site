@@ -1,0 +1,242 @@
+---
+title: Operar Tier0 con Agents
+description: Usa AI agents para operar Tier0 mediante Skills y comandos CLI.
+editions: [edge, cloud, enterprise]
+sidebar:
+  order: 8
+---
+
+import {
+  Steps,
+  Tabs,
+  TabItem,
+} from '@astrojs/starlight/components';
+
+import AgentIcons from '../../../../components/AgentIcons.astro';
+
+Tier0 proporciona Skills y comandos CLI que permiten a los AI agents operar la plataforma.
+
+<AgentIcons />
+
+## Instalar Skills y CLI
+
+Elige el instalador que coincida con tu entorno.
+
+### Con Node.js
+
+Si Node.js 16 o posterior está disponible, usa `npx` para instalar el CLI y los skills.
+
+```bash
+npx -y @tier0/cli@latest install
+```
+
+Esto ejecuta el instalador completo y hace dos cosas:
+
+- Instala el binario CLI `tier0` en `~/.tier0/bin/`.
+- Instala la base integrada de Tier0 Skill y la sincroniza con agents detectados como Codex, Claude Code y más.
+
+### Sin Node.js
+
+<Steps>
+1. Instala el binario CLI `tier0`.
+    <Tabs syncKey="tier0-cli-binary-install">
+      <TabItem label="curl">
+
+        ```bash
+        curl -fsSL https://raw.githubusercontent.com/FREEZONEX/Tier0-cli/main/install.sh | bash
+        ```
+
+      </TabItem>
+      <TabItem label="iwr">
+
+        ```powershell
+        iwr https://raw.githubusercontent.com/FREEZONEX/Tier0-cli/main/install.ps1 | iex
+        ```
+
+      </TabItem>
+    </Tabs>
+2. Descarga los Tier0 Skills más recientes y sincronízalos con los agents detectados.
+    ```bash
+    tier0 skills update
+    ```
+3. Verifica la versión y el estado de salud del Skill instalado.
+    ```bash
+    tier0 skills status
+    ```
+</Steps>
+
+### Gestionar Skills
+- Comprueba la versión y el estado de salud del Skill instalado:
+    ```bash
+    tier0 skills status
+    ```
+- Repara una base integrada de Skill ausente o dañada:
+    ```bash
+    tier0 skills install
+    ```
+- Actualiza al Tier0 Skill más reciente:
+    ```bash
+    tier0 skills update
+    ```
+
+## Cómo trabajan juntos Skills y CLI
+Tier0 CLI proporciona comandos ejecutables, y las Skills guían a los agents para elegir y usar esos comandos de forma segura.
+:::note
+Tier0 Skills están diseñadas para activarse automáticamente mediante prompts y guiar a los agents sobre qué hacer y qué comandos usar.
+:::
+
+### Ejemplo
+- Prompt: Comprueba la temperatura actual de `Plant/Line1/Metric/Temperature`.
+- Skill
+  - `tier0-uns`
+  - Indica al agent que el valor actual debe leerse desde un topic path completo y selecciona la operación de lectura UNS adecuada.
+- CLI: `tier0 uns read Plant/Line1/Metric/Temperature --json`
+
+### Skills
+| Skill | Propósito |
+| --- | --- |
+| `tier0` | Enruta tareas de Tier0 al skill adecuado y proporciona reglas compartidas de configuración, autenticación y seguridad. |
+| `tier0-uns` | Guía a los agents en operaciones UNS, como browse, read, write, history, search, create, update, delete y restore. |
+| `tier0-flow` | Guía a los agents en la gestión de SourceFlow y EventFlow, como inspección, exportación, creación, actualización, despliegue y eliminación. |
+| `tier0-mqtt` | Guía a los agents en la gestión de credenciales MQTT, publicación y suscripciones en tiempo real acotadas. |
+| `tier0-files` | Guía a los agents en operaciones de archivos de Tier0, como upload, download, generación de URL de acceso y delete. |
+
+:::tip[Usa un agent para leer el skill repo]
+Pide a tu agent que lea el [Tier0 Skill repo](https://github.com/FREEZONEX/Tier0-Skills) para ver los detalles.
+:::
+
+## Operaciones CLI
+
+### Configurar la instancia operativa
+:::note
+Cloud usa `https://tier0.dev` por defecto y no necesita configuración de base URL.
+:::
+Los despliegues privados deben configurar la base URL antes del login. Una vez configurada, todos los comandos siguientes se ejecutarán sobre esa instancia.
+
+```bash
+tier0 config --base-url https://your-tier0.example.com
+tier0 login # interactive browser login
+```
+
+### Autenticación
+
+<Tabs syncKey="tier0-login-method">
+  <TabItem label="Con API key">
+
+  <Steps>
+  1. Configura la API key obtenida de la instancia Tier0 operativa.
+
+      ```bash
+      tier0 config --api-key <api-key>
+      ```
+  2. Verifica la identidad y permisos de la API key.
+      ```bash
+      tier0 auth whoami --json
+      ```
+  3. Realiza otras operaciones con el CLI `tier0`.
+  </Steps>
+
+  </TabItem>
+  <TabItem label="Sin API key">
+
+  <Steps>
+  1. Obtén el enlace de autenticación en navegador.
+
+      ```bash
+      tier0 login --no-wait --json
+      ```
+  2. Completa la autenticación en el navegador accediendo al `verification_url` devuelto.
+  3. Consulta el resultado del login con el `setup_code` devuelto.
+      ```bash
+      tier0 login --setup-code <setup_code>
+      ```
+ </Steps>
+  </TabItem>
+</Tabs>
+
+:::caution[Importante]
+Ejecuta `config` para definir la instancia operativa antes de configurar una API key o iniciar el login en navegador; de lo contrario, el CLI puede operar sobre la instancia equivocada.
+:::
+
+### Previsualizar operaciones
+Usa `--dry-run` para validar y previsualizar operaciones de escritura compatibles sin enviar una solicitud a Tier0.
+
+#### Operaciones compatibles
+- UNS: `write/create/update/delete/restore`
+- Flow: `create/update/delete/deploy`
+- API: `tier0 api`
+- MQTT: `auth create/auth delete/publish`
+- Files: `delete`
+
+#### Ejemplos
+```bash
+tier0 uns write --topic demo --value '{"value":1}' --dry-run
+tier0 flow deploy --id 1 --flows-file flows.json --dry-run --json
+tier0 api /openapi/v1/uns/write --body-file body.json --dry-run --json
+tier0 mqtt auth create --name my-client --save my-client --dry-run --json
+tier0 assets delete --file-path workspace/path/to/file.csv --dry-run --json
+```
+:::note
+La opción `--json` genera la solicitud en formato JSON.
+:::
+:::caution[El request body debe contener JSON válido]
+El CLI ya no intenta adivinar ni reescribir JSON mal formado si no se proporciona JSON válido.
+:::
+#### Previsualizaciones devueltas
+
+:::note
+Los headers y API keys no se muestran en la salida de dry-run.
+:::
+
+```json
+{
+  "ok": true,
+  "dry_run": true,
+  "data": {
+    "api": [
+      {"method": "POST", "url": "https://tier0.dev/openapi/v1/uns/write", "body": {}}
+    ]
+  }
+}
+```
+
+### Manejar errores
+Con `--json`, los fallos de comando devuelven un objeto JSON con el mensaje y el código de error.
+
+```json
+{"ok":false,"error":{"type":"validation","subtype":"invalid_argument","param":"--qos","message":"--qos must be 0, 1, or 2"}}
+```
+
+## Desinstalar Skills y CLI
+
+- Comandos de desinstalación
+```bash
+# Elimina el CLI de Tier0 y conserva la configuración local y los skills.
+npx @tier0/cli@latest uninstall
+
+# Elimina el CLI de Tier0 y borra la configuración local, credenciales y caché, pero conserva los skills.
+npx @tier0/cli@latest uninstall --purge
+
+# Elimina los skills
+npx @tier0/cli@latest uninstall --remove-skills
+
+# Elimina todo lo anterior
+npx @tier0/cli@latest uninstall --purge --remove-skills
+```
+- Desinstalación global de NPM
+```bash
+npm uninstall -g @tier0/cli
+```
+- Limpieza manual
+```bash
+rm -rf ~/.tier0/bin/tier0 ~/.tier0/skills
+npx -y --package=skills -- skills remove tier0 -y -g
+```
+
+## Referencia CLI
+
+[Referencia CLI de Tier0](../../reference/cli-commands-reference/) lista todos los comandos CLI.
+
+## Siguiente
+
+- [Trabajar con datos de fábrica](../working-with-factory-data/) — Cómo operar sobre tu modelo de datos de fábrica mediante MQTT y APIs.

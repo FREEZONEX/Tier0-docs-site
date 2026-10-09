@@ -1,0 +1,52 @@
+diff --git a/node_modules/starlight-llms-txt/llms-custom.txt.ts b/node_modules/starlight-llms-txt/llms-custom.txt.ts
+index f96dbbd..1a1776b 100644
+--- a/node_modules/starlight-llms-txt/llms-custom.txt.ts
++++ b/node_modules/starlight-llms-txt/llms-custom.txt.ts
+@@ -31,5 +31,7 @@ export const GET: APIRoute<Props, Params> = async (context) => {
+ 		description,
+ 		include: context.props.paths,
+ 	});
+-	return new Response(body);
++	return new Response(body, {
++		headers: { 'Content-Type': 'text/plain; charset=utf-8' },
++	});
+ };
+diff --git a/node_modules/starlight-llms-txt/llms-full.txt.ts b/node_modules/starlight-llms-txt/llms-full.txt.ts
+index 03f408b..883e018 100644
+--- a/node_modules/starlight-llms-txt/llms-full.txt.ts
++++ b/node_modules/starlight-llms-txt/llms-full.txt.ts
+@@ -14,5 +14,7 @@ export const GET: APIRoute = async (context) => {
+ 		minify: false,
+ 		description: `This is the full developer documentation for ${getSiteTitle()}`,
+ 	});
+-	return new Response(body);
++	return new Response(body, {
++		headers: { 'Content-Type': 'text/plain; charset=utf-8' },
++	});
+ };
+diff --git a/node_modules/starlight-llms-txt/llms-small.txt.ts b/node_modules/starlight-llms-txt/llms-small.txt.ts
+index 8e114b9..b350132 100644
+--- a/node_modules/starlight-llms-txt/llms-small.txt.ts
++++ b/node_modules/starlight-llms-txt/llms-small.txt.ts
+@@ -15,5 +15,7 @@ export const GET: APIRoute = async (context) => {
+ 		description: `This is the abridged developer documentation for ${getSiteTitle()}`,
+ 		exclude: starlightLllmsTxtContext.exclude,
+ 	});
+-	return new Response(body);
++	return new Response(body, {
++		headers: { 'Content-Type': 'text/plain; charset=utf-8' },
++	});
+ };
+diff --git a/node_modules/starlight-llms-txt/llms.txt.ts b/node_modules/starlight-llms-txt/llms.txt.ts
+index 482af33..7d00ed1 100644
+--- a/node_modules/starlight-llms-txt/llms.txt.ts
++++ b/node_modules/starlight-llms-txt/llms.txt.ts
+@@ -52,5 +52,7 @@ export const GET: APIRoute = async (context) => {
+ 		);
+ 	}
+ 
+-	return new Response(segments.join('\n\n') + '\n');
++	return new Response(segments.join('\n\n') + '\n', {
++		headers: { 'Content-Type': 'text/plain; charset=utf-8' },
++	});
+ };

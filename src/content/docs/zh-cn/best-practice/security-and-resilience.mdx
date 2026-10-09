@@ -1,0 +1,65 @@
+---
+title: 安全与可靠性
+description: Tier0 身份认证、数据访问、部署可用性与恢复机制概览。
+editions: [cloud, enterprise]
+---
+
+Tier0 支持从**安全**和**可靠性**两个方面来确保数据安全。
+- **安全**：控制谁能访问平台、应用和数据；
+- **可靠性**：发生故障后服务能否继续，以及数据能否恢复。
+
+## 各版本的安全范围
+
+| 版本 | 安全能力范围 |
+| --- | --- |
+| **云版** | 提供平台访问控制，以及需要身份认证的 MQTT 和 API 数据访问。 |
+| **企业版** | 除平台和数据访问控制外，还提供适用于私有部署的部署可用性、备份与恢复方案。 |
+| **Edge（开源版）** | 用于本地数据连接与建模，内置 MQTT Broker 支持匿名订阅。 |
+
+各版本定位请参阅[选择合适的产品版本](https://tier0.app/pricing)。
+
+## 安全
+
+### 身份与访问控制
+
+| 范围 | Tier0 机制 | 详情 |
+| --- | --- | --- |
+| 平台访问 | <ul><li>云版通过 Workspace 成员资格控制访问。</li><li>企业版通过用户账号控制访问。</li></ul> | [用户管理](../../reference/user-management/) |
+| Agent 访问 | Agent 使用 API Key 完成身份认证，并通过 Tier0 CLI 访问和操作平台。 | [CLI 身份认证](../../using-tier0/operating-on-tier0-with-agents/#认证) |
+| 项目与应用访问 | Tier0 基于 RBAC 实现应用访问控制。 | [访问控制](../../using-tier0/building-apps/#访问控制) |
+
+:::note
+Workspace 成员资格不代表自动生成账号，用户仍需自行注册并登录账号。账号注册须经过双重验证。
+:::
+### 数据访问控制
+
+| 访问方式 | Tier0 机制 | 详情 |
+| --- | --- | --- |
+| MQTT | <ul><li>客户端使用 Tier0 生成的 Credential 凭据完成鉴权。</li><li>TLS 和安全 WebSocket 对传输中的数据进行加密。</li></ul> | [MQTT 凭据与连接](../../using-tier0/working-with-factory-data/#生成-mqtt-凭据) |
+| REST API | 必须使用 Tier0 生成的 Key 才能访问数据。 | [API 参考](../../reference/api-reference/) |
+
+## 可靠性
+
+### 部署可用性
+
+企业版目前为中心节点提供两种部署方案：
+
+| 方案 | 可用性边界 | 详情 |
+| --- | --- | --- |
+| **标准部署** | <ul><li>数据库支持主备故障切换。</li><li>Enterprise 应用和 EMQX 仍为单点。</li></ul> | [标准部署方案](../../reference/standard-deployment-plan/) |
+| **高可用部署** | <ul><li>增加 Enterprise 主备节点，并明确数据库、缓存、对象存储及运行文件的故障切换机制。</li><li>不承诺零中断或零数据丢失。</li></ul> | [高可用部署方案](../../reference/high-availability-deployment-plan/) |
+
+:::note
+详细的可用性限制请参阅 [SLA 与高可用边界](../../reference/sla-and-ha-boundaries/)。
+:::
+
+### 备份与恢复
+
+企业版提供数据库备份和恢复。恢复后需要检查部署状态、执行基础功能验证，并确认能够正常登录平台。
+
+- 备份请参阅[备份与恢复](../../reference/operations-runbook/#备份与恢复)
+- 恢复验证要求请参阅[演练要求](../../reference/sla-and-ha-boundaries/#演练要求)。
+
+:::note[响应时间]
+一般情况下，响应时间为 3 个工作日。
+:::

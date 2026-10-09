@@ -1466,6 +1466,19 @@ starlight-tabs.t0-topic-explosion-tabs,
 	overflow-wrap: anywhere;
 }
 
+/* Security and Resilience: reserve more room for explanations than labels. */
+:root[data-theme] .sl-markdown-content:has(#security-scope-by-edition, #各版本的安全范围) table {
+	table-layout: auto;
+}
+
+.sl-markdown-content:has(#security-scope-by-edition, #各版本的安全范围) th:first-child {
+	width: 22%;
+}
+
+.sl-markdown-content:has(#security-scope-by-edition, #各版本的安全范围) th:nth-child(3) {
+	width: 24%;
+}
+
 /* Default tables: wrap inside the content column (no horizontal scrollbar). */
 .sl-markdown-content :is(th, td) {
 	white-space: normal;
@@ -3196,7 +3209,7 @@ main:has(.t0-banner) .t0-banner {
 	border-left-color: #bdbdbd;
 }
 
-/* Light theme baseline (match /using-tier0/build-apps/) */
+/* Light theme baseline (match /using-tier0/building-apps/) */
 :root[data-theme='light'] .mermaid {
 	border: 0 !important;
 	background: var(--t0-mermaid-canvas-bg) !important;

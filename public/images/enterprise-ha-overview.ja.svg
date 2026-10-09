@@ -1,7 +1,7 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="840" viewBox="0 0 1600 840" role="img" aria-label="全体トポロジ">
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="920" viewBox="0 0 1600 920" role="img" aria-label="全体トポロジ">
 <defs><marker id="arrow" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto"><path d="M2,2 L10,6 L2,10 Z" fill="#475569"/></marker></defs>
 <style>text{font-family:IBM Plex Sans,Segoe UI,Arial,sans-serif}.label{fill:#475569}</style>
-<rect x="30" y="30" width="1540" height="780" rx="24" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2"/>
+<rect x="30" y="30" width="1540" height="860" rx="24" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2"/>
 <text x="800" y="75" text-anchor="middle" font-size="34" font-weight="700" fill="#0f172a"><tspan x="800" dy="0">全体トポロジ</tspan></text>
 <rect x="650" y="105" width="300" height="86" rx="14" fill="#ffffff" stroke="#94a3b8" stroke-width="2"/>
 <text x="800" y="156" text-anchor="middle" font-size="22" font-weight="650" fill="#0f172a"><tspan x="800" dy="0">クライアント / 現場システム</tspan></text>
@@ -30,6 +30,6 @@
 <line x1="1250" y1="725" x2="1250" y2="760" stroke="#475569" stroke-width="3" marker-end="url(#arrow)"/>
 <rect x="1065" y="760" width="370" height="70" rx="14" fill="#f0fdf4" stroke="#86efac" stroke-width="2"/>
 <text x="1250" y="803" text-anchor="middle" font-size="18" font-weight="600" fill="#0f172a"><tspan x="1250" dy="0">C/D/E/F RustFS クラスター</tspan></text>
-<rect x="260" y="765" width="1080" height="35" rx="18" fill="#e2e8f0" stroke="#cbd5e1" stroke-width="1"/>
-<text x="800" y="789" text-anchor="middle" font-size="17" font-weight="500" fill="#334155"><tspan x="800" dy="0">クライアントと Enterprise は常に固定 VIP を使用し、バックエンドの役割が変わっても接続先は変更しません。</tspan></text>
+<rect x="260" y="845" width="1080" height="35" rx="18" fill="#e2e8f0" stroke="#cbd5e1" stroke-width="1"/>
+<text x="800" y="869" text-anchor="middle" font-size="17" font-weight="500" fill="#334155"><tspan x="800" dy="0">クライアントと Enterprise は常に固定 VIP を使用し、バックエンドの役割が変わっても接続先は変更しません。</tspan></text>
 </svg>

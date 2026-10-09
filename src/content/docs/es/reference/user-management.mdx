@@ -1,0 +1,42 @@
+---
+title: Gestión de usuarios
+description: Tier0 utiliza la pertenencia a un Workspace, las licencias y las cuentas de usuario personalizadas para que los clientes gestionen el acceso a la plataforma y los permisos de los usuarios.
+editions: [cloud, enterprise]
+---
+
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+
+Tier0 gestiona los permisos de usuario y el acceso de forma diferente según la edición.
+- Cloud utiliza invitaciones a miembros para gestionar quién puede acceder a un Workspace.
+- En Enterprise, el administrador asigna cuentas de usuario y roles para determinar las funciones a las que se puede acceder.
+
+## Control de acceso
+<Tabs syncKey="edition">
+  <TabItem label="Cloud">
+
+- El propietario del Workspace o los miembros existentes pueden invitar a nuevos miembros mediante su número de teléfono o correo electrónico.
+- Tras recibir un código o enlace de invitación, los nuevos miembros registran una cuenta y se unen al Workspace.
+- El registro de la cuenta requiere una verificación en dos pasos.
+
+:::caution
+Ser miembro de un Workspace no concede automáticamente acceso a la plataforma; los usuarios deben registrar una cuenta con el número de teléfono o correo electrónico al que se envió la invitación para utilizarla.
+:::
+
+:::note
+Después de registrar una cuenta, también puedes solicitar un nuevo Workspace.
+:::
+
+  </TabItem>
+  <TabItem label="Enterprise">
+
+- Tras iniciar sesión por primera vez con la cuenta predeterminada, el administrador cambia la contraseña y, a continuación, añade cuentas de usuario y asigna roles en **Configuración**.
+- El administrador determina quién puede utilizar la plataforma mediante la asignación de cuentas y a qué funciones puede acceder cada cuenta mediante la asignación de roles:
+
+    - **Admin**: Puede acceder a todos los módulos funcionales.
+    - **Operator**: Solo puede acceder al **Launchpad**, donde se muestran todas las aplicaciones a las que tiene acceso.
+
+:::note
+Inicia sesión con la cuenta creada por el administrador y utiliza las funciones dentro de los permisos del rol asignado.
+:::
+  </TabItem>
+</Tabs>

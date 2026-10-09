@@ -1,0 +1,99 @@
+---
+title: Crear apps
+description: Crea aplicaciones industriales mediante conversaciones con IA, usando datos de fábrica, control de acceso, gestión de versiones y despliegue.
+editions: [cloud]
+sidebar:
+  order: 6
+---
+import { Steps } from '@astrojs/starlight/components';
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+
+Crea aplicaciones industriales personalizadas mediante conversaciones con IA. Las aplicaciones pueden usar datos de fábrica e incluir capacidades integradas como control de acceso basado en roles, gestión de versiones y despliegue.
+
+## Crear una app de Tier0
+Antes de crear una aplicación, crea un project.
+
+- El project se usa para clasificar aplicaciones y gestionar el control de acceso.
+- Las aplicaciones dentro de un mismo project pueden funcionar como módulos relacionados de un sistema complejo.
+- Los datos de cada project son independientes de los datos de otros projects.
+
+### Escribir el prompt
+Para que el agent genere una aplicación que se ajuste mejor a tus requisitos, asegúrate de que el prompt cubra ***al menos*** los siguientes aspectos.
+
+- **Propósito de la aplicación**: ¿Cuál es el objetivo de la aplicación?
+    ```text
+    Crea una aplicación de mantenimiento de equipos para técnicos de fábrica.
+    ```
+- **Datos de la aplicación**: ¿Qué datos usa la aplicación y dónde están?
+
+    <Tabs>
+    <TabItem label="Platform Plan">
+    Las aplicaciones pueden consumir datos de UNS y publicar datos en UNS indicando el UNS topic en el prompt.
+    ```text
+    La aplicación debe usar el estado de los equipos, los registros de alarmas y el historial de mantenimiento del modelo UNS xxx, y publicar actualizaciones en el UNS topic xxx.
+    ```
+    </TabItem>
+    <TabItem label="Builder Plan">
+    La aplicación no se conecta a UNS. Los datos generados durante el uso de la aplicación se almacenan en la base de datos.
+    </TabItem>
+    </Tabs>
+- **Función de la aplicación**: ¿Qué debe hacer la aplicación?
+    ```text
+    La aplicación debe permitir a los usuarios supervisar el estado de los equipos, enviar solicitudes de mantenimiento y seguir el progreso de las reparaciones.
+    ```
+
+:::caution[Cuando estás en **Builder**]
+El plan **Builder** actualmente no admite UNS, pero los datos simulados están disponibles. Para necesidades de integración de datos más específicas, contacta con nuestro equipo en sales@freezonex.io.
+:::
+:::tip[Para crear aplicaciones más rápido]
+- Las plantillas de aplicaciones industriales comunes están disponibles en **Library**. Puedes usar una plantilla y modificar sus funciones para crear una aplicación mucho más rápido.
+- Usa las [Skills integradas de Builder](../../reference/embedded-builder-skills/) para ayudarte a crear aplicaciones.
+- Usa `/clear` para borrar el contexto y `/compact` para comprimirlo cuando la conversación sea demasiado larga.
+:::
+
+### Control de acceso
+El control de acceso basado en roles se aplica tanto a los projects como a las aplicaciones.
+
+- Niveles de acceso del project
+    - **Owner**: Acceso completo al project.
+    - **Can Edit**: Acceso completo al project, excepto eliminarlo.
+    - **Can Launch**: Solo puede ver el project en **Launchpad** y usar las aplicaciones permitidas.
+- Roles de la aplicación
+    - El agent los genera automáticamente según la lógica de negocio de la aplicación cuando no se definen explícitamente. También se pueden reutilizar roles existentes de otras aplicaciones cuando sus responsabilidades coinciden.
+    - Solo pueden asignarse a miembros del project.
+    - La aplicación queda abierta a todos los miembros del project si el prompt especifica explícitamente que no se requieren roles.
+
+:::tip[Si quieres asignar tus propios roles]
+Indica los roles y el alcance de permisos en el prompt. El agent los comparará con los roles existentes generados desde otras aplicaciones. Si hay un conflicto, el agent te pedirá confirmación.
+:::
+:::caution[La asignación de roles de aplicación es obligatoria para aplicaciones controladas por roles]
+Para acceder a una aplicación controlada por roles en **Launchpad**, debes tener roles de aplicación asignados. Incluso un workspace/project owner no puede acceder a la aplicación sin un rol de aplicación.
+:::
+
+### Gestión de versiones
+Las aplicaciones existen en Tier0 en 3 estados.
+
+- **Draft**: El estado más reciente de la aplicación. Los cambios en esta versión no afectan a otras versiones si no se despliega.
+- **Snapshot**: Guarda la aplicación en el momento de crear el snapshot. Desplegar una versión snapshot reemplaza la versión **Active** actual.
+- **Active**: La versión actual de la aplicación en línea.
+
+:::tip[Cambio de versión]
+- Al desplegar un draft, la aplicación active se actualiza a una versión más nueva.
+- Al desplegar un snapshot, la aplicación active vuelve a una versión anterior.
+:::
+
+### Exportar a entornos externos
+Cuando la aplicación esté lista, se puede exportar desde la página **Preview** tanto para terceros externos como para Tier0 Enterprise.
+
+- **Download Source Code**: Exporta el código fuente de la aplicación para desarrollo secundario.
+- **Export Bundle**: Exportación específica para importación local en **Tier0 Enterprise**.
+
+:::tip[Descargar el código fuente de un snapshot]
+Descarga el snapshot después de guardarlo para obtener el código fuente de esa versión.
+:::
+
+## Siguiente
+
+- [Analizar datos](../analyzing-data/) - Analiza datos UNS con Marimo Notebook y Python.
+- [Mejor práctica: conectar protocolos industriales](../../best-practice/connecting-industrial-protocols/) - Ejemplos de conexión de fuentes de datos comunes.

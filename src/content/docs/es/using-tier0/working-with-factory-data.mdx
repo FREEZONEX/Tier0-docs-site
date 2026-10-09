@@ -1,0 +1,494 @@
+---
+title: Trabajar con datos de fábrica
+description: Opera datos UNS con MQTT y la API, con la referencia de API.
+editions: [edge, cloud, enterprise]
+sidebar:
+  order: 3
+---
+import { Steps } from '@astrojs/starlight/components';
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+
+Puedes operar datos de UNS mediante MQTT y APIs.
+
+## MQTT
+Los MQTT clients pueden conectarse al broker UNS con credentials generadas en Tier0.
+:::note
+Puedes usar MQTT clients como **MQTTX**, **MQTT Explorer** y **Node-RED** para conectarte al broker y publicar/suscribirte a messages.
+:::
+### Generar MQTT Credentials
+En la pestaña **Edge** de Tier0, crea una nueva credential y guárdala.
+
+### Conectar MQTT Clients
+
+:::tip
+Los siguientes clients se usan como ejemplos para mostrar cómo usar las credentials para conectarse al broker UNS.
+:::
+
+<Tabs syncKey="mqtt-client">
+  <TabItem label="MQTTX">
+
+1. Install and open <a href="https://mqttx.app/" target="_blank" rel="noopener noreferrer">MQTTX</a>.
+2. Agrega una conexión con la información del broker UNS y las credentials generadas.
+    ```json
+    {
+      "Host": "mqtt.tier0.dev",
+      "Port": 8883,
+      "Client ID": "<generated client ID>",
+      "Username": "<generated username>",
+      "Password": "<generated password>"
+    }
+    ``` 
+
+  </TabItem>
+  <TabItem label="MQTT Explorer">
+
+1. Install and open <a href="https://mqtt-explorer.com/" target="_blank" rel="noopener noreferrer">MQTT Explorer</a>.
+2. Agrega una nueva conexión con la información del broker UNS y las credentials generadas.
+    ```json
+    {
+      "Protocol": "mqtt://",
+      "Host": "mqtt.tier0.dev",
+      "Port": 8883,
+      "Username": "<generated username>",
+      "Password": "<generated password>"
+    }
+    ``` 
+3. Change the client ID to the credential ID in **ADVANCED** before connecting.
+
+  </TabItem>
+  <TabItem label="Node-RED">
+      - Usa **Event Flow** - módulo de procesamiento de datos en Tier0 basado en Node-RED.
+          1. Crea un **Event Flow** en **Flows** y empieza con un node `mqtt in`.
+          2. Select the UNS broker as **Server** (same name as the flow) and set **Topic** to a UNS model in the node.
+      - Usa una **instancia independiente de Node-RED**
+          1. Instala y abre la instancia de <a href="https://nodered.org/docs/getting-started/local" target="_blank" rel="noopener noreferrer">Node-RED</a>.
+          2. Agrega un server en el node `mqtt in` con la siguiente información.
+          ```json
+          {
+            {/* under Connection */}
+            "Server": "mqtt://mqtt.tier0.dev",
+            "Port": 8883,
+            "Client ID": "<generated clientId>",
+            {/* under Security */}
+            "Username": "<generated username>",
+            "Password": "<generated password>"
+          }
+          ```
+  </TabItem>
+</Tabs>
+
+### Probar conexiones
+<Steps>
+1. Asegúrate de que el client status sea normal.
+2. Copia un topic de modelo UNS y publica un message en él mediante el client.
+</Steps>
+
+## API
+Usa la **REST API** para operar datos de UNS.
+:::tip[Cómo usar la API]
+El base path de OpenAPI es `/openapi/v1`, por ejemplo `https://your-workspace.tier0.app/openapi/v1`, y la API key se pasa en el header `x-api-key`.
+:::
+
+### Obtener API Key
+
+Las API keys están en **Settings > API Keys**. Según el account type, los tipos de key permitidos son distintos.
+- **Service Key**: Solo la pueden crear **Admin** y **Owner**.
+- **Personal Key**: La puede crear cualquier persona, y su permission scope es el mismo que el de la cuenta.
+:::caution[Permiso de key vs permiso de cuenta]
+El permiso de cuenta prevalece sobre el permiso de key. Cuando la key está configurada como **Full Access**, los datos no disponibles para la cuenta siguen sin poder accederse con esa key.
+:::
+
+### Ejemplos
+
+- `/uns/create`
+
+  Crea un path o topic de UNS. Usa `namespace` para definir el node tree.
+
+  <Tabs syncKey="uns-api-language">
+    <TabItem label="JavaScript">
+
+      ```js
+      const BASE_URL = process.env.TIER0_BASE_URL;
+      const API_KEY = process.env.TIER0_API_KEY;
+
+      const response = await fetch(`${BASE_URL}/uns/create`, {
+        method: 'POST',
+        headers: {
+          'content-type': 'application/json',
+          'x-api-key': API_KEY,
+        },
+        body: JSON.stringify({
+          namespace: [
+            {
+              name: 'DemoFactory',
+              type: 'PATH',
+              children: [
+                {
+                  name: 'Site_01',
+                  type: 'PATH',
+                  children: [
+                    {
+                      name: 'Production',
+                      type: 'PATH',
+                      children: [
+                        {
+                          name: 'Produced_Qty',
+                          type: 'TOPIC',
+                          topicType: 'METRIC',
+                          displayName: 'Produced Quantity',
+                          description: 'Produced quantity from the production line.',
+                          enableHistory: true,
+                          fields: [
+                            { name: 'value', type: 'DOUBLE', unit: 'pcs' },
+                          ],
+                        },
+                      ],
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+        }),
+      });
+
+      const result = await response.json();
+      console.log(result.data.results);
+      ```
+
+    </TabItem>
+    <TabItem label="Python">
+
+      ```python
+      import os
+      import requests
+
+      base_url = os.environ["TIER0_BASE_URL"]
+      api_key = os.environ["TIER0_API_KEY"]
+
+      response = requests.post(
+          f"{base_url}/uns/create",
+          headers={"x-api-key": api_key},
+          json={
+              "namespace": [
+                  {
+                      "name": "DemoFactory",
+                      "type": "PATH",
+                      "children": [
+                          {
+                              "name": "Site_01",
+                              "type": "PATH",
+                              "children": [
+                                  {
+                                      "name": "Production",
+                                      "type": "PATH",
+                                      "children": [
+                                          {
+                                              "name": "Produced_Qty",
+                                              "type": "TOPIC",
+                                              "topicType": "METRIC",
+                                              "displayName": "Produced Quantity",
+                                              "description": "Produced quantity from the production line.",
+                                              "enableHistory": True,
+                                              "fields": [
+                                                  {"name": "value", "type": "DOUBLE", "unit": "pcs"},
+                                              ],
+                                          },
+                                      ],
+                                  },
+                              ],
+                          },
+                      ],
+                  },
+              ],
+          },
+          timeout=30,
+      )
+      response.raise_for_status()
+
+      result = response.json()
+      print(result["data"]["results"])
+      ```
+
+    </TabItem>
+    <TabItem label="cURL">
+
+      ```bash
+      curl -X POST "$TIER0_BASE_URL/uns/create" \
+        -H "content-type: application/json" \
+        -H "x-api-key: $TIER0_API_KEY" \
+        -d '{
+          "namespace": [
+            {
+              "name": "DemoFactory",
+              "type": "PATH",
+              "children": [
+                {
+                  "name": "Site_01",
+                  "type": "PATH",
+                  "children": [
+                    {
+                      "name": "Production",
+                      "type": "PATH",
+                      "children": [
+                        {
+                          "name": "Produced_Qty",
+                          "type": "TOPIC",
+                          "topicType": "METRIC",
+                          "displayName": "Produced Quantity",
+                          "description": "Produced quantity from the production line.",
+                          "enableHistory": true,
+                          "fields": [
+                            { "name": "value", "type": "DOUBLE", "unit": "pcs" }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }'
+      ```
+
+    </TabItem>
+  </Tabs>
+
+- `/uns/read`
+
+  Lee el valor más reciente y los metadatos de uno o varios UNS topics.
+
+  <Tabs syncKey="uns-api-language">
+    <TabItem label="JavaScript">
+
+      ```js
+      const BASE_URL = process.env.TIER0_BASE_URL;
+      const API_KEY = process.env.TIER0_API_KEY;
+
+      const response = await fetch(`${BASE_URL}/uns/read`, {
+        method: 'POST',
+        headers: {
+          'content-type': 'application/json',
+          'x-api-key': API_KEY,
+        },
+        body: JSON.stringify({
+          topics: [
+            'DemoFactory/Site_01/Production/Produced_Qty',
+          ],
+          include_leaf_value: true,
+          include_metadata: true,
+        }),
+      });
+
+      const result = await response.json();
+      console.log(result.data.results);
+      ```
+
+    </TabItem>
+    <TabItem label="Python">
+
+      ```python
+      import os
+      import requests
+
+      base_url = os.environ["TIER0_BASE_URL"]
+      api_key = os.environ["TIER0_API_KEY"]
+
+      response = requests.post(
+          f"{base_url}/uns/read",
+          headers={"x-api-key": api_key},
+          json={
+              "topics": [
+                  "DemoFactory/Site_01/Production/Produced_Qty",
+              ],
+              "include_leaf_value": True,
+              "include_metadata": True,
+          },
+          timeout=30,
+      )
+      response.raise_for_status()
+
+      result = response.json()
+      print(result["data"]["results"])
+      ```
+
+    </TabItem>
+    <TabItem label="cURL">
+
+      ```bash
+      curl -X POST "$TIER0_BASE_URL/uns/read" \
+        -H "content-type: application/json" \
+        -H "x-api-key: $TIER0_API_KEY" \
+        -d '{
+          "topics": [
+            "DemoFactory/Site_01/Production/Produced_Qty"
+          ],
+          "include_leaf_value": true,
+          "include_metadata": true
+        }'
+      ```
+
+    </TabItem>
+  </Tabs>
+
+- `/uns/update`
+
+  Actualiza un UNS node por `path`. Usa `updateMask` para especificar qué campos deben cambiar.
+
+  <Tabs syncKey="uns-api-language">
+    <TabItem label="JavaScript">
+
+      ```js
+      const BASE_URL = process.env.TIER0_BASE_URL;
+      const API_KEY = process.env.TIER0_API_KEY;
+
+      const response = await fetch(`${BASE_URL}/uns/update`, {
+        method: 'POST',
+        headers: {
+          'content-type': 'application/json',
+          'x-api-key': API_KEY,
+        },
+        body: JSON.stringify({
+          path: 'DemoFactory/Site_01/Production/Produced_Qty',
+          displayName: 'Produced Quantity',
+          description: 'Updated production output quantity.',
+          updateMask: ['displayName', 'description'],
+        }),
+      });
+
+      const result = await response.json();
+      console.log(result.data);
+      ```
+
+    </TabItem>
+    <TabItem label="Python">
+
+      ```python
+      import os
+      import requests
+
+      base_url = os.environ["TIER0_BASE_URL"]
+      api_key = os.environ["TIER0_API_KEY"]
+
+      response = requests.post(
+          f"{base_url}/uns/update",
+          headers={"x-api-key": api_key},
+          json={
+              "path": "DemoFactory/Site_01/Production/Produced_Qty",
+              "displayName": "Produced Quantity",
+              "description": "Updated production output quantity.",
+              "updateMask": ["displayName", "description"],
+          },
+          timeout=30,
+      )
+      response.raise_for_status()
+
+      result = response.json()
+      print(result["data"])
+      ```
+
+    </TabItem>
+    <TabItem label="cURL">
+
+      ```bash
+      curl -X POST "$TIER0_BASE_URL/uns/update" \
+        -H "content-type: application/json" \
+        -H "x-api-key: $TIER0_API_KEY" \
+        -d '{
+          "path": "DemoFactory/Site_01/Production/Produced_Qty",
+          "displayName": "Produced Quantity",
+          "description": "Updated production output quantity.",
+          "updateMask": ["displayName", "description"]
+        }'
+      ```
+
+    </TabItem>
+  </Tabs>
+
+- `/uns/delete`
+
+  Elimina uno o varios UNS models. Usa `hard_delete: false` para mover los models a la papelera.
+
+  <Tabs syncKey="uns-api-language">
+    <TabItem label="JavaScript">
+
+      ```js
+      const BASE_URL = process.env.TIER0_BASE_URL;
+      const API_KEY = process.env.TIER0_API_KEY;
+
+      const response = await fetch(`${BASE_URL}/uns/delete`, {
+        method: 'POST',
+        headers: {
+          'content-type': 'application/json',
+          'x-api-key': API_KEY,
+        },
+        body: JSON.stringify({
+          topics: [
+            'DemoFactory/Site_01/Production/Produced_Qty',
+          ],
+          hard_delete: false,
+        }),
+      });
+
+      const result = await response.json();
+      console.log(result.data);
+      ```
+
+    </TabItem>
+    <TabItem label="Python">
+
+      ```python
+      import os
+      import requests
+
+      base_url = os.environ["TIER0_BASE_URL"]
+      api_key = os.environ["TIER0_API_KEY"]
+
+      response = requests.post(
+          f"{base_url}/uns/delete",
+          headers={"x-api-key": api_key},
+          json={
+              "topics": [
+                  "DemoFactory/Site_01/Production/Produced_Qty",
+              ],
+              "hard_delete": False,
+          },
+          timeout=30,
+      )
+      response.raise_for_status()
+
+      result = response.json()
+      print(result["data"])
+      ```
+
+    </TabItem>
+    <TabItem label="cURL">
+
+      ```bash
+      curl -X POST "$TIER0_BASE_URL/uns/delete" \
+        -H "content-type: application/json" \
+        -H "x-api-key: $TIER0_API_KEY" \
+        -d '{
+          "topics": [
+            "DemoFactory/Site_01/Production/Produced_Qty"
+          ],
+          "hard_delete": false
+        }'
+      ```
+
+    </TabItem>
+  </Tabs>
+
+## Referencia de API
+
+- [Referencia OpenAPI de Tier0](../../reference/tier0-openapi/)
+
+:::caution[Limitaciones de API key en Tier0 Edge]
+La API key obtenida desde Tier0 Edge solo es válida para las API de UNS y Flows.
+:::
+
+## Siguiente
+
+- [Crear apps sobre UNS](../building-apps/) — Crea aplicaciones industriales con datos UNS.
+- [Analizar datos](../analyzing-data/) — Analiza datos UNS con Marimo Notebook y Python.

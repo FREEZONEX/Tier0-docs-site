@@ -1,0 +1,151 @@
+---
+title: 最適なバージョンを選ぶ
+description: "Edge、Cloud、Enterprise：位置づけ、プラン、機能マトリクスから Tier0 エディションを選びます。"
+sidebar:
+  order: 3
+---
+
+Tier0 には 3 つのエディションがあります。各エディションには、それぞれ異なる機能、プラン、対応範囲があります。
+
+<section class="t0-board not-content">
+	<div class="t0-board-grid">
+		<div class="t0-col">
+			<div class="t0-col-header">
+				<p class="t0-tag">オープンソース</p>
+			</div>
+			<div class="t0-col-body">
+				<div class="t0-col-top">
+					<h3>Edge</h3>
+					<p class="t0-col-tagline">1 台のマシン上で動く UNS 基盤。すべて自分で管理できます。</p>
+					<p class="t0-col-for">技術評価、PoC、自社でオープンソースソフトウェアを運用できるチーム向け。</p>
+				</div>
+				<div class="t0-plans">
+					<div class="t0-plan t0-plan--apache">
+						<span class="t0-plan-name">Apache-2.0</span>
+						<span class="t0-plan-price">無料</span>
+						<p class="t0-plan-desc">UNS データ統合、履歴保存、単一マシン Docker デプロイ。</p>
+					</div>
+					<a class="t0-col-cta" href="https://github.com/FREEZONEX/Tier0-Edge">GitHub でクローン</a>
+				</div>
+			</div>
+		</div>
+		<div class="t0-col t0-col--accent">
+			<div class="t0-col-header">
+				<p class="t0-tag">マネージド SaaS</p>
+			</div>
+			<div class="t0-col-body">
+				<div class="t0-col-top">
+					<h3>Cloud <span class="t0-col-flag">多くのチームはここから始めます</span></h3>
+					<p class="t0-col-tagline">フルプラットフォームを運用込みで利用できます。</p>
+					<p class="t0-col-for">初日から apps、notebooks、launchpad を利用でき、インフラ運用は不要です。</p>
+				</div>
+				<div class="t0-plans">
+					<div class="t0-plan">
+						<span class="t0-plan-name">Builder</span>
+						<span class="t0-plan-price">$199/seat/mo</span>
+						<p class="t0-plan-desc">アプリ生成のみ。</p>
+					</div>
+					<div class="t0-plan t0-plan--growth">
+						<span class="t0-plan-name">Growth <span class="t0-plan-star" aria-hidden="true">★</span></span>
+						<span class="t0-plan-price">$20,000/yr</span>
+						<p class="t0-plan-desc">最大 5 edges。少数のアプリで素早く始めたい単一工場向け。</p>
+					</div>
+					<div class="t0-plan t0-plan--scale">
+						<span class="t0-plan-name">Scale</span>
+						<span class="t0-plan-price">$38,000/yr</span>
+						<p class="t0-plan-desc">最大 10 edges。複数工場と多数のアプリを持つユーザー向け。</p>
+					</div>
+          <a class="t0-col-cta" href="https://tier0.dev/login">7 日間トライアルを開始</a>
+				</div>
+			</div>
+		</div>
+		<div class="t0-col t0-col--dark">
+			<div class="t0-col-header">
+				<p class="t0-tag">プライベートデプロイ</p>
+			</div>
+			<div class="t0-col-body">
+				<div class="t0-col-top">
+					<h3>Enterprise</h3>
+					<p class="t0-col-tagline">フルプラットフォームを自社要件に合わせて利用できます。</p>
+					<p class="t0-col-for">データ主権、スケール、ガバナンス、エンタープライズ監督が必要な環境向け。</p>
+				</div>
+				<div class="t0-plans">
+					<div class="t0-plan t0-plan--base">
+						<span class="t0-plan-name">Base</span>
+						<span class="t0-plan-price">$10,000/yr</span>
+						<p class="t0-plan-desc">統合データ基盤。少数の単目的アプリ。</p>
+					</div>
+					<div class="t0-plan t0-plan--plus">
+						<span class="t0-plan-name">Plus</span>
+						<span class="t0-plan-price">$20,000/yr</span>
+						<p class="t0-plan-desc">シングルインスタンス。単一工場のデータ統合と複数ユースケースのアプリ。</p>
+					</div>
+					<div class="t0-plan t0-plan--cluster">
+						<span class="t0-plan-name">Cluster <span class="t0-plan-star" aria-hidden="true">★</span></span>
+						<span class="t0-plan-price">$39,900+/yr</span>
+						<p class="t0-plan-desc">マルチインスタンス。複数工場、多数のアプリ、集中型プライベートクラウド管理。</p>
+					</div>
+					<a class="t0-col-cta" href="https://tier0.app/talk-to-team">チームに相談</a>
+				</div>
+			</div>
+		</div>
+	</div>
+</section>
+
+**Add-ons**：要件に応じて、既存プランに edge nodes と applications を追加できます。詳細は [tier0.app/pricing](https://tier0.app/pricing) を参照してください。
+
+:::note[用語説明]
+Cloud プランでは、edge はクラウド Tier0 と通信する接続ノードです。Edge Tier0、ゲートウェイ、または産業用 PC にできます。
+:::
+
+## 機能マトリクス
+
+| 機能 | Edge | Cloud | Enterprise |
+|---|---|---|---|
+| UNS / データモデリング | <span class="t0-yes">&#10003;</span> 単一マシン UNS | <span class="t0-yes">&#10003;</span> Growth / Scale | <span class="t0-yes">&#10003;</span> Base / Plus / Cluster |
+| 産業プロトコル | <span class="t0-yes">&#10003;</span> MQTT | <span class="t0-yes">&#10003;</span> Growth / Scale：MQTT、REST、i3X、OPC UA | <span class="t0-yes">&#10003;</span> Base：MQTT；Plus / Cluster：MQTT、REST、i3X、OPC UA |
+| UNS Agent | <span class="t0-no">&#215;</span> | <span class="t0-yes">&#10003;</span> Growth / Scale | <span class="t0-no">&#215;</span> |
+| Notebook（高度分析） | <span class="t0-no">&#215;</span> | <span class="t0-yes">&#10003;</span> Growth / Scale | <span class="t0-yes">&#10003;</span> Plus / Cluster |
+| Vision | <span class="t0-no">&#215;</span> | <span class="t0-yes">&#10003;</span> Scale | <span class="t0-yes">&#10003;</span> Plus / Cluster |
+| Anchor | <span class="t0-no">&#215;</span> | <span class="t0-yes">&#10003;</span> Scale | <span class="t0-yes">&#10003;</span> Cluster |
+| App Builder + Template Library | <span class="t0-no">&#215;</span> | <span class="t0-yes">&#10003;</span> Builder / Growth / Scale | <span class="t0-no">&#215;</span> |
+| LaunchPad / My Apps | <span class="t0-no">&#215;</span> | <span class="t0-yes">&#10003;</span> Builder / Growth / Scale | <span class="t0-yes">&#10003;</span> Base / Plus / Cluster |
+| 監査 / アプリとシステムログ | <span class="t0-no">&#215;</span> | <span class="t0-yes">&#10003;</span> Growth / Scale | <span class="t0-yes">&#10003;</span> Plus / Cluster；Cluster では SIEM |
+| HA / マルチインスタンス / ガバナンス | <span class="t0-no">&#215;</span> | <span class="t0-no">&#215;</span> | <span class="t0-yes">&#10003;</span> Cluster |
+| 運用 | 自分で運用 | FREEZONEX | 自分で運用、サポート付き |
+
+## Edge ハードウェア要件
+
+:::tip[Edge を使いたい場合]
+Edge は技術評価向けで、運用経験が必要です。
+使用前に、環境が以下のハードウェア要件を満たしていることを確認してください。
+:::
+
+| | 最小 | 推奨 |
+|---|---|---|
+| CPU | 4 cores | 8 cores |
+| Memory | 8 GB | 16 GB |
+| Disk | 100 GB (1000 IOPS) | 1 TB |
+| OS | Ubuntu 24.04、Windows 10/11 (Docker) | - |
+
+## 判断ツリー
+
+まだどれを選ぶべきか迷う場合は、パスをたどって判断してください。
+
+```mermaid
+flowchart LR
+  q1{"技術評価<br/>または self-host?"} -- "yes" --> edge["Edge (open source)"]
+  q1 -- "no" --> q2{"on-prem /<br/>sovereignty が必要?"}
+  q2 -- "no" --> q3{"edge が 5 個超?"}
+  q2 -- "yes" --> q4{"複数工場 / HA が必要?"}
+  q3 -- "no" --> growth["Cloud Growth ★"]
+  q3 -- "yes" --> scale["Cloud Scale"]
+  q4 -- "yes" --> cluster["Enterprise Cluster ★"]
+  q4 -- "no" --> baseplus["Enterprise Base / Plus"]
+  class growth,cluster t0accent
+```
+
+## 次へ
+
+- [UNS 上にアプリを構築](../../using-tier0/building-apps/) - UNS データで産業アプリケーションを構築します。
+- [インストール](../installation/) - 7 日間 Cloud トライアルはフルプラットフォームです。
