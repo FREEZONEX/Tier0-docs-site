@@ -21,18 +21,19 @@ const PDF_DOC_ROUTES = [
 	['using-tier0/building-apps', 'doc-7'],
 	['using-tier0/analyzing-data', 'doc-8'],
 	['using-tier0/operating-on-tier0-with-agents', 'doc-9'],
-	['best-practice/modeling-factory-data', 'doc-10'],
-	['best-practice/connecting-industrial-protocols', 'doc-11'],
-	['best-practice/displaying-data-with-digital-twin', 'doc-12'],
-	['best-practice/building-analytics-apps', 'doc-13'],
-	['reference/api-reference', 'doc-14'],
-	['reference/tier0-openapi', 'doc-14'],
-	['reference/cli-commands-reference', 'doc-15'],
-	['reference/tier0-skill', 'doc-15'],
-	['reference/high-availability-deployment-plan', 'doc-16'],
-	['reference/sla-and-ha-boundaries', 'doc-17'],
-	['reference/standard-port-list', 'doc-18'],
-	['reference/operations-runbook', 'doc-19'],
+  ['best-practice/modeling-factory-data', 'doc-10'],
+  ['best-practice/connecting-industrial-protocols', 'doc-11'],
+  ['best-practice/building-shopfloor-workflow-with-agent', 'doc-12'],
+  ['best-practice/displaying-data-with-digital-twin', 'doc-13'],
+  ['best-practice/building-analytics-apps', 'doc-14'],
+  ['reference/api-reference', 'doc-15'],
+  ['reference/tier0-openapi', 'api-reference-appendix'],
+  ['reference/cli-commands-reference', 'doc-16'],
+  ['reference/tier0-skill', 'doc-16'],
+  ['reference/high-availability-deployment-plan', 'doc-17'],
+  ['reference/sla-and-ha-boundaries', 'doc-18'],
+  ['reference/standard-port-list', 'doc-19'],
+  ['reference/operations-runbook', 'doc-20'],
 ];
 
 const MIME_TYPES = {
@@ -123,7 +124,10 @@ try {
 	await listen();
 	browser = await launchBrowser();
 	const page = await browser.newPage({ viewport: { width: 1280, height: 1600 } });
-	await page.goto(url, { waitUntil: 'networkidle' });
+	// The static export includes third-party assets that may keep an HTTP connection open.
+	// DOM content is sufficient for this self-contained PDF route and avoids an indefinite
+	// wait for network-idle before printing.
+	await page.goto(url, { waitUntil: 'domcontentloaded' });
 	try {
 		await page.waitForFunction(
 			() =>
@@ -154,6 +158,29 @@ try {
 
 		for (const details of document.querySelectorAll('details')) {
 			details.open = true;
+		}
+
+		// Chromium derives PDF bookmarks from heading elements. Keep only the cover,
+		// document-section, and document-title headings in that outline; the printed
+		// body and OpenAPI headings retain their appearance but stay out of bookmarks.
+		const copiedHeadingProperties = [
+			'display', 'font-family', 'font-size', 'font-style', 'font-weight',
+			'line-height', 'letter-spacing', 'color', 'background-color',
+			'margin-top', 'margin-right', 'margin-bottom', 'margin-left',
+			'padding-top', 'padding-right', 'padding-bottom', 'padding-left',
+			'border-top', 'border-right', 'border-bottom', 'border-left',
+			'break-after', 'break-before', 'break-inside', 'text-align', 'text-transform',
+		];
+		for (const heading of document.querySelectorAll('.sl-markdown-content :is(h1, h2, h3, h4, h5, h6), .pdf-api-appendix :is(h1, h2, h3, h4, h5, h6)')) {
+			const style = window.getComputedStyle(heading);
+			const replacement = document.createElement('div');
+			replacement.className = heading.className;
+			if (heading.id) replacement.id = heading.id;
+			replacement.innerHTML = heading.innerHTML;
+			for (const property of copiedHeadingProperties) {
+				replacement.style.setProperty(property, style.getPropertyValue(property));
+			}
+			heading.replaceWith(replacement);
 		}
 
 		for (const link of document.querySelectorAll('a[href]')) {
@@ -190,6 +217,15 @@ try {
 		format: 'A4',
 		printBackground: true,
 		preferCSSPageSize: true,
+		outline: true,
+		tagged: true,
+		displayHeaderFooter: true,
+		headerTemplate: '<span></span>',
+		footerTemplate: `
+			<div style="width: 100%; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; font-size: 9px; color: #707780; text-align: center;">
+				<span class="pageNumber"></span> / <span class="totalPages"></span>
+			</div>
+		`,
 		margin: {
 			top: '18mm',
 			right: '16mm',

@@ -1,8 +1,40 @@
 ---
 title: Referencia de API
-description: Referencia interactiva de Tier0 OpenAPI.
+description: Aspectos esenciales de la integración de API y una referencia OpenAPI legible por máquinas para Tier0.
 sidebar:
   order: 1
 ---
 
-[Referencia OpenAPI](../tier0-openapi/)
+## Primeros pasos
+
+- Usa `https://<your-tier0-host>/openapi/v1` como URL base.
+- Envía `x-api-key` a los endpoints OpenAPI excepto a `/assets/files/public`. Los archivos marcados como `public` se pueden descargar sin una clave de API.
+- Llama primero a `POST /auth/whoami` para confirmar la identidad y los permisos efectivos de la clave de API.
+
+:::note[Referencia OpenAPI]
+Abre la [Referencia de API](../tier0-openapi/) interactiva para consultar esquemas de solicitud, esquemas de respuesta y solicitudes ejecutables.
+:::
+
+## Gestión de resultados
+
+Las operaciones por lotes de UNS pueden fallar parcialmente incluso con respuestas HTTP `200`. Revisa cada resultado antes de asumir que la operación tuvo éxito.
+
+## Rutas HTTP In personalizadas en Flows
+
+En las API desarrolladas dentro de **Source Flow** y **Event Flow**, la entrada y la respuesta las define el Flow desplegado.
+
+- **Source Flow** usa `/flow/source/` y es público de forma predeterminada. Añade control de acceso de entrada o a nivel de Flow antes de exponer comportamiento sensible.
+- **Event Flow** usa `/flow/event/` y requiere `x-api-key` con permiso `flow.read`.
+
+:::note[Ejemplo de API personalizada en Source Flow o Event Flow]
+Por ejemplo, si la URL de la API es `/integrations/echo` y necesitas un nodo `HTTP In` para desarrollar la API:
+
+- La ruta de `HTTP In` es `/integrations/echo`; Tier0 completa el resto.
+- La URL de llamada externa es `https://tier0.example.com/flow/source/integrations/echo` o `https://tier0.example.com/flow/event/integrations/echo`.
+:::
+
+## Solución de problemas
+
+- `401` / `403`: Comprueba la clave de API, el alcance y los permisos del propietario.
+- `404`: Comprueba el método HTTP, el prefijo de ruta, la URL del nodo y el despliegue.
+- `No response`: Asegúrate de que cada ruta del Flow llega a un nodo `HTTP Response` sin descartar las propiedades originales de la solicitud y la respuesta.

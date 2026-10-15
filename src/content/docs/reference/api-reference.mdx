@@ -1,8 +1,37 @@
 ---
 title: API Reference
-description: Static OpenAPI endpoint summary
+description: API integration essentials and a machine-readable OpenAPI reference for Tier0.
 sidebar:
   order: 1
 ---
 
-[OpenAPI Reference](../tier0-openapi/)
+## Starting Up
+- Use `https://<your-tier0-host>/openapi/v1` as the base URL.
+- Send `x-api-key` to OpenAPI endpoints except for `/assets/files/public`. Any files marked as `public` can be downloaded without an API key.
+- Call `POST /auth/whoami` first to confirm the API key identity and effective permissions.
+
+:::note[OpenAPI Reference]
+Open the interactive [API Reference](../tier0-openapi/) for request schemas, response schemas, and executable requests.
+:::
+
+## Handling Results
+
+UNS batch operations can partially fail even with HTTP `200` results. Inspect every result before assuming success.
+
+## Custom HTTP In Routes
+
+For APIs developed inside **Source Flow** and **Event Flow**, their input and response are defined by the deployed flow.
+
+- **Source Flow** uses `/flow/source/` and is public by default. Add ingress or flow-level access control before exposing sensitive behavior.
+- **Event Flow** uses `/flow/event/` and requires `x-api-key` with `flow.read` permission.
+:::note[Example custom API in Source Flow or Event Flow]
+For example, API URL is `/integrations/echo` and you need an `HTTP In` node to develop the API:
+- Route in `HTTP In` is `/integrations/echo`, Tier0 will complete the rest.
+- External call URL is `https://tier0.example.com/flow/source/integrations/echo` or `https://tier0.example.com/flow/event/integrations/echo`.
+:::
+
+## Troubleshooting
+
+- `401` / `403`: Check the API key, scope, and owner permissions.
+- `404`: Check the HTTP method, route prefix, node URL, and deployment.
+- `No response`: Make sure every flow path reaches an `HTTP Response` node without discarding the original request and response properties.

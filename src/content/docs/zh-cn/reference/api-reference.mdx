@@ -1,8 +1,40 @@
 ---
 title: API 参考
-description: Tier0 OpenAPI 的交互式参考。
+description: Tier0 的 API 集成要点和机器可读的 OpenAPI 参考。
 sidebar:
   order: 1
 ---
 
-[OpenAPI 参考](../tier0-openapi/)
+## 快速开始
+
+- 使用 `https://<your-tier0-host>/openapi/v1` 作为基础 URL。
+- 除 `/assets/files/public` 外，所有 OpenAPI 端点都要发送 `x-api-key`。标记为 `public` 的文件无需 API 密钥即可下载。
+- 先调用 `POST /auth/whoami`，确认 API 密钥对应的身份和实际权限。
+
+:::note[OpenAPI 参考]
+打开交互式 [API 参考](../tier0-openapi/)，查看请求架构、响应架构和可执行请求。
+:::
+
+## 处理结果
+
+即使返回 HTTP `200`，UNS 批量操作也可能部分失败。在认定操作成功前，请检查每一项结果。
+
+## Flow 中的自定义 HTTP In 路由
+
+对于在 **Source Flow** 和 **Event Flow** 中开发的 API，输入和响应由已部署的 Flow 定义。
+
+- **Source Flow** 使用 `/flow/source/`，默认公开。暴露敏感行为前，请添加入口或 Flow 级访问控制。
+- **Event Flow** 使用 `/flow/event/`，需要具备 `flow.read` 权限的 `x-api-key`。
+
+:::note[Source Flow 或 Event Flow 中的自定义 API 示例]
+例如 API URL 为 `/integrations/echo`，并且需要用 `HTTP In` 节点开发该 API：
+
+- `HTTP In` 节点中的路由为 `/integrations/echo`，其余部分由 Tier0 补全。
+- 外部调用 URL 为 `https://tier0.example.com/flow/source/integrations/echo` 或 `https://tier0.example.com/flow/event/integrations/echo`。
+:::
+
+## 故障排除
+
+- `401` / `403`：检查 API 密钥、权限范围和所有者权限。
+- `404`：检查 HTTP 方法、路由前缀、节点 URL 和部署状态。
+- `No response`：确保每条 Flow 路径都到达 `HTTP Response` 节点，且没有丢弃原始请求和响应属性。

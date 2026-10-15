@@ -1,8 +1,40 @@
 ---
 title: API リファレンス
-description: Tier0 OpenAPI のインタラクティブリファレンス。
+description: Tier0 の API 統合の要点と、機械可読な OpenAPI リファレンスです。
 sidebar:
   order: 1
 ---
 
-[OpenAPI リファレンス](../tier0-openapi/)
+## はじめに
+
+- ベース URL には `https://<your-tier0-host>/openapi/v1` を使用します。
+- `/assets/files/public` 以外の OpenAPI エンドポイントには `x-api-key` を送信します。`public` としてマークされたファイルは API キーなしでダウンロードできます。
+- まず `POST /auth/whoami` を呼び出し、API キーの ID と有効な権限を確認します。
+
+:::note[OpenAPI リファレンス]
+リクエストスキーマ、レスポンススキーマ、および実行可能なリクエストは、インタラクティブな [API リファレンス](../tier0-openapi/) で確認できます。
+:::
+
+## 結果の処理
+
+HTTP `200` が返っても、UNS の一括操作は一部失敗することがあります。成功と判断する前に、各結果を確認してください。
+
+## Flow のカスタム HTTP In ルート
+
+**Source Flow** と **Event Flow** 内で開発する API の入力とレスポンスは、デプロイ済み Flow によって定義されます。
+
+- **Source Flow** は `/flow/source/` を使用し、デフォルトで公開されます。機密性の高い動作を公開する前に、入口または Flow レベルのアクセス制御を追加してください。
+- **Event Flow** は `/flow/event/` を使用し、`flow.read` 権限を持つ `x-api-key` が必要です。
+
+:::note[Source Flow または Event Flow のカスタム API の例]
+API URL が `/integrations/echo` で、`HTTP In` ノードで API を開発する場合:
+
+- `HTTP In` のルートは `/integrations/echo` です。残りは Tier0 が補完します。
+- 外部からの呼び出し URL は `https://tier0.example.com/flow/source/integrations/echo` または `https://tier0.example.com/flow/event/integrations/echo` です。
+:::
+
+## トラブルシューティング
+
+- `401` / `403`: API キー、スコープ、所有者の権限を確認します。
+- `404`: HTTP メソッド、ルートプレフィックス、ノード URL、デプロイ状況を確認します。
+- `No response`: すべての Flow パスが `HTTP Response` ノードに到達し、元のリクエストとレスポンスのプロパティを破棄していないことを確認します。

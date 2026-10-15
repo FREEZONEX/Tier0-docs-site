@@ -228,8 +228,60 @@ function localizeSpec(input: unknown): unknown {
   return copy;
 }
 
+const API_GROUPS = [
+  { name: 'UNS', description: 'Read, write, and manage Unified Namespace data.' },
+  { name: 'Assets', description: 'Upload, download, and manage stored files.' },
+  { name: 'Authentication', description: 'Verify the current OpenAPI identity and permissions.' },
+  { name: 'Flow', description: 'Manage Source Flow and Event Flow definitions.' },
+  { name: 'Platform and Projects', description: 'Read platform information and manage projects.' },
+  { name: 'MQTT Authentication', description: 'Create and remove MQTT credentials.' },
+] as const;
+
+function groupForPath(path: string): (typeof API_GROUPS)[number] {
+  if (path.startsWith('/uns/')) return API_GROUPS[0];
+  if (path.startsWith('/assets/')) return API_GROUPS[1];
+  if (path.startsWith('/auth/')) return API_GROUPS[2];
+  if (path.startsWith('/flow/')) return API_GROUPS[3];
+  if (path.startsWith('/mqtt-auth/')) return API_GROUPS[5];
+  return API_GROUPS[4];
+}
+
+function pathRank(path: string): number {
+  // Keep the retired upload-URL endpoint after the active Assets endpoints.
+  if (path === '/assets/upload') return 99;
+  return 0;
+}
+
+function organizeSpec(input: unknown): unknown {
+  if (!input || typeof input !== 'object') return input;
+  const record = input as Record<string, unknown>;
+  const paths = record.paths;
+  if (!paths || typeof paths !== 'object') return input;
+
+  const orderedPaths = Object.entries(paths as Record<string, Record<string, unknown>>)
+    .sort(([left], [right]) => {
+      const groupDifference = API_GROUPS.indexOf(groupForPath(left)) - API_GROUPS.indexOf(groupForPath(right));
+      if (groupDifference !== 0) return groupDifference;
+      const rankDifference = pathRank(left) - pathRank(right);
+      return rankDifference !== 0 ? rankDifference : left.localeCompare(right);
+    })
+    .map(([path, pathItem]) => {
+      for (const [method, operation] of Object.entries(pathItem)) {
+        if (!['get', 'post', 'put', 'patch', 'delete', 'head', 'options'].includes(method)) continue;
+        if (operation && typeof operation === 'object') {
+          (operation as Record<string, unknown>).tags = [groupForPath(path).name];
+        }
+      }
+      return [path, pathItem];
+    });
+
+  record.paths = Object.fromEntries(orderedPaths);
+  record.tags = API_GROUPS.map(({ name, description }) => ({ name, description }));
+  return record;
+}
+
 const currentText = pageText[locale] ?? pageText.en;
-const spec = localizeSpec(baseSpec);
+const spec = organizeSpec(localizeSpec(baseSpec));
 ---
 
 <!doctype html>
@@ -272,7 +324,7 @@ const spec = localizeSpec(baseSpec);
       }
 
       .api-header a {
-        color: #2563eb;
+        color: #73b200;
         font-size: 0.875rem;
         text-decoration: none;
       }
@@ -281,15 +333,42 @@ const spec = localizeSpec(baseSpec);
         text-decoration: underline;
       }
 
-      #swagger-ui {
+      .api-document {
         max-width: 1280px;
         margin: 0 auto;
         padding: 1rem;
       }
 
-      .swagger-ui .topbar,
-      .swagger-ui .models {
-        display: none;
+      #swagger-ui {
+        background: #fff;
+      }
+
+      #swagger-ui :global(.t0-response-tabs) {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.4rem;
+        margin: 0.75rem 0;
+      }
+
+      #swagger-ui :global(.t0-response-tab) {
+        min-width: 3rem;
+        border: 1px solid #cdd9bf;
+        border-radius: 4px;
+        padding: 0.3rem 0.55rem;
+        background: #fff;
+        color: #315b00;
+        font: 700 0.75rem/1 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+        cursor: pointer;
+      }
+
+      #swagger-ui :global(.t0-response-tab[aria-selected='true']) {
+        border-color: #73b200;
+        background: #e7f6be;
+        color: #171717;
+      }
+
+      #swagger-ui :global(tr.t0-response-hidden) {
+        display: none !important;
       }
     </style>
   </head>
@@ -298,7 +377,9 @@ const spec = localizeSpec(baseSpec);
       <h1>{currentText.title}</h1>
       <a href={currentText.backHref}>{currentText.back}</a>
     </header>
-    <main id="swagger-ui"></main>
+    <main class="api-document">
+      <div id="swagger-ui"></div>
+    </main>
 
     <script is:inline src="https://unpkg.com/swagger-ui-dist@5/swagger-ui-bundle.js"></script>
     <script is:inline src="https://unpkg.com/swagger-ui-dist@5/swagger-ui-standalone-preset.js"></script>
@@ -306,19 +387,76 @@ const spec = localizeSpec(baseSpec);
       window.addEventListener('load', () => {
         if (!window.SwaggerUIBundle) {
           document.querySelector('#swagger-ui').innerHTML =
-            '<p style="padding:1rem;background:#fff;border:1px solid #dde2ea;border-radius:8px;color:#b91c1c;">Swagger UI failed to load. Check network access to unpkg.com.</p>';
+            '<p style="padding:1rem;background:#fff;border:1px solid #d8dfca;border-radius:8px;color:#7a1c1c;">The API reference could not load. Check network access to the renderer.</p>';
           return;
         }
+
+        const addResponseTabs = () => {
+          document.querySelectorAll('.responses-wrapper').forEach((wrapper) => {
+            if (wrapper.dataset.t0ResponseTabs === 'ready') return;
+            const rows = Array.from(wrapper.querySelectorAll('tbody tr.response'));
+            if (rows.length < 2) return;
+
+            const entries = rows
+              .map((row) => ({
+                row,
+                status: row.querySelector('.response-col_status')?.textContent?.trim(),
+              }))
+              .filter((entry) => entry.status);
+            if (entries.length < 2) return;
+
+            const tabs = document.createElement('div');
+            tabs.className = 't0-response-tabs';
+            tabs.setAttribute('role', 'tablist');
+            tabs.setAttribute('aria-label', 'Response status examples');
+
+            const select = (selected) => {
+              entries.forEach((entry) => {
+                const active = entry === selected;
+                entry.row.classList.toggle('t0-response-hidden', !active);
+                entry.button.setAttribute('aria-selected', String(active));
+              });
+            };
+
+            entries.forEach((entry, index) => {
+              const button = document.createElement('button');
+              button.type = 'button';
+              button.className = 't0-response-tab';
+              button.textContent = entry.status;
+              button.setAttribute('role', 'tab');
+              button.setAttribute('aria-selected', String(index === 0));
+              button.addEventListener('click', () => select(entry));
+              entry.button = button;
+              tabs.append(button);
+            });
+
+            // Keep Swagger UI's "Responses" heading as the section label; the
+            // status selector belongs to the response content that follows it.
+            const responseHeading = wrapper.querySelector('.opblock-section-header');
+            if (responseHeading) {
+              responseHeading.after(tabs);
+            } else {
+              wrapper.prepend(tabs);
+            }
+            select(entries[0]);
+            wrapper.dataset.t0ResponseTabs = 'ready';
+          });
+        };
 
         window.ui = SwaggerUIBundle({
           spec,
           dom_id: '#swagger-ui',
           deepLinking: true,
           defaultModelsExpandDepth: -1,
+          defaultModelRendering: 'model',
           displayRequestDuration: true,
           presets: [SwaggerUIBundle.presets.apis, SwaggerUIStandalonePreset],
           layout: 'BaseLayout',
         });
+
+        const responseTabObserver = new MutationObserver(addResponseTabs);
+        responseTabObserver.observe(document.querySelector('#swagger-ui'), { childList: true, subtree: true });
+        addResponseTabs();
       });
     </script>
   </body>

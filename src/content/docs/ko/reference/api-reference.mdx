@@ -1,8 +1,40 @@
 ---
 title: API 레퍼런스
-description: Tier0 OpenAPI 대화형 참조입니다.
+description: Tier0 API 통합 핵심 사항과 기계가 읽을 수 있는 OpenAPI 레퍼런스입니다.
 sidebar:
   order: 1
 ---
 
-[OpenAPI 참조](../tier0-openapi/)
+## 시작하기
+
+- 기본 URL로 `https://<your-tier0-host>/openapi/v1`을 사용합니다.
+- `/assets/files/public`을 제외한 OpenAPI 엔드포인트에 `x-api-key`를 보냅니다. `public`으로 표시된 파일은 API 키 없이 다운로드할 수 있습니다.
+- 먼저 `POST /auth/whoami`를 호출하여 API 키의 ID와 유효 권한을 확인합니다.
+
+:::note[OpenAPI 참조]
+요청 스키마, 응답 스키마 및 실행 가능한 요청은 대화형 [API 레퍼런스](../tier0-openapi/)에서 확인할 수 있습니다.
+:::
+
+## 결과 처리
+
+HTTP `200`을 반환하더라도 UNS 일괄 작업은 일부 실패할 수 있습니다. 성공으로 간주하기 전에 각 결과를 확인하세요.
+
+## Flow의 사용자 지정 HTTP In 경로
+
+**Source Flow** 및 **Event Flow** 안에서 개발하는 API의 입력과 응답은 배포된 Flow가 정의합니다.
+
+- **Source Flow**는 `/flow/source/`를 사용하며 기본적으로 공개됩니다. 민감한 동작을 노출하기 전에 인그레스 또는 Flow 수준 접근 제어를 추가하세요.
+- **Event Flow**는 `/flow/event/`를 사용하며 `flow.read` 권한이 있는 `x-api-key`가 필요합니다.
+
+:::note[Source Flow 또는 Event Flow의 사용자 지정 API 예시]
+예를 들어 API URL이 `/integrations/echo`이고 API 개발에 `HTTP In` 노드가 필요한 경우:
+
+- `HTTP In`의 경로는 `/integrations/echo`이며, 나머지는 Tier0가 완성합니다.
+- 외부 호출 URL은 `https://tier0.example.com/flow/source/integrations/echo` 또는 `https://tier0.example.com/flow/event/integrations/echo`입니다.
+:::
+
+## 문제 해결
+
+- `401` / `403`: API 키, 범위 및 소유자 권한을 확인하세요.
+- `404`: HTTP 메서드, 경로 접두사, 노드 URL 및 배포 상태를 확인하세요.
+- `No response`: 모든 Flow 경로가 원래 요청 및 응답 속성을 버리지 않고 `HTTP Response` 노드에 도달하는지 확인하세요.
