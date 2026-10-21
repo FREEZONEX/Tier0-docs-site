@@ -31,60 +31,11 @@ Consulta [Elegir la mejor versión](../choosing-the-best-product/) para encontra
 	</Steps>
 	
 	</TabItem>
-	<TabItem label="Edge">
-
-	#### Requisitos
-	- CPU mínimo de 4 núcleos, 8 GB de RAM, 100 GB de disco
-	- Ubuntu 24.04 o Windows 10/11 con Docker y Git
-	#### Operaciones
-	<Steps>
-	1. Clona el repositorio Tier0-Edge desde GitHub en tu servidor y entra al proyecto.
-
-		```bash
-		git clone https://github.com/FREEZONEX/Tier0-Edge
-		cd Tier0-Edge/deploy
-		```
-
-	2. Configura en `.env.default` los parámetros de la tabla según tu entorno.
-	
-		```bash
-		cp .env.default .env
-		vi .env
-		:wq!
-		```
-		:::note[Parámetros que deben configurarse]
-
-		| Campo | Tipo | Descripción | Ejemplo |
-		|------|------|-------------|---------|
-		| VOLUMES_PATH | string | Ruta de almacenamiento para los datos del proyecto | `/srv/tier0/data` en Linux; `D:/tier0/data` o `/d/tier0/data` en Windows Bash |
-		| ENTRANCE_DOMAIN/ENTRANCE_PORT | string | Endpoint de acceso a Tier0 (IP/dominio + puerto) | `192.168.1.10` / `8088` |
-		| LANGUAGE | enum | zh-CN / en-US | `en-US` |
-		| ADMIN_INIT_PASSWORD | string | Contraseña inicial del usuario administrador | Una contraseña privada y segura |
-		| COMPOSE_PROJECT_NAME/PORT_OFFSET | string | Aísla varias instancias en el mismo host | `edge_lab` / `100` |
-
-		:::
-	3. Ejecuta el script de instalación y revisa el estado de la instalación.
-
-		```bash
-		bash bin/install.sh
-		bash bin/compose.sh ps # Revisa el estado de los contenedores
-		bash bin/compose.sh logs -f backend # Revisa los logs del contenedor backend
-		curl -fsS http://127.0.0.1:8088/readyz # Revisa la readiness del servicio backend
-		```
-
-		:::caution
-		No edites `deploy/.env.runtime`; contiene secretos generados y valores de runtime resueltos.
-		:::
-	4. Accede a Tier0 con el endpoint configurado y la cuenta de administrador predeterminada:
-		- Usuario: `tier0`
-		- Contraseña: el valor de `ADMIN_INIT_PASSWORD` en `.env` o `tier0` si no se configuró.
-
-	</Steps>
-		
-
-	</TabItem>
 	<TabItem label="Enterprise">
-#### Requisitos
+<h4 id="requisitos-1">Requisitos</h4>
+- Despliegue de un solo nodo
+	- Mínimo: 4C / 8G / 100G
+	- Recomendado: 8C / 16G / 500G
 - Despliegue estándar
 	- Mínimo: 4 VM
 	- Línea base requerida por tipo de VM:
@@ -105,7 +56,7 @@ Los requisitos de hardware de Enterprise varían según el escenario de desplieg
 :::note
 La información detallada del despliegue está disponible en el [Plan de despliegue estándar](../../reference/standard-deployment-plan/) y el [Plan de despliegue de alta disponibilidad](../../reference/high-availability-deployment-plan/).
 :::
-#### Operaciones
+<h4 id="operaciones-1">Operaciones</h4>
 <Steps>
 1. Obtén el paquete de tu proveedor y verifícalo.
 		```bash
@@ -144,6 +95,59 @@ La información detallada del despliegue está disponible en el [Plan de desplie
 - [Instrucciones sobre límites de HA](../../reference/sla-and-ha-boundaries/)
 
 </TabItem>
+	<TabItem label="Edge">
+
+<h4 id="requisitos">Requisitos</h4>
+	- CPU mínimo de 4 núcleos, 8 GB de RAM, 100 GB de disco
+	- Ubuntu 24.04 o Windows 10/11 con Docker y Git
+<h4 id="operaciones">Operaciones</h4>
+	<Steps>
+	1. Clona el repositorio Tier0-Edge desde GitHub en tu servidor y entra al proyecto.
+
+		```bash
+		git clone https://github.com/FREEZONEX/Tier0-Edge
+		cd Tier0-Edge/deploy
+		```
+
+	2. Configura en `.env.default` los parámetros de la tabla según tu entorno.
+
+		```bash
+		cp .env.default .env
+		vi .env
+		:wq!
+		```
+		:::note[Parámetros que deben configurarse]
+
+		| Campo | Tipo | Descripción | Ejemplo |
+		|------|------|-------------|---------|
+		| VOLUMES_PATH | string | Ruta de almacenamiento para los datos del proyecto | `/srv/tier0/data` en Linux; `D:/tier0/data` o `/d/tier0/data` en Windows Bash |
+		| ENTRANCE_DOMAIN/ENTRANCE_PORT | string | Endpoint de acceso a Tier0 (IP/dominio + puerto) | `192.168.1.10` / `8088` |
+		| LANGUAGE | enum | zh-CN / en-US | `en-US` |
+		| ADMIN_INIT_PASSWORD | string | Contraseña inicial del usuario administrador | Una contraseña privada y segura |
+		| COMPOSE_PROJECT_NAME/PORT_OFFSET | string | Aísla varias instancias en el mismo host | `edge_lab` / `100` |
+
+		:::
+	3. Ejecuta el script de instalación y revisa el estado de la instalación.
+
+		```bash
+		bash bin/install.sh
+		bash bin/compose.sh ps # Revisa el estado de los contenedores
+		bash bin/compose.sh logs -f backend # Revisa los logs del contenedor backend
+		curl -fsS http://127.0.0.1:8088/readyz # Revisa la readiness del servicio backend
+		```
+
+		:::caution
+		No edites `deploy/.env.runtime`; contiene secretos generados y valores de runtime resueltos.
+		:::
+	4. Accede a Tier0 con el endpoint configurado y la cuenta de administrador predeterminada:
+		- Usuario: `tier0`
+		- Contraseña: el valor de `ADMIN_INIT_PASSWORD` en `.env` o `tier0` si no se configuró.
+
+	</Steps>
+
+
+	</TabItem>
+
 </Tabs>
 
 ## Siguiente

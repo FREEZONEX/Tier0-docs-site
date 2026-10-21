@@ -118,9 +118,39 @@ import Default from '@astrojs/starlight/components/Head.astro';
 			});
 		}
 
+		function revealHashTarget() {
+			if (!location.hash) return;
+			var id;
+			try {
+				id = decodeURIComponent(location.hash.slice(1));
+			} catch (_) {
+				return;
+			}
+			var target = document.getElementById(id);
+			if (!target) return;
+
+			var panel = target.closest('[role="tabpanel"]');
+			var changed = false;
+			while (panel) {
+				var tabs = panel.parentElement;
+				if (!tabs || tabs.tagName !== 'STARLIGHT-TABS') break;
+				if (panel.hidden) {
+					var panels = Array.from(tabs.querySelectorAll(':scope > [role="tabpanel"]'));
+					var tab = tabs.querySelectorAll(':scope > .tablist-wrapper [role="tab"]')[panels.indexOf(panel)];
+					if (tab) {
+						tab.click();
+						changed = true;
+					}
+				}
+				panel = tabs.closest('[role="tabpanel"]');
+			}
+			if (changed) requestAnimationFrame(function () { target.scrollIntoView(); });
+		}
+
 		function scan() {
 			scanSidebarToggle();
 			bindHeadingAnchorCopy();
+			revealHashTarget();
 			syncScrollClass();
 			if (!document.documentElement.classList.contains('t0-table-scroll')) return;
 			document.querySelectorAll('.sl-markdown-content table').forEach(bindTable);
@@ -132,5 +162,6 @@ import Default from '@astrojs/starlight/components/Head.astro';
 			scan();
 		}
 		document.addEventListener('astro:page-load', scan);
+		window.addEventListener('hashchange', revealHashTarget);
 	})();
 </script>
