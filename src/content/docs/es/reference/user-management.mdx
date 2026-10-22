@@ -16,6 +16,10 @@ Tier0 gestiona los permisos de usuario y el acceso de forma diferente según la 
 
 - El propietario del Workspace o los miembros existentes pueden invitar a nuevos miembros mediante su número de teléfono o correo electrónico.
 - Tras recibir un código o enlace de invitación, los nuevos miembros registran una cuenta y se unen al Workspace.
+- Al enviar la invitación, configura el tipo de puesto del nuevo miembro (Operator o Builder) para determinar a qué funciones puede acceder.
+
+    - **Builder**: Puede acceder a todos los módulos funcionales.
+    - **Operator**: Solo puede acceder al centro de aplicaciones.
 - El registro de la cuenta requiere una verificación en dos pasos.
 
 :::caution
@@ -38,5 +42,27 @@ Después de registrar una cuenta, también puedes solicitar un nuevo Workspace.
 :::note
 Inicia sesión con la cuenta creada por el administrador y utiliza las funciones dentro de los permisos del rol asignado.
 :::
+  </TabItem>
+</Tabs>
+
+## Gestión de cuentas
+<Tabs syncKey="edition">
+  <TabItem label="Cloud">
+
+| Operación | Quién | Descripción |
+| --- | --- | --- |
+| Cambiar el tipo de puesto | Creador / Builder | <ul><li>El creador puede cambiar el tipo de puesto de cualquier miembro.</li><li>Builder solo puede cambiar el de un Operator.</li></ul> |
+| Eliminar el Workspace | Creador | Al eliminar el Workspace, todos los datos se borran de inmediato y no se pueden recuperar. |
+| Transferir el Workspace | Creador | — |
+| Quitar a un miembro | Creador / Builder | <ul><li>El creador puede quitar a cualquier miembro.</li><li>Builder solo puede quitar a un Operator.</li></ul> |
+| Eliminar la cuenta | Todos los miembros | <ul><li>El creador debe eliminar o transferir primero su Workspace.</li><li>Los datos de la cuenta se borran de inmediato y no se pueden recuperar.</li></ul> |
+
+  </TabItem>
+  <TabItem label="Enterprise">
+
+- Un Admin puede restablecer contraseñas, editar roles de usuario, deshabilitar cuentas y eliminarlas.
+- No se puede editar el rol de la cuenta predeterminada inicial, ni deshabilitar o eliminar esa cuenta.
+- Al eliminar una cuenta, todos sus datos se borran de inmediato y no se pueden recuperar.
+
   </TabItem>
 </Tabs>

@@ -16,6 +16,10 @@ Tier0 manages user permissions and access differently across editions.
 
 - Workspace owner or existing members can invite new members by phone or email.
 - After receiving an invitation code or link, new members register an account and join the Workspace.
+- Set each new member's seat type (Operator or Builder) when sending the invitation to determine which features they can access.
+
+    - **Builder**: Can access all functional modules.
+    - **Operator**: Can access only the application center.
 - Account registration requires two-step verification.
 
 :::caution
@@ -38,5 +42,27 @@ After registering an account, you can also apply for a new Workspace.
 :::note
 Sign in with the account created by the admin and use functions within the permissions of the assigned role.
 :::
+  </TabItem>
+</Tabs>
+
+## Account Management
+<Tabs syncKey="edition">
+  <TabItem label="Cloud">
+
+| Action | Who | Description |
+| --- | --- | --- |
+| Change seat type | Owner / Builder | <ul><li>The owner can change any member's seat type.</li><li>A Builder can change only an Operator's seat type.</li></ul> |
+| Delete Workspace | Owner | Deleting the Workspace immediately erases all data. This cannot be undone. |
+| Transfer Workspace | Owner | — |
+| Remove member | Owner / Builder | <ul><li>The owner can remove any member.</li><li>A Builder can remove only an Operator.</li></ul> |
+| Delete account | All members | <ul><li>The owner must delete or transfer their Workspace first.</li><li>Account data is erased immediately and cannot be recovered.</li></ul> |
+
+  </TabItem>
+  <TabItem label="Enterprise">
+
+- An Admin can reset passwords, edit user roles, disable accounts, and delete accounts.
+- The role of the initial default account cannot be edited, and the account cannot be disabled or deleted.
+- Deleting an account immediately erases all its data. This cannot be undone.
+
   </TabItem>
 </Tabs>

@@ -1479,6 +1479,19 @@ starlight-tabs.t0-topic-explosion-tabs,
 	width: 24%;
 }
 
+/* User Management: keep action and actor compact, leaving room for descriptions. */
+.sl-markdown-content:has(#账号管理, #account-management, #アカウント管理, #gestión-de-cuentas, #계정-관리) th:first-child {
+	width: 23%;
+}
+
+.sl-markdown-content:has(#账号管理, #account-management, #アカウント管理, #gestión-de-cuentas, #계정-관리) th:nth-child(2) {
+	width: 25%;
+}
+
+.sl-markdown-content:has(#账号管理, #account-management, #アカウント管理, #gestión-de-cuentas, #계정-관리) th:nth-child(3) {
+	width: 52%;
+}
+
 /* Default tables: wrap inside the content column (no horizontal scrollbar). */
 .sl-markdown-content :is(th, td) {
 	white-space: normal;

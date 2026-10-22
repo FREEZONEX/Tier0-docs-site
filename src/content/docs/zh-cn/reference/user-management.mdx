@@ -6,7 +6,7 @@ editions: [cloud, enterprise]
 
 import { Tabs, TabItem } from '@astrojs/starlight/components';
 
-Tier0 用户权限管理和访问控制依据不同版本通过不通方式实现。
+Tier0 用户权限管理和访问控制依据不同版本通过不同方式实现。
 - 云版通过 Workspace 成员邀请管理使用资格；
 - 企业版由管理员分配用户账号和角色，控制用户可访问的功能模块。
 
@@ -16,6 +16,10 @@ Tier0 用户权限管理和访问控制依据不同版本通过不通方式实�
 <TabItem label="云版">
 
 - Workspace 创建者或现有成员通过电话或邮箱向新成员发起邀请。新成员收到邀请码或邀请链接后，注册账号并加入 Workspace。
+- 发起邀请时配置新成员的坐席类型（Operator 或 Builder），决定新成员可访问的功能范围。
+
+    - **Builder**：可访问所有功能模块。
+    - **Operator**：仅可访问应用中心。
 - 账号注册须经过双重验证。
 
 :::caution
@@ -39,3 +43,39 @@ Tier0 用户权限管理和访问控制依据不同版本通过不通方式实�
 :::
 </TabItem>
 </Tabs>
+
+## 账号管理
+<Tabs syncKey="edition">
+<TabItem label="云版">
+
+| 操作 | 谁 | 描述 |
+| --- | --- | --- |
+| 更改席位 | 创建者 / Builder | <ul><li>创建者可更改所有成员的席位。</li><li>Builder 仅可更改 Operator 的席位。</li></ul> |
+| 删除 Workspace | 创建者 | 删除 Workspace 后，所有数据立即清除且无法恢复。 |
+| 转移 Workspace | 创建者 | — |
+| 移除成员 | 创建者 / Builder | <ul><li>创建者可移除所有成员。</li><li>Builder 仅可移除 Operator。</li></ul> |
+| 删除账号 | 所有成员 | <ul><li>创建者必须先删除或转移 Workspace。</li><li>账号数据立即清除且无法恢复。</li></ul> |
+
+</TabItem>
+<TabItem label="企业版">
+
+- Admin 可以重置密码、编辑用户角色、禁用账号、删除账号。
+- 初始默认账号角色不可编辑，且不能被禁用或删除。
+- 账号删除后，所有数据立即清除且无法恢复。
+
+</TabItem>
+</Tabs>
+
+{/* ## 数据管理
+<Tabs syncKey="edition">
+<TabItem label="云版">
+
+- 免费试用期结束后，立刻清除所有数据且无法恢复。
+
+</TabItem>
+<TabItem label="企业版">
+
+
+
+</TabItem>
+</Tabs> */}
