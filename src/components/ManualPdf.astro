@@ -1,0 +1,846 @@
+---
+import { getCollection, render } from 'astro:content';
+import openApiSpec from '../../public/openapi/tier0-openapi.json';
+import { MANUAL_LOCALES, MANUAL_DOCUMENTS, manualText } from '../lib/manual-locales.js';
+import '../styles/custom.css';
+
+interface Props { locale?: string; }
+const { locale = 'en' } = Astro.props;
+if (!Object.hasOwn(MANUAL_LOCALES, locale)) throw new Error(`Unsupported PDF locale: ${locale}`);
+const language = MANUAL_LOCALES[locale as keyof typeof MANUAL_LOCALES];
+const t = (text: string) => manualText(locale, text);
+const DOC_ORDER = MANUAL_DOCUMENTS;
+const sectionLabel = (section: string) => language.sections[MANUAL_LOCALES.en.sections.indexOf(section)];
+
+const allDocs = await getCollection('docs');
+const docsById = new Map(allDocs.map((entry) => [entry.id, entry]));
+const renderedDocs = await Promise.all(
+	DOC_ORDER.map(async (item, index) => {
+		const localizedSlug = locale === 'en' ? item.slug : `${locale}/${item.slug}`;
+		const entry = docsById.get(localizedSlug) ?? docsById.get(item.slug);
+		if (!entry) throw new Error(`Missing docs entry for ${item.slug}`);
+		const { Content, headings } = await render(entry);
+		return {
+			...item,
+			index,
+			fallback: locale !== 'en' && entry.id === item.slug,
+			entry,
+			Content,
+			headings: headings.filter((heading) => heading.depth === 2),
+			anchor: `doc-${index + 1}`,
+		};
+	})
+);
+
+const HTTP_METHODS = new Set(['get', 'post', 'put', 'patch', 'delete', 'head', 'options']);
+const openApiPaths = (openApiSpec.paths ?? {}) as Record<string, Record<string, unknown>>;
+const apiOperations = Object.entries(openApiPaths).flatMap(([path, pathItem]) =>
+	Object.entries(pathItem)
+		.filter(([method]) => HTTP_METHODS.has(method.toLowerCase()))
+		.map(([method, operation]) => ({
+			method: method.toUpperCase(),
+			path,
+			operation: operation as Record<string, unknown>,
+		}))
+);
+const API_GROUPS = [
+	{ name: 'UNS', description: 'Read, write, and manage Unified Namespace data.' },
+	{ name: 'Assets', description: 'Upload, download, and manage stored files.' },
+	{ name: 'Authentication', description: 'Verify the current OpenAPI identity and permissions.' },
+	{ name: 'Flow', description: 'Manage Source Flow and Event Flow definitions.' },
+	{ name: 'Platform and Projects', description: 'Read platform information and manage projects.' },
+	{ name: 'MQTT Authentication', description: 'Create and remove MQTT credentials.' },
+] as const;
+
+function groupForPath(path: string): (typeof API_GROUPS)[number] {
+	if (path.startsWith('/uns/')) return API_GROUPS[0];
+	if (path.startsWith('/assets/')) return API_GROUPS[1];
+	if (path.startsWith('/auth/')) return API_GROUPS[2];
+	if (path.startsWith('/flow/')) return API_GROUPS[3];
+	if (path.startsWith('/mqtt-auth/')) return API_GROUPS[5];
+	return API_GROUPS[4];
+}
+
+function operationRank(path: string): number {
+	return path === '/assets/upload' ? 99 : 0;
+}
+
+const groupedApiOperations = API_GROUPS.map((group) => ({
+	...group,
+	operations: apiOperations
+		.filter((operation) => groupForPath(operation.path).name === group.name)
+		.sort((left, right) => operationRank(left.path) - operationRank(right.path) || left.path.localeCompare(right.path)),
+})).filter((group) => group.operations.length > 0);
+const apiSchemas = Object.entries(
+	((openApiSpec.components ?? {}).schemas ?? {}) as Record<string, unknown>
+).sort(([left], [right]) => left.localeCompare(right));
+const formatApiJson = (value: unknown) => JSON.stringify(value, null, 2);
+
+type OpenApiRecord = Record<string, unknown>;
+
+function isOpenApiRecord(value: unknown): value is OpenApiRecord {
+	return Boolean(value) && typeof value === 'object' && !Array.isArray(value);
+}
+
+const componentSchemas = ((openApiSpec.components ?? {}).schemas ?? {}) as Record<string, unknown>;
+
+function resolveSchema(schema: unknown): OpenApiRecord | undefined {
+	if (!isOpenApiRecord(schema)) return undefined;
+	const reference = schema.$ref;
+	if (typeof reference === 'string' && reference.startsWith('#/components/schemas/')) {
+		const name = reference.slice('#/components/schemas/'.length);
+		return isOpenApiRecord(componentSchemas[name]) ? componentSchemas[name] as OpenApiRecord : schema;
+	}
+	return schema;
+}
+
+function schemaProperties(schema: unknown): Array<[string, OpenApiRecord]> {
+	const resolved = resolveSchema(schema);
+	if (!resolved) return [];
+	const directProperties = resolved.properties;
+	const direct = isOpenApiRecord(directProperties)
+		? Object.entries(directProperties).filter((entry): entry is [string, OpenApiRecord] => isOpenApiRecord(entry[1]))
+		: [];
+	const allOf = Array.isArray(resolved.allOf) ? resolved.allOf.flatMap(schemaProperties) : [];
+	return [...allOf, ...direct];
+}
+
+function schemaType(schema: unknown): string {
+	const resolved = resolveSchema(schema);
+	if (!resolved) return '—';
+	if (typeof resolved.$ref === 'string') return resolved.$ref.replace('#/components/schemas/', '');
+	const type = typeof resolved.type === 'string' ? resolved.type : 'object';
+	const format = typeof resolved.format === 'string' ? ` (${resolved.format})` : '';
+	const items = resolved.items;
+	if (type === 'array' && isOpenApiRecord(items)) return `array<${schemaType(items)}>`;
+	return `${type}${format}`;
+}
+
+function schemaDescription(schema: unknown): string | undefined {
+	const raw = isOpenApiRecord(schema) ? schema : undefined;
+	if (typeof raw?.$ref === 'string' && raw.$ref.startsWith('#/components/schemas/')) {
+		const name = raw.$ref.slice('#/components/schemas/'.length);
+		return `${name}. ${t('See the referenced schema in the Schemas section.')}`;
+	}
+	const resolved = resolveSchema(schema);
+	if (resolved && typeof resolved.description === 'string') return resolved.description;
+	if (resolved && typeof resolved.title === 'string') return resolved.title;
+	return undefined;
+}
+
+function schemaRequired(schema: unknown): Set<string> {
+	const resolved = resolveSchema(schema);
+	return new Set(Array.isArray(resolved?.required) ? resolved.required.filter((name): name is string => typeof name === 'string') : []);
+}
+
+function mediaSchemas(requestBody: unknown): Array<[string, unknown]> {
+	if (!isOpenApiRecord(requestBody) || !isOpenApiRecord(requestBody.content)) return [];
+	return Object.entries(requestBody.content).flatMap(([mediaType, media]) =>
+		isOpenApiRecord(media) && media.schema ? [[mediaType, media.schema] as [string, unknown]] : []
+	);
+}
+
+function responseDetails(responses: unknown): Array<{ status: string; description: string; mediaTypes: string }> {
+	if (!isOpenApiRecord(responses)) return [];
+	return Object.entries(responses).map(([status, response]) => {
+		const record = isOpenApiRecord(response) ? response : {};
+		const content = isOpenApiRecord(record.content) ? record.content : {};
+		return {
+			status,
+			description: typeof record.description === 'string' ? record.description : t('Not specified in OpenAPI'),
+			mediaTypes: Object.entries(content)
+				.filter(([, media]) => isOpenApiRecord(media))
+				.map(([mediaType]) => mediaType)
+				.join(', ') || '—',
+		};
+	});
+}
+
+function responseBodySchemas(responses: unknown): Array<{ status: string; mediaType: string; schema: unknown }> {
+	if (!isOpenApiRecord(responses)) return [];
+	return Object.entries(responses).flatMap(([status, response]) => {
+		const record = isOpenApiRecord(response) ? response : {};
+		const content = isOpenApiRecord(record.content) ? record.content : {};
+		return Object.entries(content).flatMap(([mediaType, media]) =>
+			isOpenApiRecord(media) && media.schema
+				? [{ status, mediaType, schema: media.schema }]
+				: []
+		);
+	});
+}
+
+type ResponseExample = { status: string; mediaType: string; value: unknown };
+
+function responseExamples(responses: unknown): ResponseExample[] {
+	if (!isOpenApiRecord(responses)) return [];
+	return Object.entries(responses).flatMap(([status, response]) => {
+		const record = isOpenApiRecord(response) ? response : {};
+		const content = isOpenApiRecord(record.content) ? record.content : {};
+		return Object.entries(content).flatMap(([mediaType, media]) =>
+			isOpenApiRecord(media) && media.example !== undefined
+				? [{ status, mediaType, value: media.example }]
+				: []
+		);
+	});
+}
+
+function successResponseExample(responses: unknown): ResponseExample | undefined {
+	const explicitExample = responseExamples(responses).find((response) => response.status.startsWith('2'));
+	if (explicitExample) return explicitExample;
+
+	const schemaResponse = responseBodySchemas(responses).find((response) => response.status.startsWith('2'));
+	return schemaResponse && {
+		status: schemaResponse.status,
+		mediaType: schemaResponse.mediaType,
+		value: valueForSchema(schemaResponse.schema),
+	};
+}
+
+function valueForSchema(schema: unknown, depth = 0): unknown {
+	const resolved = resolveSchema(schema);
+	if (!resolved || depth > 2) return 'value';
+	if (resolved.example !== undefined) return resolved.example;
+	if (Array.isArray(resolved.enum) && resolved.enum.length > 0) return resolved.enum[0];
+	if (resolved.type === 'boolean') return false;
+	if (resolved.type === 'integer' || resolved.type === 'number') return 0;
+	if (resolved.type === 'array') return [valueForSchema(resolved.items, depth + 1)];
+	if (resolved.type === 'object' || resolved.properties) {
+		return Object.fromEntries(
+			schemaProperties(resolved)
+				.slice(0, 5)
+				.map(([name, property]) => [name, valueForSchema(property, depth + 1)])
+		);
+	}
+	return 'string';
+}
+
+function curlExample(method: string, path: string, operation: OpenApiRecord): string {
+	const lines = [`curl --request ${method} 'https://<tier0-host>/openapi/v1${path}'`];
+	if (path !== '/assets/files/public') lines.push("  --header 'x-api-key: <api-key>'");
+	const [mediaType, schema] = mediaSchemas(operation.requestBody)[0] ?? [];
+	if (mediaType === 'application/json' && schema) {
+		lines.push("  --header 'Content-Type: application/json'");
+		lines.push(`  --data '${JSON.stringify(valueForSchema(schema))}'`);
+	}
+	return lines.join(' \\\n');
+}
+---
+
+<!doctype html>
+<html lang={language.lang} data-theme="light">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<meta name="algolia-site-verification" content="958EE07D47EDCCC6" />
+		<title>{language.technicalTitle}</title>
+		<style>
+			@page {
+				size: A4;
+				margin: 18mm 16mm 20mm;
+			}
+
+			:root {
+				color-scheme: light;
+				--sl-font: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica,
+					Arial, sans-serif;
+				--sl-font-mono: 'Source Code Pro', Menlo, Monaco, Consolas, monospace;
+			}
+
+			body {
+				margin: 0;
+				background: #fff;
+				color: #171717;
+				font-family: var(--sl-font);
+			}
+
+			.pdf-cover {
+				min-height: 82vh;
+				display: flex;
+				flex-direction: column;
+				justify-content: center;
+				border-bottom: 1px solid #dfe6d8;
+			}
+
+			.pdf-cover h1 {
+				max-width: 14cm;
+				margin: 0.75rem 0 1rem;
+				color: #171717;
+				font-size: 3rem;
+				line-height: 1.05;
+			}
+
+			.pdf-toc {
+				break-after: page;
+				padding-top: 0.5rem;
+			}
+
+			.pdf-toc-title {
+				margin: 0 0 1rem;
+				font-size: 1.75rem;
+				font-weight: 700;
+			}
+
+			.pdf-toc-section {
+				margin-top: 1.25rem;
+				break-inside: avoid;
+			}
+
+			.pdf-toc-section-title {
+				margin: 0 0 0.5rem;
+				color: #4a7300;
+				font-size: 0.875rem;
+				font-weight: 700;
+				text-transform: uppercase;
+			}
+
+			.pdf-toc ol {
+				margin: 0;
+				padding-left: 1.25rem;
+			}
+
+			.pdf-toc li {
+				margin: 0.35rem 0;
+				color: #454545;
+			}
+
+			.pdf-toc a {
+				color: #171717;
+				text-decoration: none;
+			}
+
+			.pdf-doc {
+				break-before: page;
+			}
+
+			.pdf-doc-header {
+				margin-bottom: 1.25rem;
+				padding-bottom: 0.75rem;
+				border-bottom: 1px solid #dfe6d8;
+			}
+
+			.pdf-doc-kicker {
+				color: #4a7300;
+				font-size: 0.75rem;
+				font-weight: 700;
+				text-transform: uppercase;
+			}
+
+			.pdf-bookmark-section {
+				margin: 0;
+				text-transform: none;
+			}
+
+			.pdf-doc h3 {
+				margin: 0.35rem 0 0.25rem;
+				color: #171717;
+				font-size: 2rem;
+				line-height: 1.2;
+			}
+
+			.pdf-doc-description {
+				margin: 0;
+				color: #707070;
+				font-size: 0.9375rem;
+			}
+
+			.sl-markdown-content {
+				max-width: none;
+				color: #2a2a2a;
+			}
+
+			.sl-markdown-content h1 {
+				display: none;
+			}
+
+			.sl-markdown-content h2 {
+				margin-top: 1.7rem;
+				padding-top: 0.4rem;
+				color: #171717;
+				font-size: 1.35rem;
+				break-after: avoid;
+			}
+
+			.sl-markdown-content h3,
+			.sl-markdown-content h4 {
+				break-after: avoid;
+			}
+
+			.sl-markdown-content p,
+			.sl-markdown-content li {
+				font-size: 0.95rem;
+				line-height: 1.62;
+			}
+
+			.sl-markdown-content a {
+				color: #4a7300;
+				text-decoration: none;
+			}
+
+			.sl-markdown-content table {
+				width: 100%;
+				display: table;
+				font-size: 0.82rem;
+				break-inside: auto;
+			}
+
+			.sl-markdown-content th,
+			.sl-markdown-content td {
+				padding: 0.45rem 0.5rem;
+			}
+
+			.sl-markdown-content pre,
+			.sl-markdown-content table,
+			.sl-markdown-content blockquote,
+			.sl-markdown-content .mermaid,
+			.sl-markdown-content img {
+				break-inside: avoid;
+			}
+
+			.sl-markdown-content pre {
+				white-space: pre-wrap;
+				overflow: visible;
+				border: 1px solid #dfe6d8;
+				background: #f7f8f4;
+			}
+
+			.sl-markdown-content :global(pre.mermaid) {
+				display: flex;
+				justify-content: center;
+				max-width: 100%;
+				margin: 1.25rem 0;
+				padding: 0;
+				white-space: normal;
+				overflow: visible !important;
+				border: 0;
+				background: transparent;
+				break-inside: avoid;
+			}
+
+			.sl-markdown-content :global(pre.mermaid svg) {
+				max-width: 100%;
+				height: auto;
+			}
+
+			.sl-markdown-content code {
+				font-family: var(--sl-font-mono);
+			}
+
+			.sl-markdown-content :global(.expressive-code),
+			.sl-markdown-content :global(.expressive-code figure),
+			.sl-markdown-content :global(.expressive-code pre) {
+				max-width: 100%;
+				overflow: visible !important;
+			}
+
+			.sl-markdown-content :global(.expressive-code pre),
+			.sl-markdown-content :global(.expressive-code code),
+			.sl-markdown-content :global(.expressive-code .ec-line),
+			.sl-markdown-content :global(.expressive-code .code) {
+				white-space: pre-wrap !important;
+				overflow-wrap: anywhere;
+				word-break: break-word;
+			}
+
+			.sl-markdown-content img {
+				max-width: 100%;
+				height: auto;
+			}
+
+			.sl-markdown-content :global(details) {
+				display: block;
+				margin: 0.75rem 0;
+				border: 1px solid #dfe6d8;
+				border-radius: 6px;
+				padding: 0.75rem;
+				background: #fbfcf8;
+			}
+
+			.sl-markdown-content :global(details > summary) {
+				font-weight: 700;
+				color: #4a7300;
+				break-after: avoid;
+			}
+
+			.sl-markdown-content :global(.tablist-wrapper),
+			.sl-markdown-content :global([role='tablist']) {
+				display: none;
+			}
+
+			.sl-markdown-content :global([role='tabpanel']) {
+				display: block !important;
+				margin: 0.75rem 0;
+				padding: 0 0.85rem 0.85rem;
+				border: 1px solid #dfe6d8;
+				border-radius: 6px;
+				background: #fff;
+			}
+
+			.sl-markdown-content :global(.pdf-tab-label) {
+				display: block;
+				margin: 0 -0.85rem 0.75rem;
+				padding: 0.45rem 0.85rem;
+				border-bottom: 1px solid #dfe6d8;
+				border-radius: 6px 6px 0 0;
+				background: #f4f8e9;
+				color: #4a7300;
+				font-size: 0.78rem;
+				font-weight: 700;
+				letter-spacing: 0.02em;
+				text-transform: uppercase;
+			}
+
+			.pdf-reference-note {
+				margin-top: 2rem;
+				padding: 0.75rem 1rem;
+				border: 1px solid #dfe6d8;
+				border-radius: 6px;
+				background: #fbfcf8;
+				color: #454545;
+				font-size: 0.875rem;
+			}
+
+			.pdf-api-appendix {
+				break-before: page;
+			}
+
+			.pdf-api-appendix h2 {
+				margin: 1.75rem 0 0.75rem;
+				color: #171717;
+				font-size: 1.35rem;
+				break-after: avoid;
+			}
+
+			.pdf-api-summary {
+				margin: 0 0 1.5rem;
+				color: #707070;
+				font-size: 0.95rem;
+				line-height: 1.62;
+			}
+
+			.pdf-api-operation {
+				margin: 1.25rem 0;
+				padding-top: 1.25rem;
+				border-top: 1px solid #dfe6d8;
+			}
+
+			.pdf-api-group {
+				margin: 1.8rem 0 0.35rem;
+				color: #4a7300;
+				font-size: 1.05rem;
+				break-after: avoid;
+			}
+
+			.pdf-api-group-description {
+				margin: 0 0 0.35rem;
+				color: #707070;
+				font-size: 0.82rem;
+			}
+
+			.pdf-api-operation h4,
+			.pdf-api-schema h3 {
+				margin: 0 0 0.75rem;
+				color: #171717;
+				font-size: 1.05rem;
+				break-after: avoid;
+			}
+
+			.pdf-api-method {
+				display: inline-block;
+				min-width: 3.75rem;
+				margin-right: 0.6rem;
+				padding: 0.16rem 0.35rem;
+				border-radius: 3px;
+				background: #e7f6be;
+				color: #315b00;
+				font-family: var(--sl-font-mono);
+				font-size: 0.78rem;
+				font-weight: 700;
+				text-align: center;
+			}
+
+			.pdf-api-path {
+				font-family: var(--sl-font-mono);
+				font-size: 0.9rem;
+				word-break: break-word;
+			}
+
+			.pdf-api-operation p {
+				font-size: 0.9rem;
+				line-height: 1.55;
+			}
+
+			.pdf-api-operation h5 {
+				margin: 1rem 0 0.45rem;
+				font-size: 0.9rem;
+				break-after: avoid;
+			}
+
+			.pdf-api-status-tabs {
+				display: flex;
+				flex-wrap: wrap;
+				gap: 0.3rem;
+				margin: 0.45rem 0 0.65rem;
+			}
+
+			.pdf-api-status-tab {
+				display: inline-block;
+				padding: 0.18rem 0.42rem;
+				border: 1px solid #cdd9bf;
+				border-radius: 3px;
+				background: #f4f8e9;
+				color: #315b00;
+				font-family: var(--sl-font-mono);
+				font-size: 0.72rem;
+				font-weight: 700;
+			}
+
+			.pdf-api-error-list {
+				margin: 0.45rem 0 1rem;
+				padding-left: 1.15rem;
+			}
+
+			.pdf-api-error-list li {
+				margin: 0.45rem 0;
+				break-inside: avoid;
+			}
+
+			.pdf-api-table {
+				width: 100%;
+				margin: 0.45rem 0 1rem;
+				border-collapse: collapse;
+				font-size: 0.78rem;
+				line-height: 1.45;
+			}
+
+			.pdf-api-table th,
+			.pdf-api-table td {
+				padding: 0.45rem 0.5rem;
+				border: 1px solid #dfe6d8;
+				vertical-align: top;
+				text-align: left;
+			}
+
+			.pdf-api-table th {
+				background: #f4f8e9;
+				color: #315b00;
+				font-weight: 700;
+			}
+
+			.pdf-api-table code {
+				font-family: var(--sl-font-mono);
+				font-size: 0.75rem;
+			}
+
+			.pdf-api-table .pdf-api-missing-description {
+				color: #707070;
+			}
+
+			.pdf-api-operation pre,
+			.pdf-api-schema pre {
+				margin: 0.45rem 0 1rem;
+				padding: 0.75rem;
+				border: 1px solid #dfe6d8;
+				border-radius: 4px;
+				background: #f7f8f4;
+				font-family: var(--sl-font-mono);
+				font-size: 0.68rem;
+				line-height: 1.45;
+				white-space: pre-wrap;
+				word-break: break-word;
+				break-inside: avoid;
+			}
+
+			@media print {
+				.pdf-cover {
+					break-after: page;
+				}
+			}
+		</style>
+	</head>
+	<body class="t0-pdf-page">
+		<main>
+			<section class="pdf-cover">
+				<h1>{language.technicalTitle}</h1>
+			</section>
+
+			<nav class="pdf-toc" aria-label={t('Table of Contents')}>
+				<div class="pdf-toc-title">{t('Table of Contents')}</div>
+				{
+					['Get Started', 'Using Tier0', 'Best Practice', 'Reference'].map((section) => (
+						<div class="pdf-toc-section">
+							<div class="pdf-toc-section-title">{sectionLabel(section)}</div>
+							<ol>
+								{renderedDocs
+									.filter((doc) => doc.section === section)
+									.map((doc) => (
+										<li>
+											<a href={`#${doc.anchor}`}>{doc.entry.data.title}</a>
+										</li>
+									))}
+							</ol>
+						</div>
+					))
+				}
+				<div class="pdf-toc-section">
+					<div class="pdf-toc-section-title">{t('Appendix')}</div>
+					<ol>
+						<li><a href="#api-reference-appendix">{t('Complete OpenAPI Reference')}</a></li>
+					</ol>
+				</div>
+			</nav>
+
+			{
+				renderedDocs.map((doc, index) => {
+					const isFirstDocumentInSection = index === 0 || renderedDocs[index - 1].section !== doc.section;
+					return (
+					<article id={doc.anchor} class="pdf-doc" data-route={doc.slug} data-source-route={doc.entry.id} lang={doc.fallback ? 'en' : language.lang}>
+						<header class="pdf-doc-header">
+							{isFirstDocumentInSection
+								? <h2 class="pdf-doc-kicker pdf-bookmark-section">{sectionLabel(doc.section)}</h2>
+								: <div class="pdf-doc-kicker">{sectionLabel(doc.section)}</div>}
+							<h3>{doc.entry.data.title}</h3>
+							{doc.entry.data.description && (
+								<p class="pdf-doc-description">{doc.entry.data.description}</p>
+							)}
+						</header>
+						<div class="sl-markdown-content">
+							{doc.fallback && <p class="pdf-fallback-notice" lang={language.lang}>{language.fallback}</p>}
+							<doc.Content />
+						</div>
+					</article>
+					);
+				})
+			}
+
+			<section id="api-reference-appendix" class="pdf-api-appendix">
+				<header class="pdf-doc-header">
+					<div class="pdf-doc-kicker">{sectionLabel('Reference')}</div>
+					<h1>{t('OpenAPI Reference Appendix')}</h1>
+					<p class="pdf-doc-description">
+						Tier0 OpenAPI {openApiSpec.info.version} · {t('Operations')}: {apiOperations.length} · {t('Schemas')}: {apiSchemas.length}
+					</p>
+				</header>
+
+				<h2>{t('Operations')}</h2>
+				<p class="pdf-api-summary">
+					{language.apiNote}
+				</p>
+				{
+					groupedApiOperations.map((group) => <section class="pdf-api-group-section">
+						<h3 class="pdf-api-group">{t(group.name)}</h3>
+						<p class="pdf-api-group-description">{t(group.description)}</p>
+						{group.operations.map(({ method, path, operation }) => (
+							<section class="pdf-api-operation">
+								<h4>
+									<span class="pdf-api-method">{method}</span>
+									<span class="pdf-api-path">{path}</span>
+								</h4>
+							{typeof operation.summary === 'string' && <p>{operation.summary}</p>}
+							{typeof operation.description === 'string' && <p>{operation.description}</p>}
+							{Array.isArray(operation.parameters) && operation.parameters.length > 0 && (
+								<>
+									<h5>{t('Request parameters')}</h5>
+									<table class="pdf-api-table">
+										<thead>
+											<tr><th>{t('Name')}</th><th>{t('Location')}</th><th>{t('Type')}</th><th>{t('Required')}</th><th>{t('Description')}</th></tr>
+										</thead>
+										<tbody>
+											{operation.parameters.map((parameter) => {
+												const item = isOpenApiRecord(parameter) ? parameter : {};
+												return <tr>
+													<td><code>{typeof item.name === 'string' ? item.name : '—'}</code></td>
+													<td>{typeof item.in === 'string' ? item.in : '—'}</td>
+													<td><code>{schemaType(item.schema)}</code></td>
+													<td>{item.required === true ? t('Yes') : t('No')}</td>
+													<td>{typeof item.description === 'string' ? item.description : <span class="pdf-api-missing-description">{t('Not specified in OpenAPI')}</span>}</td>
+												</tr>;
+											})}
+										</tbody>
+									</table>
+								</>
+							)}
+							{operation.requestBody && (
+								<>
+									<h5>{t('Request body')}</h5>
+									{typeof (operation.requestBody as OpenApiRecord).description === 'string' && <p>{(operation.requestBody as OpenApiRecord).description}</p>}
+									<pre>{curlExample(method, path, operation)}</pre>
+									{mediaSchemas(operation.requestBody).map(([mediaType, schema]) => {
+										const required = schemaRequired(schema);
+										const properties = schemaProperties(schema);
+										return <>
+											<p><code>{mediaType}</code></p>
+											{properties.length > 0 ? <table class="pdf-api-table">
+												<thead><tr><th>{t('Field')}</th><th>{t('Type')}</th><th>{t('Required')}</th><th>{t('Description')}</th></tr></thead>
+												<tbody>{properties.map(([name, property]) => <tr>
+													<td><code>{name}</code></td><td><code>{schemaType(property)}</code></td><td>{required.has(name) ? t('Yes') : t('No')}</td>
+													<td>{schemaDescription(property) ?? <span class="pdf-api-missing-description">{t('Not specified in OpenAPI')}</span>}</td>
+												</tr>)}</tbody>
+											</table> : <p class="pdf-api-missing-description">{t('This request body has no declared object fields in OpenAPI.')}</p>}
+										</>;
+									})}
+								</>
+							)}
+							<h5>{t('Responses')}</h5>
+							<div class="pdf-api-status-tabs" aria-label={t('Response status codes')}>
+								{responseDetails(operation.responses).map((response) => <span class="pdf-api-status-tab">{response.status}</span>)}
+							</div>
+							{(() => {
+								const example = successResponseExample(operation.responses);
+								return example && <>
+									<h5>{t('Success response example')}</h5>
+									<p><code>{example.status} · {example.mediaType}</code></p>
+									<pre>{formatApiJson(example.value)}</pre>
+								</>;
+							})()}
+							{responseBodySchemas(operation.responses)
+								.filter((response) => response.status.startsWith('2'))
+								.map((response) => {
+									const required = schemaRequired(response.schema);
+									const properties = schemaProperties(response.schema);
+									return properties.length > 0 && <>
+										<h5>{t('Success response fields')}</h5>
+										<p><code>{response.status} · {response.mediaType}</code></p>
+										<table class="pdf-api-table">
+											<thead><tr><th>{t('Field')}</th><th>{t('Type')}</th><th>{t('Required')}</th><th>{t('Description')}</th></tr></thead>
+											<tbody>{properties.map(([name, property]) => <tr>
+												<td><code>{name}</code></td><td><code>{schemaType(property)}</code></td><td>{required.has(name) ? t('Yes') : t('No')}</td>
+												<td>{schemaDescription(property) ?? <span class="pdf-api-missing-description">{t('See the referenced schema in the Schemas section.')}</span>}</td>
+											</tr>)}</tbody>
+										</table>
+									</>;
+								})}
+							<h5>{t('Response status meanings')}</h5>
+							<table class="pdf-api-table">
+								<thead><tr><th>{t('Status')}</th><th>{t('Meaning')}</th><th>{t('Media type')}</th></tr></thead>
+								<tbody>{responseDetails(operation.responses).map((response) => <tr>
+									<td><code>{response.status}</code></td><td>{response.description}</td><td><code>{response.mediaTypes}</code></td>
+								</tr>)}</tbody>
+							</table>
+							</section>
+						))}
+					</section>)
+				}
+
+				<h2>{t('Schemas')}</h2>
+				<p class="pdf-api-summary">
+					{language.apiNote}
+				</p>
+				{
+					apiSchemas.map(([name, schema]) => (
+						<section class="pdf-api-schema">
+							<h3>{name}</h3>
+							{schemaDescription(schema) && <p>{schemaDescription(schema)}</p>}
+							{schemaProperties(schema).length > 0 ? <table class="pdf-api-table">
+								<thead><tr><th>{t('Field')}</th><th>{t('Type')}</th><th>{t('Required')}</th><th>{t('Description')}</th></tr></thead>
+								<tbody>{schemaProperties(schema).map(([propertyName, property]) => <tr>
+									<td><code>{propertyName}</code></td><td><code>{schemaType(property)}</code></td><td>{schemaRequired(schema).has(propertyName) ? t('Yes') : t('No')}</td>
+									<td>{schemaDescription(property) ?? <span class="pdf-api-missing-description">{t('Not specified in OpenAPI')}</span>}</td>
+								</tr>)}</tbody>
+							</table> : <pre>{formatApiJson(schema)}</pre>}
+						</section>
+					))
+				}
+			</section>
+		</main>
+	</body>
+</html>

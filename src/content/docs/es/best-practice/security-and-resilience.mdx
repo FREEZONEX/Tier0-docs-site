@@ -1,0 +1,71 @@
+---
+title: Seguridad y resiliencia
+description: Resumen de los controles de identidad, acceso a datos, disponibilidad del despliegue y recuperación de Tier0.
+editions: [cloud, enterprise]
+---
+
+Tier0 protege los datos desde dos perspectivas:
+
+- **Seguridad**: Controla quién puede acceder a la plataforma, las aplicaciones y los datos.
+- **Resiliencia**: Abarca la continuidad del servicio y la recuperación de datos tras un fallo.
+
+## Ámbito de seguridad por edición
+
+| Edición | Cobertura de seguridad |
+| --- | --- |
+| **Cloud** | Control de acceso a la plataforma y acceso autenticado a MQTT y las API. |
+| **Enterprise** | Control de acceso a la plataforma y los datos, además de disponibilidad del despliegue, copias de seguridad y recuperación para despliegues privados. |
+| **Edge (código abierto)** | Conexión y modelado de datos locales. Su broker MQTT integrado permite suscripciones sin autenticación. |
+
+Consulta [Elegir el mejor producto](https://tier0.app/pricing) para conocer el enfoque de cada edición.
+
+:::note[Seguridad de Tier0 Cloud]
+Para conocer los límites de red, el aislamiento de inquilinos, la protección de datos y las operaciones de seguridad del servicio Cloud de producción, consulta [Seguridad de red y datos de Tier0 Cloud](../../reference/tier0-cloud-security-overview/). Este documento solo se aplica a Tier0 Cloud.
+:::
+
+## Seguridad
+
+### Identidad y control de acceso
+
+| Área | Mecanismo de Tier0 | Detalles |
+| --- | --- | --- |
+| Acceso a la plataforma | <ul><li>Cloud controla el acceso mediante la pertenencia a un Workspace.</li><li>Enterprise controla el acceso mediante cuentas de usuario.</li></ul> | [Gestión de usuarios](../../reference/user-management/) |
+| Acceso de agentes | Los agentes se autentican con una clave de API y utilizan Tier0 CLI para acceder a la plataforma y operarla. | [Autenticación de CLI](../../using-tier0/operating-on-tier0-with-agents/#autenticación) |
+| Acceso a proyectos y aplicaciones | Tier0 utiliza RBAC para controlar el acceso a las aplicaciones. | [Control de acceso](../../using-tier0/building-apps/#control-de-acceso) |
+
+:::note
+La pertenencia a un Workspace no crea automáticamente una cuenta. Cada usuario debe registrar su cuenta e iniciar sesión. El registro de la cuenta requiere una verificación en dos pasos.
+:::
+
+### Control de acceso a los datos
+
+| Acceso | Mecanismo de Tier0 | Detalles |
+| --- | --- | --- |
+| MQTT | <ul><li>Los clientes se autentican con credenciales generadas por Tier0.</li><li>TLS y WebSocket seguro cifran los datos en tránsito.</li></ul> | [Credenciales y conexiones MQTT](../../using-tier0/working-with-factory-data/#generar-mqtt-credentials) |
+| REST API | El acceso a los datos requiere una clave generada por Tier0. | [Referencia de API](../../reference/api-reference/) |
+
+## Resiliencia
+
+### Disponibilidad del despliegue
+
+Enterprise ofrece actualmente dos planes de despliegue para los nodos centrales:
+
+| Plan | Límite de disponibilidad | Detalles |
+| --- | --- | --- |
+| **Despliegue estándar** | <ul><li>Permite la conmutación por error entre las bases de datos primaria y en espera.</li><li>La aplicación Enterprise y EMQX siguen siendo puntos únicos de fallo.</li></ul> | [Plan de despliegue estándar](../../reference/standard-deployment-plan/) |
+| **Despliegue de alta disponibilidad** | <ul><li>Añade nodos Enterprise activo y en espera y define la conmutación por error de la base de datos, la caché, el almacenamiento de objetos y los archivos gestionados del entorno de ejecución.</li><li>No garantiza cero interrupciones ni cero pérdida de datos.</li></ul> | [Plan de despliegue de alta disponibilidad](../../reference/high-availability-deployment-plan/) |
+
+:::note
+Las limitaciones detalladas de disponibilidad se describen en [SLA y límites de alta disponibilidad](../../reference/sla-and-ha-boundaries/).
+:::
+
+### Copias de seguridad y recuperación
+
+Enterprise permite realizar copias de seguridad y recuperar bases de datos. Después de la recuperación, comprueba el estado del despliegue, verifica las funciones básicas y confirma que los usuarios pueden iniciar sesión en la plataforma.
+
+- Para las copias de seguridad, consulta [Runbook de operaciones](../../reference/operations-runbook/#backup-y-restore).
+- Para los requisitos de verificación de la recuperación, consulta los requisitos de simulacros en [SLA y límites de alta disponibilidad](../../reference/sla-and-ha-boundaries/).
+
+:::note[Tiempo de respuesta]
+El tiempo de respuesta habitual es de 3 días laborables.
+:::

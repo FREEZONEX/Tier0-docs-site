@@ -51,7 +51,7 @@ const orderedEditions = editions
 		<div class="t0-editions" aria-label={availableIn}>
 			<span class="t0-editions-label">{availableIn}</span>
 			{orderedEditions.map((e) => (
-				<span class={`t0-edition t0-edition--${e}`}>{LABELS[e]}</span>
+				<span class={`t0-edition t0-edition--${e}`}>{lang === 'zh-CN' && e === 'cloud' ? 'Tier0 云服务版' : LABELS[e]}</span>
 			))}
 		</div>
 	)

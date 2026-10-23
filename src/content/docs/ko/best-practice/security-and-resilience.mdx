@@ -1,0 +1,71 @@
+---
+title: 보안 및 복원력
+description: Tier0의 ID, 데이터 접근, 배포 가용성 및 복구 제어에 대한 개요입니다.
+editions: [cloud, enterprise]
+---
+
+Tier0는 다음 두 가지 측면에서 데이터를 보호합니다.
+
+- **보안**: 플랫폼, 애플리케이션 및 데이터에 접근할 수 있는 사용자를 제어합니다.
+- **복원력**: 장애 발생 후 서비스 연속성과 데이터 복구를 다룹니다.
+
+## 에디션별 보안 범위
+
+| 에디션 | 보안 지원 범위 |
+| --- | --- |
+| **Cloud** | 플랫폼 접근 제어와 인증이 필요한 MQTT 및 API 접근을 제공합니다. |
+| **Enterprise** | 플랫폼 및 데이터 접근 제어 외에도 프라이빗 배포를 위한 배포 가용성, 백업 및 복구를 제공합니다. |
+| **Edge(오픈 소스)** | 로컬 데이터 연결 및 모델링에 사용합니다. 내장 MQTT 브로커는 인증 없는 구독을 허용합니다. |
+
+각 에디션의 용도는 [가장 적합한 제품 선택](https://tier0.app/pricing)을 참조하세요.
+
+:::note[Tier0 Cloud 보안 안내]
+Cloud 프로덕션 서비스의 네트워크 경계, 테넌트 격리, 데이터 보호 및 보안 운영 조치는 [Tier0 Cloud 네트워크 및 데이터 보안 안내](../../reference/tier0-cloud-security-overview/)를 참조하세요. 이 안내는 Tier0 Cloud에만 적용됩니다.
+:::
+
+## 보안
+
+### ID 및 접근 제어
+
+| 범위 | Tier0 방식 | 상세 정보 |
+| --- | --- | --- |
+| 플랫폼 접근 | <ul><li>Cloud는 Workspace 멤버 자격으로 접근을 제어합니다.</li><li>Enterprise는 사용자 계정으로 접근을 제어합니다.</li></ul> | [사용자 관리](../../reference/user-management/) |
+| Agent 접근 | Agent는 API 키로 인증하고 Tier0 CLI를 사용해 플랫폼에 접근하고 작업을 수행합니다. | [CLI 인증](../../using-tier0/operating-on-tier0-with-agents/#인증) |
+| 프로젝트 및 애플리케이션 접근 | Tier0는 RBAC를 사용해 애플리케이션 접근을 제어합니다. | [접근 제어](../../using-tier0/building-apps/#접근-제어) |
+
+:::note
+Workspace 멤버 자격이 계정을 자동으로 생성하지는 않습니다. 사용자가 직접 계정을 등록하고 로그인해야 합니다. 계정 등록에는 2단계 확인이 필요합니다.
+:::
+
+### 데이터 접근 제어
+
+| 접근 방식 | Tier0 방식 | 상세 정보 |
+| --- | --- | --- |
+| MQTT | <ul><li>클라이언트는 Tier0가 생성한 자격 증명으로 인증합니다.</li><li>TLS 및 보안 WebSocket이 전송 중인 데이터를 암호화합니다.</li></ul> | [MQTT 자격 증명 및 연결](../../using-tier0/working-with-factory-data/#mqtt-credential-생성) |
+| REST API | 데이터 접근에는 Tier0가 생성한 키가 필요합니다. | [API 레퍼런스](../../reference/api-reference/) |
+
+## 복원력
+
+### 배포 가용성
+
+Enterprise는 현재 중앙 노드에 대해 두 가지 배포 계획을 제공합니다.
+
+| 계획 | 가용성 경계 | 상세 정보 |
+| --- | --- | --- |
+| **표준 배포** | <ul><li>데이터베이스 기본/대기 장애 조치를 지원합니다.</li><li>Enterprise 애플리케이션과 EMQX는 여전히 단일 장애 지점입니다.</li></ul> | [표준 배포 계획](../../reference/standard-deployment-plan/) |
+| **고가용성 배포** | <ul><li>Enterprise 활성/대기 노드를 추가하고 데이터베이스, 캐시, 객체 스토리지 및 관리 대상 런타임 파일의 장애 조치 동작을 정의합니다.</li><li>무중단이나 데이터 손실 없음을 보장하지 않습니다.</li></ul> | [고가용성 배포 계획](../../reference/high-availability-deployment-plan/) |
+
+:::note
+자세한 가용성 제한은 [SLA 및 고가용성 경계](../../reference/sla-and-ha-boundaries/)를 참조하세요.
+:::
+
+### 백업 및 복구
+
+Enterprise는 데이터베이스 백업 및 복구를 제공합니다. 복구 후에는 배포 상태와 기본 기능을 검증하고 플랫폼에 로그인할 수 있는지 확인하세요.
+
+- 백업은 [운영 Runbook](../../reference/operations-runbook/#backup-and-restore)을 참조하세요.
+- 복구 검증 요건은 [SLA 및 고가용성 경계](../../reference/sla-and-ha-boundaries/)의 훈련 요건을 참조하세요.
+
+:::note[응답 시간]
+일반적인 응답 시간은 영업일 기준 3일입니다.
+:::

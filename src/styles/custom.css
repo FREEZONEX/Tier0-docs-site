@@ -402,11 +402,13 @@ starlight-menu-button[aria-expanded='true'] button {
 	background: #2a2a2a;
 }
 
-:root[data-theme='dark'] header .astro-r2p65idu {
+:root[data-theme='dark'] header .astro-r2p65idu,
+:root[data-theme='dark'] header .t0-pdf-trigger {
 	color: #a0a0a0;
 }
 
-header .astro-r2p65idu {
+header .astro-r2p65idu,
+header .t0-pdf-trigger {
 	color: #878787;
 	font-size: 13px;
 	line-height: 16.25px;
@@ -4199,4 +4201,89 @@ starlight-tabs [role='tablist'] {
 	.t0-cmd {
 		font-size: 0.75rem;
 	}
+}
+
+/* Manual PDF export */
+.t0-pdf-page {
+	--t0-aside-note-accent: #505050;
+	--t0-aside-note-border: #d0d0d0;
+	--t0-aside-note-bg: #f7f7f7;
+	--t0-aside-note-code-bg: #eeeeee;
+}
+.t0-pdf-trigger {
+	display: inline-flex;
+	align-items: center;
+	gap: 4px;
+	align-self: center;
+	min-height: 32px;
+	padding: 10px 0;
+	border: 0;
+	border-radius: 4px;
+	background: transparent;
+	color: var(--sl-color-text);
+	font: inherit;
+	font-size: 0.875rem;
+	font-weight: 400;
+	white-space: nowrap;
+	cursor: pointer;
+}
+.t0-pdf-trigger svg { flex-shrink: 0; width: 14px; height: 14px; }
+.t0-pdf-trigger-mobile { display: none; }
+.t0-pdf-dialog {
+	position: fixed;
+	inset: 0;
+	margin: auto;
+	max-height: calc(100dvh - 2rem);
+	overflow: auto;
+	box-sizing: border-box;
+	width: min(30rem, calc(100vw - 2rem));
+	max-width: none;
+	padding: 0;
+	border: 1px solid var(--sl-color-gray-5);
+	border-radius: 4px;
+	background: var(--sl-color-bg);
+	color: var(--sl-color-text);
+	box-shadow: 0 24px 80px #0003;
+	font-family: var(--sl-font);
+}
+.t0-pdf-dialog::backdrop { background: #16161680; }
+.t0-pdf-dialog-inner { margin: 0; }
+.t0-pdf-dialog-heading { display: flex; align-items: center; gap: 12px; padding: 24px 24px 20px; }
+.t0-pdf-dialog-icon { display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; border: 1px solid var(--sl-color-gray-5); border-radius: 4px; color: var(--sl-color-text-accent); }
+.t0-pdf-dialog h2 { margin: 0; font-size: 21px; line-height: 28px; font-weight: 700; }
+.t0-pdf-close { display: inline-flex; align-items: center; justify-content: center; margin-inline-start: auto; width: 32px; height: 32px; padding: 0; border: 0; border-radius: 4px; background: transparent; color: var(--sl-color-gray-2); cursor: pointer; }
+.t0-pdf-close:hover { background: var(--sl-color-gray-6); color: var(--sl-color-text); }
+.t0-pdf-fields { display: grid; gap: 10px; padding: 4px 24px 28px; }
+.t0-pdf-dialog label { font-size: 14px; font-weight: 500; }
+.t0-pdf-dialog select,
+.t0-pdf-dialog input {
+	width: 100%;
+	box-sizing: border-box;
+	min-height: 44px;
+	padding: 10px 12px;
+	border: 1px solid var(--sl-color-gray-5);
+	border-radius: 4px;
+	background: var(--sl-color-bg);
+	color: var(--sl-color-text);
+	font: inherit;
+	font-size: 14px;
+	line-height: 22px;
+}
+.t0-pdf-dialog input::placeholder { color: var(--sl-color-gray-3); }
+.t0-pdf-trigger:focus-visible,
+.t0-pdf-dialog :is(button, select, input):focus-visible { outline: 2px solid #73b200; outline-offset: 3px; }
+.t0-pdf-dialog [hidden] { display: none; }
+.t0-pdf-actions { display: flex; justify-content: flex-end; gap: 10px; padding: 16px 24px; border-top: 1px solid var(--sl-color-gray-5); background: var(--sl-color-gray-7, var(--sl-color-bg)); }
+.t0-pdf-actions button { min-height: 40px; padding: 8px 16px; border-radius: 4px; font: inherit; font-size: 14px; font-weight: 500; cursor: pointer; }
+.t0-pdf-cancel { border: 1px solid var(--sl-color-gray-5); background: transparent; color: var(--sl-color-text); }
+.t0-pdf-download { border: 1px solid #b2ed1d; background: #b2ed1d; color: #171717; }
+.t0-pdf-cancel:hover { background: var(--sl-color-gray-6); }
+.t0-pdf-download:hover { background: #c2f244; border-color: #c2f244; }
+.t0-pdf-download:disabled { opacity: 0.6; cursor: wait; }
+.t0-pdf-error { margin: 0; color: #b42318; font-size: 0.875rem; }
+.t0-pdf-help { margin: 0; color: var(--sl-color-gray-2); font-size: 14px; line-height: 22px; }
+@media (max-width: 49.999rem) {
+	.t0-pdf-trigger-mobile { display: inline-flex; margin-inline-start: 12px; }
+	.t0-pdf-trigger-mobile span { display: none; }
+	.t0-pdf-trigger-mobile { min-width: 32px; justify-content: center; }
 }

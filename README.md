@@ -13,7 +13,19 @@ npm run build     # static output in dist/ — must pass before committing
 npm run preview   # preview the production build
 ```
 
-Requires Node 18+. No other services needed.
+Requires Node 22.12+ and npm 9.6.5+. No other services needed.
+
+## PDF manuals
+
+`npm run pdf` builds the site and refreshes the downloadable manuals in all five languages:
+English (`en`), Simplified Chinese (`zh-cn`), Japanese (`ja`), Spanish (`es`), and Korean (`ko`).
+The export dialog defaults to the current page language and allows a separate PDF language choice.
+Untranslated chapters include a localized notice and use the English source; OpenAPI source descriptions remain in English.
+
+Run this command after changing documentation before publishing updated PDF downloads. It requires
+Chrome, Edge, or Playwright Chromium. To refresh one language after building, use `PDF_LOCALE=ja node scripts/export-pdf.mjs`
+(PowerShell: `$env:PDF_LOCALE='ja'; node scripts/export-pdf.mjs`). The PDFs are written to `public/downloads/`
+and copied into `dist/downloads/`; include the updated download files in the release.
 
 ## Structure
 

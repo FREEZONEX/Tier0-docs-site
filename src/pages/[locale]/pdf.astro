@@ -1,0 +1,12 @@
+---
+import ManualPdf from '../../components/ManualPdf.astro';
+import { MANUAL_LOCALES } from '../../lib/manual-locales.js';
+
+export function getStaticPaths() {
+    return Object.keys(MANUAL_LOCALES)
+        .filter((locale) => locale !== 'en')
+        .map((locale) => ({ params: { locale } }));
+}
+const { locale } = Astro.params;
+---
+<ManualPdf locale={locale} />

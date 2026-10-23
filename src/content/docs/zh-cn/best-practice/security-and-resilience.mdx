@@ -12,11 +12,15 @@ Tier0 支持从**安全**和**可靠性**两个方面来确保数据安全。
 
 | 版本 | 安全能力范围 |
 | --- | --- |
-| **云版** | 提供平台访问控制，以及需要身份认证的 MQTT 和 API 数据访问。 |
+| **云服务版** | 提供平台访问控制，以及需要身份认证的 MQTT 和 API 数据访问。 |
 | **企业版** | 除平台和数据访问控制外，还提供适用于私有部署的部署可用性、备份与恢复方案。 |
 | **Edge（开源版）** | 用于本地数据连接与建模，内置 MQTT Broker 支持匿名订阅。 |
 
 各版本定位请参阅[选择合适的产品版本](https://tier0.app/pricing)。
+
+:::note[Tier0 云服务版安全说明]
+有关云服务版生产服务的网络边界、租户隔离、数据保护和安全运维措施，请参阅 [Tier0 云服务版网络与数据安全说明](../../reference/tier0-cloud-security-overview/)。该说明仅适用于 Tier0 云服务版。
+:::
 
 ## 安全
 
@@ -24,7 +28,7 @@ Tier0 支持从**安全**和**可靠性**两个方面来确保数据安全。
 
 | 范围 | Tier0 机制 | 详情 |
 | --- | --- | --- |
-| 平台访问 | <ul><li>云版通过 Workspace 成员资格控制访问。</li><li>企业版通过用户账号控制访问。</li></ul> | [用户管理](../../reference/user-management/) |
+| 平台访问 | <ul><li>云服务版通过 Workspace 成员资格控制访问。</li><li>企业版通过用户账号控制访问。</li></ul> | [用户管理](../../reference/user-management/) |
 | Agent 访问 | Agent 使用 API Key 完成身份认证，并通过 Tier0 CLI 访问和操作平台。 | [CLI 身份认证](../../using-tier0/operating-on-tier0-with-agents/#认证) |
 | 项目与应用访问 | Tier0 基于 RBAC 实现应用访问控制。 | [访问控制](../../using-tier0/building-apps/#访问控制) |
 

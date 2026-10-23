@@ -270,6 +270,11 @@ export default defineConfig({
 							slug: 'reference/user-management',
 						},
 						{
+							label: 'Tier0 Cloud Network and Data Security Overview',
+							translations: { 'zh-CN': 'Tier0 云服务版网络与数据安全说明', ja: 'Tier0 Cloud のネットワークとデータのセキュリティに関する説明', es: 'Seguridad de red y datos de Tier0 Cloud', ko: 'Tier0 Cloud 네트워크 및 데이터 보안 안내' },
+							slug: 'reference/tier0-cloud-security-overview',
+						},
+						{
 							label: 'ISA-95 Equipment Hierarchy',
 							translations: { 'zh-CN': 'ISA-95 设备层级', ja: 'ISA-95 設備階層', es: 'Jerarquía de equipos ISA-95', ko: 'ISA-95 설비 계층' },
 							slug: 'reference/isa-95-equipment-hierarchy',

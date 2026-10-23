@@ -1,0 +1,81 @@
+---
+title: Tier0 Cloud Network and Data Security Overview
+description: Network boundaries, tenant isolation, data protection, and security operations for the Tier0 Cloud production SaaS service.
+editions: [cloud]
+---
+
+**Scope:** The Tier0 Cloud production SaaS service, deployed in the AWS Singapore Region.\
+**Document date:** October 22, 2026
+
+Tier0 Cloud uses network access controls, tenant isolation, identity and access management, data encryption, and backup and recovery measures to reduce the risk of network attacks and unauthorized access. This overview describes the platform's security measures and the controls that limit the spread of security incidents to other tenants, internal platform services, and customer networks.
+
+:::note[Edge edition]
+This overview applies only to Tier0 Cloud. For Edge setup, see [Installation](../../get-started/installation/).
+:::
+
+## 1 Network Boundaries and Access Control
+
+Public Web and API access to Tier0 Cloud uses TLS encryption and passes through a unified edge entry point and application gateway. Core service endpoints validate access to the origin and reject direct requests that do not meet the validation requirements, reducing the risk of bypassing the edge entry point to access the origin.
+
+Production environments are isolated from development and staging environments at the cloud account, network, cluster, and database levels, with access credentials managed separately. Administrative access to production uses an authenticated, dedicated network channel.
+
+## 2 Tenant Isolation and Incident Containment
+
+### 2.1 Workload Isolation
+
+Tenant workloads run in separate Kubernetes namespaces and are separated from platform services and management components through dedicated node pools and scheduling constraints. These controls limit direct interaction between tenant applications and platform components, reducing the impact on other services if an application experiences a security incident.
+
+### 2.2 Network Isolation
+
+Inbound and outbound traffic for tenant namespaces follows network policies that deny traffic by default and allow it only through explicit rules. The platform automatically configures and synchronizes these policies, which are enforced by the cluster networking components.
+
+Inbound traffic is allowed only from workloads belonging to the same tenant and platform services that perform necessary business functions. Outbound rules allow cluster DNS resolution, services belonging to the same tenant, designated platform gateways, messaging services, and assigned database endpoints. Public internet access is subject to network policies. Except for explicitly allowed business dependencies, these policies restrict access to private network addresses and block direct access to cloud instance metadata addresses.
+
+These measures limit unauthorized connections between tenants and lateral movement from tenant workloads into the platform's internal network. A security incident affecting one tenant application does not automatically grant access to other tenants or platform management components. Authorized business connections remain subject to the applicable network rules and identity and access controls.
+
+### 2.3 Data and Identity Isolation
+
+Tenant application data is logically isolated at the database level. Where a separate database unit is allocated, network access rules also restrict connection sources.
+
+The platform assigns access permissions according to service responsibilities, limiting each workload's access to the resources needed for its functions. Network isolation and identity-based authorization work together to limit the resources an affected workload can access.
+
+### 2.4 Customer Network Access Boundaries
+
+The tenant isolation measures described in this section apply within the Tier0 Cloud platform. When customers connect internal systems through connectors, gateways, or other integrations, the access boundaries of their networks also depend on the connection method, routing, firewall rules, and permissions granted to the credentials used.
+
+Customers should allow only the destination addresses, ports, and account permissions required for their business needs, and segment integration components from other internal systems. Platform isolation cannot replace network access controls on the customer side. Both parties should determine and verify the access scope for the specific integration to limit the risk of an incident spreading to other customer systems through authorized connections.
+
+## 3 Data Protection
+
+The platform protects data in transit, at rest, and during access through the following measures:
+
+- Public Web and API communication, as well as access to managed databases and caches, uses TLS encryption.
+- Managed databases, caches, and object storage have encryption at rest enabled.
+- Object storage blocks public access and restricts data access through encryption requirements, HTTPS requirements, and resource permissions.
+- Access to tenant data is subject to both database isolation and identity and access controls.
+
+## 4 Backup and Recovery
+
+Tier0 Cloud backs up production databases and service-level databases included in the backup scope. Backup data is stored in dedicated object storage with restricted access and managed according to the applicable retention policies.
+
+Backup jobs use a separate identity with permissions limited to the required read and write operations at designated storage locations. This identity is not granted permission to delete backup objects. Storage lifecycle rules remove expired backups, reducing the risk that compromised backup credentials could be used to delete recovery data.
+
+Integrity checks are performed after backups complete, and restore validation in an isolated environment checks that backups are usable. Application configurations are version-controlled, and build artifacts are stored in a private container image registry to support service recovery and version rollback.
+
+## 5 Administrative Access and Production Changes
+
+Administrative access to production uses individually assigned identities and permissions based on the principle of least privilege. Console identities used for sensitive operations require multi-factor authentication.
+
+Routine inspections use a restricted, read-only identity that can view workload status, logs, and events, but cannot read sensitive credentials, modify resources, or execute remote commands. Production changes use separately authorized identities and processes.
+
+Infrastructure configurations, deployment manifests, and operations scripts are version-controlled. Production changes must define their objectives, scope of impact, verification steps, and rollback plans. Records include the executing identity, configuration differences, and verification results to support traceability and recovery.
+
+## 6 Monitoring and Security Incident Response
+
+The platform centrally collects production metrics, logs, and health information and sends anomaly alerts to operational response channels. Monitoring covers service availability, error rates, database health, certificate validity, backup job status, and cluster status.
+
+When a security incident occurs, response efforts prioritize containing its impact and preserving relevant logs, configurations, and the incident timeline. Service is restored after the necessary isolation and investigation, followed by an incident review and tracked corrective actions. Production changes during incident response follow established authorization and recordkeeping processes.
+
+## 7 Security Contact
+
+For security assessments, customer due diligence, or suspected vulnerabilities, contact your Tier0 account manager or the security team. Non-public architecture and control details may be provided under appropriate confidentiality arrangements. Do not include access credentials, private keys, or sensitive customer data in your initial contact.

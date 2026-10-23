@@ -1,0 +1,81 @@
+---
+title: Seguridad de red y datos de Tier0 Cloud
+description: Límites de red, aislamiento de inquilinos, protección de datos y operaciones de seguridad del servicio SaaS de producción de Tier0 Cloud.
+editions: [cloud]
+---
+
+**Ámbito:** El servicio SaaS de producción de Tier0 Cloud, desplegado en la región de AWS de Singapur.\
+**Fecha del documento:** 22 de octubre de 2026
+
+Tier0 Cloud utiliza controles de acceso a la red, aislamiento de inquilinos, gestión de identidades y accesos, cifrado de datos y medidas de copia de seguridad y recuperación para reducir el riesgo de ataques de red y accesos no autorizados. Este documento describe las medidas de seguridad de la plataforma y los controles que limitan la propagación de incidentes de seguridad a otros inquilinos, a servicios internos de la plataforma y a las redes de los clientes.
+
+:::note[Edición Edge]
+Este documento solo se aplica a Tier0 Cloud. Para configurar Edge, consulta [Instalación](../../get-started/installation/).
+:::
+
+## 1 Límites de red y control de acceso
+
+El acceso público a la Web y a las API de Tier0 Cloud utiliza cifrado TLS y pasa por un punto de entrada perimetral unificado y una puerta de enlace de aplicaciones. Los puntos de entrada de los servicios principales validan el acceso al servidor de origen y rechazan las solicitudes directas que no cumplen los requisitos de validación, lo que reduce el riesgo de acceder al origen evitando el punto de entrada perimetral.
+
+El entorno de producción está aislado de los entornos de desarrollo y preproducción en las capas de cuenta de nube, red, clúster y base de datos. Las credenciales de acceso se gestionan por separado. El acceso administrativo a producción utiliza un canal de red dedicado con autenticación.
+
+## 2 Aislamiento de inquilinos y contención de incidentes
+
+### 2.1 Aislamiento de cargas de trabajo
+
+Las cargas de trabajo de los inquilinos se ejecutan en espacios de nombres de Kubernetes independientes y se separan de los servicios de la plataforma y de los componentes de administración mediante grupos de nodos dedicados y restricciones de planificación. Estos controles limitan la interacción directa entre las aplicaciones de los inquilinos y los componentes de la plataforma, reduciendo el impacto en otros servicios si una aplicación sufre un incidente de seguridad.
+
+### 2.2 Aislamiento de red
+
+El tráfico entrante y saliente de los espacios de nombres de los inquilinos está sujeto a políticas de red que deniegan el tráfico de forma predeterminada y solo lo permiten mediante reglas explícitas. La plataforma configura y sincroniza estas políticas automáticamente, y los componentes de red del clúster las aplican.
+
+El tráfico entrante solo se permite desde cargas de trabajo del mismo inquilino y desde servicios de la plataforma que realizan funciones de negocio necesarias. Las reglas de salida permiten la resolución DNS del clúster, los servicios del mismo inquilino, las puertas de enlace designadas de la plataforma, los servicios de mensajería y los puntos de conexión de base de datos asignados. El acceso a Internet está sujeto a las políticas de red. Salvo las dependencias de negocio permitidas explícitamente, estas políticas restringen el acceso a direcciones de red privadas y bloquean el acceso directo a las direcciones de metadatos de las instancias de nube.
+
+Estas medidas limitan las conexiones no autorizadas entre inquilinos y el movimiento lateral desde las cargas de trabajo de los inquilinos hacia la red interna de la plataforma. Un incidente de seguridad en una aplicación de un inquilino no concede automáticamente acceso a otros inquilinos ni a los componentes de administración de la plataforma. Las conexiones de negocio autorizadas siguen sujetas a las reglas de red y a los controles de identidad y acceso correspondientes.
+
+### 2.3 Aislamiento de datos e identidades
+
+Los datos de las aplicaciones de los inquilinos se aíslan lógicamente en la capa de base de datos. Cuando se asigna una unidad de base de datos independiente, las reglas de acceso a la red también restringen los orígenes de las conexiones.
+
+La plataforma asigna permisos de acceso según las responsabilidades de cada servicio y limita el acceso de cada carga de trabajo a los recursos necesarios para sus funciones. El aislamiento de red y la autorización basada en identidades limitan conjuntamente los recursos a los que puede acceder una carga de trabajo afectada.
+
+### 2.4 Límites de acceso a la red del cliente
+
+Las medidas de aislamiento de inquilinos descritas en esta sección se aplican dentro de la plataforma Tier0 Cloud. Cuando los clientes conectan sistemas internos mediante conectores, puertas de enlace u otras integraciones, los límites de acceso a sus redes también dependen del método de conexión, el enrutamiento, las reglas del cortafuegos y los permisos concedidos a las credenciales utilizadas.
+
+Los clientes deben permitir únicamente las direcciones de destino, los puertos y los permisos de cuenta necesarios para su actividad, y segmentar los componentes de integración respecto de otros sistemas internos. El aislamiento interno de la plataforma no sustituye los controles de acceso a la red del cliente. Ambas partes deben determinar y verificar el alcance del acceso según la integración concreta, para limitar el riesgo de propagación a otros sistemas del cliente a través de conexiones autorizadas.
+
+## 3 Protección de datos
+
+La plataforma protege los datos en tránsito, en reposo y durante el acceso mediante las siguientes medidas:
+
+- La comunicación pública con la Web y las API, así como el acceso a las bases de datos y cachés gestionadas, utiliza cifrado TLS.
+- Las bases de datos, las cachés y el almacenamiento de objetos gestionados tienen habilitado el cifrado en reposo.
+- El almacenamiento de objetos bloquea el acceso público y restringe el acceso a los datos mediante requisitos de cifrado, requisitos de HTTPS y permisos sobre los recursos.
+- El acceso a los datos de los inquilinos está sujeto tanto al aislamiento de bases de datos como a los controles de identidad y acceso.
+
+## 4 Copias de seguridad y recuperación
+
+Tier0 Cloud realiza copias de seguridad de las bases de datos de producción y de las bases de datos de servicios incluidas en el ámbito de las copias de seguridad. Las copias se guardan en almacenamiento de objetos dedicado con acceso restringido y se gestionan según las políticas de retención correspondientes.
+
+Los trabajos de copia de seguridad utilizan una identidad independiente con permisos limitados a las operaciones de lectura y escritura necesarias en las ubicaciones de almacenamiento designadas. Esta identidad no tiene permisos para eliminar los objetos de las copias de seguridad. Las reglas de ciclo de vida del almacenamiento eliminan las copias caducadas, lo que reduce el riesgo de que unas credenciales de copia de seguridad comprometidas se utilicen para eliminar datos de recuperación.
+
+Al finalizar las copias de seguridad se comprueba su integridad, y se valida su restauración en un entorno aislado para verificar que son utilizables. Las configuraciones de las aplicaciones se mantienen bajo control de versiones y los artefactos de compilación se guardan en un registro privado de imágenes de contenedor para facilitar la recuperación del servicio y la reversión de versiones.
+
+## 5 Acceso administrativo y cambios en producción
+
+El acceso administrativo a producción utiliza identidades asignadas individualmente y permisos basados en el principio de mínimo privilegio. Las identidades de consola utilizadas para operaciones sensibles requieren autenticación multifactor.
+
+Las inspecciones rutinarias utilizan una identidad restringida de solo lectura que permite consultar el estado de las cargas de trabajo, los registros y los eventos, pero no leer credenciales sensibles, modificar recursos ni ejecutar comandos remotos. Los cambios en producción utilizan identidades y procesos autorizados por separado.
+
+Las configuraciones de infraestructura, los manifiestos de despliegue y los scripts de operaciones se mantienen bajo control de versiones. Los cambios en producción deben definir sus objetivos, alcance del impacto, pasos de verificación y planes de reversión. Se registran la identidad que ejecuta el cambio, las diferencias de configuración y los resultados de la verificación para facilitar la trazabilidad y la recuperación.
+
+## 6 Supervisión y respuesta a incidentes de seguridad
+
+La plataforma recopila de forma centralizada las métricas operativas, los registros y el estado de salud del entorno de producción, y envía alertas de anomalías a los canales de respuesta operativa. La supervisión incluye la disponibilidad del servicio, las tasas de error, el estado de las bases de datos, la validez de los certificados, el estado de los trabajos de copia de seguridad y el estado del clúster.
+
+Ante un incidente de seguridad, la respuesta prioriza contener su impacto y conservar los registros, las configuraciones y la cronología del incidente. El servicio se restablece tras completar el aislamiento y la investigación necesarios. Después se revisa el incidente y se realiza un seguimiento de las medidas correctivas. Los cambios en producción durante la respuesta a incidentes siguen los procesos establecidos de autorización y registro.
+
+## 7 Contacto de seguridad
+
+Para evaluaciones de seguridad, procesos de diligencia debida de clientes o posibles vulnerabilidades, contacta con tu gestor de cuenta de Tier0 o con el equipo de seguridad. Los detalles no públicos de la arquitectura y los controles pueden facilitarse bajo acuerdos de confidencialidad adecuados. No incluyas credenciales de acceso, claves privadas ni datos sensibles de clientes en el primer contacto.

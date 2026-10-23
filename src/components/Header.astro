@@ -7,6 +7,7 @@ import SiteTitle from 'virtual:starlight/components/SiteTitle';
 import SocialIcons from 'virtual:starlight/components/SocialIcons';
 import ThemeSelect from 'virtual:starlight/components/ThemeSelect';
 import DocChatBot from './DocChatBot.astro';
+import { MANUAL_LOCALES } from '../lib/manual-locales.js';
 
 /**
  * Render the `Search` component if Pagefind is enabled or the default search component has been overridden.
@@ -15,6 +16,10 @@ const shouldRenderSearch =
 	config.pagefind || config.components.Search !== '@astrojs/starlight/components/Search.astro';
 
 const { hasSidebar } = Astro.locals.starlightRoute;
+const locale = Astro.locals.starlightRoute.lang.toLowerCase();
+const initialLocale = Object.hasOwn(MANUAL_LOCALES, locale) ? locale : 'en';
+const language = MANUAL_LOCALES[initialLocale as keyof typeof MANUAL_LOCALES];
+const labels = language.ui;
 ---
 
 <div class="header">
@@ -26,8 +31,8 @@ const { hasSidebar } = Astro.locals.starlightRoute;
 					class="t0-sidebar-toggle print:hidden"
 					aria-controls="starlight__sidebar"
 					aria-expanded="true"
-					aria-label="Toggle sidebar"
-					title="Toggle sidebar"
+					aria-label={labels.toggle}
+					title={labels.toggle}
 					data-t0-sidebar-toggle
 				>
 					<svg
@@ -58,6 +63,10 @@ const { hasSidebar } = Astro.locals.starlightRoute;
 	</div>
 	<div class="sl-flex print:hidden">
 		{shouldRenderSearch && <Search />}
+		<button type="button" class="t0-pdf-trigger t0-pdf-trigger-mobile" data-pdf-open aria-label={labels.button} aria-haspopup="dialog">
+			<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M12 3v12m-4-4 4 4 4-4M5 15v5h14v-5" /></svg>
+			<span>{labels.button}</span>
+		</button>
 	</div>
 	<div class="sl-hidden md:sl-flex print:hidden right-group">
 		<div class="sl-flex social-icons">
@@ -65,6 +74,118 @@ const { hasSidebar } = Astro.locals.starlightRoute;
 		</div>
 		<ThemeSelect />
 		<LanguageSelect />
+		<button type="button" class="t0-pdf-trigger" data-pdf-open aria-haspopup="dialog">
+			<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M12 3v12m-4-4 4 4 4-4M5 15v5h14v-5" /></svg>
+			<span>{labels.button}</span>
+		</button>
 	</div>
 </div>
 <DocChatBot />
+<dialog class="t0-pdf-dialog" data-pdf-dialog aria-labelledby="t0-pdf-dialog-title" data-failed={labels.failed} data-required={labels.required}>
+	<form method="dialog" class="t0-pdf-dialog-inner" data-pdf-form>
+		<div class="t0-pdf-dialog-heading">
+			<div class="t0-pdf-dialog-icon" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8zM14 2v6h6M8 13h8M8 17h5" /></svg></div>
+			<h2 id="t0-pdf-dialog-title">{labels.title}</h2>
+			<button type="button" class="t0-pdf-close" data-pdf-close aria-label={labels.cancel}><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18" /></svg></button>
+		</div>
+		<div class="t0-pdf-fields">
+		<label for="t0-pdf-language">{labels.language}</label>
+		<select id="t0-pdf-language" data-pdf-language>
+			{Object.entries(MANUAL_LOCALES).map(([key, value]) => <option value={key} selected={key === initialLocale}>{value.name}</option>)}
+		</select>
+		<label for="t0-pdf-title-choice">{labels.label}</label>
+		<select id="t0-pdf-title-choice" data-pdf-choice>
+			<option value="user">{language.userTitle}</option>
+			<option value="technical">{language.technicalTitle}</option>
+			<option value="custom">{labels.custom}</option>
+		</select>
+		<input type="text" data-pdf-custom aria-label={labels.label} placeholder={labels.placeholder} maxlength="120" hidden />
+		<p class="t0-pdf-help">{labels.fallback}</p>
+		<p class="t0-pdf-error" data-pdf-error role="alert" hidden></p>
+		</div>
+		<div class="t0-pdf-actions">
+			<button type="button" class="t0-pdf-cancel" data-pdf-cancel>{labels.cancel}</button>
+			<button type="submit" class="t0-pdf-download" data-pdf-download data-preparing={labels.preparing}>{labels.download}</button>
+		</div>
+	</form>
+</dialog>
+<script>
+	import { MANUAL_LOCALES } from '../lib/manual-locales.js';
+
+	function initPdfExport() {
+		const dialog = document.querySelector<HTMLDialogElement>('[data-pdf-dialog]');
+		const openButtons = document.querySelectorAll<HTMLButtonElement>('[data-pdf-open]');
+		const form = document.querySelector<HTMLFormElement>('[data-pdf-form]');
+		const choice = document.querySelector<HTMLSelectElement>('[data-pdf-choice]');
+		const pdfLanguage = document.querySelector<HTMLSelectElement>('[data-pdf-language]');
+		const custom = document.querySelector<HTMLInputElement>('[data-pdf-custom]');
+		const cancel = document.querySelector<HTMLButtonElement>('[data-pdf-cancel]');
+		const download = document.querySelector<HTMLButtonElement>('[data-pdf-download]');
+		const error = document.querySelector<HTMLElement>('[data-pdf-error]');
+		if (!dialog || !openButtons.length || !form || !choice || !pdfLanguage || !custom || !cancel || !download || !error) return;
+		if (dialog.dataset.initialized) return;
+		dialog.dataset.initialized = 'true';
+		let activeRequest: AbortController | undefined;
+		dialog.addEventListener('close', () => activeRequest?.abort());
+		custom.addEventListener('input', () => custom.setCustomValidity(''));
+		pdfLanguage.addEventListener('change', () => {
+			const selected = MANUAL_LOCALES[pdfLanguage.value as keyof typeof MANUAL_LOCALES];
+			choice.options[0].textContent = selected.userTitle;
+			choice.options[1].textContent = selected.technicalTitle;
+		});
+		openButtons.forEach((button) => button.addEventListener('click', () => dialog.showModal()));
+		dialog.querySelector('[data-pdf-close]')?.addEventListener('click', () => dialog.close());
+		dialog.addEventListener('click', (event) => { if (event.target === dialog) { const bounds = dialog.getBoundingClientRect(); if (event.clientX < bounds.left || event.clientX > bounds.right || event.clientY < bounds.top || event.clientY > bounds.bottom) dialog.close(); } });
+		cancel.addEventListener('click', () => dialog.close());
+		choice.addEventListener('change', () => {
+			custom.setCustomValidity('');
+			custom.hidden = choice.value !== 'custom';
+			custom.required = choice.value === 'custom';
+			if (!custom.hidden) custom.focus();
+		});
+		form.addEventListener('submit', async (event) => {
+			event.preventDefault();
+			error.hidden = true;
+			const selectedLocale = pdfLanguage.value as keyof typeof MANUAL_LOCALES;
+			const selected = MANUAL_LOCALES[selectedLocale];
+			const rawTitle = choice.value === 'user' ? selected.userTitle : choice.value === 'technical' ? selected.technicalTitle : custom.value;
+			const title = rawTitle.trim().replace(/\s+/g, ' ');
+			if (!title) {
+				custom.setCustomValidity(dialog.dataset.required ?? '');
+				custom.reportValidity();
+				return;
+			}
+			activeRequest = new AbortController();
+			download.disabled = true;
+			pdfLanguage.disabled = choice.disabled = custom.disabled = true;
+			form.setAttribute('aria-busy', 'true');
+			const previousLabel = download.textContent ?? '';
+			download.textContent = download.dataset.preparing ?? previousLabel;
+			try {
+				const { updateManualTitle, rasterizeManualTitle } = await import('../lib/manual-pdf.js');
+				const response = await fetch(`/downloads/tier0-manual-${selectedLocale}.pdf`, { signal: activeRequest.signal });
+				if (!response.ok) throw new Error(`PDF download failed (${response.status}).`);
+				const bytes = await updateManualTitle(await response.arrayBuffer(), title, { rasterizeTitle: rasterizeManualTitle, locale: selectedLocale });
+				if (activeRequest.signal.aborted) return;
+				const url = URL.createObjectURL(new Blob([bytes as BlobPart], { type: 'application/pdf' }));
+				const link = document.createElement('a');
+				link.href = url;
+				link.download = `${title.replace(/[^\p{L}\p{N}\s-]/gu, '').replace(/\s+/g, '-') || 'Tier0-Manual'}-${selectedLocale}.pdf`;
+				link.click();
+				setTimeout(() => URL.revokeObjectURL(url), 60_000);
+				dialog.close();
+			} catch (cause) {
+				if (activeRequest?.signal.aborted) return;
+				error.textContent = dialog.dataset.failed ?? '';
+				error.hidden = false;
+			} finally {
+				download.disabled = false;
+				pdfLanguage.disabled = choice.disabled = custom.disabled = false;
+				form.removeAttribute('aria-busy');
+				activeRequest = undefined;
+				download.textContent = previousLabel;
+			}
+		});
+	}
+	document.addEventListener('DOMContentLoaded', initPdfExport);
+</script>
