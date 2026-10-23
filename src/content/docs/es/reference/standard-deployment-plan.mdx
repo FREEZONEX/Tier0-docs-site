@@ -1,0 +1,206 @@
+---
+title: Plan de despliegue estándar
+description: Plan de referencia de despliegue estándar de Tier0 Enterprise con cuatro máquinas virtuales.
+sidebar:
+  order: 3
+tableOfContents:
+  minHeadingLevel: 2
+  maxHeadingLevel: 2
+---
+
+## Objetivo
+
+La configuración simplificada no utiliza Docker Swarm. Despliega un único nodo de aplicación `enterprise`, con un total de `4` máquinas virtuales:
+
+- `1` nodo enterprise aloja `tier0-enterprise + EMQX`.
+- `2` nodos de base de datos forman un clúster PostgreSQL + TimescaleDB primario/en espera.
+- `1` nodo Witness participa en la supervisión de la base de datos, el cuórum y la conmutación por error.
+
+La configuración simplificada reduce la complejidad del despliegue. A cambio, la capa de aplicación y EMQX son puntos únicos de fallo. Solo la capa de base de datos conserva la alta disponibilidad mediante `DB VIP + Witness`.
+
+## Direcciones IP planificadas
+
+Las siguientes direcciones IP son valores de ejemplo. Sustitúyelas por las de la red real de la instalación antes de la implementación.
+
+| Tipo | Nombre | IP planificada | Descripción |
+| --- | --- | --- | --- |
+| Nodo de aplicación | `ent-enterprise-01` | `10.60.10.11` | Nodo enterprise único que aloja `tier0-enterprise + EMQX` |
+| Punto de entrada lógico | `DB VIP` | `10.60.20.10` | Punto de conexión unificado de base de datos que apunta solo al primario actual |
+| Nodo de base de datos | `ent-db-01` | `10.60.20.11` | Candidato a primario de PostgreSQL + TimescaleDB |
+| Nodo de base de datos | `ent-db-02` | `10.60.20.12` | Candidato en espera de PostgreSQL + TimescaleDB |
+| Nodo de cuórum | `ent-db-witness-01` | `10.60.20.13` | `repmgr witness` / supervisor del cuórum de base de datos |
+
+## Topología general
+
+<img width={650} src="https://enterpriseimage.oss-cn-hangzhou.aliyuncs.com/9.png" />
+
+Rutas principales:
+
+- Ruta de negocio: clientes / sistemas de la instalación → `ent-enterprise-01` → `DB VIP` → base de datos primaria actual.
+- Tanto `tier0-enterprise` como `EMQX` se ejecutan en `ent-enterprise-01`.
+- El acceso a la base de datos sigue pasando por `DB VIP`; se prohíbe el acceso directo de la aplicación a `ent-db-01/02`.
+- `Witness` participa únicamente en el cuórum, la promoción y las comprobaciones de salud de la base de datos. No forma parte de la ruta de negocio.
+
+## Supervisión de la base de datos y conmutación por error
+
+| Fase | Ruta | Descripción |
+| --- | --- | --- |
+| Acceso normal | `ent-enterprise-01 -> DB VIP -> current primary` | La aplicación siempre se conecta a `10.60.20.10:5432` |
+| Replicación normal | `current primary -> current standby` | Replicación en streaming de WAL de PostgreSQL |
+| Supervisión normal | `DB-01/DB-02 -> Witness` | `repmgrd` informa del estado; Witness participa en el cuórum |
+| Fallo del primario | `standby -> Witness` | El nodo en espera solicita confirmación del cuórum para evitar un escenario de cerebro dividido |
+| Promoción del nodo en espera | `standby promote` | El nodo en espera se promueve tras la confirmación de Witness |
+| Traslado de la VIP | `DB VIP -> new primary` | `10.60.20.10` se asigna al nuevo primario |
+| Recuperación de la aplicación | `ent-enterprise-01 -> DB VIP -> new primary` | La aplicación se recupera cuando el pool de conexiones vuelve a conectarse |
+
+## Configuración de los nodos
+
+| Nodo | Función | vCPU | Memoria | Almacenamiento | Disco de sistema recomendado | Disco de datos recomendado | Componentes principales |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| `ent-enterprise-01` | Nodo enterprise único | `8` | `32G` | `100G` | Un único disco de sistema `/`, 100G | Sin disco de datos independiente | tier0-enterprise, EMQX, Nginx/HAProxy opcional |
+| `ent-db-01` | Candidato a primario de PostgreSQL/TSDB | `4` | `8G` | `500G` | `/` 80G | `/pgdata` 360G, `/pgwal` 40G, `/backup-staging` 20G | PostgreSQL, TimescaleDB, repmgr, keepalived |
+| `ent-db-02` | Candidato en espera de PostgreSQL/TSDB | `4` | `8G` | `500G` | `/` 80G | `/pgdata` 360G, `/pgwal` 40G, `/backup-staging` 20G | PostgreSQL, TimescaleDB, repmgr, keepalived |
+| `ent-db-witness-01` | Witness / supervisor del cuórum | `2` | `4G` | `40G` | `/` 40G | Sin asignación independiente | repmgr witness, agente de supervisión, registros de auditoría |
+
+## Resumen de la configuración
+
+| Categoría | Cantidad | Especificación por nodo | Subtotal de vCPU | Subtotal de memoria | Subtotal de almacenamiento |
+| --- | --- | --- | --- | --- | --- |
+| Nodo de aplicación enterprise | `1` | `8C / 32G / 100G` | `8C` | `32G` | `100G` |
+| Nodos PostgreSQL + TimescaleDB | `2` | `4C / 8G / 500G` | `8C` | `16G` | `1000G` |
+| Nodo Witness | `1` | `2C / 4G / 40G` | `2C` | `4G` | `40G` |
+| Total | `4` | - | `18C` | `52G` | `1140G` |
+
+Totales:
+
+- Máquinas virtuales: `4`
+- vCPU: `18`
+- Memoria: `52G`
+- Almacenamiento: `1.14T`
+
+## Matriz de conectividad
+
+### Acceso de operaciones
+
+| Destino | Método | Puerto | Descripción |
+| --- | --- | --- | --- |
+| Todas las máquinas virtuales | `ssh -i ~/.ssh/chen-rsa ops@<IP>` | `22/TCP` | Utilizar tras implementar SSH unificado con claves; hasta entonces, utilizar la cuenta de la instalación |
+| `ent-enterprise-01` | `https://10.60.10.11` | `443/TCP` | Punto de entrada de negocio |
+| `DB VIP` | `psql -h 10.60.20.10 -p 5432` | `5432/TCP` | Permitir únicamente el nodo enterprise y la lista de acceso permitido de operaciones |
+
+### Puertos de la aplicación y EMQX
+
+| Origen | Destino | Puerto | Finalidad |
+| --- | --- | --- | --- |
+| Usuarios / sistemas de la instalación | `ent-enterprise-01` | `80/TCP` | Entrada HTTP o redirección a HTTPS, opcional |
+| Usuarios / sistemas de la instalación | `ent-enterprise-01` | `443/TCP` | Entrada HTTPS de negocio |
+| Dispositivos / sistemas de la instalación | `ent-enterprise-01` | `1883/TCP` | MQTT de EMQX sin cifrar, opcional |
+| Dispositivos / sistemas de la instalación | `ent-enterprise-01` | `8883/TCP` | MQTT TLS de EMQX, recomendado |
+| Dispositivos / sistemas de la instalación | `ent-enterprise-01` | `8083/TCP` | MQTT WebSocket, opcional |
+| Dispositivos / sistemas de la instalación | `ent-enterprise-01` | `8084/TCP` | MQTT WebSocket TLS, opcional |
+| Red de operaciones | `ent-enterprise-01` | `18083/TCP` | EMQX Dashboard, solo la lista de acceso permitido de operaciones |
+| `ent-enterprise-01` | `DB VIP` | `5432/TCP` | Acceso de negocio a PostgreSQL |
+
+### Comunicación de base de datos y supervisión
+
+| Origen | Destino | Puerto | Finalidad |
+| --- | --- | --- | --- |
+| `ent-db-01` | `ent-db-02` | `5432/TCP` | Replicación en streaming de WAL de PostgreSQL |
+| `ent-db-02` | `ent-db-01` | `5432/TCP` | Replicación inversa tras la recuperación |
+| `ent-db-01/02` | `ent-db-witness-01` | `5432/TCP` | Metadatos de repmgr / comunicación con Witness |
+| `ent-db-01` | `ent-db-02` | `VRRP` | Traslado de DB VIP; permitir el protocolo `112` |
+
+## Recomendaciones de despliegue
+
+### Nodo de aplicación enterprise
+
+- No desplegar Docker Swarm.
+- Desplegar `tier0-enterprise` y `EMQX` en el mismo nodo `ent-enterprise-01`.
+- `ent-enterprise-01` es un punto único de fallo de la capa de aplicación. En caso de fallo, recuperar manualmente o reconstruir desde una copia de seguridad.
+- El nodo solo tiene un disco de sistema de `100G` y no es adecuado para conservar datos de negocio a largo plazo.
+- Los datos de negocio de `tier0-enterprise` deben guardarse en PostgreSQL/TimescaleDB.
+- Los archivos de carga, importación/exportación e informes pueden guardarse localmente y respaldarse. Si más adelante se migra a la configuración estándar, trasladar estos archivos a NFS/NAS o almacenamiento de objetos.
+
+### EMQX de un solo nodo
+
+- En la configuración simplificada, EMQX es un servicio con estado de un solo nodo.
+- Fijar su directorio de datos en `ent-enterprise-01`, por ejemplo `/data/emqx`.
+- Realizar copias de seguridad de la configuración, los certificados, los plugins y la configuración del motor de reglas.
+- No se proporciona alta disponibilidad de la capa de mensajería. Si esto no cumple los requisitos, utilizar la configuración estándar con un clúster EMQX de tres nodos.
+
+### PostgreSQL + TimescaleDB
+
+- PostgreSQL: `16` o la versión certificada para la instalación.
+- TimescaleDB: versión estable compatible con la versión principal de PostgreSQL seleccionada.
+- Replicación: replicación física en streaming.
+- Conmutación por error: `repmgrd + witness`.
+- Punto de entrada de la base de datos: `DB VIP`.
+- Pool de conexiones: PgBouncer puede ejecutarse en `ent-enterprise-01` para reducir la carga de conexiones de la base de datos.
+
+### Witness
+
+- Witness solo almacena los metadatos de `repmgr witness` y la lógica de supervisión.
+- Witness no ejecuta SQL de negocio.
+- Un fallo de Witness no detiene el primario actual, pero reduce la fiabilidad de la conmutación automática por error.
+
+## Base de puertos y cortafuegos
+
+| Puerto / protocolo | Ámbito permitido | Finalidad |
+| --- | --- | --- |
+| `22/TCP` | Red de operaciones hacia las 4 máquinas virtuales | SSH |
+| `80/TCP` | Red de usuarios hacia `ent-enterprise-01` | Redirección HTTP o entrada interna sin cifrar |
+| `443/TCP` | Red de usuarios hacia `ent-enterprise-01` | Entrada HTTPS de negocio |
+| `1883/TCP` | Dispositivos / sistemas de la instalación hacia `ent-enterprise-01` | MQTT de EMQX sin cifrar, opcional |
+| `8883/TCP` | Dispositivos / sistemas de la instalación hacia `ent-enterprise-01` | MQTT TLS de EMQX, recomendado |
+| `8083/TCP` | Dispositivos / sistemas de la instalación hacia `ent-enterprise-01` | WebSocket de EMQX, opcional |
+| `8084/TCP` | Dispositivos / sistemas de la instalación hacia `ent-enterprise-01` | WebSocket TLS de EMQX, opcional |
+| `18083/TCP` | Red de operaciones hacia `ent-enterprise-01` | EMQX Dashboard, solo la lista de acceso permitido |
+| `5432/TCP` | enterprise hacia `DB VIP`; comunicación interna de DB/Witness | PostgreSQL / repmgr |
+| `112/VRRP` | Entre nodos de base de datos | Traslado de DB VIP |
+| `9100/TCP` | Sistema de supervisión hacia las 4 máquinas virtuales | node exporter, opcional |
+
+## Capacidades de alta disponibilidad y límites ante fallos
+
+| Escenario de fallo | Comportamiento esperado | Impacto en el negocio |
+| --- | --- | --- |
+| Fallo de `ent-enterprise-01` | Se detienen la aplicación y EMQX; se requiere recuperación manual o reconstrucción desde una copia de seguridad | Interrupción completa de la capa de aplicación |
+| Fallo del primario actual de la base de datos | El nodo en espera se promueve tras el cuórum de Witness y DB VIP se traslada | Interrupción de escritura de segundos a minutos; la aplicación debe reconectarse |
+| Fallo del nodo de base de datos en espera | El primario sigue prestando servicio y se genera una alerta de replicación | Sin interrupción directa del negocio, pero se pierde el nodo de reserva en caliente |
+| Fallo de Witness | El primario actual sigue prestando servicio, pero disminuye la fiabilidad de la conmutación automática por error | Sin interrupción directa del negocio; recuperar Witness primero |
+| Fallo en el traslado de DB VIP | Puede existir un nuevo primario, pero el punto de entrada unificado no es accesible | Interrupción del negocio; se requiere asignar la VIP manualmente |
+
+## Lista de comprobación antes de producción
+
+| Comprobación | Criterio de aceptación |
+| --- | --- |
+| Nombres de host fijos en las 4 máquinas virtuales | `hostnamectl` coincide con el plan |
+| SSH unificado operativo | El terminal de operaciones puede acceder a las 4 máquinas virtuales con autenticación por clave |
+| Sincronización horaria | La diferencia horaria entre las 4 máquinas virtuales es inferior a `1s` |
+| Cortafuegos habilitado | Los puertos de la sección 9 están permitidos según su ámbito |
+| Servicio enterprise saludable | La comprobación de salud de `tier0-enterprise` es correcta |
+| Estado de EMQX verificado | El nodo EMQX, los puertos de escucha y el directorio persistente están en buen estado |
+| Uso seguro del disco de enterprise | El uso de `/` es inferior al `70%`; está configurada la limpieza de registros y caché |
+| Primario y nodo en espera de DB saludables | `repmgr cluster show` indica que el primario, el nodo en espera y Witness están en buen estado |
+| DB VIP operativa | El nodo enterprise puede conectarse a `10.60.20.10:5432` |
+| Simulacro de conmutación por error del primario de DB | El nodo en espera puede promoverse y DB VIP puede trasladarse |
+| Simulacro de restauración de una copia de seguridad | La copia puede restaurarse en una base de datos de prueba |
+
+## Orden de implementación
+
+1. Crear 4 máquinas virtuales y fijar nombres de host, IP, sincronización horaria y SSH.
+2. Inicializar la configuración base del sistema operativo, el cortafuegos, los puntos de montaje y los parámetros del kernel.
+3. Desplegar `tier0-enterprise` en `ent-enterprise-01`.
+4. Desplegar EMQX de un solo nodo en `ent-enterprise-01`.
+5. Desplegar PostgreSQL + TimescaleDB con nodos primario y en espera.
+6. Desplegar repmgr witness, repmgrd y los scripts de traslado de DB VIP.
+7. Verificar conectividad, recuperación de EMQX, conmutación por error de base de datos, restauración de copias y comprobaciones rutinarias.
+8. Completar los Runbooks de operaciones, el archivo de credenciales y las tareas de revisión rutinaria.
+
+## Riesgos y cuestiones pendientes
+
+- La configuración simplificada tiene un punto único de fallo en la capa de aplicación. Si falla `ent-enterprise-01`, todo el servicio de negocio queda inaccesible.
+- EMQX tiene un solo nodo y no proporciona alta disponibilidad de la capa de mensajería.
+- `ent-enterprise-01` solo tiene un disco de sistema de `100G`. Es necesario controlar registros, caché, adjuntos y archivos temporales.
+- Si más adelante se necesita alta disponibilidad de la capa de aplicación o de EMQX, migrar a la configuración estándar.
+- El RPO/RTO de la base de datos no está confirmado. Este diseño primario/en espera no garantiza la ausencia de pérdida de datos.
+- Los scripts de traslado de DB VIP deben verificarse en la instalación, especialmente si la plataforma de virtualización/red permite VRRP.

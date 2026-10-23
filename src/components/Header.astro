@@ -1,5 +1,6 @@
 ---
 import config from 'virtual:starlight/user-config';
+import { getCollection } from 'astro:content';
 
 import LanguageSelect from 'virtual:starlight/components/LanguageSelect';
 import Search from 'virtual:starlight/components/Search';
@@ -7,7 +8,7 @@ import SiteTitle from 'virtual:starlight/components/SiteTitle';
 import SocialIcons from 'virtual:starlight/components/SocialIcons';
 import ThemeSelect from 'virtual:starlight/components/ThemeSelect';
 import DocChatBot from './DocChatBot.astro';
-import { MANUAL_LOCALES } from '../lib/manual-locales.js';
+import { MANUAL_LOCALES, MANUAL_DOCUMENTS } from '../lib/manual-locales.js';
 
 /**
  * Render the `Search` component if Pagefind is enabled or the default search component has been overridden.
@@ -20,6 +21,14 @@ const locale = Astro.locals.starlightRoute.lang.toLowerCase();
 const initialLocale = Object.hasOwn(MANUAL_LOCALES, locale) ? locale : 'en';
 const language = MANUAL_LOCALES[initialLocale as keyof typeof MANUAL_LOCALES];
 const labels = language.ui;
+const docs = await getCollection('docs');
+const docsById = new Map(docs.map((entry) => [entry.id, entry]));
+const missingChapters = Object.fromEntries(Object.keys(MANUAL_LOCALES).map((key) => [
+	key,
+	key === 'en' ? [] : MANUAL_DOCUMENTS
+		.filter(({ slug }) => !docsById.has(`${key}/${slug}`))
+		.map(({ slug }) => docsById.get(slug)?.data.title ?? slug),
+]));
 ---
 
 <div class="header">
@@ -81,7 +90,7 @@ const labels = language.ui;
 	</div>
 </div>
 <DocChatBot />
-<dialog class="t0-pdf-dialog" data-pdf-dialog aria-labelledby="t0-pdf-dialog-title" data-failed={labels.failed} data-required={labels.required}>
+<dialog class="t0-pdf-dialog" data-pdf-dialog aria-labelledby="t0-pdf-dialog-title" data-failed={labels.failed} data-required={labels.required} data-fallback={labels.fallback}>
 	<form method="dialog" class="t0-pdf-dialog-inner" data-pdf-form>
 		<div class="t0-pdf-dialog-heading">
 			<div class="t0-pdf-dialog-icon" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8zM14 2v6h6M8 13h8M8 17h5" /></svg></div>
@@ -91,7 +100,7 @@ const labels = language.ui;
 		<div class="t0-pdf-fields">
 		<label for="t0-pdf-language">{labels.language}</label>
 		<select id="t0-pdf-language" data-pdf-language>
-			{Object.entries(MANUAL_LOCALES).map(([key, value]) => <option value={key} selected={key === initialLocale}>{value.name}</option>)}
+			{Object.entries(MANUAL_LOCALES).map(([key, value]) => <option value={key} selected={key === initialLocale} data-missing-chapters={missingChapters[key].join('; ')}>{value.name}</option>)}
 		</select>
 		<label for="t0-pdf-title-choice">{labels.label}</label>
 		<select id="t0-pdf-title-choice" data-pdf-choice>
@@ -100,7 +109,7 @@ const labels = language.ui;
 			<option value="custom">{labels.custom}</option>
 		</select>
 		<input type="text" data-pdf-custom aria-label={labels.label} placeholder={labels.placeholder} maxlength="120" hidden />
-		<p class="t0-pdf-help">{labels.fallback}</p>
+		<p class="t0-pdf-help" data-pdf-fallback hidden={missingChapters[initialLocale].length === 0}>{labels.fallback} {missingChapters[initialLocale].join('; ')}</p>
 		<p class="t0-pdf-error" data-pdf-error role="alert" hidden></p>
 		</div>
 		<div class="t0-pdf-actions">
@@ -122,7 +131,8 @@ const labels = language.ui;
 		const cancel = document.querySelector<HTMLButtonElement>('[data-pdf-cancel]');
 		const download = document.querySelector<HTMLButtonElement>('[data-pdf-download]');
 		const error = document.querySelector<HTMLElement>('[data-pdf-error]');
-		if (!dialog || !openButtons.length || !form || !choice || !pdfLanguage || !custom || !cancel || !download || !error) return;
+		const fallback = document.querySelector<HTMLElement>('[data-pdf-fallback]');
+		if (!dialog || !openButtons.length || !form || !choice || !pdfLanguage || !custom || !cancel || !download || !error || !fallback) return;
 		if (dialog.dataset.initialized) return;
 		dialog.dataset.initialized = 'true';
 		let activeRequest: AbortController | undefined;
@@ -132,6 +142,9 @@ const labels = language.ui;
 			const selected = MANUAL_LOCALES[pdfLanguage.value as keyof typeof MANUAL_LOCALES];
 			choice.options[0].textContent = selected.userTitle;
 			choice.options[1].textContent = selected.technicalTitle;
+			const missing = pdfLanguage.selectedOptions[0].dataset.missingChapters ?? '';
+			fallback.hidden = missing.length === 0;
+			fallback.textContent = missing ? `${dialog.dataset.fallback} ${missing}` : '';
 		});
 		openButtons.forEach((button) => button.addEventListener('click', () => dialog.showModal()));
 		dialog.querySelector('[data-pdf-close]')?.addEventListener('click', () => dialog.close());

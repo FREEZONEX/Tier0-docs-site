@@ -1,0 +1,206 @@
+---
+title: 표준 배포 계획
+description: Tier0 Enterprise의 가상 머신 4대 기반 표준 배포 참조 구성입니다.
+sidebar:
+  order: 3
+tableOfContents:
+  minHeadingLevel: 2
+  maxHeadingLevel: 2
+---
+
+## 목표
+
+간소화 구성은 Docker Swarm을 사용하지 않고 단일 `enterprise` 애플리케이션 노드를 배포합니다. 가상 머신은 총 `4`대입니다.
+
+- `1`대의 enterprise 노드에서 `tier0-enterprise + EMQX`를 실행합니다.
+- `2`대의 데이터베이스 노드로 PostgreSQL + TimescaleDB 기본/대기 클러스터를 구성합니다.
+- `1`대의 Witness 노드가 데이터베이스 감시, 쿼럼 및 장애 조치에 참여합니다.
+
+간소화 구성은 배포 복잡성을 줄입니다. 대신 애플리케이션 계층과 EMQX는 단일 장애 지점이 됩니다. 데이터베이스 계층만 `DB VIP + Witness`를 통한 고가용성을 유지합니다.
+
+## IP 주소 계획
+
+다음 IP 주소는 계획용 예시입니다. 구현 전에 실제 현장 네트워크에 맞게 바꾸세요.
+
+| 유형 | 이름 | 계획 IP | 설명 |
+| --- | --- | --- | --- |
+| 애플리케이션 노드 | `ent-enterprise-01` | `10.60.10.11` | `tier0-enterprise + EMQX`를 실행하는 단일 enterprise 노드 |
+| 논리 진입점 | `DB VIP` | `10.60.20.10` | 현재 기본 노드만 가리키는 통합 데이터베이스 엔드포인트 |
+| 데이터베이스 노드 | `ent-db-01` | `10.60.20.11` | PostgreSQL + TimescaleDB 기본 노드 후보 |
+| 데이터베이스 노드 | `ent-db-02` | `10.60.20.12` | PostgreSQL + TimescaleDB 대기 노드 후보 |
+| 쿼럼 노드 | `ent-db-witness-01` | `10.60.20.13` | `repmgr witness` / 데이터베이스 쿼럼 감시 |
+
+## 전체 토폴로지
+
+<img width={650} src="https://enterpriseimage.oss-cn-hangzhou.aliyuncs.com/9.png" />
+
+주요 경로:
+
+- 업무 경로: 클라이언트 / 현장 시스템 → `ent-enterprise-01` → `DB VIP` → 현재 기본 데이터베이스.
+- `tier0-enterprise`와 `EMQX`는 모두 `ent-enterprise-01`에서 실행합니다.
+- 데이터베이스 접근에는 계속 `DB VIP`를 사용하며, 애플리케이션에서 `ent-db-01/02`로 직접 접근하는 것은 금지합니다.
+- `Witness`는 데이터베이스 쿼럼, 승격 및 상태 확인에만 참여하며 업무 경로에는 포함되지 않습니다.
+
+## 데이터베이스 감시 및 장애 조치
+
+| 단계 | 경로 | 설명 |
+| --- | --- | --- |
+| 정상 접근 | `ent-enterprise-01 -> DB VIP -> current primary` | 애플리케이션은 항상 `10.60.20.10:5432`에 연결합니다 |
+| 정상 복제 | `current primary -> current standby` | PostgreSQL WAL 스트리밍 복제 |
+| 정상 감시 | `DB-01/DB-02 -> Witness` | `repmgrd`가 상태를 보고하고 Witness가 쿼럼에 참여합니다 |
+| 기본 노드 장애 | `standby -> Witness` | 대기 노드가 쿼럼 확인을 요청하여 스플릿 브레인을 방지합니다 |
+| 대기 노드 승격 | `standby promote` | Witness 확인 후 대기 노드를 승격합니다 |
+| VIP 이동 | `DB VIP -> new primary` | `10.60.20.10`을 새 기본 노드에 할당합니다 |
+| 애플리케이션 복구 | `ent-enterprise-01 -> DB VIP -> new primary` | 연결 풀이 다시 연결되면 애플리케이션이 복구됩니다 |
+
+## 노드 구성
+
+| 노드 | 역할 | vCPU | 메모리 | 스토리지 | 권장 시스템 디스크 | 권장 데이터 디스크 | 주요 구성 요소 |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| `ent-enterprise-01` | 단일 enterprise 노드 | `8` | `32G` | `100G` | 단일 `/` 시스템 디스크, 100G | 별도 데이터 디스크 없음 | tier0-enterprise, EMQX, 선택 사항으로 Nginx/HAProxy |
+| `ent-db-01` | PostgreSQL/TSDB 기본 노드 후보 | `4` | `8G` | `500G` | `/` 80G | `/pgdata` 360G, `/pgwal` 40G, `/backup-staging` 20G | PostgreSQL, TimescaleDB, repmgr, keepalived |
+| `ent-db-02` | PostgreSQL/TSDB 대기 노드 후보 | `4` | `8G` | `500G` | `/` 80G | `/pgdata` 360G, `/pgwal` 40G, `/backup-staging` 20G | PostgreSQL, TimescaleDB, repmgr, keepalived |
+| `ent-db-witness-01` | Witness / 쿼럼 감시 | `2` | `4G` | `40G` | `/` 40G | 별도 계획 없음 | repmgr witness, 모니터링 에이전트, 감사 로그 |
+
+## 구성 요약
+
+| 분류 | 수량 | 노드별 사양 | vCPU 소계 | 메모리 소계 | 스토리지 소계 |
+| --- | --- | --- | --- | --- | --- |
+| enterprise 애플리케이션 노드 | `1` | `8C / 32G / 100G` | `8C` | `32G` | `100G` |
+| PostgreSQL + TimescaleDB 노드 | `2` | `4C / 8G / 500G` | `8C` | `16G` | `1000G` |
+| Witness 노드 | `1` | `2C / 4G / 40G` | `2C` | `4G` | `40G` |
+| 합계 | `4` | - | `18C` | `52G` | `1140G` |
+
+총합:
+
+- 가상 머신: `4`대
+- vCPU: `18`
+- 메모리: `52G`
+- 스토리지: `1.14T`
+
+## 연결 매트릭스
+
+### 운영 접근
+
+| 대상 | 방법 | 포트 | 설명 |
+| --- | --- | --- | --- |
+| 모든 가상 머신 | `ssh -i ~/.ssh/chen-rsa ops@<IP>` | `22/TCP` | 통합 키 기반 SSH를 구현한 후 사용합니다. 그전에는 현장 계정을 사용합니다 |
+| `ent-enterprise-01` | `https://10.60.10.11` | `443/TCP` | 업무 진입점 |
+| `DB VIP` | `psql -h 10.60.20.10 -p 5432` | `5432/TCP` | enterprise 노드와 운영 허용 목록만 허용합니다 |
+
+### 애플리케이션 및 EMQX 포트
+
+| 출발지 | 대상 | 포트 | 용도 |
+| --- | --- | --- | --- |
+| 사용자 / 현장 시스템 | `ent-enterprise-01` | `80/TCP` | HTTP 진입점 또는 HTTPS 리디렉션, 선택 사항 |
+| 사용자 / 현장 시스템 | `ent-enterprise-01` | `443/TCP` | HTTPS 업무 진입점 |
+| 장치 / 현장 시스템 | `ent-enterprise-01` | `1883/TCP` | EMQX MQTT 평문 통신, 선택 사항 |
+| 장치 / 현장 시스템 | `ent-enterprise-01` | `8883/TCP` | EMQX MQTT TLS, 권장 |
+| 장치 / 현장 시스템 | `ent-enterprise-01` | `8083/TCP` | MQTT WebSocket, 선택 사항 |
+| 장치 / 현장 시스템 | `ent-enterprise-01` | `8084/TCP` | MQTT WebSocket TLS, 선택 사항 |
+| 운영 네트워크 | `ent-enterprise-01` | `18083/TCP` | EMQX Dashboard, 운영 허용 목록만 접근 |
+| `ent-enterprise-01` | `DB VIP` | `5432/TCP` | PostgreSQL 업무 접근 |
+
+### 데이터베이스 및 감시 통신
+
+| 출발지 | 대상 | 포트 | 용도 |
+| --- | --- | --- | --- |
+| `ent-db-01` | `ent-db-02` | `5432/TCP` | PostgreSQL WAL 스트리밍 복제 |
+| `ent-db-02` | `ent-db-01` | `5432/TCP` | 복구 후 역방향 복제 |
+| `ent-db-01/02` | `ent-db-witness-01` | `5432/TCP` | repmgr 메타데이터 / Witness 통신 |
+| `ent-db-01` | `ent-db-02` | `VRRP` | DB VIP 이동. 프로토콜 `112`를 허용합니다 |
+
+## 배포 권장 사항
+
+### enterprise 애플리케이션 노드
+
+- Docker Swarm을 배포하지 않습니다.
+- `tier0-enterprise`와 `EMQX`를 동일한 `ent-enterprise-01` 노드에 배포합니다.
+- `ent-enterprise-01`은 애플리케이션 계층의 단일 장애 지점입니다. 장애 시 수동으로 복구하거나 백업에서 재구축합니다.
+- 이 노드에는 `100G` 시스템 디스크 하나만 있으므로 업무 데이터를 장기간 저장하기에 적합하지 않습니다.
+- `tier0-enterprise` 업무 데이터는 PostgreSQL/TimescaleDB에 저장해야 합니다.
+- 업로드, 가져오기/내보내기 및 보고서 파일은 로컬에 저장하고 백업할 수 있습니다. 나중에 표준 구성으로 전환하면 해당 파일을 NFS/NAS 또는 객체 스토리지로 이전하세요.
+
+### 단일 노드 EMQX
+
+- 간소화 구성에서 EMQX는 단일 노드의 상태 저장 서비스입니다.
+- 데이터 디렉터리를 `ent-enterprise-01`에 고정합니다. 예: `/data/emqx`.
+- 구성, 인증서, 플러그인 및 규칙 엔진 구성을 백업합니다.
+- 메시징 계층의 고가용성은 제공하지 않습니다. 이 조건이 요구 사항을 충족하지 못하면 3노드 EMQX 클러스터를 갖춘 표준 구성을 사용하세요.
+
+### PostgreSQL + TimescaleDB
+
+- PostgreSQL: `16` 또는 현장에서 검증된 버전.
+- TimescaleDB: 선택한 PostgreSQL 주 버전과 호환되는 안정 버전.
+- 복제: 물리 스트리밍 복제.
+- 장애 조치: `repmgrd + witness`.
+- 데이터베이스 진입점: `DB VIP`.
+- 연결 풀: `ent-enterprise-01`에서 PgBouncer를 실행하여 데이터베이스 연결 부하를 줄일 수 있습니다.
+
+### Witness
+
+- Witness는 `repmgr witness` 메타데이터와 감시 로직만 저장합니다.
+- Witness는 업무 SQL을 처리하지 않습니다.
+- Witness 장애가 현재 기본 노드를 중지시키지는 않지만 자동 장애 조치의 신뢰성은 낮아집니다.
+
+## 포트 및 방화벽 기준
+
+| 포트 / 프로토콜 | 허용 범위 | 용도 |
+| --- | --- | --- |
+| `22/TCP` | 운영 네트워크에서 가상 머신 4대로 접근 | SSH |
+| `80/TCP` | 사용자 네트워크에서 `ent-enterprise-01`로 접근 | HTTP 리디렉션 또는 내부 평문 진입점 |
+| `443/TCP` | 사용자 네트워크에서 `ent-enterprise-01`로 접근 | HTTPS 업무 진입점 |
+| `1883/TCP` | 장치 / 현장 시스템에서 `ent-enterprise-01`로 접근 | EMQX MQTT 평문 통신, 선택 사항 |
+| `8883/TCP` | 장치 / 현장 시스템에서 `ent-enterprise-01`로 접근 | EMQX MQTT TLS, 권장 |
+| `8083/TCP` | 장치 / 현장 시스템에서 `ent-enterprise-01`로 접근 | EMQX WebSocket, 선택 사항 |
+| `8084/TCP` | 장치 / 현장 시스템에서 `ent-enterprise-01`로 접근 | EMQX WebSocket TLS, 선택 사항 |
+| `18083/TCP` | 운영 네트워크에서 `ent-enterprise-01`로 접근 | EMQX Dashboard, 허용 목록만 접근 |
+| `5432/TCP` | enterprise에서 `DB VIP`로 접근; DB/Witness 내부 통신 | PostgreSQL / repmgr |
+| `112/VRRP` | 데이터베이스 노드 간 | DB VIP 이동 |
+| `9100/TCP` | 모니터링 시스템에서 가상 머신 4대로 접근 | node exporter, 선택 사항 |
+
+## 고가용성 기능 및 장애 경계
+
+| 장애 시나리오 | 예상 동작 | 업무 영향 |
+| --- | --- | --- |
+| `ent-enterprise-01` 장애 | 애플리케이션과 EMQX가 모두 중지됩니다. 수동 복구 또는 백업을 통한 재구축이 필요합니다 | 애플리케이션 계층 전체 중단 |
+| 현재 DB 기본 노드 장애 | Witness 쿼럼 확인 후 대기 노드가 승격되고 DB VIP가 이동합니다 | 수초에서 수분 동안 쓰기가 중단되며 애플리케이션이 다시 연결해야 합니다 |
+| DB 대기 노드 장애 | 기본 노드가 서비스를 계속 제공하고 복제 알림이 발생합니다 | 직접적인 업무 중단은 없지만 DB 핫 스탠바이를 잃습니다 |
+| Witness 장애 | 현재 기본 노드가 서비스를 계속 제공하지만 자동 장애 조치의 신뢰성이 낮아집니다 | 직접적인 업무 중단은 없습니다. Witness를 먼저 복구합니다 |
+| DB VIP 이동 실패 | 새 기본 노드가 있더라도 통합 진입점에 접근하지 못할 수 있습니다 | 업무가 중단되며 VIP를 수동으로 할당해야 합니다 |
+
+## 운영 전환 전 점검 목록
+
+| 점검 항목 | 통과 기준 |
+| --- | --- |
+| 가상 머신 4대의 호스트 이름 고정 | `hostnamectl`이 계획과 일치합니다 |
+| 통합 SSH 정상 작동 | 운영 단말에서 키 기반 SSH로 가상 머신 4대 모두에 접근할 수 있습니다 |
+| 시간 동기화 | 가상 머신 4대 간 시간 차이가 `1s` 미만입니다 |
+| 방화벽 허용 | 9절의 포트가 정해진 범위에 따라 허용됩니다 |
+| enterprise 서비스 정상 | `tier0-enterprise` 상태 확인을 통과합니다 |
+| EMQX 상태 검증 | EMQX 노드, 수신 대기 포트 및 영구 데이터 디렉터리가 정상입니다 |
+| enterprise 디스크 사용량 안전 | `/` 사용률이 `70%` 미만이며 로그 및 캐시 정리가 구성되어 있습니다 |
+| DB 기본/대기 상태 정상 | `repmgr cluster show`에서 기본 노드, 대기 노드 및 Witness가 정상으로 표시됩니다 |
+| DB VIP 정상 작동 | enterprise 노드가 `10.60.20.10:5432`에 연결할 수 있습니다 |
+| DB 기본 노드 장애 조치 훈련 | 대기 노드 승격과 DB VIP 이동이 가능합니다 |
+| 백업 복원 훈련 | 테스트 데이터베이스에 백업을 복원할 수 있습니다 |
+
+## 구현 순서
+
+1. 가상 머신 4대를 생성하고 호스트 이름, IP, 시간 동기화 및 SSH를 설정합니다.
+2. OS 기본 설정, 방화벽, 마운트 및 커널 매개변수를 초기화합니다.
+3. `ent-enterprise-01`에 `tier0-enterprise`를 배포합니다.
+4. `ent-enterprise-01`에 단일 노드 EMQX를 배포합니다.
+5. PostgreSQL + TimescaleDB 기본/대기 노드를 배포합니다.
+6. repmgr witness, repmgrd 및 DB VIP 이동 스크립트를 배포합니다.
+7. 연결, EMQX 복구, 데이터베이스 장애 조치, 백업 복원 및 일상 점검을 검증합니다.
+8. 운영 Runbook, 자격 증명 보관 및 일상 점검 작업을 정리합니다.
+
+## 위험 및 미확정 사항
+
+- 간소화 구성에는 애플리케이션 계층의 단일 장애 지점이 있습니다. `ent-enterprise-01`에 장애가 발생하면 전체 업무 서비스를 사용할 수 없습니다.
+- EMQX는 단일 노드이며 메시징 계층의 고가용성을 제공하지 않습니다.
+- `ent-enterprise-01`에는 `100G` 시스템 디스크 하나만 있습니다. 로그, 캐시, 첨부 파일 및 임시 파일의 사용량을 관리해야 합니다.
+- 나중에 애플리케이션 계층이나 EMQX의 고가용성이 필요하면 표준 구성으로 전환합니다.
+- 데이터베이스 RPO/RTO는 확정되지 않았습니다. 이 기본/대기 설계는 데이터 손실이 없음을 보장하지 않습니다.
+- DB VIP 이동 스크립트는 현장에서 검증해야 합니다. 특히 가상화/네트워크 플랫폼이 VRRP를 허용하는지 확인하세요.
