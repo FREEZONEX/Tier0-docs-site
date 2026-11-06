@@ -11,9 +11,8 @@ next: false
 	<div class="t0-banner-main">
 		<p class="t0-tag">用 Tier0 开始构建</p>
 		<h2>把这段话贴进你的 code agent</h2>
-		<p>一段 prompt 完成安装 Tier0 CLI + Skill、登录,并带你的 agent 把 Unified Namespace 逛一遍。</p>
-		<pre class="t0-prompt" id="t0-agent-prompt">{`运行 \`npx -y @tier0/cli@latest install\` 安装 tier0 CLI 和 agent skill。
-阅读 https://docs.tier0.app/llms.txt 获取完整 Tier0 文档。`}</pre>
+		<p>通过 MCP 将 agent 连接到 Tier0。</p>
+		<pre class="t0-prompt" id="t0-agent-prompt">{`阅读 https://docs.tier0.app/using-tier0/operating-on-tier0-with-agents/，通过 MCP 连接 Tier0，并协助我操作 Tier0。`}</pre>
 		<button class="t0-copy" id="t0-copy-btn" type="button">
 			<svg class="t0-copy-icon t0-copy-icon--copy" width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
 				<rect x="5" y="5" width="8" height="8" rx="1" stroke="currentColor" stroke-width="1.25" />
@@ -27,9 +26,8 @@ next: false
 	</div>
 	<div class="t0-banner-side">
 		<div class="t0-side-group">
-			<p class="t0-side-label">更喜欢手动来?</p>
-			<a class="t0-side-link" href="/zh-cn/get-started/installation/">安装指南</a>
-			<a class="t0-side-link" href="/zh-cn/get-started/try-the-demo-factory-in-tier0/">演示工厂</a>
+			<p class="t0-side-label">通过 MCP 连接 Agent</p>
+			<a class="t0-side-link" href="/zh-cn/using-tier0/operating-on-tier0-with-agents/">MCP 接入指南</a>
 		</div>
 		<div class="t0-side-group">
 			<p class="t0-side-label">给 agent 的机器可读端点:</p>
@@ -77,43 +75,11 @@ document.getElementById('t0-copy-btn').addEventListener('click', function () {
 </div>
 
 <section class="t0-grid not-content">
-	<a class="t0-cell" href="/zh-cn/best-practice/modeling-factory-data/">
-		<span class="t0-tag">建模</span>
-		<div class="t0-cell-body">
-			<h3>工厂数据建模</h3>
-			<p>Demo UNS 的设计思路——层级规划、防止 Topic 爆炸、可扩展的 payload 结构。</p>
-			<span class="t0-more">阅读全文</span>
-		</div>
-	</a>
-	<a class="t0-cell" href="/zh-cn/best-practice/connecting-industrial-protocols/">
-		<span class="t0-tag">协议</span>
-		<div class="t0-cell-body">
-			<h3>连接工业协议</h3>
-			<p>典型工业协议的 Node-RED 接入流程,附可直接导入的真实 Flow JSON 参考。</p>
-			<span class="t0-more">阅读全文</span>
-		</div>
-	</a>
 	<a class="t0-cell" href="/zh-cn/best-practice/security-and-resilience/">
 		<span class="t0-tag">安全</span>
 		<div class="t0-cell-body">
 			<h3>安全与可靠性</h3>
 			<p>保护身份与数据访问，选择加密传输方式，并了解不同部署和恢复方案的能力边界。</p>
-			<span class="t0-more">阅读全文</span>
-		</div>
-	</a>
-	<a class="t0-cell" href="/zh-cn/best-practice/building-analytics-apps/">
-		<span class="t0-tag">分析</span>
-		<div class="t0-cell-body">
-			<h3>构建分析应用</h3>
-			<p>从 Notebook 查询到交互式分析应用——Aramco Bowtie 案例(脱敏数据)。</p>
-			<span class="t0-more">阅读全文</span>
-		</div>
-	</a>
-	<a class="t0-cell" href="/zh-cn/best-practice/displaying-data-with-digital-twin/">
-		<span class="t0-tag">数字孪生</span>
-		<div class="t0-cell-body">
-			<h3>使用数字孪生展示工厂数据</h3>
-			<p>使用数字孪生场景，在车间式运行视图中可视化实时 UNS 数据。</p>
 			<span class="t0-more">阅读全文</span>
 		</div>
 	</a>

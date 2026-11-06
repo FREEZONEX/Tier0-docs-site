@@ -1,37 +1,29 @@
 ---
 title: API Reference
-description: API integration essentials and a machine-readable OpenAPI reference for Tier0.
-sidebar:
-  order: 1
+description: Connect to the Tier0 API, check responses, and retry writes safely.
 ---
 
-## Starting Up
-- Use `https://<your-tier0-host>/openapi/v1` as the base URL.
-- Send `x-api-key` to OpenAPI endpoints except for `/assets/files/public`. Any files marked as `public` can be downloaded without an API key.
-- Call `POST /auth/whoami` first to confirm the API key identity and effective permissions.
+## Connection and Authentication
 
-:::note[OpenAPI Reference]
-Open the interactive [API Reference](../tier0-openapi/) for request schemas, response schemas, and executable requests.
+- **Base URL**: `https://<your-tier0-host>/openapi/v2`
+- **Authentication**: Send your Tier0 API key in the `x-api-key` request header.
+
+## Checking Results
+
+- For `/uns/` requests, check both the HTTP status and the response body. A successful response has a `2xx` status and `code: 0`. Read the result from `data`.
+- On failure, inspect `error.code` for the reason and keep `requestId` for troubleshooting.
+- For batch requests, check each item even when the HTTP status is `200`. Some items may have failed.
+
+## Retrying Writes
+
+- Check `error.execution` to see whether the write was started, rolled back, committed, or has an unknown outcome.
+- If `error.retry.safe` is `true`, retry the same request with the same idempotency key. If one was supplied, wait at least as long as indicated by `error.retry.afterMs` or the `Retry-After` header.
+- If part of a batch was committed, check which items succeeded before submitting any remaining work. If the outcome is unknown and the response does not confirm a safe retry, verify whether the write took effect before sending it again.
+
+## Glossary
+
+- **Idempotency** means repeating an operation has the same effect as performing it once. For a write that supports an idempotency key, reuse the same key when retrying the same request. Use a new key for a separate write.
+
+:::note
+Check [OpenAPI Reference](../tier0-openapi/) for detailed information.
 :::
-
-## Handling Results
-
-UNS batch operations can partially fail even with HTTP `200` results. Inspect every result before assuming success.
-
-## Custom HTTP In Routes
-
-For APIs developed inside **Source Flow** and **Event Flow**, their input and response are defined by the deployed flow.
-
-- **Source Flow** uses `/flow/source/` and is public by default. Add ingress or flow-level access control before exposing sensitive behavior.
-- **Event Flow** uses `/flow/event/` and requires `x-api-key` with `flow.read` permission.
-:::note[Example custom API in Source Flow or Event Flow]
-For example, API URL is `/integrations/echo` and you need an `HTTP In` node to develop the API:
-- Route in `HTTP In` is `/integrations/echo`, Tier0 will complete the rest.
-- External call URL is `https://tier0.example.com/flow/source/integrations/echo` or `https://tier0.example.com/flow/event/integrations/echo`.
-:::
-
-## Troubleshooting
-
-- `401` / `403`: Check the API key, scope, and owner permissions.
-- `404`: Check the HTTP method, route prefix, node URL, and deployment.
-- `No response`: Make sure every flow path reaches an `HTTP Response` node without discarding the original request and response properties.

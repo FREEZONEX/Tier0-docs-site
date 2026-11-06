@@ -34,19 +34,16 @@ src/content/docs/                  # pages — URL mirrors the file path
 ├── index.mdx                      # wireframe landing
 ├── get-started/
 │   ├── installation.mdx           # CLI via Skill/GitHub + edition tabs
-│   ├── demo-factory.mdx           # Cloud trial tour
 │   └── choosing-version.mdx       # edition board + hw requirements + matrix
 ├── using-tier0/
 │   ├── uns-concepts.mdx           # Metric/State/Action, VQT, storage (skeleton)
 │   ├── connect-data.md            # modeling + SourceFlow
 │   ├── working-with-uns-data.mdx  # MQTT / API / CLI (skeleton)
 │   ├── build-apps.mdx             # containers as apps + Event Flow (skeleton)
-│   ├── analyze-data.md            # Notebook, interactive + ML
 │   └── agents.mdx                 # Tier0 Skill (skeleton)
 └── best-practice/
     ├── uns-modeling.mdx           # topic explosion, payloads (skeleton)
-    ├── protocol-connections.mdx   # OPC UA/Modbus flows + JSON refs (skeleton)
-    └── analytics-apps.mdx         # Aramco Bowtie case (skeleton)
+    └── protocol-connections.mdx   # OPC UA/Modbus flows + JSON refs (skeleton)
 
 astro.config.mjs                   # sidebar, plugins (mermaid, llms.txt), site URL
 src/styles/custom.css              # the entire theme, sectioned by comments

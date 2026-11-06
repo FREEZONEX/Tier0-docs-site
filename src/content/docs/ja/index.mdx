@@ -11,9 +11,8 @@ next: false
 	<div class="t0-banner-main">
 		<p class="t0-tag">Tier0 で構築を始める</p>
 		<h2>これをコードエージェントに貼り付け</h2>
-		<p>ひとつのプロンプトで Tier0 CLI + スキルのインストール、ログイン、Unified Namespace の一巡りまで完了します。</p>
-		<pre class="t0-prompt" id="t0-agent-prompt">{`\`npx -y @tier0/cli@latest install\` を実行して tier0 CLI とエージェントスキルをインストール。
-完全なドキュメントは https://docs.tier0.app/llms.txt を参照。`}</pre>
+		<p>MCP でエージェントを Tier0 に接続できます。</p>
+		<pre class="t0-prompt" id="t0-agent-prompt">{`https://docs.tier0.app/using-tier0/operating-on-tier0-with-agents/ を読み、MCP で Tier0 に接続して、Tier0 の操作を手伝ってください。`}</pre>
 		<button class="t0-copy" id="t0-copy-btn" type="button">
 			<svg class="t0-copy-icon t0-copy-icon--copy" width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
 				<rect x="5" y="5" width="8" height="8" rx="1" stroke="currentColor" stroke-width="1.25" />
@@ -27,9 +26,8 @@ next: false
 	</div>
 	<div class="t0-banner-side">
 		<div class="t0-side-group">
-			<p class="t0-side-label">手動で進めたい場合:</p>
-			<a class="t0-side-link" href="/ja/get-started/installation/">インストールガイド</a>
-			<a class="t0-side-link" href="/ja/get-started/try-the-demo-factory-in-tier0/">デモファクトリー</a>
+			<p class="t0-side-label">MCP でエージェントを接続</p>
+			<a class="t0-side-link" href="/ja/using-tier0/operating-on-tier0-with-agents/">MCP 接続ガイド</a>
 		</div>
 		<div class="t0-side-group">
 			<p class="t0-side-label">エージェント向けエンドポイント:</p>
@@ -77,43 +75,11 @@ document.getElementById('t0-copy-btn').addEventListener('click', function () {
 </div>
 
 <section class="t0-grid not-content">
-	<a class="t0-cell" href="/ja/best-practice/modeling-factory-data/">
-		<span class="t0-tag">モデリング</span>
-		<div class="t0-cell-body">
-			<h3>工場データをモデリングする</h3>
-			<p>Demo UNS の設計 — 階層構成、トピック爆発の防止、スケールする payload 構造。</p>
-			<span class="t0-more">続きを読む</span>
-		</div>
-	</a>
-	<a class="t0-cell" href="/ja/best-practice/connecting-industrial-protocols/">
-		<span class="t0-tag">プロトコル</span>
-		<div class="t0-cell-body">
-			<h3>産業プロトコルの接続</h3>
-			<p>代表的な産業プロトコルの Node-RED フロー。そのままインポートできる実フロー JSON 付き。</p>
-			<span class="t0-more">続きを読む</span>
-		</div>
-	</a>
 	<a class="t0-cell" href="/ja/best-practice/security-and-resilience/">
 		<span class="t0-tag">セキュリティ</span>
 		<div class="t0-cell-body">
 			<h3>セキュリティとレジリエンス</h3>
 			<p>ID とデータアクセスを保護し、暗号化通信を選択して、デプロイと復旧の境界を理解します。</p>
-			<span class="t0-more">続きを読む</span>
-		</div>
-	</a>
-	<a class="t0-cell" href="/ja/best-practice/building-analytics-apps/">
-		<span class="t0-tag">分析</span>
-		<div class="t0-cell-body">
-			<h3>分析アプリの構築</h3>
-			<p>Notebook のクエリからインタラクティブな分析アプリへ — Aramco Bowtie 事例(匿名化データ)。</p>
-			<span class="t0-more">続きを読む</span>
-		</div>
-	</a>
-	<a class="t0-cell" href="/ja/best-practice/displaying-data-with-digital-twin/">
-		<span class="t0-tag">デジタルツイン</span>
-		<div class="t0-cell-body">
-			<h3>Digital Twin で工場データを表示する</h3>
-			<p>Digital Twin シーンを使い、ワークショップ形式の運用ビューでライブ UNS データを可視化します。</p>
 			<span class="t0-more">続きを読む</span>
 		</div>
 	</a>

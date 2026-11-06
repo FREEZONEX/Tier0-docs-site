@@ -11,9 +11,8 @@ next: false
 	<div class="t0-banner-main">
 		<p class="t0-tag">Empieza a construir con Tier0</p>
 		<h2>Pega esto en tu agente de código</h2>
-		<p>Un solo prompt instala el CLI + skill de Tier0, inicia tu sesión y da la primera vuelta por el Unified Namespace.</p>
-		<pre class="t0-prompt" id="t0-agent-prompt">{`Ejecuta \`npx -y @tier0/cli@latest install\` para instalar el CLI y el skill del agente.
-Lee https://docs.tier0.app/llms.txt para la documentación completa de Tier0.`}</pre>
+		<p>Conecta tu agente a Tier0 mediante MCP.</p>
+		<pre class="t0-prompt" id="t0-agent-prompt">{`Lee https://docs.tier0.app/using-tier0/operating-on-tier0-with-agents/, conéctate a Tier0 mediante MCP y ayúdame a operar en Tier0.`}</pre>
 		<button class="t0-copy" id="t0-copy-btn" type="button">
 			<svg class="t0-copy-icon t0-copy-icon--copy" width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
 				<rect x="5" y="5" width="8" height="8" rx="1" stroke="currentColor" stroke-width="1.25" />
@@ -27,9 +26,8 @@ Lee https://docs.tier0.app/llms.txt para la documentación completa de Tier0.`}<
 	</div>
 	<div class="t0-banner-side">
 		<div class="t0-side-group">
-			<p class="t0-side-label">¿Prefieres hacerlo a mano?</p>
-			<a class="t0-side-link" href="/es/get-started/installation/">Guía de instalación</a>
-			<a class="t0-side-link" href="/es/get-started/try-the-demo-factory-in-tier0/">Fábrica demo</a>
+			<p class="t0-side-label">Conecta un agente mediante MCP</p>
+			<a class="t0-side-link" href="/es/using-tier0/operating-on-tier0-with-agents/">Guía de conexión MCP</a>
 		</div>
 		<div class="t0-side-group">
 			<p class="t0-side-label">Endpoints legibles por máquina:</p>
@@ -77,43 +75,11 @@ document.getElementById('t0-copy-btn').addEventListener('click', function () {
 </div>
 
 <section class="t0-grid not-content">
-	<a class="t0-cell" href="/es/best-practice/modeling-factory-data/">
-		<span class="t0-tag">Modelado</span>
-		<div class="t0-cell-body">
-			<h3>Modelar datos de fábrica</h3>
-			<p>Cómo está diseñado el Demo UNS — jerarquía, cómo evitar la explosión de topics y estructura de payload escalable.</p>
-			<span class="t0-more">Leer más</span>
-		</div>
-	</a>
-	<a class="t0-cell" href="/es/best-practice/connecting-industrial-protocols/">
-		<span class="t0-tag">Protocolos</span>
-		<div class="t0-cell-body">
-			<h3>Conectar protocolos industriales</h3>
-			<p>Flujos de Node-RED para protocolos industriales típicos, con referencias JSON reales e importables.</p>
-			<span class="t0-more">Leer más</span>
-		</div>
-	</a>
 	<a class="t0-cell" href="/es/best-practice/security-and-resilience/">
 		<span class="t0-tag">Seguridad</span>
 		<div class="t0-cell-body">
 			<h3>Seguridad y resiliencia</h3>
 			<p>Protege identidades y accesos a datos, elige transportes cifrados y comprende los límites de despliegue y recuperación.</p>
-			<span class="t0-more">Leer más</span>
-		</div>
-	</a>
-	<a class="t0-cell" href="/es/best-practice/building-analytics-apps/">
-		<span class="t0-tag">Analítica</span>
-		<div class="t0-cell-body">
-			<h3>Apps de analítica</h3>
-			<p>Del query en Notebook a una app de análisis interactiva — el caso Aramco Bowtie (datos anonimizados).</p>
-			<span class="t0-more">Leer más</span>
-		</div>
-	</a>
-	<a class="t0-cell" href="/es/best-practice/displaying-data-with-digital-twin/">
-		<span class="t0-tag">Digital Twin</span>
-		<div class="t0-cell-body">
-			<h3>Mostrar datos de fábrica con Digital Twin</h3>
-			<p>Usa escenas de Digital Twin para visualizar datos UNS en vivo en una vista operativa tipo taller.</p>
 			<span class="t0-more">Leer más</span>
 		</div>
 	</a>

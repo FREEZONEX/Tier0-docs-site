@@ -84,411 +84,168 @@ MQTT 客户端可以使用 Tier0 生成的凭据连接到 UNS broker。
 </Steps>
 
 ## API
-使用 **REST API** 操作 UNS 数据。
-:::tip[如何使用 API]
-OpenAPI base path 是 `/openapi/v1`，例如 `https://your-workspace.tier0.app/openapi/v1`，API key 通过 `x-api-key` header 传入。
-:::
-
-### 获取 API Key
-
-API keys 位于 **Settings > API Keys**。不同 account type 允许创建的 key type 不同。
-- **Service Key**：只能由 **Admin** 和 **Owner** 创建。
-- **Personal Key**：任何人都可以创建，permission scope 与该 account 相同。
-:::caution[Key permission vs Account permission]
-Account permission 优先于 key permission。即使 key permission 设置为 **Full Access**，account 无权访问的数据仍然无法通过该 key 访问。
-:::
-
-### 示例
-
-- `/uns/create`
-
-  创建 UNS path 或 topic。使用 `namespace` 定义 node tree.
-
-  <Tabs syncKey="uns-api-language">
-    <TabItem label="JavaScript">
-
-      ```js
-      const BASE_URL = process.env.TIER0_BASE_URL;
-      const API_KEY = process.env.TIER0_API_KEY;
-
-      const response = await fetch(`${BASE_URL}/uns/create`, {
-        method: 'POST',
-        headers: {
-          'content-type': 'application/json',
-          'x-api-key': API_KEY,
-        },
-        body: JSON.stringify({
-          namespace: [
-            {
-              name: 'DemoFactory',
-              type: 'PATH',
-              children: [
-                {
-                  name: 'Site_01',
-                  type: 'PATH',
-                  children: [
-                    {
-                      name: 'Production',
-                      type: 'PATH',
-                      children: [
-                        {
-                          name: 'Produced_Qty',
-                          type: 'TOPIC',
-                          topicType: 'METRIC',
-                          displayName: 'Produced Quantity',
-                          description: 'Produced quantity from the production line.',
-                          enableHistory: true,
-                          fields: [
-                            { name: 'value', type: 'DOUBLE', unit: 'pcs' },
-                          ],
-                        },
-                      ],
-                    },
-                  ],
-                },
-              ],
-            },
-          ],
-        }),
-      });
-
-      const result = await response.json();
-      console.log(result.data.results);
-      ```
-
-    </TabItem>
-    <TabItem label="Python">
-
-      ```python
-      import os
-      import requests
-
-      base_url = os.environ["TIER0_BASE_URL"]
-      api_key = os.environ["TIER0_API_KEY"]
-
-      response = requests.post(
-          f"{base_url}/uns/create",
-          headers={"x-api-key": api_key},
-          json={
-              "namespace": [
-                  {
-                      "name": "DemoFactory",
-                      "type": "PATH",
-                      "children": [
-                          {
-                              "name": "Site_01",
-                              "type": "PATH",
-                              "children": [
-                                  {
-                                      "name": "Production",
-                                      "type": "PATH",
-                                      "children": [
-                                          {
-                                              "name": "Produced_Qty",
-                                              "type": "TOPIC",
-                                              "topicType": "METRIC",
-                                              "displayName": "Produced Quantity",
-                                              "description": "Produced quantity from the production line.",
-                                              "enableHistory": True,
-                                              "fields": [
-                                                  {"name": "value", "type": "DOUBLE", "unit": "pcs"},
-                                              ],
-                                          },
-                                      ],
-                                  },
-                              ],
-                          },
-                      ],
-                  },
-              ],
-          },
-          timeout=30,
-      )
-      response.raise_for_status()
-
-      result = response.json()
-      print(result["data"]["results"])
-      ```
-
-    </TabItem>
-    <TabItem label="cURL">
-
-      ```bash
-      curl -X POST "$TIER0_BASE_URL/uns/create" \
-        -H "content-type: application/json" \
-        -H "x-api-key: $TIER0_API_KEY" \
-        -d '{
-          "namespace": [
-            {
-              "name": "DemoFactory",
-              "type": "PATH",
-              "children": [
-                {
-                  "name": "Site_01",
-                  "type": "PATH",
-                  "children": [
-                    {
-                      "name": "Production",
-                      "type": "PATH",
-                      "children": [
-                        {
-                          "name": "Produced_Qty",
-                          "type": "TOPIC",
-                          "topicType": "METRIC",
-                          "displayName": "Produced Quantity",
-                          "description": "Produced quantity from the production line.",
-                          "enableHistory": true,
-                          "fields": [
-                            { "name": "value", "type": "DOUBLE", "unit": "pcs" }
-                          ]
-                        }
-                      ]
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        }'
-      ```
-
-    </TabItem>
-  </Tabs>
-
-- `/uns/read`
-
-  读取一个或多个 UNS topics 的最新值和元数据。
-
-  <Tabs syncKey="uns-api-language">
-    <TabItem label="JavaScript">
-
-      ```js
-      const BASE_URL = process.env.TIER0_BASE_URL;
-      const API_KEY = process.env.TIER0_API_KEY;
-
-      const response = await fetch(`${BASE_URL}/uns/read`, {
-        method: 'POST',
-        headers: {
-          'content-type': 'application/json',
-          'x-api-key': API_KEY,
-        },
-        body: JSON.stringify({
-          topics: [
-            'DemoFactory/Site_01/Production/Produced_Qty',
-          ],
-          include_leaf_value: true,
-          include_metadata: true,
-        }),
-      });
-
-      const result = await response.json();
-      console.log(result.data.results);
-      ```
-
-    </TabItem>
-    <TabItem label="Python">
-
-      ```python
-      import os
-      import requests
-
-      base_url = os.environ["TIER0_BASE_URL"]
-      api_key = os.environ["TIER0_API_KEY"]
-
-      response = requests.post(
-          f"{base_url}/uns/read",
-          headers={"x-api-key": api_key},
-          json={
-              "topics": [
-                  "DemoFactory/Site_01/Production/Produced_Qty",
-              ],
-              "include_leaf_value": True,
-              "include_metadata": True,
-          },
-          timeout=30,
-      )
-      response.raise_for_status()
-
-      result = response.json()
-      print(result["data"]["results"])
-      ```
-
-    </TabItem>
-    <TabItem label="cURL">
-
-      ```bash
-      curl -X POST "$TIER0_BASE_URL/uns/read" \
-        -H "content-type: application/json" \
-        -H "x-api-key: $TIER0_API_KEY" \
-        -d '{
-          "topics": [
-            "DemoFactory/Site_01/Production/Produced_Qty"
-          ],
-          "include_leaf_value": true,
-          "include_metadata": true
-        }'
-      ```
-
-    </TabItem>
-  </Tabs>
-
-- `/uns/update`
-
-  通过 `path` 更新 UNS 节点。使用 `updateMask` 指定需要变更的字段。
-
-  <Tabs syncKey="uns-api-language">
-    <TabItem label="JavaScript">
-
-      ```js
-      const BASE_URL = process.env.TIER0_BASE_URL;
-      const API_KEY = process.env.TIER0_API_KEY;
-
-      const response = await fetch(`${BASE_URL}/uns/update`, {
-        method: 'POST',
-        headers: {
-          'content-type': 'application/json',
-          'x-api-key': API_KEY,
-        },
-        body: JSON.stringify({
-          path: 'DemoFactory/Site_01/Production/Produced_Qty',
-          displayName: 'Produced Quantity',
-          description: 'Updated production output quantity.',
-          updateMask: ['displayName', 'description'],
-        }),
-      });
-
-      const result = await response.json();
-      console.log(result.data);
-      ```
-
-    </TabItem>
-    <TabItem label="Python">
-
-      ```python
-      import os
-      import requests
-
-      base_url = os.environ["TIER0_BASE_URL"]
-      api_key = os.environ["TIER0_API_KEY"]
-
-      response = requests.post(
-          f"{base_url}/uns/update",
-          headers={"x-api-key": api_key},
-          json={
-              "path": "DemoFactory/Site_01/Production/Produced_Qty",
-              "displayName": "Produced Quantity",
-              "description": "Updated production output quantity.",
-              "updateMask": ["displayName", "description"],
-          },
-          timeout=30,
-      )
-      response.raise_for_status()
-
-      result = response.json()
-      print(result["data"])
-      ```
-
-    </TabItem>
-    <TabItem label="cURL">
-
-      ```bash
-      curl -X POST "$TIER0_BASE_URL/uns/update" \
-        -H "content-type: application/json" \
-        -H "x-api-key: $TIER0_API_KEY" \
-        -d '{
-          "path": "DemoFactory/Site_01/Production/Produced_Qty",
-          "displayName": "Produced Quantity",
-          "description": "Updated production output quantity.",
-          "updateMask": ["displayName", "description"]
-        }'
-      ```
-
-    </TabItem>
-  </Tabs>
-
-- `/uns/delete`
-
-  删除一个或多个 UNS 模型。使用 `hard_delete: false` 将模型移到回收站。
-
-  <Tabs syncKey="uns-api-language">
-    <TabItem label="JavaScript">
-
-      ```js
-      const BASE_URL = process.env.TIER0_BASE_URL;
-      const API_KEY = process.env.TIER0_API_KEY;
-
-      const response = await fetch(`${BASE_URL}/uns/delete`, {
-        method: 'POST',
-        headers: {
-          'content-type': 'application/json',
-          'x-api-key': API_KEY,
-        },
-        body: JSON.stringify({
-          topics: [
-            'DemoFactory/Site_01/Production/Produced_Qty',
-          ],
-          hard_delete: false,
-        }),
-      });
-
-      const result = await response.json();
-      console.log(result.data);
-      ```
-
-    </TabItem>
-    <TabItem label="Python">
-
-      ```python
-      import os
-      import requests
-
-      base_url = os.environ["TIER0_BASE_URL"]
-      api_key = os.environ["TIER0_API_KEY"]
-
-      response = requests.post(
-          f"{base_url}/uns/delete",
-          headers={"x-api-key": api_key},
-          json={
-              "topics": [
-                  "DemoFactory/Site_01/Production/Produced_Qty",
-              ],
-              "hard_delete": False,
-          },
-          timeout=30,
-      )
-      response.raise_for_status()
-
-      result = response.json()
-      print(result["data"])
-      ```
-
-    </TabItem>
-    <TabItem label="cURL">
-
-      ```bash
-      curl -X POST "$TIER0_BASE_URL/uns/delete" \
-        -H "content-type: application/json" \
-        -H "x-api-key: $TIER0_API_KEY" \
-        -d '{
-          "topics": [
-            "DemoFactory/Site_01/Production/Produced_Qty"
-          ],
-          "hard_delete": false
-        }'
-      ```
-
-    </TabItem>
-  </Tabs>
-
-## API 参考
-
-- [Tier0 OpenAPI 参考](../../reference/tier0-openapi/)
-
-:::caution[Tier0 Edge 上的 API 密钥限制]
-从 Tier0 Edge 获取的 API 密钥仅适用于 UNS 和 Flows API。
-:::
-
-## 下一步
-
-- [在 UNS 上构建应用](../building-apps/) — 使用 UNS 数据构建工业应用。
-- [分析数据](../analyzing-data/) — 使用 Marimo Notebook 和 Python 分析 UNS 数据。
+
+### Cloud v2 数据读取
+
+Cloud v2 使用 `https://<your-cloud-host>/openapi/v2` 和 `x-api-key`。以下示例读取业务记录与真实时序采样，不适用于 Edge 或 Enterprise。
+
+先调用 `POST /uns/metadata:find`，请求 `{"kind":"collection","filter":{},"page":{"mode":"offset","page":1,"size":20}}`。选中集合的 `data.items[].id` 是 `collectionId`。`records:find` 返回记录的 `id`，可作为采样查询的 `recordId`。两者都不是 UNS 路径。
+
+#### 查询业务记录: `records:find`
+
+<Tabs syncKey="uns-api-language">
+  <TabItem label="JavaScript">
+
+```js
+const base = process.env.TIER0_BASE_URL; // https://<your-cloud-host>/openapi/v2
+const collectionId = process.env.TIER0_COLLECTION_ID;
+const response = await fetch(`${base}/uns/collections/${encodeURIComponent(collectionId)}/records:find`, {
+  method: "POST",
+  headers: { "content-type": "application/json", "x-api-key": process.env.TIER0_API_KEY },
+  body: JSON.stringify({"filter": {"status": "running"}, "limit": 20}),
+});
+const result = await response.json();
+if (!response.ok || result.code !== 0) throw new Error(result.error?.code || result.msg);
+console.log(result.data);
+```
+
+  </TabItem>
+  <TabItem label="Python">
+
+```python
+import os
+import requests
+
+response = requests.post(
+    f"{os.environ['TIER0_BASE_URL']}/uns/collections/{os.environ['TIER0_COLLECTION_ID']}/records:find",
+    headers={"x-api-key": os.environ["TIER0_API_KEY"]},
+    json={"filter": {"status": "running"}, "limit": 20},
+    timeout=30,
+)
+response.raise_for_status()
+result = response.json()
+if result["code"] != 0:
+    raise RuntimeError(result.get("error", result.get("msg")))
+print(result["data"])
+```
+
+  </TabItem>
+  <TabItem label="cURL">
+
+```bash
+curl --fail-with-body -X POST "$TIER0_BASE_URL/uns/collections/${TIER0_COLLECTION_ID}/records:find" \
+  -H "content-type: application/json" \
+  -H "x-api-key: $TIER0_API_KEY" \
+  -d '{"filter": {"status": "running"}, "limit": 20}'
+```
+
+  </TabItem>
+</Tabs>
+
+#### 获取记录的最新采样: `samples:latest`
+
+<Tabs syncKey="uns-api-language">
+  <TabItem label="JavaScript">
+
+```js
+const base = process.env.TIER0_BASE_URL; // https://<your-cloud-host>/openapi/v2
+const collectionId = process.env.TIER0_COLLECTION_ID;
+const response = await fetch(`${base}/uns/collections/${encodeURIComponent(collectionId)}/samples:latest`, {
+  method: "POST",
+  headers: { "content-type": "application/json", "x-api-key": process.env.TIER0_API_KEY },
+  body: JSON.stringify({"recordIds": ["record_123"]}),
+});
+const result = await response.json();
+if (!response.ok || result.code !== 0) throw new Error(result.error?.code || result.msg);
+console.log(result.data);
+```
+
+  </TabItem>
+  <TabItem label="Python">
+
+```python
+import os
+import requests
+
+response = requests.post(
+    f"{os.environ['TIER0_BASE_URL']}/uns/collections/{os.environ['TIER0_COLLECTION_ID']}/samples:latest",
+    headers={"x-api-key": os.environ["TIER0_API_KEY"]},
+    json={"recordIds": ["record_123"]},
+    timeout=30,
+)
+response.raise_for_status()
+result = response.json()
+if result["code"] != 0:
+    raise RuntimeError(result.get("error", result.get("msg")))
+print(result["data"])
+```
+
+  </TabItem>
+  <TabItem label="cURL">
+
+```bash
+curl --fail-with-body -X POST "$TIER0_BASE_URL/uns/collections/${TIER0_COLLECTION_ID}/samples:latest" \
+  -H "content-type: application/json" \
+  -H "x-api-key: $TIER0_API_KEY" \
+  -d '{"recordIds": ["record_123"]}'
+```
+
+  </TabItem>
+</Tabs>
+
+#### 查询历史采样: `samples:find`
+
+<Tabs syncKey="uns-api-language">
+  <TabItem label="JavaScript">
+
+```js
+const base = process.env.TIER0_BASE_URL; // https://<your-cloud-host>/openapi/v2
+const collectionId = process.env.TIER0_COLLECTION_ID;
+const response = await fetch(`${base}/uns/collections/${encodeURIComponent(collectionId)}/samples:find`, {
+  method: "POST",
+  headers: { "content-type": "application/json", "x-api-key": process.env.TIER0_API_KEY },
+  body: JSON.stringify({"recordIds": ["record_123"], "from": 1792454400000, "to": 1792540800000, "filter": {"temperature": {"$gt": 20}}, "limit": 20}),
+});
+const result = await response.json();
+if (!response.ok || result.code !== 0) throw new Error(result.error?.code || result.msg);
+console.log(result.data);
+```
+
+  </TabItem>
+  <TabItem label="Python">
+
+```python
+import os
+import requests
+
+response = requests.post(
+    f"{os.environ['TIER0_BASE_URL']}/uns/collections/{os.environ['TIER0_COLLECTION_ID']}/samples:find",
+    headers={"x-api-key": os.environ["TIER0_API_KEY"]},
+    json={"recordIds": ["record_123"], "from": 1792454400000, "to": 1792540800000, "filter": {"temperature": {"$gt": 20}}, "limit": 20},
+    timeout=30,
+)
+response.raise_for_status()
+result = response.json()
+if result["code"] != 0:
+    raise RuntimeError(result.get("error", result.get("msg")))
+print(result["data"])
+```
+
+  </TabItem>
+  <TabItem label="cURL">
+
+```bash
+curl --fail-with-body -X POST "$TIER0_BASE_URL/uns/collections/${TIER0_COLLECTION_ID}/samples:find" \
+  -H "content-type: application/json" \
+  -H "x-api-key: $TIER0_API_KEY" \
+  -d '{"recordIds": ["record_123"], "from": 1792454400000, "to": 1792540800000, "filter": {"temperature": {"$gt": 20}}, "limit": 20}'
+```
+
+  </TabItem>
+</Tabs>
+
+`samples:latest` 返回 `data.series`，每个请求的记录对应一个 `{recordId, sample}`；没有采样时 `sample` 为 `null`。`samples:find` 返回 `data.items` 和 `data.pageInfo`。`from`、`to` 是 Unix 毫秒，范围为 `[from, to)`。`temperature` 等筛选字段直接指业务字段；返回值位于每个采样的 `data`。
+
+[Cloud v2 API 使用与错误处理](../../reference/api-reference/) · [Cloud v2 完整参考](../../reference/tier0-openapi/cloud/) · [Enterprise v1 参考](../../reference/tier0-openapi/)
+
+Enterprise v1 使用 `/openapi/v1`；请查看完整参考并核对部署是否支持。Edge API 行为需以 Edge 部署为准。

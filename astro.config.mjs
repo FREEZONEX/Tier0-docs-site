@@ -17,19 +17,16 @@ const algoliaConfig = {
 const legacySlugRedirects = Object.fromEntries(
 	[
 		['get-started/choosing-version', 'get-started/choosing-the-best-product'],
-		['get-started/demo-factory', 'get-started/try-the-demo-factory-in-tier0'],
 		['using-tier0/uns-concepts', 'using-tier0/factory-data-foundation'],
 		['using-tier0/connect-data', 'using-tier0/preparing-data-foundation'],
 		['using-tier0/fleet-management', 'using-tier0/manage-data-from-center-to-edge'],
 		['using-tier0/working-with-uns-data', 'using-tier0/working-with-factory-data'],
 		['using-tier0/build-apps', 'using-tier0/building-apps'],
 		['using-tier0/digital-twin', 'using-tier0/building-digital-twins'],
-		['using-tier0/analyze-data', 'using-tier0/analyzing-data'],
 		['using-tier0/agents', 'using-tier0/operating-on-tier0-with-agents'],
 		['best-practice/uns-modeling', 'best-practice/modeling-factory-data'],
 		['best-practice/protocol-connections', 'best-practice/connecting-industrial-protocols'],
 		['best-practice/building-data-workflow-with-agent', 'best-practice/building-shopfloor-workflow-with-agent'],
-		['best-practice/analytics-apps', 'best-practice/building-analytics-apps'],
 		['best-practice/view-uns-with-digital-twin', 'best-practice/displaying-data-with-digital-twin'],
 		['reference/skill-reference', 'reference/cli-commands-reference'],
 		['reference/high-availability-deployment', 'reference/high-availability-deployment-plan'],
@@ -87,6 +84,7 @@ export default defineConfig({
 				},
 			},
 		}),
+		// Refit rendered Mermaid diagrams, including the compact data-foundation figures.
 		mermaidEdgeLabels(),
 		starlight({
 			title: 'Tier0 Docs',
@@ -153,9 +151,9 @@ export default defineConfig({
 							slug: 'get-started/installation',
 						},
 						{
-							label: 'Try the Demo Factory',
-							translations: { 'zh-CN': '体验演示工厂', ja: 'デモファクトリーを試す', es: 'Prueba la fábrica demo', ko: '데모 팩토리 체험' },
-							slug: 'get-started/try-the-demo-factory-in-tier0',
+							label: 'User Journey',
+							translations: { 'zh-CN': '用户旅程', ja: 'ユーザージャーニー', es: 'Recorrido del usuario', ko: '사용자 여정' },
+							slug: 'get-started/user-journey',
 						},
 						
 					],
@@ -166,9 +164,9 @@ export default defineConfig({
 					collapsed: false,
 					items: [
 						{
-							label: 'Factory Data Modeling',
-							translations: { 'zh-CN': '工厂数据基础', ja: '工場データ基盤', es: 'Base de datos de fábrica', ko: '공장 데이터 기반' },
-							slug: 'using-tier0/factory-data-foundation',
+							label: 'Building Apps',
+							translations: { 'zh-CN': '构建应用', ja: 'アプリを構築する', es: 'Crear apps', ko: '앱 구축하기' },
+							slug: 'using-tier0/building-apps',
 						},
 						{
 							label: 'Preparing Data Foundation',
@@ -186,21 +184,6 @@ export default defineConfig({
 							slug: 'using-tier0/working-with-factory-data',
 						},
 						{
-							label: 'Building Apps',
-							translations: { 'zh-CN': '构建应用', ja: 'アプリを構築する', es: 'Crear apps', ko: '앱 구축하기' },
-							slug: 'using-tier0/building-apps',
-						},
-						{
-							label: 'Building Digital Twins',
-							translations: { 'zh-CN': '构建数字孪生', ja: 'Digital Twin を構築する', es: 'Construir Digital Twins', ko: 'Digital Twin 구축하기' },
-							slug: 'using-tier0/building-digital-twins',
-						},
-						{
-							label: 'Analyzing Data',
-							translations: { 'zh-CN': '分析数据', ja: '工場データを分析する', es: 'Analizar datos de fábrica', ko: '공장 데이터 분석' },
-							slug: 'using-tier0/analyzing-data',
-						},
-						{
 							label: 'Operating on Tier0 with Agents',
 							translations: { 'zh-CN': '用 Agents 操作 Tier0', ja: 'Agents で Tier0 を操作する', es: 'Operar Tier0 con Agents', ko: 'Agent로 Tier0 운영' },
 							slug: 'using-tier0/operating-on-tier0-with-agents',
@@ -213,16 +196,6 @@ export default defineConfig({
 					collapsed: false,
 					items: [
 						{
-							label: 'Modeling Factory Data',
-							translations: { 'zh-CN': '工厂数据建模', ja: '工場データをモデリングする', es: 'Modelar datos de fábrica', ko: '공장 데이터 모델링' },
-							slug: 'best-practice/modeling-factory-data',
-						},
-						{
-							label: 'Connecting Industrial Protocols',
-							translations: { 'zh-CN': '连接工业协议', ja: '産業プロトコルの接続', es: 'Conectar protocolos industriales', ko: '산업 프로토콜 연결' },
-							slug: 'best-practice/connecting-industrial-protocols',
-						},
-						{
 							label: 'Security and Resilience',
 							translations: { 'zh-CN': '安全与可靠性', ja: 'セキュリティとレジリエンス', es: 'Seguridad y resiliencia', ko: '보안 및 복원력' },
 							slug: 'best-practice/security-and-resilience',
@@ -232,16 +205,6 @@ export default defineConfig({
 						// 	translations: { 'zh-CN': '用 Agent 构建车间工作流', ja: 'Agent で現場ワークフローを構築する', es: 'Crear flujos de planta con Agent', ko: 'Agent로 현장 워크플로 구축하기' },
 						// 	slug: 'best-practice/building-shopfloor-workflow-with-agent',
 						// },
-						{
-							label: 'Building Analytics Apps',
-							translations: { 'zh-CN': '构建分析应用', ja: '分析アプリの構築', es: 'Apps de analítica', ko: '분석 앱 구축' },
-							slug: 'best-practice/building-analytics-apps',
-						},
-						{
-							label: 'Displaying Data with Digital Twin',
-							translations: { 'zh-CN': '使用数字孪生展示工厂数据', ja: 'Digital Twin で工場データを表示する', es: 'Mostrar datos de fábrica con Digital Twin', ko: 'Digital Twin으로 공장 데이터 표시하기' },
-							slug: 'best-practice/displaying-data-with-digital-twin',
-						},
 					],
 				},
 				{
@@ -253,11 +216,6 @@ export default defineConfig({
 							label: 'API Reference',
 							translations: { 'zh-CN': 'API 参考', ja: 'API リファレンス', es: 'Referencia de API', ko: 'API 참조' },
 							slug: 'reference/api-reference',
-						},
-						{
-							label: 'CLI Command Reference',
-							translations: { 'zh-CN': 'CLI 命令参考', ja: 'CLI コマンドリファレンス', es: 'Referencia de comandos CLI', ko: 'CLI 명령 참조' },
-							slug: 'reference/cli-commands-reference',
 						},
 						{
 							label: 'Embedded Builder Skills',
@@ -273,11 +231,6 @@ export default defineConfig({
 							label: 'Tier0 Cloud Network and Data Security Overview',
 							translations: { 'zh-CN': 'Tier0 云服务版网络与数据安全说明', ja: 'Tier0 Cloud のネットワークとデータのセキュリティに関する説明', es: 'Seguridad de red y datos de Tier0 Cloud', ko: 'Tier0 Cloud 네트워크 및 데이터 보안 안내' },
 							slug: 'reference/tier0-cloud-security-overview',
-						},
-						{
-							label: 'ISA-95 Equipment Hierarchy',
-							translations: { 'zh-CN': 'ISA-95 设备层级', ja: 'ISA-95 設備階層', es: 'Jerarquía de equipos ISA-95', ko: 'ISA-95 설비 계층' },
-							slug: 'reference/isa-95-equipment-hierarchy',
 						},
 						{
 							label: 'Standard Deployment Plan',
@@ -312,7 +265,7 @@ export default defineConfig({
 				starlightLlmsTxt({
 					projectName: 'Tier0',
 					description:
-						'Tier0 is an agentic industrial platform: a Unified Namespace (UNS) for real-time industrial data, flow-based data collection, an AI app builder, notebooks for analytics, and a launchpad for front-line users.',
+						'Tier0 is an agentic industrial platform: a Unified Namespace (UNS) for real-time industrial data, flow-based data collection, an AI app builder, and a launchpad for front-line users.',
 					details:
 						'Tier0 is built by FREEZONEX. The UNS organizes data semantically (site / area / equipment / process / order) over MQTT pub/sub. Interact with the platform via the web UI or the `tier0` CLI (npm: @tier0/cli, GitHub: FREEZONEX/Tier0-cli). Agent skills are available via `npx skills add FREEZONEX/Tier0-skill`.',
 					optionalLinks: [
@@ -340,22 +293,17 @@ export default defineConfig({
 					// small set — they live in llms-full.txt.
 					promote: [
 						'get-started/installation',
+						'get-started/user-journey',
 						'get-started/choosing-the-best-product',
-						'get-started/try-the-demo-factory-in-tier0',
 						'using-tier0/factory-data-foundation',
 						'using-tier0/preparing-data-foundation',
 						'using-tier0/manage-data-from-center-to-edge',
 						'using-tier0/working-with-factory-data',
 						'using-tier0/building-apps',
-						'using-tier0/building-digital-twins',
-						'using-tier0/analyzing-data',
 						'using-tier0/operating-on-tier0-with-agents',
 						'best-practice/modeling-factory-data',
-						'best-practice/connecting-industrial-protocols',
 						'best-practice/building-shopfloor-workflow-with-agent',
-						'reference/cli-commands-reference',
 						'reference/embedded-builder-skills',
-						'reference/isa-95-equipment-hierarchy',
 						'reference/standard-port-list',
 						'reference/operations-runbook',
 						'reference/sla-and-ha-boundaries',
@@ -364,7 +312,6 @@ export default defineConfig({
 						'index',
 					],
 					exclude: [
-						'best-practice/building-analytics-apps',
 						'best-practice/displaying-data-with-digital-twin',
 					],
 				}),

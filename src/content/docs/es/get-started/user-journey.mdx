@@ -1,0 +1,37 @@
+---
+title: Recorrido del usuario
+description: Pasos recomendados para empezar con Tier0.
+lastUpdated: 2026-11-06
+---
+
+<div class="t0-compact-mermaid" style="max-width: 550px; margin-inline: auto;">
+
+```mermaid
+flowchart TD
+  app["Crear la aplicación"]
+  namespace["Crear un Namespace"]
+  external["Conectar datos externos (opcional)"]
+  use["Usar los datos unificados en la aplicación"]
+  app --> namespace --> external --> use
+  namespace -.->|"Omitir el paso opcional"| use
+  classDef t0accent fill:#B2ED1D,stroke:#73B200,color:#171717
+  class use t0accent
+```
+
+</div>
+
+<div class="t0-journey-table">
+
+| Acción | Responsable | Descripción |
+| --- | --- | --- |
+| Crear la aplicación | Tú | Habla con el Agent para crear una aplicación personalizada. |
+| Crear un Namespace | Agent | Crea un Namespace y modelos de datos según la lógica de negocio de la aplicación. |
+| Conectar datos externos (opcional) | Tú | Si hace falta, proporciona información de sistemas empresariales o dispositivos existentes para que el Agent los conecte. |
+| Integrar datos | Agent | Asigna, transforma e integra los datos externos en el modelo existente de la aplicación. |
+
+</div>
+
+## Siguiente
+
+- [Crear aplicaciones](../../using-tier0/building-apps/) — Descubre cómo se crean aplicaciones en Tier0.
+- [Preparar la base de datos](../../using-tier0/preparing-data-foundation/) — Conoce los modelos de datos y las conexiones externas.

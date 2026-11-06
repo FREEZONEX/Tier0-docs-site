@@ -16,7 +16,7 @@ MQTT clients can connect to the UNS broker with credentials generated on Tier0.
 You can use MQTT clients such as **MQTTX**, **MQTT Explorer**, and **Node-RED** to connect to the broker and publish/subscribe messages.
 :::
 ### Generating MQTT Credentials
-On the **Edge** tab in Tier0, create a new credential and make a note of it.
+Generate MQTT credentials in **Connect** > **Source** > **MQTT Device** and make a note of it.
 :::note[Exceptions on Tier0 Edge version]
 The Tier0 Edge version does not require credentials for external connections.
 :::
@@ -94,409 +94,224 @@ The Tier0 Edge version does not require credentials for external connections.
 </Steps>
 
 ## API
-Use the **REST API** to operate on UNS data.
-:::tip[How to use the API]
-The OpenAPI base path is `/openapi/v1`, For example `https://your-workspace.tier0.app/openapi/v1`, and pass your API key in the `x-api-key` header.
-:::
 
-### Getting API Key
+### Basic Information
 
-API keys are from **Settings > API Keys**. Depend on different account type, allowed key types are different.
-- **Service Key**: Can only be created by **Admin** and **Owner**.
-- **Personal Key**: Can be created by anyone, and the permission scope is the same as that of the account.
-:::caution[Key permisson vs Account permission]
-Account permission trumps key permission. When the key permission is set to **Full Access**, data unavailable to the account still cannot be accessed with this key.
-:::
+- **Base URL**: `https://<your-tier0-host>/openapi/v2`
+- **Authentication**: Send the API key obtained from Tier0 in the `x-api-key` header.
 
-### Examples
+### Request Examples
 
-- `/uns/create`
-
-  Create UNS path or topic. Use `namespace` to define the node tree.
-
+- `POST /uns/metadata:find` — List collections and get the collection ID
+  :::note
+  Find the collection you want in `data.items` and copy its `id`. If it is missing from the first page, check `data.pageInfo` and request the next page.
+  :::
   <Tabs syncKey="uns-api-language">
     <TabItem label="JavaScript">
 
-      ```js
-      const BASE_URL = process.env.TIER0_BASE_URL;
-      const API_KEY = process.env.TIER0_API_KEY;
-
-      const response = await fetch(`${BASE_URL}/uns/create`, {
-        method: 'POST',
-        headers: {
-          'content-type': 'application/json',
-          'x-api-key': API_KEY,
-        },
-        body: JSON.stringify({
-          namespace: [
-            {
-              name: 'DemoFactory',
-              type: 'PATH',
-              children: [
-                {
-                  name: 'Site_01',
-                  type: 'PATH',
-                  children: [
-                    {
-                      name: 'Production',
-                      type: 'PATH',
-                      children: [
-                        {
-                          name: 'Produced_Qty',
-                          type: 'TOPIC',
-                          topicType: 'METRIC',
-                          displayName: 'Produced Quantity',
-                          description: 'Produced quantity from the production line.',
-                          enableHistory: true,
-                          fields: [
-                            { name: 'value', type: 'DOUBLE', unit: 'pcs' },
-                          ],
-                        },
-                      ],
-                    },
-                  ],
-                },
-              ],
-            },
-          ],
-        }),
-      });
-
-      const result = await response.json();
-      console.log(result.data.results);
-      ```
+  ```js
+  const base = "https://your-tier0-host/openapi/v2";
+  const response = await fetch(`${base}/uns/metadata:find`, {
+    method: "POST",
+    headers: { "content-type": "application/json", "x-api-key": "your-api-key" },
+    body: JSON.stringify({"kind": "collection", "filter": {}, "page": {"mode": "offset", "page": 1, "size": 20}}),
+  });
+  const result = await response.json();
+  if (!response.ok || result.code !== 0) throw new Error(result.error?.code || result.msg);
+  console.log(result.data.items);
+  ```
 
     </TabItem>
     <TabItem label="Python">
 
-      ```python
-      import os
-      import requests
+  ```python
+  import requests
 
-      base_url = os.environ["TIER0_BASE_URL"]
-      api_key = os.environ["TIER0_API_KEY"]
-
-      response = requests.post(
-          f"{base_url}/uns/create",
-          headers={"x-api-key": api_key},
-          json={
-              "namespace": [
-                  {
-                      "name": "DemoFactory",
-                      "type": "PATH",
-                      "children": [
-                          {
-                              "name": "Site_01",
-                              "type": "PATH",
-                              "children": [
-                                  {
-                                      "name": "Production",
-                                      "type": "PATH",
-                                      "children": [
-                                          {
-                                              "name": "Produced_Qty",
-                                              "type": "TOPIC",
-                                              "topicType": "METRIC",
-                                              "displayName": "Produced Quantity",
-                                              "description": "Produced quantity from the production line.",
-                                              "enableHistory": True,
-                                              "fields": [
-                                                  {"name": "value", "type": "DOUBLE", "unit": "pcs"},
-                                              ],
-                                          },
-                                      ],
-                                  },
-                              ],
-                          },
-                      ],
-                  },
-              ],
-          },
-          timeout=30,
-      )
-      response.raise_for_status()
-
-      result = response.json()
-      print(result["data"]["results"])
-      ```
+  response = requests.post(
+      "https://your-tier0-host/openapi/v2/uns/metadata:find",
+      headers={"x-api-key": "your-api-key"},
+      json={"kind": "collection", "filter": {}, "page": {"mode": "offset", "page": 1, "size": 20}},
+      timeout=30,
+  )
+  response.raise_for_status()
+  result = response.json()
+  if result["code"] != 0:
+      raise RuntimeError(result.get("error", result.get("msg")))
+  print(result["data"]["items"])
+  ```
 
     </TabItem>
     <TabItem label="cURL">
 
-      ```bash
-      curl -X POST "$TIER0_BASE_URL/uns/create" \
-        -H "content-type: application/json" \
-        -H "x-api-key: $TIER0_API_KEY" \
-        -d '{
-          "namespace": [
-            {
-              "name": "DemoFactory",
-              "type": "PATH",
-              "children": [
-                {
-                  "name": "Site_01",
-                  "type": "PATH",
-                  "children": [
-                    {
-                      "name": "Production",
-                      "type": "PATH",
-                      "children": [
-                        {
-                          "name": "Produced_Qty",
-                          "type": "TOPIC",
-                          "topicType": "METRIC",
-                          "displayName": "Produced Quantity",
-                          "description": "Produced quantity from the production line.",
-                          "enableHistory": true,
-                          "fields": [
-                            { "name": "value", "type": "DOUBLE", "unit": "pcs" }
-                          ]
-                        }
-                      ]
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        }'
-      ```
+  ```bash
+  curl --fail-with-body -X POST "https://your-tier0-host/openapi/v2/uns/metadata:find" \
+    -H "content-type: application/json" \
+    -H "x-api-key: your-api-key" \
+    -d '{"kind": "collection", "filter": {}, "page": {"mode": "offset", "page": 1, "size": 20}}'
+  ```
 
     </TabItem>
   </Tabs>
 
-- `/uns/read`
-
-  Read the latest value and metadata for one or more UNS topics.
-
+- `POST /uns/collections/{collectionId}/records:find` — List records and get the record ID
+  :::note
+  - Replace `your-collection-id` with the ID from `metadata:find`.
+  - Find the target record in `data.items` and copy its `id`. If it is missing from the first page, use `data.pageInfo.nextCursor` as the `cursor` in the next request when available.
+  :::
   <Tabs syncKey="uns-api-language">
     <TabItem label="JavaScript">
 
-      ```js
-      const BASE_URL = process.env.TIER0_BASE_URL;
-      const API_KEY = process.env.TIER0_API_KEY;
-
-      const response = await fetch(`${BASE_URL}/uns/read`, {
-        method: 'POST',
-        headers: {
-          'content-type': 'application/json',
-          'x-api-key': API_KEY,
-        },
-        body: JSON.stringify({
-          topics: [
-            'DemoFactory/Site_01/Production/Produced_Qty',
-          ],
-          include_leaf_value: true,
-          include_metadata: true,
-        }),
-      });
-
-      const result = await response.json();
-      console.log(result.data.results);
-      ```
+  ```js
+  const base = "https://your-tier0-host/openapi/v2";
+  const collectionId = "your-collection-id";
+  const response = await fetch(`${base}/uns/collections/${encodeURIComponent(collectionId)}/records:find`, {
+    method: "POST",
+    headers: { "content-type": "application/json", "x-api-key": "your-api-key" },
+    body: JSON.stringify({"limit": 20}),
+  });
+  const result = await response.json();
+  if (!response.ok || result.code !== 0) throw new Error(result.error?.code || result.msg);
+  console.log(result.data);
+  ```
 
     </TabItem>
     <TabItem label="Python">
 
-      ```python
-      import os
-      import requests
+  ```python
+  import requests
 
-      base_url = os.environ["TIER0_BASE_URL"]
-      api_key = os.environ["TIER0_API_KEY"]
-
-      response = requests.post(
-          f"{base_url}/uns/read",
-          headers={"x-api-key": api_key},
-          json={
-              "topics": [
-                  "DemoFactory/Site_01/Production/Produced_Qty",
-              ],
-              "include_leaf_value": True,
-              "include_metadata": True,
-          },
-          timeout=30,
-      )
-      response.raise_for_status()
-
-      result = response.json()
-      print(result["data"]["results"])
-      ```
+  response = requests.post(
+      "https://your-tier0-host/openapi/v2/uns/collections/your-collection-id/records:find",
+      headers={"x-api-key": "your-api-key"},
+      json={"limit": 20},
+      timeout=30,
+  )
+  response.raise_for_status()
+  result = response.json()
+  if result["code"] != 0:
+      raise RuntimeError(result.get("error", result.get("msg")))
+  print(result["data"])
+  ```
 
     </TabItem>
     <TabItem label="cURL">
 
-      ```bash
-      curl -X POST "$TIER0_BASE_URL/uns/read" \
-        -H "content-type: application/json" \
-        -H "x-api-key: $TIER0_API_KEY" \
-        -d '{
-          "topics": [
-            "DemoFactory/Site_01/Production/Produced_Qty"
-          ],
-          "include_leaf_value": true,
-          "include_metadata": true
-        }'
-      ```
+  ```bash
+  curl --fail-with-body -X POST "https://your-tier0-host/openapi/v2/uns/collections/your-collection-id/records:find" \
+    -H "content-type: application/json" \
+    -H "x-api-key: your-api-key" \
+    -d '{"limit": 20}'
+  ```
 
     </TabItem>
   </Tabs>
 
-- `/uns/update`
-
-  Update a UNS node by `path`. Use `updateMask` to specify which fields should change.
-
+- `POST /uns/collections/{collectionId}/samples:latest` — Get the latest sample for a record
+  :::note
+  - Replace `your-collection-id` with the ID from `metadata:find`.
+  - Replace `record_123` in `recordIds` with the record ID from `records:find`.
+  :::
   <Tabs syncKey="uns-api-language">
     <TabItem label="JavaScript">
 
-      ```js
-      const BASE_URL = process.env.TIER0_BASE_URL;
-      const API_KEY = process.env.TIER0_API_KEY;
-
-      const response = await fetch(`${BASE_URL}/uns/update`, {
-        method: 'POST',
-        headers: {
-          'content-type': 'application/json',
-          'x-api-key': API_KEY,
-        },
-        body: JSON.stringify({
-          path: 'DemoFactory/Site_01/Production/Produced_Qty',
-          displayName: 'Produced Quantity',
-          description: 'Updated production output quantity.',
-          updateMask: ['displayName', 'description'],
-        }),
-      });
-
-      const result = await response.json();
-      console.log(result.data);
-      ```
+  ```js
+  const base = "https://your-tier0-host/openapi/v2";
+  const collectionId = "your-collection-id";
+  const response = await fetch(`${base}/uns/collections/${encodeURIComponent(collectionId)}/samples:latest`, {
+    method: "POST",
+    headers: { "content-type": "application/json", "x-api-key": "your-api-key" },
+    body: JSON.stringify({"recordIds": ["record_123"]}),
+  });
+  const result = await response.json();
+  if (!response.ok || result.code !== 0) throw new Error(result.error?.code || result.msg);
+  console.log(result.data);
+  ```
 
     </TabItem>
     <TabItem label="Python">
 
-      ```python
-      import os
-      import requests
+  ```python
+  import requests
 
-      base_url = os.environ["TIER0_BASE_URL"]
-      api_key = os.environ["TIER0_API_KEY"]
-
-      response = requests.post(
-          f"{base_url}/uns/update",
-          headers={"x-api-key": api_key},
-          json={
-              "path": "DemoFactory/Site_01/Production/Produced_Qty",
-              "displayName": "Produced Quantity",
-              "description": "Updated production output quantity.",
-              "updateMask": ["displayName", "description"],
-          },
-          timeout=30,
-      )
-      response.raise_for_status()
-
-      result = response.json()
-      print(result["data"])
-      ```
+  response = requests.post(
+      "https://your-tier0-host/openapi/v2/uns/collections/your-collection-id/samples:latest",
+      headers={"x-api-key": "your-api-key"},
+      json={"recordIds": ["record_123"]},
+      timeout=30,
+  )
+  response.raise_for_status()
+  result = response.json()
+  if result["code"] != 0:
+      raise RuntimeError(result.get("error", result.get("msg")))
+  print(result["data"])
+  ```
 
     </TabItem>
     <TabItem label="cURL">
 
-      ```bash
-      curl -X POST "$TIER0_BASE_URL/uns/update" \
-        -H "content-type: application/json" \
-        -H "x-api-key: $TIER0_API_KEY" \
-        -d '{
-          "path": "DemoFactory/Site_01/Production/Produced_Qty",
-          "displayName": "Produced Quantity",
-          "description": "Updated production output quantity.",
-          "updateMask": ["displayName", "description"]
-        }'
-      ```
+  ```bash
+  curl --fail-with-body -X POST "https://your-tier0-host/openapi/v2/uns/collections/your-collection-id/samples:latest" \
+    -H "content-type: application/json" \
+    -H "x-api-key: your-api-key" \
+    -d '{"recordIds": ["record_123"]}'
+  ```
 
     </TabItem>
   </Tabs>
 
-- `/uns/delete`
-
-  Delete one or more UNS models. Use `hard_delete: false` to move models to the recycle bin.
-
+- `POST /uns/collections/{collectionId}/samples:find` — Get samples in a time range
+  :::note
+  - Replace `your-collection-id` with the ID from `metadata:find`.
+  - Replace `record_123` in `recordIds` with the record ID from `records:find`.
+  - Set `from` and `to` to the time range you want.
+  - This example also filters on `temperature`. Remove that filter if you want all samples in the range or if your collection uses a different field.
+  :::
   <Tabs syncKey="uns-api-language">
     <TabItem label="JavaScript">
 
-      ```js
-      const BASE_URL = process.env.TIER0_BASE_URL;
-      const API_KEY = process.env.TIER0_API_KEY;
-
-      const response = await fetch(`${BASE_URL}/uns/delete`, {
-        method: 'POST',
-        headers: {
-          'content-type': 'application/json',
-          'x-api-key': API_KEY,
-        },
-        body: JSON.stringify({
-          topics: [
-            'DemoFactory/Site_01/Production/Produced_Qty',
-          ],
-          hard_delete: false,
-        }),
-      });
-
-      const result = await response.json();
-      console.log(result.data);
-      ```
+  ```js
+  const base = "https://your-tier0-host/openapi/v2";
+  const collectionId = "your-collection-id";
+  const response = await fetch(`${base}/uns/collections/${encodeURIComponent(collectionId)}/samples:find`, {
+    method: "POST",
+    headers: { "content-type": "application/json", "x-api-key": "your-api-key" },
+    body: JSON.stringify({"recordIds": ["record_123"], "from": 1792454400000, "to": 1792540800000, "filter": {"temperature": {"$gt": 20}}, "limit": 20}),
+  });
+  const result = await response.json();
+  if (!response.ok || result.code !== 0) throw new Error(result.error?.code || result.msg);
+  console.log(result.data);
+  ```
 
     </TabItem>
     <TabItem label="Python">
 
-      ```python
-      import os
-      import requests
+  ```python
+  import requests
 
-      base_url = os.environ["TIER0_BASE_URL"]
-      api_key = os.environ["TIER0_API_KEY"]
-
-      response = requests.post(
-          f"{base_url}/uns/delete",
-          headers={"x-api-key": api_key},
-          json={
-              "topics": [
-                  "DemoFactory/Site_01/Production/Produced_Qty",
-              ],
-              "hard_delete": False,
-          },
-          timeout=30,
-      )
-      response.raise_for_status()
-
-      result = response.json()
-      print(result["data"])
-      ```
+  response = requests.post(
+      "https://your-tier0-host/openapi/v2/uns/collections/your-collection-id/samples:find",
+      headers={"x-api-key": "your-api-key"},
+      json={"recordIds": ["record_123"], "from": 1792454400000, "to": 1792540800000, "filter": {"temperature": {"$gt": 20}}, "limit": 20},
+      timeout=30,
+  )
+  response.raise_for_status()
+  result = response.json()
+  if result["code"] != 0:
+      raise RuntimeError(result.get("error", result.get("msg")))
+  print(result["data"])
+  ```
 
     </TabItem>
     <TabItem label="cURL">
 
-      ```bash
-      curl -X POST "$TIER0_BASE_URL/uns/delete" \
-        -H "content-type: application/json" \
-        -H "x-api-key: $TIER0_API_KEY" \
-        -d '{
-          "topics": [
-            "DemoFactory/Site_01/Production/Produced_Qty"
-          ],
-          "hard_delete": false
-        }'
-      ```
+  ```bash
+  curl --fail-with-body -X POST "https://your-tier0-host/openapi/v2/uns/collections/your-collection-id/samples:find" \
+    -H "content-type: application/json" \
+    -H "x-api-key: your-api-key" \
+    -d '{"recordIds": ["record_123"], "from": 1792454400000, "to": 1792540800000, "filter": {"temperature": {"$gt": 20}}, "limit": 20}'
+  ```
 
     </TabItem>
   </Tabs>
 
-## API reference
-
-- [Tier0 OpenAPI Reference](../../reference/tier0-openapi/)
-:::caution[API key limitations on Tier0 Edge]
-API key obtained from Tier0 Edge is only valid for UNS and Flows APIs.
-:::
-## Next
-
-- [Build Apps on UNS](../building-apps/) — Build industrial applications with UNS data.
-- [Analyze Data](../analyzing-data/) — Analyze UNS data with Marimo Notebook and Python.
+[API Reference](../../reference/api-reference/)

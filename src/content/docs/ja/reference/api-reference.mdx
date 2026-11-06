@@ -1,40 +1,29 @@
 ---
 title: API リファレンス
-description: Tier0 の API 統合の要点と、機械可読な OpenAPI リファレンスです。
-sidebar:
-  order: 1
+description: Tier0 API への接続、応答の確認、安全な書き込み再試行。
 ---
 
-## はじめに
+## 接続と認証
 
-- ベース URL には `https://<your-tier0-host>/openapi/v1` を使用します。
-- `/assets/files/public` 以外の OpenAPI エンドポイントには `x-api-key` を送信します。`public` としてマークされたファイルは API キーなしでダウンロードできます。
-- まず `POST /auth/whoami` を呼び出し、API キーの ID と有効な権限を確認します。
+- **ベース URL**: `https://<your-tier0-host>/openapi/v2`
+- **認証**: `x-api-key` リクエストヘッダーに Tier0 API キーを指定します。
 
-:::note[OpenAPI リファレンス]
-リクエストスキーマ、レスポンススキーマ、および実行可能なリクエストは、インタラクティブな [API リファレンス](../tier0-openapi/) で確認できます。
+## 結果の確認
+
+- `/uns/` リクエストでは HTTP ステータスと応答本文の両方を確認します。成功時は `2xx` かつ `code: 0` で、結果は `data` にあります。
+- 失敗時は `error.code` を確認し、調査用に `requestId` を保存します。
+- バッチでは HTTP `200` でも各項目を確認します。一部の項目だけ失敗する場合があります。
+
+## 書き込みの再試行
+
+- `error.execution` を確認し、未開始、ロールバック済み、コミット済み、結果不明のいずれかを判断します。
+- `error.retry.safe` が `true` の場合に限り、同じ冪等キーで同一リクエストを再試行します。待機時間が示された場合は、`error.retry.afterMs` または `Retry-After` ヘッダー以上待ちます。
+- バッチの一部がコミットされた場合、成功項目を確認してから残りを送信します。結果不明で安全な再試行が確認できない場合は、再送前に書き込みの反映を確認します。
+
+## 用語
+
+- **冪等性**: 操作を繰り返しても一度だけ行った場合と同じ結果になることです。対応する書き込みでは、同じリクエストの再試行に同じキーを使い、別の書き込みには新しいキーを使います。
+
+:::note
+詳細は [OpenAPI リファレンス](../tier0-openapi/)を参照してください。
 :::
-
-## 結果の処理
-
-HTTP `200` が返っても、UNS の一括操作は一部失敗することがあります。成功と判断する前に、各結果を確認してください。
-
-## Flow のカスタム HTTP In ルート
-
-**Source Flow** と **Event Flow** 内で開発する API の入力とレスポンスは、デプロイ済み Flow によって定義されます。
-
-- **Source Flow** は `/flow/source/` を使用し、デフォルトで公開されます。機密性の高い動作を公開する前に、入口または Flow レベルのアクセス制御を追加してください。
-- **Event Flow** は `/flow/event/` を使用し、`flow.read` 権限を持つ `x-api-key` が必要です。
-
-:::note[Source Flow または Event Flow のカスタム API の例]
-API URL が `/integrations/echo` で、`HTTP In` ノードで API を開発する場合:
-
-- `HTTP In` のルートは `/integrations/echo` です。残りは Tier0 が補完します。
-- 外部からの呼び出し URL は `https://tier0.example.com/flow/source/integrations/echo` または `https://tier0.example.com/flow/event/integrations/echo` です。
-:::
-
-## トラブルシューティング
-
-- `401` / `403`: API キー、スコープ、所有者の権限を確認します。
-- `404`: HTTP メソッド、ルートプレフィックス、ノード URL、デプロイ状況を確認します。
-- `No response`: すべての Flow パスが `HTTP Response` ノードに到達し、元のリクエストとレスポンスのプロパティを破棄していないことを確認します。

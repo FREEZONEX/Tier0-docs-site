@@ -1495,6 +1495,17 @@ starlight-tabs.t0-topic-explosion-tabs,
 }
 
 /* Default tables: wrap inside the content column (no horizontal scrollbar). */
+:root[data-theme] .sl-markdown-content .t0-journey-table table {
+	table-layout: auto;
+}
+
+.sl-markdown-content .t0-journey-table :is(th, td):nth-child(2) {
+	min-width: 6.5rem;
+	white-space: nowrap;
+	overflow-wrap: normal;
+	word-break: normal;
+}
+
 .sl-markdown-content :is(th, td) {
 	white-space: normal;
 	overflow-wrap: anywhere;

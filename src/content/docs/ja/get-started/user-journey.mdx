@@ -1,0 +1,37 @@
+---
+title: ユーザージャーニー
+description: Tier0 を使い始めるための推奨手順。
+lastUpdated: 2026-11-06
+---
+
+<div class="t0-compact-mermaid" style="max-width: 550px; margin-inline: auto;">
+
+```mermaid
+flowchart TD
+  app["アプリを構築"]
+  namespace["Namespace を作成"]
+  external["外部データを接続（任意）"]
+  use["アプリで統合データを利用"]
+  app --> namespace --> external --> use
+  namespace -.->|"任意の手順を省略"| use
+  classDef t0accent fill:#B2ED1D,stroke:#73B200,color:#171717
+  class use t0accent
+```
+
+</div>
+
+<div class="t0-journey-table">
+
+| 操作 | 担当 | 説明 |
+| --- | --- | --- |
+| アプリを構築 | あなた | Agent と対話してカスタムアプリを作成します。 |
+| Namespace を作成 | Agent | アプリの業務ロジックに基づいて Namespace とデータモデルを作成します。 |
+| 外部データを接続（任意） | あなた | 必要に応じて、接続する既存の業務システムやデバイスの情報を Agent に提供します。 |
+| データを統合 | Agent | 外部データを既存のアプリのモデルにマッピング、変換、統合します。 |
+
+</div>
+
+## 次へ
+
+- [アプリの構築](../../using-tier0/building-apps/) — Tier0 でアプリを構築する方法。
+- [データ基盤の準備](../../using-tier0/preparing-data-foundation/) — データモデルと外部データ接続について。

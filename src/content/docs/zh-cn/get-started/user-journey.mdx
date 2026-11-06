@@ -1,0 +1,37 @@
+---
+title: 用户旅程
+description: 开始使用 Tier0 的推荐步骤。
+lastUpdated: 2026-11-06
+---
+
+<div class="t0-compact-mermaid" style="max-width: 550px; margin-inline: auto;">
+
+```mermaid
+flowchart TD
+  app["构建应用"]
+  namespace["创建 Namespace"]
+  external["接入外部数据（可选）"]
+  use["在应用中使用统一数据"]
+  app --> namespace --> external --> use
+  namespace -.->|"跳过可选步骤"| use
+  classDef t0accent fill:#B2ED1D,stroke:#73B200,color:#171717
+  class use t0accent
+```
+
+</div>
+
+<div class="t0-journey-table">
+
+| 操作 | 执行者 | 说明 |
+| --- | --- | --- |
+| 构建应用 | 你 | 与 Agent 对话，创建自定义应用。 |
+| 创建 Namespace | Agent | 根据应用的业务逻辑创建 Namespace 和数据模型。 |
+| 接入外部数据（可选） | 你 | 如有需要，提供现有业务系统或设备的信息，供 Agent 连接。 |
+| 集成数据 | Agent | 将外部数据映射、转换并集成到应用现有的数据模型中。 |
+
+</div>
+
+## 下一步
+
+- [构建应用](../../using-tier0/building-apps/) — 了解如何在 Tier0 中构建应用。
+- [准备数据基础](../../using-tier0/preparing-data-foundation/) — 了解数据模型和外部数据连接。

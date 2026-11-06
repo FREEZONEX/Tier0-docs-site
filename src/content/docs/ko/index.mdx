@@ -11,9 +11,8 @@ next: false
 	<div class="t0-banner-main">
 		<p class="t0-tag">Tier0로 구축 시작</p>
 		<h2>이 내용을 코드 agent에 붙여넣기</h2>
-		<p>프롬프트 하나로 Tier0 CLI와 skill을 설치하고 로그인한 뒤, agent가 Unified Namespace를 처음 둘러볼 수 있게 합니다.</p>
-		<pre class="t0-prompt" id="t0-agent-prompt">{`\`npx -y @tier0/cli@latest install\`를 실행해 tier0 CLI와 agent skill을 설치하세요.
-전체 Tier0 문서는 https://docs.tier0.app/llms.txt 를 읽어보세요.`}</pre>
+		<p>MCP로 agent를 Tier0에 연결하세요.</p>
+		<pre class="t0-prompt" id="t0-agent-prompt">{`https://docs.tier0.app/using-tier0/operating-on-tier0-with-agents/ 를 읽고 MCP로 Tier0에 연결한 다음 Tier0 작업을 도와주세요.`}</pre>
 		<button class="t0-copy" id="t0-copy-btn" type="button">
 			<svg class="t0-copy-icon t0-copy-icon--copy" width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
 				<rect x="5" y="5" width="8" height="8" rx="1" stroke="currentColor" stroke-width="1.25" />
@@ -27,9 +26,8 @@ next: false
 	</div>
 	<div class="t0-banner-side">
 		<div class="t0-side-group">
-			<p class="t0-side-label">직접 진행하고 싶나요?</p>
-			<a class="t0-side-link" href="/get-started/installation/">설치 가이드</a>
-			<a class="t0-side-link" href="/get-started/try-the-demo-factory-in-tier0/">데모 팩토리</a>
+			<p class="t0-side-label">MCP로 agent 연결</p>
+			<a class="t0-side-link" href="/ko/using-tier0/operating-on-tier0-with-agents/">MCP 연결 가이드</a>
 		</div>
 		<div class="t0-side-group">
 			<p class="t0-side-label">agent용 machine-readable endpoint:</p>
@@ -71,43 +69,11 @@ document.getElementById('t0-copy-btn').addEventListener('click', function () {
 </div>
 
 <section class="t0-grid not-content">
-	<a class="t0-cell" href="/ko/best-practice/modeling-factory-data/">
-		<span class="t0-tag">모델링</span>
-		<div class="t0-cell-body">
-			<h3>공장 데이터 모델링</h3>
-			<p>Demo UNS가 어떻게 설계되는지 설명합니다. 계층 구조, topic 폭증 방지, 확장 가능한 payload 구조를 다룹니다.</p>
-			<span class="t0-more">자세히 보기</span>
-		</div>
-	</a>
-	<a class="t0-cell" href="/ko/best-practice/connecting-industrial-protocols/">
-		<span class="t0-tag">프로토콜</span>
-		<div class="t0-cell-body">
-			<h3>산업 프로토콜 연결</h3>
-			<p>일반 산업 프로토콜용 Node-RED flow와 실제 import 가능한 flow JSON reference입니다.</p>
-			<span class="t0-more">자세히 보기</span>
-		</div>
-	</a>
 	<a class="t0-cell" href="/ko/best-practice/security-and-resilience/">
 		<span class="t0-tag">보안</span>
 		<div class="t0-cell-body">
 			<h3>보안 및 복원력</h3>
 			<p>신원과 데이터 접근을 보호하고 암호화 전송을 선택하며 배포 및 복구 경계를 이해합니다.</p>
-			<span class="t0-more">자세히 보기</span>
-		</div>
-	</a>
-	<a class="t0-cell" href="/ko/best-practice/building-analytics-apps/">
-		<span class="t0-tag">분석</span>
-		<div class="t0-cell-body">
-			<h3>분석 앱 구축</h3>
-			<p>Notebook query부터 interactive 분석 앱까지, 비식별 데이터 기반 Aramco Bowtie 사례를 다룹니다.</p>
-			<span class="t0-more">자세히 보기</span>
-		</div>
-	</a>
-	<a class="t0-cell" href="/ko/best-practice/displaying-data-with-digital-twin/">
-		<span class="t0-tag">Digital Twin</span>
-		<div class="t0-cell-body">
-			<h3>Digital Twin으로 공장 데이터 표시하기</h3>
-			<p>Digital Twin 장면을 사용해 작업장 스타일 운영 화면에서 실시간 UNS 데이터를 시각화합니다.</p>
 			<span class="t0-more">자세히 보기</span>
 		</div>
 	</a>

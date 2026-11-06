@@ -1,0 +1,40 @@
+---
+title: User Journey
+description: The recommended way to get started with Tier0.
+lastUpdated: 2026-11-06
+---
+
+<div class="t0-compact-mermaid" style="max-width: 550px; margin-inline: auto;">
+
+```mermaid
+flowchart TD
+  app["Build Your App"]
+  namespace["Create Namespace"]
+  external["Extend with External Data (Optional)"]
+  use["Use Unified Data in Your App"]
+
+  app --> namespace --> external --> use
+  namespace -.->|"Skip optional step"| use
+
+  classDef t0accent fill:#B2ED1D,stroke:#73B200,color:#171717
+  class use t0accent
+```
+
+</div>
+
+<div class="t0-journey-table">
+
+| Action | Operator | Description |
+| --- | --- | --- |
+| Build App | You | Talk to the Agent to create a custom application. |
+| Create Namespace | Agent | Creates a Namespace and data models based on the App's business logic. |
+| Connect External Data (optional) | You | Provide information of existing business systems or devices for the agent to connect when necessary. |
+| Integrate Data | Agent | Maps, transforms, and integrates external data into the existing model for the App. |
+
+</div>
+
+
+## Next
+
+- [Building Apps](../../using-tier0/building-apps/) - Explore how Apps are built in Tier0.
+- [Preparing Data Foundation](../../using-tier0/preparing-data-foundation/) - Learn how data models and external data connections work.

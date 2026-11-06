@@ -30,10 +30,13 @@ function parseEdgePoints(path) {
 function fitSvgViewBox(svg, pad) {
 	const padValue = pad ?? 6;
 	const current = svg.viewBox.baseVal;
-	let minX = current.x;
-	let minY = current.y;
-	let maxX = current.x + current.width;
-	let maxY = current.y + current.height;
+	const tightBounds = svg.closest('.t0-foundation-mermaid')
+		? svg.querySelector('g.root')?.getBBox()
+		: null;
+	let minX = tightBounds?.x ?? current.x;
+	let minY = tightBounds?.y ?? current.y;
+	let maxX = tightBounds ? tightBounds.x + tightBounds.width : current.x + current.width;
+	let maxY = tightBounds ? tightBounds.y + tightBounds.height : current.y + current.height;
 
 	for (const edgeLabel of svg.querySelectorAll('g.edgeLabel')) {
 		const outer = edgeLabel.getAttribute('transform')?.match(/translate\\(([-\\d.]+),\\s*([-\\d.]+)\\)/);
@@ -132,7 +135,7 @@ function adjustMermaidEdgeLabels(root) {
 	svg.style.setProperty('height', 'auto', 'important');
 	svg.style.setProperty('max-width', '100%', 'important');
 
-	if (vb.width > 0 && available > 0 && vb.width > available) {
+	if (svg.closest('.t0-foundation-mermaid') || (vb.width > 0 && available > 0 && vb.width > available)) {
 		root.style.width = '100%';
 		svg.setAttribute('width', '100%');
 		svg.style.setProperty('width', '100%', 'important');

@@ -5,11 +5,11 @@ sidebar:
   order: 3
 ---
 
-Tier0 App Builder currently includes 7 active embedded AI skills. These skills help the agent turn requirements into industrial applications, align applications with the Tier0 platform scaffold, repair UI issues, and keep preview environments stable.
+The [Tier0 Builder Skills repository](https://github.com/FREEZONEX/Tier0-Builder-Skill/tree/feature/cloud-new-architecture-migration) currently contains 6 skills for requirements, app building, platform alignment, browser capabilities, responsive design, and preview troubleshooting. This page follows its `feature/cloud-new-architecture-migration` branch.
 
 ## `app-srs`
 
-**Meaning**: The requirements-analysis entry point for new industrial-enterprise apps. It is used for WMS, MES, ERP, CRM, QMS, EAM, approval, inventory, supplier, customer, scheduling, and similar enterprise workflows.
+**Meaning**: The requirements-analysis entry point for industrial-enterprise apps. It creates an SRS from a request, converts a PRD, or revises an existing SRS.
 
 **Example**:
 
@@ -17,23 +17,16 @@ Tier0 App Builder currently includes 7 active embedded AI skills. These skills h
 Use $app-srs to design a quality exception management system for an automotive parts factory.
 ```
 
-Natural language can also trigger it:
-
-```text
-Generate a warehouse management app with receiving, putaway, picking, shipping, and inventory counting.
-```
-
 **What it does**:
 
-1. Analyzes business roles, workflows, states, and exceptions.
-2. Checks whether the requirement is clear enough.
-3. Generates a complete SRS.
-4. Saves it to `specs/spec.md` by default.
-5. Hands the result to `app-builder` by default unless the user asks for requirements only.
+1. Maps business roles, workflows, states, validations, and exceptions.
+2. Defines a bounded first release with visible, usable commitments.
+3. Saves the complete SRS to `specs/spec.md` by default.
+4. Continues to `app-builder` for a first-time app unless the user asks for requirements only or clarification is needed.
 
 ## `app-builder`
 
-**Meaning**: The core skill for actually building the app.
+**Meaning**: Builds a runnable app or substantially extends an existing app from requirements or `specs/spec.md`.
 
 **Example**:
 
@@ -41,102 +34,72 @@ Generate a warehouse management app with receiving, putaway, picking, shipping, 
 Use $app-builder to build the first version from specs/spec.md.
 ```
 
-**Internal work types**: The agent decides which work type to use based on the prompt and current project state.
+**Work modes**:
 
-- **First Release**: Builds the first version from an SRS.
-- **Delta Feature**: Adds a substantial module or workflow to an existing app.
-- **Light Edit**: Handles small field, copy, style, or validation changes without running the full build flow.
+- **First release**: Builds the bounded first version; creates an SRS with `app-srs` first if needed.
+- **Substantial extension**: Adds a business module or workflow while preserving existing behavior.
+
+Ordinary field, copy, style, and isolated UI repairs do not require the full Builder workflow.
 
 **What it checks**:
 
-- Visible entry points.
-- Executable user paths.
-- Data or state changes.
-- Role permissions.
-- Build and preview verification.
+- Discoverable entry points and executable user paths for committed capabilities.
+- Real data and state changes, validation, and role permissions.
+- Build, preview, and interactive workflow evidence.
 
-:::tip
-If a first-time build has no `specs/spec.md`, the agent will create one with `app-srs` first.
-:::
+For list-type pages, it uses the target scaffold's `MetaListPage` when suitable and connects it to real services and permissions.
 
 ## `align-platform-app`
 
-**Meaning**: A migration skill for aligning an existing app with the Tier0 platform scaffold.
+**Meaning**: Migrates an imported app to the Tier0 scaffold or aligns an existing Tier0 app with the current scaffold contract.
+
+**Example**:
 
 ```text
-Use $align-platform-app to migrate this old Vite React project into the Tier0 platform scaffold.
+Use $align-platform-app to align this app to the latest Tier0 scaffold while keeping its business code.
 ```
 
 **Suitable sources**:
 
-- Vite, CRA, Next.js, React Router, static HTML, and full-stack Node/React apps.
-- Older Tier0 apps.
-- Apps that rely on LocalStorage, IndexedDB, Zustand persist, in-memory mocks, or simulated data.
+- Imported applications and older Tier0 apps.
+- Apps with app-owned SQL databases, browser storage, or mock business persistence.
+- Existing scaffold apps that need a full update or a scoped platform repair.
 
 **What it does**:
 
-- Aligns the app to the Tier0 TanStack Start scaffold.
-- Migrates persistent business data to Drizzle/PostgreSQL.
-- Aligns routes, APIs, services, and database setup.
-- Removes app-owned login, logout, and role-switching flows.
-- Connects to Gateway-owned identity and roles.
-- Preserves platform contracts such as `/api/health`, `/api/manifest`, and `artifact.toml`.
-- Verifies preview and production startup.
-
-## `migrate-node-red-app`
-
-**Meaning**: A Node-RED migration skill for aligning a Node-RED application with the Tier0 platform scaffold. It is usually used together with `align-platform-app`.
-
-**Example**:
-
-```text
-Use $align-platform-app and $migrate-node-red-app to migrate this Node-RED backend into a Tier0 TanStack Start app.
-```
-
-**What it does**:
-
-- Inventories flows, subflows, function nodes, change nodes, and switch nodes.
-- Analyzes HTTP, MQTT, database, scheduled jobs, and external API calls.
-- Builds a migration mapping table.
-- Separates CRUD, workflow, scheduling, integration, and temporary simulation behavior.
-- Moves business logic into services.
-- Moves interfaces into API routes.
-- Moves state into PostgreSQL.
-- Moves long-running work and integrations into workers, queues, or external services.
-- Verifies browser, CRUD, workflow, and integration cutover separately.
+- Compares the app against an exact commit of the [cloud architecture scaffold](https://github.com/FREEZONEX/Tier0-App-Scaffold/tree/feature/cloud-new-architecture-migration).
+- Preserves business behavior while aligning runtime, routing, Gateway roles, and platform contracts.
+- For a full cloud migration, moves app-owned durable records to Tier0 UNS collections through `@tier0/sdk-v2`; historical records from the original database require a separate UNS-side import when needed.
+- Verifies the changed build and runtime behavior before writing the scaffold version marker in `package.json`.
 
 :::caution
-It does not handle ordinary preview or packaging issues by itself.
+A scoped repair does not imply a full data migration or a complete scaffold update.
 :::
 
-## `ui-repair`
+## `browser-platform-capabilities`
 
-**Meaning**: A repair skill for existing apps. It is used for UI quality issues, not for first-time app generation.
+**Meaning**: Guides browser interactions for QR/barcode scanning, photo capture, geolocation, audio recording, file reading, and clipboard access.
 
 **Example**:
 
 ```text
-Use $ui-repair to fix overflow and form misalignment in the order edit dialog on small screens.
+Use $browser-platform-capabilities to add photo capture with a file-upload fallback to an inspection form.
 ```
 
-**Suitable issues**:
+**What it does**:
 
-- Misaligned forms or required markers.
-- Dialog or drawer overflow.
-- Accidental horizontal scrolling.
-- Clipped select menus or dropdowns.
-- Broken table or chart layout.
-- Flat pages with weak visual hierarchy.
-- Mixed UI languages.
-- PDA, kiosk, dashboard, and industrial interface layout problems.
+- Chooses browser APIs and fallbacks for the target device and container.
+- Checks secure contexts, permissions, and iframe or WebView restrictions.
+- Preserves form input on cancellation or failure and labels fallback data when its meaning differs from live capture.
+- Verifies success, denial, retry, and cleanup for the implemented capability.
 
-:::caution
-The skill should locate the smallest owning component and fix the affected surface without rebuilding the whole app. For complex responsive work, use `responsive-craft`.
+:::note
+This skill does not provide a unified Tier0 device SDK or guarantee that every browser or embedded host permits these APIs.
 :::
 
 ## `responsive-craft`
 
-**Meaning**: A responsive-layout skill for audits, new responsive builds, and multi-breakpoint previews.
+**Meaning**: Handles complex breakpoint decisions, coordinated sticky and scroll regions, and multi-viewport audits or previews. Isolated overflow and clipped controls can be repaired directly.
 
 **Invocation modes**:
 
@@ -151,21 +114,12 @@ Use $responsive-craft audit to fix the mobile layout of this dashboard.
 ```
 
 ```text
-Use $responsive-craft build to create an inventory workspace for phone, tablet, and desktop.
-```
-
-```text
 Use $responsive-craft preview to show 375, 768, 1024, and 1440 px breakpoints.
 ```
 
-**Execution styles**:
-
-- **Adaptive**: Moves quickly and confirms design forks as they appear.
-- **Guided**: Writes responsive behavior specs for each component before implementation.
-
 ## `preview-runtime-stability`
 
-**Meaning**: A runtime troubleshooting skill for preview failures during app development. It does not build business features.
+**Meaning**: Diagnoses managed preview installation, startup, readiness, role, port, and HMR failures. It does not build business features.
 
 **Example**:
 
@@ -175,29 +129,21 @@ Use $preview-runtime-stability to diagnose "Preview loading timed out".
 
 **Suitable issues**:
 
-- Missing or partial `node_modules`.
-- npm `ERESOLVE`.
-- Vite or TanStack Start startup failures.
-- Port `5173` conflicts.
-- `/api/health` failures.
-- SDK SSR module errors.
-- `artifact.toml` preview port mismatch.
-- Frequent full-page reloads during HMR.
-- Stale Node or Vite processes that did not exit.
+- Missing dependencies, npm `ERESOLVE`, or lockfile errors.
+- Vite or TanStack Start startup failures and port `5173` conflicts.
+- `/api/health` failures, preview role errors, or `artifact.toml` mismatches.
+- Frequent full-page reloads during HMR and stale app-owned preview processes.
 
 **Standard flow**:
 
-1. Check dependency installation.
-2. Check port `5173`.
-3. Probe the health endpoint.
-4. Reuse the preview when it is healthy.
-5. Clean up the old preview when it is unhealthy.
-6. Restart and verify the port, health endpoint, and HMR behavior.
-
+1. Read the first relevant install or preview error.
+2. Fix the evidenced cause in the app or use the managed preview control for runtime issues.
+3. Restart only when needed and verify the original failure, health, and affected route.
 
 ## Skill Selection Guide
 
-- Use `app-srs` first when the requirement is unclear or when you need a durable specification. 
-- Use `app-builder` when the implementation scope is already clear. 
-- Use `align-platform-app` and `migrate-node-red-app` for migration work. 
-- Use `ui-repair`, `responsive-craft`, or `preview-runtime-stability` when the app already exists and the problem is visual, responsive, or runtime-specific.
+- Use `app-srs` to create or revise requirements; it normally hands a new app to `app-builder`.
+- Use `app-builder` for a first release or substantial business extension.
+- Use `align-platform-app` for migration or scaffold alignment.
+- Use `browser-platform-capabilities` when an app needs one of its six browser capabilities.
+- Use `responsive-craft` for complex responsive work, and `preview-runtime-stability` for managed preview failures.

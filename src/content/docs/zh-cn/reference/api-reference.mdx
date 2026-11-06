@@ -1,40 +1,29 @@
 ---
 title: API 参考
-description: Tier0 的 API 集成要点和机器可读的 OpenAPI 参考。
-sidebar:
-  order: 1
+description: 连接 Tier0 API、检查响应，并安全地重试写入。
 ---
 
-## 快速开始
+## 连接与认证
 
-- 使用 `https://<your-tier0-host>/openapi/v1` 作为基础 URL。
-- 除 `/assets/files/public` 外，所有 OpenAPI 端点都要发送 `x-api-key`。标记为 `public` 的文件无需 API 密钥即可下载。
-- 先调用 `POST /auth/whoami`，确认 API 密钥对应的身份和实际权限。
+- **基础 URL**：`https://<your-tier0-host>/openapi/v2`
+- **认证**：在 `x-api-key` 请求头中发送 Tier0 API Key。
 
-:::note[OpenAPI 参考]
-打开交互式 [API 参考](../tier0-openapi/)，查看请求架构、响应架构和可执行请求。
+## 检查结果
+
+- 对 `/uns/` 请求同时检查 HTTP 状态和响应体。成功响应的状态为 `2xx` 且 `code: 0`，结果在 `data` 中。
+- 失败时查看 `error.code`，并保留 `requestId` 以便排查。
+- 批量请求即使返回 HTTP `200`，也要逐项检查，部分项目可能失败。
+
+## 重试写入
+
+- 查看 `error.execution`，判断写入是否未开始、已回滚、已提交或结果未知。
+- 仅当 `error.retry.safe` 为 `true` 时，才使用相同幂等键重试同一请求。如果给出等待时间，至少等待 `error.retry.afterMs` 或 `Retry-After` 响应头指定的时长。
+- 如果批量请求部分提交，先核对成功项目，再提交剩余工作。若结果未知且响应未确认可安全重试，先验证写入是否生效。
+
+## 术语
+
+- **幂等性**：重复执行操作与执行一次产生相同效果。对支持幂等键的写入，重试同一请求时复用原键；独立的新写入使用新键。
+
+:::note
+详细信息请查看 [OpenAPI 参考](../tier0-openapi/)。
 :::
-
-## 处理结果
-
-即使返回 HTTP `200`，UNS 批量操作也可能部分失败。在认定操作成功前，请检查每一项结果。
-
-## Flow 中的自定义 HTTP In 路由
-
-对于在 **Source Flow** 和 **Event Flow** 中开发的 API，输入和响应由已部署的 Flow 定义。
-
-- **Source Flow** 使用 `/flow/source/`，默认公开。暴露敏感行为前，请添加入口或 Flow 级访问控制。
-- **Event Flow** 使用 `/flow/event/`，需要具备 `flow.read` 权限的 `x-api-key`。
-
-:::note[Source Flow 或 Event Flow 中的自定义 API 示例]
-例如 API URL 为 `/integrations/echo`，并且需要用 `HTTP In` 节点开发该 API：
-
-- `HTTP In` 节点中的路由为 `/integrations/echo`，其余部分由 Tier0 补全。
-- 外部调用 URL 为 `https://tier0.example.com/flow/source/integrations/echo` 或 `https://tier0.example.com/flow/event/integrations/echo`。
-:::
-
-## 故障排除
-
-- `401` / `403`：检查 API 密钥、权限范围和所有者权限。
-- `404`：检查 HTTP 方法、路由前缀、节点 URL 和部署状态。
-- `No response`：确保每条 Flow 路径都到达 `HTTP Response` 节点，且没有丢弃原始请求和响应属性。

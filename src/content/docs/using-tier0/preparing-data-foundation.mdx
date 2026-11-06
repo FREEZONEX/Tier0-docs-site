@@ -1,108 +1,97 @@
 ---
 title: Preparing Data Foundation
-description: Model your namespace and bring data in with Source Flows. Available in all editions.
-editions: [edge, cloud, enterprise]
+description: Connect, model and intergrate external data into Tier0 for your applications.
+editions: [cloud]
 sidebar:
   order: 2
 ---
 import { Steps } from '@astrojs/starlight/components';
 
-First build a model in **UNS**, then connect data through **Source Flow** to the model, forming a data foundation for subsequent use.
+Tier0 builds a data foundation for customized applications that:
+- Takes in business data from applications;
+- Connects external data sources from your existing systems and devices;
+- Integrates data into a unified model for your applications to use.
+
+:::tip[Who takes care of the data]
+- Data source connections, especially ones that require authentication, are handled by you.
+- The agent does the rest, including data acquisition, mapping and modeling.
+:::
+
+## Data Foundation Concept
+
+### Namespace
+
+All data is modeled into **Collections** under **Namespace** and organized based on data types.
+- Relational data, mostly from business systems, is stored in **Record** tables.
+- Time-series data, mostly from devices, is stored in **Sample** tables.
+
+<div class="t0-compact-mermaid t0-foundation-mermaid" style="max-width: 450px; margin-inline: auto;">
 
 ```mermaid
-flowchart BT
-  uns["UNS Model"]
-  flow["Source Flow"]
+flowchart TB
+  namespace["Namespace"] --> collection["Collection"]
+  collection --> record["Record table<br/>relational data"]
+  collection --> sample["Sample table<br/>time-series data"]
 
-
-  flow -->|"send data"| uns
-
-  classDef t0accent fill:#EFFFD2,stroke:#8AC926,stroke-width:1px,color:#18230B
-  classDef t0node fill:#F8FAFC,stroke:#CBD5E1,stroke-width:1px,color:#111827
-  class uns t0accent
-  class flow t0node
+  classDef t0accent fill:#B2ED1D,stroke:#73B200,color:#171717
+  class collection t0accent
 ```
-{/* 
-:::note
-The process can be done through conversations with the UNS agent. Check [here](../../best-practice/building-shopfloor-workflow-with-agent/) for details.
-::: */}
 
-## Build a Data Model
-Define the data hierarchy as a tree map according to:
-  - The physical location the data comes from ([ISA-95](../../reference/isa-95-equipment-hierarchy/));
-  - The business logic the data conforms to.
+</div>
 
-### Build Models Manually
 
-:::tip[Use drafts to verify models first]
-Create or import models in **Draft** to verify whether the models conform to model principles and deploy them after validity.
-:::
+### Data Types
 
-<Steps>
-1. Design the model structure, and add paths by order before adding the topic.
-2. Set **Topic Type** among **Metric**, **State** and **Action** based on [data features](../factory-data-foundation/#metric-state-action).
-3. Select **Mock Data** to send simulated data to the model, and **Enable History** to store the data to database.
-    
-    :::note
-    A flow will be created in **Flows** to send simulated data to the model.
-    :::
+- Business data can be from application usage or external systems.
+- Time-series data is mostly from connected devices.
 
-4. Add data fields to the topic with the correct data types by **Auto Parsing** or **Pre-defined**.
-    - **Auto Parsing**: Convert fields automatically from JSON text in batches.
+<div class="t0-compact-mermaid t0-foundation-mermaid" style="max-width: 450px; margin-inline: auto;">
 
-        ```json
-        {
-          "temp":85.5
-        }
-        ```
-        :::caution
-        Can only parse single layer JSON, and for multi-layer JSON, only the first layer will be parsed.
-        :::
-    - **Pre-defined**: Manually set fields for the topic one by one.
-</Steps>
+```mermaid
+flowchart LR
+  app["App"] -->|"business data"| record["Record"]
+  stream["Stream"] -->|"device data"| sample["Sample"]
 
-### Import Models
-:::tip
-Use LLMs like ChatGPT to help import models.
-:::
+  classDef t0accent fill:#B2ED1D,stroke:#73B200,color:#171717
+  class record,sample t0accent
+```
+
+</div>
+
+### Data Connection
+
+- **Source**: Connects to external data servers, frequently with authentications.
+- **Stream**: Collects data from servers, processes it according to requirements and stores it in **Namespace** models.
+
+<div class="t0-compact-mermaid t0-foundation-mermaid" style="max-width: 450px; margin-inline: auto;">
+
+```mermaid
+flowchart LR
+  source["Source<br/>connects server"] --> stream["Stream<br/>collects + processes"]
+
+  classDef t0accent fill:#B2ED1D,stroke:#73B200,color:#171717
+  class source,stream t0accent
+```
+
+</div>
+
+## Building Data Foundation
 
 <Steps>
-1. Send the template JSON from **Import** to AI, and use a similar prompt.
-    ```
-    Generate a UNS model used for xx in xx plant, including xx equipment and data sources based on the template.
-    ```
-2. Import the generated result in UNS.
+1. Build your application in **Builder** and have the business data models prepared in **Namespace** using agent.
+
+      :::note
+      Unless stated clearly in the prompt, data models are automatically generated by the agent based on the application business logic.
+      :::
+
+2. Connect needed data sources under **Connect** > **Source** with authentication.
+3. Tell the agent to create **Stream** to collect and process data from connected sources into **Namespace** models generated from the application.
 </Steps>
 
-
-## Connect Data to UNS
-
-### Data Flow Features
-- Based on Node-RED.
-- Every flow ends with an `mqtt out` node. It works as an MQTT client to publish data to the UNS broker.
-- The UNS broker is embedded in the `mqtt out` and `mqtt in` nodes with the same name as the flow.
-- When a UNS model is used as the topic, data goes directly to the corresponding model in **UNS**.
-
-### Steps
-
-<Steps>
-1. Use nodes based on the data source type to build a flow, and end it with an `mqtt out` node.
-
-    :::tip[If you need nodes that are not there]
-    Install nodes from Node-RED community for your requirements. Official nodes often start with `node-red-contrib`.
-    :::
-2. Make sure the **Server** of the `mqtt out` node is set to the UNS broker, and topic is a model from **UNS**.
-</Steps>
-
-### Flow Version Management
-Save versions of the data flow, so you can either roll back to an earlier version or start a new flow with a history version.
-:::caution
-Version rollback is not supported for Edge edition.
-::: 
 ## Next
 
 - [Build Apps on UNS](../building-apps/) — Build industrial applications with UNS data.
-- [Analyze UNS Data](../analyzing-data/) — Analyze UNS data with Marimo Notebook and Python.
+- [Work with Factory Data](../working-with-factory-data/) — Read and use the data after connecting it to the UNS.
 
 
 
