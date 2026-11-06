@@ -5,6 +5,8 @@ editions: [cloud]
 sidebar:
   order: 2
 ---
+import { Steps } from '@astrojs/starlight/components';
+
 
 Tier0 为自定义应用建立数据基础：接收应用业务数据、连接现有系统和设备的数据源，并将数据集成到统一模型供应用使用。
 
@@ -69,9 +71,14 @@ flowchart LR
 
 ## 构建数据基础
 
+<Steps>
 1. 在 **Builder** 中构建应用，让 Agent 在 **Namespace** 中准备业务数据模型。除非 Prompt 明确指定，否则 Agent 会根据应用业务逻辑自动生成模型。
+	:::note
+	除非 Prompt 明确指定，否则 Agent 会根据应用业务逻辑自动生成数据模型。
+	:::
 2. 在 **Connect** > **Source** 中连接所需数据源并配置认证。
 3. 让 Agent 创建 **Stream**，从已连接的 Source 采集和处理数据，写入应用生成的 **Namespace** 模型。
+</Steps>
 
 ## 下一步
 

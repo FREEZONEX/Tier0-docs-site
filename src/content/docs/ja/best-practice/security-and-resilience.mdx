@@ -30,7 +30,7 @@ Cloud の本番サービスにおけるネットワーク境界、テナント�
 | 対象 | Tier0 の仕組み | 詳細 |
 | --- | --- | --- |
 | プラットフォームへのアクセス | <ul><li>Cloud は Workspace のメンバー資格でアクセスを制御します。</li><li>Enterprise はユーザーアカウントでアクセスを制御します。</li></ul> | [ユーザー管理](../../reference/user-management/) |
-| Agent のアクセス | Agent は API キーで認証し、Tier0 CLI を使用してプラットフォームにアクセスして操作します。 | [CLI 認証](../../using-tier0/operating-on-tier0-with-agents/#認証) |
+| Agent のアクセス | Agent は MCP を介して接続し、付与された権限の範囲でプラットフォームを操作します。 | [Agent を接続する](../../using-tier0/operating-on-tier0-with-agents/) |
 | プロジェクトとアプリケーションへのアクセス | Tier0 は RBAC を使用してアプリケーションへのアクセスを制御します。 | [アクセス制御](../../using-tier0/building-apps/#アクセス制御) |
 
 :::note
@@ -41,7 +41,7 @@ Workspace のメンバー資格によってアカウントが自動作成され�
 
 | アクセス方法 | Tier0 の仕組み | 詳細 |
 | --- | --- | --- |
-| MQTT | <ul><li>クライアントは Tier0 が生成した認証情報で認証します。</li><li>TLS とセキュア WebSocket が転送中のデータを暗号化します。</li></ul> | [MQTT 認証情報と接続](../../using-tier0/working-with-factory-data/#mqtt-credentials-を生成する) |
+| MQTT | <ul><li>クライアントは Tier0 が生成した認証情報で認証します。</li><li>TLS とセキュア WebSocket が転送中のデータを暗号化します。</li></ul> | [MQTT 認証情報と接続](../../using-tier0/working-with-factory-data/) |
 | REST API | データへのアクセスには Tier0 が生成したキーが必要です。 | [API リファレンス](../../reference/api-reference/) |
 
 ## レジリエンス

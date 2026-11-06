@@ -1,4 +1,4 @@
-﻿---
+---
 title: 连接工业协议
 description: "使用 Node-RED 将 OPC UA、Modbus 和其他典型协议设备接入 UNS，并提供真实数据流 JSON 参考。"
 editions: [edge, cloud, enterprise]
@@ -21,24 +21,36 @@ import { Steps } from '@astrojs/starlight/components';
 - `inject`
     1. 单击左下角 **add** 添加一条属性。
     2. 按照以下内容配置属性。
-
         ```json
         {
-          "msg.payload": "[multiple data tags]",
+          "msg.payload": "[
+                            {
+                                "name": "D103_CHLORIDE",
+                                "nodeId": "ns=2;i=3",
+                                "datatype": "Float"
+                            },
+                            {
+                                "name": "D103_PH",
+                                "nodeId": "ns=2;i=4",
+                                "datatype": "Float"
+                            },
+                            ...
+                        ]",
           "msg.topic": "multiple"
         }
         ```
 - `OPC UA Client`
     ```json
-    "Endpoint": "<OPC UA 服务器地址和端口>", //e.g. opc.tcp://127.0.0.1:4850
+    "Endpoint": "<OPC UA server address and port>", //e.g. opc.tcp://127.0.0.1:4850
     "Action": "SUBSCRIBE",
-    "Interval": "<数据采集频率>" //e.g. 10 秒
+    "Interval": "<data collecting interval>" //e.g. 10 seconds
     ```
 - `mqtt out`
     ```json
-    "Server": "<内置 UNS broker>", //与数据流同名
-    "Topic": "<UNS 模型>",
+    "Server": "<embedded UNS broker>", //same name as the flow
+    "Topic": "<UNS model>",
     ```
+
 4. 部署并触发数据流。
 
 ### 数据流参考
@@ -212,9 +224,10 @@ import { Steps } from '@astrojs/starlight/components';
           - **Port**：Modbus 服务器端口。
     - `mqtt out`
         ```json
-        "Server": "<内置 UNS broker>", //与数据流同名
-        "Topic": "<UNS 模型>",
+        "Server": "<embedded UNS broker>", //same name as the flow
+        "Topic": "<UNS model>",
         ```
+
 3. 部署数据流。
 
 ### 数据流参考
@@ -390,9 +403,10 @@ import { Steps } from '@astrojs/starlight/components';
         ```
     - `mqtt out`
         ```json
-        "Server": "<内置 UNS broker>", //与数据流同名
-        "Topic": "<UNS 模型>",
+        "Server": "<embedded UNS broker>", //same name as the flow
+        "Topic": "<UNS model>",
         ```
+
 3. 部署数据流。
 
 ### 数据流参考

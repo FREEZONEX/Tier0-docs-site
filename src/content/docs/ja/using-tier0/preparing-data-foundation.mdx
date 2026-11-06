@@ -5,6 +5,8 @@ editions: [cloud]
 sidebar:
   order: 2
 ---
+import { Steps } from '@astrojs/starlight/components';
+
 
 Tier0 はカスタムアプリのデータ基盤を作ります。アプリから業務データを受け取り、既存のシステムやデバイスに接続し、アプリで使える統一モデルにデータを統合します。
 
@@ -69,9 +71,14 @@ flowchart LR
 
 ## データ基盤を構築する
 
+<Steps>
 1. **Builder** でアプリを構築し、Agent に **Namespace** の業務データモデルを用意させます。プロンプトで明示しない限り、Agent が業務ロジックからモデルを自動生成します。
+	:::note
+	プロンプトで明示しない限り、Agent がアプリの業務ロジックからデータモデルを自動生成します。
+	:::
 2. **Connect** > **Source** で必要なデータソースに接続し、認証を設定します。
 3. Agent に **Stream** を作成させ、接続済み Source のデータを収集・処理して、アプリ用に生成された **Namespace** モデルへ保存します。
+</Steps>
 
 ## 次へ
 

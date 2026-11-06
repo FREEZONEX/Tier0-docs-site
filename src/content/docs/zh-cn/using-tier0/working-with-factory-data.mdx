@@ -11,63 +11,73 @@ import { Tabs, TabItem } from '@astrojs/starlight/components';
 你可以通过 MQTT 和 API 操作 UNS 数据。
 
 ## MQTT
-MQTT 客户端可以使用 Tier0 生成的凭据连接到 UNS broker。
+Tier0 生成的凭据可用于让 MQTT 客户端连接 UNS broker。
 :::note
-你可以使用 **MQTTX**、**MQTT Explorer** 和 **Node-RED** 等 MQTT 客户端连接 UNS broker，并发布/订阅消息。
+可以使用 **MQTTX**、**MQTT Explorer** 和 **Node-RED** 等客户端连接 broker，发布和订阅消息。
 :::
 ### 生成 MQTT 凭据
-在 Tier0 的 **Edge** 页签创建新的凭据，并记录下来。
-
+在 **Connect** > **Source** > **MQTT Device** 中生成 MQTT 凭据并记录。
+:::note[Tier0 Edge 版本的例外]
+Tier0 Edge 的外部连接不需要凭据。
+:::
 ### 连接 MQTT 客户端
 
 :::tip
-以下客户端作为示例，用来展示如何使用凭据连接 UNS broker。
+- UNS broker 支持通过以下 TCP 和 WSS 地址连接：
+    - mqtt://host:1883
+    - mqtts://host:8883
+    - ws://host:8083/mqtt
+    - wss://host:8084/mqtt
+- 以下连接示例使用未启用 TLS 的 TCP。
 :::
 
 <Tabs syncKey="mqtt-client">
   <TabItem label="MQTTX">
 
 1. 安装并打开 <a href="https://mqttx.app/" target="_blank" rel="noopener noreferrer">MQTTX</a>。
-2. 使用 Tier0 UNS broker 信息和生成的凭据添加连接。
+2. 使用 UNS broker 信息和生成的凭据添加连接。
     ```json
     {
       "Host": "mqtt.tier0.dev",
-      "Port": 8883,
+      "Port": 1883,
       "Client ID": "<generated client ID>",
       "Username": "<generated username>",
       "Password": "<generated password>"
     }
-    ``` 
+    ```
 
   </TabItem>
   <TabItem label="MQTT Explorer">
 
 1. 安装并打开 <a href="https://mqtt-explorer.com/" target="_blank" rel="noopener noreferrer">MQTT Explorer</a>。
-2. 使用 broker 信息和生成的凭据添加新连接。
+2. 使用 UNS broker 信息和生成的凭据添加新连接。
     ```json
     {
       "Protocol": "mqtt://",
       "Host": "mqtt.tier0.dev",
-      "Port": 8883,
+      "Port": 1883,
       "Username": "<generated username>",
       "Password": "<generated password>"
     }
-    ``` 
-3. 连接前，在 **ADVANCED** 中将 client ID 改为凭据 ID。
+    ```
+3. 连接前在 **ADVANCED** 中将 Client ID 改为凭据 ID。
 
   </TabItem>
   <TabItem label="Node-RED">
-      - 使用 **事件流程** - Tier0 中基于 Node-RED 的数据处理模块。
-          1. 在 **事件流程** 中创建数据流，并用 `mqtt in` 节点作为起点。
-          2. 在节点中选择 UNS broker 作为 **Server**（与 flow 同名），并将 **Topic** 设置为 UNS 模型。
-      - 使用**独立 Node-RED 实例**
+      - 使用 **Event Flow**：Tier0 中基于 Node-RED 的数据处理模块。
+
+          1. 在 **Flows** 中创建 **Event Flow**，以 `mqtt in` 节点开始。
+          2. 在节点中选择 UNS broker 作为 **Server**（与 Flow 同名），并将 **Topic** 设置为 UNS 模型。
+
+      - 使用**独立的 Node-RED 实例**
+
           1. 安装并打开 <a href="https://nodered.org/docs/getting-started/local" target="_blank" rel="noopener noreferrer">Node-RED</a> 实例。
-          2. 在 `mqtt in` 节点中使用以下信息添加 server。
+          2. 在 `mqtt in` 节点中使用以下信息添加服务器。
           ```json
           {
             {/* under Connection */}
             "Server": "mqtt://mqtt.tier0.dev",
-            "Port": 8883,
+            "Port": 1883,
             "Client ID": "<generated clientId>",
             {/* under Security */}
             "Username": "<generated username>",
@@ -79,173 +89,230 @@ MQTT 客户端可以使用 Tier0 生成的凭据连接到 UNS broker。
 
 ### 测试连接
 <Steps>
-1. 确认 client 状态正常。
-2. 复制一个 UNS 模型 topic，并通过 client 向它发布一条 message。
+1. 确认客户端状态正常。
+2. 复制 UNS 模型 Topic，通过客户端向其发布一条消息。
 </Steps>
 
 ## API
 
-### Cloud v2 数据读取
+### 基本信息
 
-Cloud v2 使用 `https://<your-cloud-host>/openapi/v2` 和 `x-api-key`。以下示例读取业务记录与真实时序采样，不适用于 Edge 或 Enterprise。
+- **Base URL**: `https://<your-tier0-host>/openapi/v2`
+- **Authentication**: 将从 Tier0 获取的 API Key 放在 `x-api-key` 请求头中。
 
-先调用 `POST /uns/metadata:find`，请求 `{"kind":"collection","filter":{},"page":{"mode":"offset","page":1,"size":20}}`。选中集合的 `data.items[].id` 是 `collectionId`。`records:find` 返回记录的 `id`，可作为采样查询的 `recordId`。两者都不是 UNS 路径。
+### 请求示例
 
-#### 查询业务记录: `records:find`
+- `POST /uns/metadata:find` — 列出 Collections 并获取 Collection ID
+  :::note
+  在 `data.items` 中找到目标 Collection 并复制其 `id`。如果第一页没有，检查 `data.pageInfo` 并请求下一页。
+  :::
+  <Tabs syncKey="uns-api-language">
+    <TabItem label="JavaScript">
 
-<Tabs syncKey="uns-api-language">
-  <TabItem label="JavaScript">
+  ```js
+  const base = "https://your-tier0-host/openapi/v2";
+  const response = await fetch(`${base}/uns/metadata:find`, {
+    method: "POST",
+    headers: { "content-type": "application/json", "x-api-key": "your-api-key" },
+    body: JSON.stringify({"kind": "collection", "filter": {}, "page": {"mode": "offset", "page": 1, "size": 20}}),
+  });
+  const result = await response.json();
+  if (!response.ok || result.code !== 0) throw new Error(result.error?.code || result.msg);
+  console.log(result.data.items);
+  ```
 
-```js
-const base = process.env.TIER0_BASE_URL; // https://<your-cloud-host>/openapi/v2
-const collectionId = process.env.TIER0_COLLECTION_ID;
-const response = await fetch(`${base}/uns/collections/${encodeURIComponent(collectionId)}/records:find`, {
-  method: "POST",
-  headers: { "content-type": "application/json", "x-api-key": process.env.TIER0_API_KEY },
-  body: JSON.stringify({"filter": {"status": "running"}, "limit": 20}),
-});
-const result = await response.json();
-if (!response.ok || result.code !== 0) throw new Error(result.error?.code || result.msg);
-console.log(result.data);
-```
+    </TabItem>
+    <TabItem label="Python">
 
-  </TabItem>
-  <TabItem label="Python">
+  ```python
+  import requests
 
-```python
-import os
-import requests
+  response = requests.post(
+      "https://your-tier0-host/openapi/v2/uns/metadata:find",
+      headers={"x-api-key": "your-api-key"},
+      json={"kind": "collection", "filter": {}, "page": {"mode": "offset", "page": 1, "size": 20}},
+      timeout=30,
+  )
+  response.raise_for_status()
+  result = response.json()
+  if result["code"] != 0:
+      raise RuntimeError(result.get("error", result.get("msg")))
+  print(result["data"]["items"])
+  ```
 
-response = requests.post(
-    f"{os.environ['TIER0_BASE_URL']}/uns/collections/{os.environ['TIER0_COLLECTION_ID']}/records:find",
-    headers={"x-api-key": os.environ["TIER0_API_KEY"]},
-    json={"filter": {"status": "running"}, "limit": 20},
-    timeout=30,
-)
-response.raise_for_status()
-result = response.json()
-if result["code"] != 0:
-    raise RuntimeError(result.get("error", result.get("msg")))
-print(result["data"])
-```
+    </TabItem>
+    <TabItem label="cURL">
 
-  </TabItem>
-  <TabItem label="cURL">
+  ```bash
+  curl --fail-with-body -X POST "https://your-tier0-host/openapi/v2/uns/metadata:find" \
+    -H "content-type: application/json" \
+    -H "x-api-key: your-api-key" \
+    -d '{"kind": "collection", "filter": {}, "page": {"mode": "offset", "page": 1, "size": 20}}'
+  ```
 
-```bash
-curl --fail-with-body -X POST "$TIER0_BASE_URL/uns/collections/${TIER0_COLLECTION_ID}/records:find" \
-  -H "content-type: application/json" \
-  -H "x-api-key: $TIER0_API_KEY" \
-  -d '{"filter": {"status": "running"}, "limit": 20}'
-```
+    </TabItem>
+  </Tabs>
 
-  </TabItem>
-</Tabs>
+- `POST /uns/collections/{collectionId}/records:find` — 列出 Records 并获取 Record ID
+  :::note
+  - 将 `your-collection-id` 替换为 `metadata:find` 返回的 ID。
+  - 在 `data.items` 中找到目标 Record 并复制其 `id`。如果第一页没有，且返回了 `data.pageInfo.nextCursor`，请将其用作下一次请求的 `cursor`。
+  :::
+  <Tabs syncKey="uns-api-language">
+    <TabItem label="JavaScript">
 
-#### 获取记录的最新采样: `samples:latest`
+  ```js
+  const base = "https://your-tier0-host/openapi/v2";
+  const collectionId = "your-collection-id";
+  const response = await fetch(`${base}/uns/collections/${encodeURIComponent(collectionId)}/records:find`, {
+    method: "POST",
+    headers: { "content-type": "application/json", "x-api-key": "your-api-key" },
+    body: JSON.stringify({"limit": 20}),
+  });
+  const result = await response.json();
+  if (!response.ok || result.code !== 0) throw new Error(result.error?.code || result.msg);
+  console.log(result.data);
+  ```
 
-<Tabs syncKey="uns-api-language">
-  <TabItem label="JavaScript">
+    </TabItem>
+    <TabItem label="Python">
 
-```js
-const base = process.env.TIER0_BASE_URL; // https://<your-cloud-host>/openapi/v2
-const collectionId = process.env.TIER0_COLLECTION_ID;
-const response = await fetch(`${base}/uns/collections/${encodeURIComponent(collectionId)}/samples:latest`, {
-  method: "POST",
-  headers: { "content-type": "application/json", "x-api-key": process.env.TIER0_API_KEY },
-  body: JSON.stringify({"recordIds": ["record_123"]}),
-});
-const result = await response.json();
-if (!response.ok || result.code !== 0) throw new Error(result.error?.code || result.msg);
-console.log(result.data);
-```
+  ```python
+  import requests
 
-  </TabItem>
-  <TabItem label="Python">
+  response = requests.post(
+      "https://your-tier0-host/openapi/v2/uns/collections/your-collection-id/records:find",
+      headers={"x-api-key": "your-api-key"},
+      json={"limit": 20},
+      timeout=30,
+  )
+  response.raise_for_status()
+  result = response.json()
+  if result["code"] != 0:
+      raise RuntimeError(result.get("error", result.get("msg")))
+  print(result["data"])
+  ```
 
-```python
-import os
-import requests
+    </TabItem>
+    <TabItem label="cURL">
 
-response = requests.post(
-    f"{os.environ['TIER0_BASE_URL']}/uns/collections/{os.environ['TIER0_COLLECTION_ID']}/samples:latest",
-    headers={"x-api-key": os.environ["TIER0_API_KEY"]},
-    json={"recordIds": ["record_123"]},
-    timeout=30,
-)
-response.raise_for_status()
-result = response.json()
-if result["code"] != 0:
-    raise RuntimeError(result.get("error", result.get("msg")))
-print(result["data"])
-```
+  ```bash
+  curl --fail-with-body -X POST "https://your-tier0-host/openapi/v2/uns/collections/your-collection-id/records:find" \
+    -H "content-type: application/json" \
+    -H "x-api-key: your-api-key" \
+    -d '{"limit": 20}'
+  ```
 
-  </TabItem>
-  <TabItem label="cURL">
+    </TabItem>
+  </Tabs>
 
-```bash
-curl --fail-with-body -X POST "$TIER0_BASE_URL/uns/collections/${TIER0_COLLECTION_ID}/samples:latest" \
-  -H "content-type: application/json" \
-  -H "x-api-key: $TIER0_API_KEY" \
-  -d '{"recordIds": ["record_123"]}'
-```
+- `POST /uns/collections/{collectionId}/samples:latest` — 获取 Record 的最新 Sample
+  :::note
+  - 将 `your-collection-id` 替换为 `metadata:find` 返回的 ID。
+  - 将 `recordIds` 中的 `record_123` 替换为 `records:find` 返回的 Record ID。
+  :::
+  <Tabs syncKey="uns-api-language">
+    <TabItem label="JavaScript">
 
-  </TabItem>
-</Tabs>
+  ```js
+  const base = "https://your-tier0-host/openapi/v2";
+  const collectionId = "your-collection-id";
+  const response = await fetch(`${base}/uns/collections/${encodeURIComponent(collectionId)}/samples:latest`, {
+    method: "POST",
+    headers: { "content-type": "application/json", "x-api-key": "your-api-key" },
+    body: JSON.stringify({"recordIds": ["record_123"]}),
+  });
+  const result = await response.json();
+  if (!response.ok || result.code !== 0) throw new Error(result.error?.code || result.msg);
+  console.log(result.data);
+  ```
 
-#### 查询历史采样: `samples:find`
+    </TabItem>
+    <TabItem label="Python">
 
-<Tabs syncKey="uns-api-language">
-  <TabItem label="JavaScript">
+  ```python
+  import requests
 
-```js
-const base = process.env.TIER0_BASE_URL; // https://<your-cloud-host>/openapi/v2
-const collectionId = process.env.TIER0_COLLECTION_ID;
-const response = await fetch(`${base}/uns/collections/${encodeURIComponent(collectionId)}/samples:find`, {
-  method: "POST",
-  headers: { "content-type": "application/json", "x-api-key": process.env.TIER0_API_KEY },
-  body: JSON.stringify({"recordIds": ["record_123"], "from": 1792454400000, "to": 1792540800000, "filter": {"temperature": {"$gt": 20}}, "limit": 20}),
-});
-const result = await response.json();
-if (!response.ok || result.code !== 0) throw new Error(result.error?.code || result.msg);
-console.log(result.data);
-```
+  response = requests.post(
+      "https://your-tier0-host/openapi/v2/uns/collections/your-collection-id/samples:latest",
+      headers={"x-api-key": "your-api-key"},
+      json={"recordIds": ["record_123"]},
+      timeout=30,
+  )
+  response.raise_for_status()
+  result = response.json()
+  if result["code"] != 0:
+      raise RuntimeError(result.get("error", result.get("msg")))
+  print(result["data"])
+  ```
 
-  </TabItem>
-  <TabItem label="Python">
+    </TabItem>
+    <TabItem label="cURL">
 
-```python
-import os
-import requests
+  ```bash
+  curl --fail-with-body -X POST "https://your-tier0-host/openapi/v2/uns/collections/your-collection-id/samples:latest" \
+    -H "content-type: application/json" \
+    -H "x-api-key: your-api-key" \
+    -d '{"recordIds": ["record_123"]}'
+  ```
 
-response = requests.post(
-    f"{os.environ['TIER0_BASE_URL']}/uns/collections/{os.environ['TIER0_COLLECTION_ID']}/samples:find",
-    headers={"x-api-key": os.environ["TIER0_API_KEY"]},
-    json={"recordIds": ["record_123"], "from": 1792454400000, "to": 1792540800000, "filter": {"temperature": {"$gt": 20}}, "limit": 20},
-    timeout=30,
-)
-response.raise_for_status()
-result = response.json()
-if result["code"] != 0:
-    raise RuntimeError(result.get("error", result.get("msg")))
-print(result["data"])
-```
+    </TabItem>
+  </Tabs>
 
-  </TabItem>
-  <TabItem label="cURL">
+- `POST /uns/collections/{collectionId}/samples:find` — 获取指定时间范围内的 Samples
+  :::note
+  - 将 `your-collection-id` 替换为 `metadata:find` 返回的 ID。
+  - 将 `recordIds` 中的 `record_123` 替换为 `records:find` 返回的 Record ID。
+  - 将 `from` 和 `to` 设置为需要的时间范围。
+  - 本示例还按 `temperature` 筛选。如果需要范围内的全部 Samples，或者 Collection 使用其他字段，请移除该筛选条件。
+  :::
+  <Tabs syncKey="uns-api-language">
+    <TabItem label="JavaScript">
 
-```bash
-curl --fail-with-body -X POST "$TIER0_BASE_URL/uns/collections/${TIER0_COLLECTION_ID}/samples:find" \
-  -H "content-type: application/json" \
-  -H "x-api-key: $TIER0_API_KEY" \
-  -d '{"recordIds": ["record_123"], "from": 1792454400000, "to": 1792540800000, "filter": {"temperature": {"$gt": 20}}, "limit": 20}'
-```
+  ```js
+  const base = "https://your-tier0-host/openapi/v2";
+  const collectionId = "your-collection-id";
+  const response = await fetch(`${base}/uns/collections/${encodeURIComponent(collectionId)}/samples:find`, {
+    method: "POST",
+    headers: { "content-type": "application/json", "x-api-key": "your-api-key" },
+    body: JSON.stringify({"recordIds": ["record_123"], "from": 1792454400000, "to": 1792540800000, "filter": {"temperature": {"$gt": 20}}, "limit": 20}),
+  });
+  const result = await response.json();
+  if (!response.ok || result.code !== 0) throw new Error(result.error?.code || result.msg);
+  console.log(result.data);
+  ```
 
-  </TabItem>
-</Tabs>
+    </TabItem>
+    <TabItem label="Python">
 
-`samples:latest` 返回 `data.series`，每个请求的记录对应一个 `{recordId, sample}`；没有采样时 `sample` 为 `null`。`samples:find` 返回 `data.items` 和 `data.pageInfo`。`from`、`to` 是 Unix 毫秒，范围为 `[from, to)`。`temperature` 等筛选字段直接指业务字段；返回值位于每个采样的 `data`。
+  ```python
+  import requests
 
-[Cloud v2 API 使用与错误处理](../../reference/api-reference/) · [Cloud v2 完整参考](../../reference/tier0-openapi/cloud/) · [Enterprise v1 参考](../../reference/tier0-openapi/)
+  response = requests.post(
+      "https://your-tier0-host/openapi/v2/uns/collections/your-collection-id/samples:find",
+      headers={"x-api-key": "your-api-key"},
+      json={"recordIds": ["record_123"], "from": 1792454400000, "to": 1792540800000, "filter": {"temperature": {"$gt": 20}}, "limit": 20},
+      timeout=30,
+  )
+  response.raise_for_status()
+  result = response.json()
+  if result["code"] != 0:
+      raise RuntimeError(result.get("error", result.get("msg")))
+  print(result["data"])
+  ```
 
-Enterprise v1 使用 `/openapi/v1`；请查看完整参考并核对部署是否支持。Edge API 行为需以 Edge 部署为准。
+    </TabItem>
+    <TabItem label="cURL">
+
+  ```bash
+  curl --fail-with-body -X POST "https://your-tier0-host/openapi/v2/uns/collections/your-collection-id/samples:find" \
+    -H "content-type: application/json" \
+    -H "x-api-key: your-api-key" \
+    -d '{"recordIds": ["record_123"], "from": 1792454400000, "to": 1792540800000, "filter": {"temperature": {"$gt": 20}}, "limit": 20}'
+  ```
+
+    </TabItem>
+  </Tabs>
+:::tip
+所有 API 端点的详细信息请参阅 [API 参考](../../reference/api-reference/)。
+:::

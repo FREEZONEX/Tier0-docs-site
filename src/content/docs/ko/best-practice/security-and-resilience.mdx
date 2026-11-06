@@ -30,7 +30,7 @@ Cloud 프로덕션 서비스의 네트워크 경계, 테넌트 격리, 데이터
 | 범위 | Tier0 방식 | 상세 정보 |
 | --- | --- | --- |
 | 플랫폼 접근 | <ul><li>Cloud는 Workspace 멤버 자격으로 접근을 제어합니다.</li><li>Enterprise는 사용자 계정으로 접근을 제어합니다.</li></ul> | [사용자 관리](../../reference/user-management/) |
-| Agent 접근 | Agent는 API 키로 인증하고 Tier0 CLI를 사용해 플랫폼에 접근하고 작업을 수행합니다. | [CLI 인증](../../using-tier0/operating-on-tier0-with-agents/#인증) |
+| Agent 접근 | Agent는 MCP로 연결하고 부여된 권한 범위에서 플랫폼을 운영합니다. | [Agent 연결](../../using-tier0/operating-on-tier0-with-agents/) |
 | 프로젝트 및 애플리케이션 접근 | Tier0는 RBAC를 사용해 애플리케이션 접근을 제어합니다. | [접근 제어](../../using-tier0/building-apps/#접근-제어) |
 
 :::note
@@ -41,7 +41,7 @@ Workspace 멤버 자격이 계정을 자동으로 생성하지는 않습니다. 
 
 | 접근 방식 | Tier0 방식 | 상세 정보 |
 | --- | --- | --- |
-| MQTT | <ul><li>클라이언트는 Tier0가 생성한 자격 증명으로 인증합니다.</li><li>TLS 및 보안 WebSocket이 전송 중인 데이터를 암호화합니다.</li></ul> | [MQTT 자격 증명 및 연결](../../using-tier0/working-with-factory-data/#mqtt-credential-생성) |
+| MQTT | <ul><li>클라이언트는 Tier0가 생성한 자격 증명으로 인증합니다.</li><li>TLS 및 보안 WebSocket이 전송 중인 데이터를 암호화합니다.</li></ul> | [MQTT 자격 증명 및 연결](../../using-tier0/working-with-factory-data/) |
 | REST API | 데이터 접근에는 Tier0가 생성한 키가 필요합니다. | [API 레퍼런스](../../reference/api-reference/) |
 
 ## 복원력

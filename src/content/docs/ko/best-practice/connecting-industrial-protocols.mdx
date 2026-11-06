@@ -20,17 +20,26 @@ import { Steps } from '@astrojs/starlight/components';
 3. 순서대로 연결한 뒤 각 node를 double-click해 detail을 설정합니다.
 </Steps>
 - **inject**
-    <Steps>
     1. 왼쪽 아래의 **add**를 클릭해 property entry를 추가합니다.
     2. properties를 아래 항목으로 설정합니다.
-
         ```json
         {
-          "msg.payload": "[multiple data tags]",
+          "msg.payload": "[
+                            {
+                                "name": "D103_CHLORIDE",
+                                "nodeId": "ns=2;i=3",
+                                "datatype": "Float"
+                            },
+                            {
+                                "name": "D103_PH",
+                                "nodeId": "ns=2;i=4",
+                                "datatype": "Float"
+                            },
+                            ...
+                        ]",
           "msg.topic": "multiple"
         }
         ```
-    </Steps>
 - **OPC UA Client**
     ```json
     "Endpoint": "<OPC UA server address and port>", //e.g. opc.tcp://127.0.0.1:4850
@@ -42,9 +51,8 @@ import { Steps } from '@astrojs/starlight/components';
     "Server": "<embedded UNS broker>", //same name as the flow
     "Topic": "<UNS model>",
     ```
-<Steps>
+
 4. flow를 deploy하고 trigger합니다.
-</Steps>
 
 ### Flow 참조
 
@@ -202,14 +210,13 @@ import { Steps } from '@astrojs/starlight/components';
 
 ## Modbus
 ### 데이터 흐름 구성
-<Steps>
 1. flow에 **modbus-read**와 **mqtt out** node를 추가합니다.
 2. node를 double-click하고 필요한 정보를 설정합니다.
     - **modbus-read**
         - **Settings**
           - **FC**: Modbus action을 지정하는 function code입니다. 예: FC 3 = holding register 읽기.
           - **Address**: 읽기를 시작할 register address입니다(보통 0부터 시작).
-          - **Quantity**:  The number of consecutive registers to read.
+- **Quantity**: 연속해서 읽을 레지스터의 수.
           - **Poll Rate**: node가 Modbus device를 polling하는 주기입니다(예: 10초마다).
           - **Server**: 설정된 Modbus server(IP, port, protocol 등)에 대한 reference입니다.
         - **Server**
@@ -220,8 +227,8 @@ import { Steps } from '@astrojs/starlight/components';
         "Server": "<embedded UNS broker>", //same name as the flow
         "Topic": "<UNS model>",
         ```
+
 3. flow를 deploy하고 trigger합니다.
-</Steps>
 
 ### Flow 참조
 
@@ -384,7 +391,6 @@ import { Steps } from '@astrojs/starlight/components';
 
 ## API
 ### 데이터 흐름 구성
-<Steps>
 1. flow에 **inject**, **http request**, **mqtt out** node를 추가합니다.
 2. node를 double-click하고 필요한 정보를 설정합니다.
     - **http request**
@@ -399,8 +405,8 @@ import { Steps } from '@astrojs/starlight/components';
         "Server": "<embedded UNS broker>", //same name as the flow
         "Topic": "<UNS model>",
         ```
+
 3. flow를 deploy하고 trigger합니다.
-</Steps>
 
 ### Flow 참조
 <details>

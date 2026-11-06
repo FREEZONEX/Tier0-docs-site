@@ -9,6 +9,8 @@ import { Tabs, TabItem } from '@astrojs/starlight/components';
 
 
 En Tier0, los datos de fábrica se organizan en modelos claros con estructura de árbol basados en la metodología UNS (Unified Namespace), formando una base de datos unificada.
+
+## Arquitectura de la base de datos
 - El broker recibe y envía datos a través de topics del modelo.
 
 <div className="t0-uns-foundation-mermaid t0-uns-foundation-mermaid--flow">
@@ -24,7 +26,7 @@ En Tier0, los datos de fábrica se organizan en modelos claros con estructura de
       Model <--> Broker
       Broker --> Storage
   end
-  source <-- "MQTT / API" --> Broker
+  source <-- "MQTT / API" --> UNS
   classDef broker fill:#F7FAF2,stroke:#D8E6B8,stroke-width:1px,color:#2A2A2A,stroke-dasharray:5 5
   class Broker broker
 ```
@@ -122,7 +124,7 @@ Por ejemplo, un modelo en UNS se ve como el árbol siguiente:
 </Tabs>
 
 :::tip[Para crear un modelo]
-Consulta [Cómo crear un modelo de datos](../preparing-data-foundation/#construir-un-modelo-de-datos).
+Consulta [Preparar la base de datos](../preparing-data-foundation/) para ver el proceso actual de modelado.
 :::
 
 ## Broker

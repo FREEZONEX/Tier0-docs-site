@@ -11,63 +11,73 @@ import { Tabs, TabItem } from '@astrojs/starlight/components';
 MQTT と API を通じて UNS データを操作できます。
 
 ## MQTT
-MQTT clients は、Tier0 で生成された credentials を使って UNS broker に接続できます。
+Tier0 で生成した認証情報を使って MQTT クライアントを UNS broker に接続できます。
 :::note
-**MQTTX**、**MQTT Explorer**、**Node-RED** などの MQTT clients を使って broker に接続し、messages を publish/subscribe できます。
+**MQTTX**、**MQTT Explorer**、**Node-RED** などのクライアントで broker に接続し、メッセージを配信・購読できます。
 :::
-### MQTT Credentials を生成する
-Tier0 の **Edge** タブで新しい credential を作成し、記録します。
-
-### MQTT Clients を接続する
+### MQTT 認証情報を生成する
+**Connect** > **Source** > **MQTT Device** で MQTT 認証情報を生成し、記録します。
+:::note[Tier0 Edge の例外]
+Tier0 Edge の外部接続には認証情報が不要です。
+:::
+### MQTT クライアントを接続する
 
 :::tip
-以下の clients は、credentials を使って UNS broker に接続する方法を示す例です。
+- UNS broker には次の TCP と WSS のアドレスで接続できます。
+    - mqtt://host:1883
+    - mqtts://host:8883
+    - ws://host:8083/mqtt
+    - wss://host:8084/mqtt
+- 以下では TLS を使用しない TCP 接続を例にします。
 :::
 
 <Tabs syncKey="mqtt-client">
   <TabItem label="MQTTX">
 
 1. <a href="https://mqttx.app/" target="_blank" rel="noopener noreferrer">MQTTX</a> をインストールして開きます。
-2. UNS broker の情報と生成された credentials を使って connection を追加します。
+2. UNS broker の情報と生成した認証情報で接続を追加します。
     ```json
     {
       "Host": "mqtt.tier0.dev",
-      "Port": 8883,
+      "Port": 1883,
       "Client ID": "<generated client ID>",
       "Username": "<generated username>",
       "Password": "<generated password>"
     }
-    ``` 
+    ```
 
   </TabItem>
   <TabItem label="MQTT Explorer">
 
 1. <a href="https://mqtt-explorer.com/" target="_blank" rel="noopener noreferrer">MQTT Explorer</a> をインストールして開きます。
-2. UNS broker の情報と生成された credentials を使って新しい connection を追加します。
+2. UNS broker の情報と生成した認証情報で新しい接続を追加します。
     ```json
     {
       "Protocol": "mqtt://",
       "Host": "mqtt.tier0.dev",
-      "Port": 8883,
+      "Port": 1883,
       "Username": "<generated username>",
       "Password": "<generated password>"
     }
-    ``` 
-3. Change the client ID to the credential ID in **ADVANCED** before connecting.
+    ```
+3. 接続前に **ADVANCED** で Client ID を認証情報の ID に変更します。
 
   </TabItem>
   <TabItem label="Node-RED">
-      - **Event Flow** を使用 - Tier0 内の Node-RED ベースのデータ処理モジュールです。
-          1. **Flows** で **Event Flow** を作成し、`mqtt in` node から開始します。
-          2. node 内で UNS broker を **Server**（flow と同じ名前）として選択し、**Topic** を UNS model に設定します。
-      - **独立した Node-RED Instance** を使用
-          1. <a href="https://nodered.org/docs/getting-started/local" target="_blank" rel="noopener noreferrer">Node-RED</a> instance をインストールして開きます。
-          2. `mqtt in` node に、次の情報で server を追加します。
+- **Event Flow** を使用：Tier0 の Node-RED ベースのデータ処理モジュール。
+
+1. **Flows** で **Event Flow** を作成し、`mqtt in` ノードから始めます。
+2. ノードの **Server** に UNS broker（Flow と同じ名前）を選び、**Topic** に UNS モデルを指定します。
+
+- **独立した Node-RED インスタンス**を使用
+
+1. <a href="https://nodered.org/docs/getting-started/local" target="_blank" rel="noopener noreferrer">Node-RED</a> をインストールして開きます。
+2. `mqtt in` ノードに次の情報でサーバーを追加します。
           ```json
           {
             {/* under Connection */}
             "Server": "mqtt://mqtt.tier0.dev",
-            "Port": 8883,
+            "Port": 1883,
             "Client ID": "<generated clientId>",
             {/* under Security */}
             "Username": "<generated username>",
@@ -79,178 +89,230 @@ Tier0 の **Edge** タブで新しい credential を作成し、記録します�
 
 ### 接続をテストする
 <Steps>
-1. client status が正常であることを確認します。
-2. UNS model topic をコピーし、client から message を publish します。
+1. クライアントの状態が正常であることを確認します。
+2. UNS モデルの Topic をコピーし、クライアントからメッセージを配信します。
 </Steps>
 
 ## API
 
-### Cloud v2 のデータ取得
+### 基本情報
 
-Cloud v2 は `https://<your-cloud-host>/openapi/v2` と `x-api-key` を使用します。以下は業務レコードと実際の時系列サンプルを取得する例です。Edge と Enterprise には適用されません。
+- **Base URL**: `https://<your-tier0-host>/openapi/v2`
+- **Authentication**: Tier0 で取得した API キーを `x-api-key` ヘッダーに指定します。
 
-まず `POST /uns/metadata:find` に `{"kind":"collection","filter":{},"page":{"mode":"offset","page":1,"size":20}}` を送信します。選択したコレクションの `data.items[].id` が `collectionId` です。`records:find` が返すレコードの `id` を `recordId` として使用します。どちらも UNS パスではありません。
+### リクエスト例
 
-#### 業務レコードを検索: `records:find`
+- `POST /uns/metadata:find` — Collections を一覧表示して Collection ID を取得
+  :::note
+  `data.items` で対象の Collection を探し、その `id` をコピーします。最初のページにない場合は `data.pageInfo` を確認して次のページを取得します。
+  :::
+  <Tabs syncKey="uns-api-language">
+    <TabItem label="JavaScript">
 
-<Tabs syncKey="uns-api-language">
-  <TabItem label="JavaScript">
+  ```js
+  const base = "https://your-tier0-host/openapi/v2";
+  const response = await fetch(`${base}/uns/metadata:find`, {
+    method: "POST",
+    headers: { "content-type": "application/json", "x-api-key": "your-api-key" },
+    body: JSON.stringify({"kind": "collection", "filter": {}, "page": {"mode": "offset", "page": 1, "size": 20}}),
+  });
+  const result = await response.json();
+  if (!response.ok || result.code !== 0) throw new Error(result.error?.code || result.msg);
+  console.log(result.data.items);
+  ```
 
-```js
-const base = process.env.TIER0_BASE_URL; // https://<your-cloud-host>/openapi/v2
-const collectionId = process.env.TIER0_COLLECTION_ID;
-const response = await fetch(`${base}/uns/collections/${encodeURIComponent(collectionId)}/records:find`, {
-  method: "POST",
-  headers: { "content-type": "application/json", "x-api-key": process.env.TIER0_API_KEY },
-  body: JSON.stringify({"filter": {"status": "running"}, "limit": 20}),
-});
-const result = await response.json();
-if (!response.ok || result.code !== 0) throw new Error(result.error?.code || result.msg);
-console.log(result.data);
-```
+    </TabItem>
+    <TabItem label="Python">
 
-  </TabItem>
-  <TabItem label="Python">
+  ```python
+  import requests
 
-```python
-import os
-import requests
+  response = requests.post(
+      "https://your-tier0-host/openapi/v2/uns/metadata:find",
+      headers={"x-api-key": "your-api-key"},
+      json={"kind": "collection", "filter": {}, "page": {"mode": "offset", "page": 1, "size": 20}},
+      timeout=30,
+  )
+  response.raise_for_status()
+  result = response.json()
+  if result["code"] != 0:
+      raise RuntimeError(result.get("error", result.get("msg")))
+  print(result["data"]["items"])
+  ```
 
-response = requests.post(
-    f"{os.environ['TIER0_BASE_URL']}/uns/collections/{os.environ['TIER0_COLLECTION_ID']}/records:find",
-    headers={"x-api-key": os.environ["TIER0_API_KEY"]},
-    json={"filter": {"status": "running"}, "limit": 20},
-    timeout=30,
-)
-response.raise_for_status()
-result = response.json()
-if result["code"] != 0:
-    raise RuntimeError(result.get("error", result.get("msg")))
-print(result["data"])
-```
+    </TabItem>
+    <TabItem label="cURL">
 
-  </TabItem>
-  <TabItem label="cURL">
+  ```bash
+  curl --fail-with-body -X POST "https://your-tier0-host/openapi/v2/uns/metadata:find" \
+    -H "content-type: application/json" \
+    -H "x-api-key: your-api-key" \
+    -d '{"kind": "collection", "filter": {}, "page": {"mode": "offset", "page": 1, "size": 20}}'
+  ```
 
-```bash
-curl --fail-with-body -X POST "$TIER0_BASE_URL/uns/collections/${TIER0_COLLECTION_ID}/records:find" \
-  -H "content-type: application/json" \
-  -H "x-api-key: $TIER0_API_KEY" \
-  -d '{"filter": {"status": "running"}, "limit": 20}'
-```
+    </TabItem>
+  </Tabs>
 
-  </TabItem>
-</Tabs>
+- `POST /uns/collections/{collectionId}/records:find` — Records を一覧表示して Record ID を取得
+  :::note
+  - `your-collection-id` を `metadata:find` で取得した ID に置き換えます。
+  - `data.items` で対象の Record を探し、その `id` をコピーします。最初のページにない場合は、利用できるとき `data.pageInfo.nextCursor` を次のリクエストの `cursor` に指定します。
+  :::
+  <Tabs syncKey="uns-api-language">
+    <TabItem label="JavaScript">
 
-#### 最新サンプルを取得: `samples:latest`
+  ```js
+  const base = "https://your-tier0-host/openapi/v2";
+  const collectionId = "your-collection-id";
+  const response = await fetch(`${base}/uns/collections/${encodeURIComponent(collectionId)}/records:find`, {
+    method: "POST",
+    headers: { "content-type": "application/json", "x-api-key": "your-api-key" },
+    body: JSON.stringify({"limit": 20}),
+  });
+  const result = await response.json();
+  if (!response.ok || result.code !== 0) throw new Error(result.error?.code || result.msg);
+  console.log(result.data);
+  ```
 
-<Tabs syncKey="uns-api-language">
-  <TabItem label="JavaScript">
+    </TabItem>
+    <TabItem label="Python">
 
-```js
-const base = process.env.TIER0_BASE_URL; // https://<your-cloud-host>/openapi/v2
-const collectionId = process.env.TIER0_COLLECTION_ID;
-const response = await fetch(`${base}/uns/collections/${encodeURIComponent(collectionId)}/samples:latest`, {
-  method: "POST",
-  headers: { "content-type": "application/json", "x-api-key": process.env.TIER0_API_KEY },
-  body: JSON.stringify({"recordIds": ["record_123"]}),
-});
-const result = await response.json();
-if (!response.ok || result.code !== 0) throw new Error(result.error?.code || result.msg);
-console.log(result.data);
-```
+  ```python
+  import requests
 
-  </TabItem>
-  <TabItem label="Python">
+  response = requests.post(
+      "https://your-tier0-host/openapi/v2/uns/collections/your-collection-id/records:find",
+      headers={"x-api-key": "your-api-key"},
+      json={"limit": 20},
+      timeout=30,
+  )
+  response.raise_for_status()
+  result = response.json()
+  if result["code"] != 0:
+      raise RuntimeError(result.get("error", result.get("msg")))
+  print(result["data"])
+  ```
 
-```python
-import os
-import requests
+    </TabItem>
+    <TabItem label="cURL">
 
-response = requests.post(
-    f"{os.environ['TIER0_BASE_URL']}/uns/collections/{os.environ['TIER0_COLLECTION_ID']}/samples:latest",
-    headers={"x-api-key": os.environ["TIER0_API_KEY"]},
-    json={"recordIds": ["record_123"]},
-    timeout=30,
-)
-response.raise_for_status()
-result = response.json()
-if result["code"] != 0:
-    raise RuntimeError(result.get("error", result.get("msg")))
-print(result["data"])
-```
+  ```bash
+  curl --fail-with-body -X POST "https://your-tier0-host/openapi/v2/uns/collections/your-collection-id/records:find" \
+    -H "content-type: application/json" \
+    -H "x-api-key: your-api-key" \
+    -d '{"limit": 20}'
+  ```
 
-  </TabItem>
-  <TabItem label="cURL">
+    </TabItem>
+  </Tabs>
 
-```bash
-curl --fail-with-body -X POST "$TIER0_BASE_URL/uns/collections/${TIER0_COLLECTION_ID}/samples:latest" \
-  -H "content-type: application/json" \
-  -H "x-api-key: $TIER0_API_KEY" \
-  -d '{"recordIds": ["record_123"]}'
-```
+- `POST /uns/collections/{collectionId}/samples:latest` — Record の最新 Sample を取得
+  :::note
+  - `your-collection-id` を `metadata:find` で取得した ID に置き換えます。
+  - `recordIds` の `record_123` を `records:find` で取得した Record ID に置き換えます。
+  :::
+  <Tabs syncKey="uns-api-language">
+    <TabItem label="JavaScript">
 
-  </TabItem>
-</Tabs>
+  ```js
+  const base = "https://your-tier0-host/openapi/v2";
+  const collectionId = "your-collection-id";
+  const response = await fetch(`${base}/uns/collections/${encodeURIComponent(collectionId)}/samples:latest`, {
+    method: "POST",
+    headers: { "content-type": "application/json", "x-api-key": "your-api-key" },
+    body: JSON.stringify({"recordIds": ["record_123"]}),
+  });
+  const result = await response.json();
+  if (!response.ok || result.code !== 0) throw new Error(result.error?.code || result.msg);
+  console.log(result.data);
+  ```
 
-#### 過去のサンプルを検索: `samples:find`
+    </TabItem>
+    <TabItem label="Python">
 
-<Tabs syncKey="uns-api-language">
-  <TabItem label="JavaScript">
+  ```python
+  import requests
 
-```js
-const base = process.env.TIER0_BASE_URL; // https://<your-cloud-host>/openapi/v2
-const collectionId = process.env.TIER0_COLLECTION_ID;
-const response = await fetch(`${base}/uns/collections/${encodeURIComponent(collectionId)}/samples:find`, {
-  method: "POST",
-  headers: { "content-type": "application/json", "x-api-key": process.env.TIER0_API_KEY },
-  body: JSON.stringify({"recordIds": ["record_123"], "from": 1792454400000, "to": 1792540800000, "filter": {"temperature": {"$gt": 20}}, "limit": 20}),
-});
-const result = await response.json();
-if (!response.ok || result.code !== 0) throw new Error(result.error?.code || result.msg);
-console.log(result.data);
-```
+  response = requests.post(
+      "https://your-tier0-host/openapi/v2/uns/collections/your-collection-id/samples:latest",
+      headers={"x-api-key": "your-api-key"},
+      json={"recordIds": ["record_123"]},
+      timeout=30,
+  )
+  response.raise_for_status()
+  result = response.json()
+  if result["code"] != 0:
+      raise RuntimeError(result.get("error", result.get("msg")))
+  print(result["data"])
+  ```
 
-  </TabItem>
-  <TabItem label="Python">
+    </TabItem>
+    <TabItem label="cURL">
 
-```python
-import os
-import requests
+  ```bash
+  curl --fail-with-body -X POST "https://your-tier0-host/openapi/v2/uns/collections/your-collection-id/samples:latest" \
+    -H "content-type: application/json" \
+    -H "x-api-key: your-api-key" \
+    -d '{"recordIds": ["record_123"]}'
+  ```
 
-response = requests.post(
-    f"{os.environ['TIER0_BASE_URL']}/uns/collections/{os.environ['TIER0_COLLECTION_ID']}/samples:find",
-    headers={"x-api-key": os.environ["TIER0_API_KEY"]},
-    json={"recordIds": ["record_123"], "from": 1792454400000, "to": 1792540800000, "filter": {"temperature": {"$gt": 20}}, "limit": 20},
-    timeout=30,
-)
-response.raise_for_status()
-result = response.json()
-if result["code"] != 0:
-    raise RuntimeError(result.get("error", result.get("msg")))
-print(result["data"])
-```
+    </TabItem>
+  </Tabs>
 
-  </TabItem>
-  <TabItem label="cURL">
+- `POST /uns/collections/{collectionId}/samples:find` — 指定期間の Samples を取得
+  :::note
+  - `your-collection-id` を `metadata:find` で取得した ID に置き換えます。
+  - `recordIds` の `record_123` を `records:find` で取得した Record ID に置き換えます。
+  - `from` と `to` に取得期間を設定します。
+  - この例は `temperature` でも絞り込みます。期間内の全 Samples が必要な場合や Collection が別のフィールドを使う場合は、この条件を削除します。
+  :::
+  <Tabs syncKey="uns-api-language">
+    <TabItem label="JavaScript">
 
-```bash
-curl --fail-with-body -X POST "$TIER0_BASE_URL/uns/collections/${TIER0_COLLECTION_ID}/samples:find" \
-  -H "content-type: application/json" \
-  -H "x-api-key: $TIER0_API_KEY" \
-  -d '{"recordIds": ["record_123"], "from": 1792454400000, "to": 1792540800000, "filter": {"temperature": {"$gt": 20}}, "limit": 20}'
-```
+  ```js
+  const base = "https://your-tier0-host/openapi/v2";
+  const collectionId = "your-collection-id";
+  const response = await fetch(`${base}/uns/collections/${encodeURIComponent(collectionId)}/samples:find`, {
+    method: "POST",
+    headers: { "content-type": "application/json", "x-api-key": "your-api-key" },
+    body: JSON.stringify({"recordIds": ["record_123"], "from": 1792454400000, "to": 1792540800000, "filter": {"temperature": {"$gt": 20}}, "limit": 20}),
+  });
+  const result = await response.json();
+  if (!response.ok || result.code !== 0) throw new Error(result.error?.code || result.msg);
+  console.log(result.data);
+  ```
 
-  </TabItem>
-</Tabs>
+    </TabItem>
+    <TabItem label="Python">
 
-`samples:latest` は各レコードの `{recordId, sample}` を `data.series` に返します。サンプルがなければ `sample` は `null` です。`samples:find` は `data.items` と `data.pageInfo` を返します。`from` と `to` は Unix ミリ秒で、範囲は `[from, to)` です。`temperature` などのフィルターは業務フィールドを直接参照し、返却値は各サンプルの `data` に入ります。
+  ```python
+  import requests
 
-[Cloud v2 API の使用とエラー処理](../../reference/api-reference/) · [Cloud v2 完全リファレンス](../../reference/tier0-openapi/cloud/) · [Enterprise v1 リファレンス](../../reference/tier0-openapi/)
+  response = requests.post(
+      "https://your-tier0-host/openapi/v2/uns/collections/your-collection-id/samples:find",
+      headers={"x-api-key": "your-api-key"},
+      json={"recordIds": ["record_123"], "from": 1792454400000, "to": 1792540800000, "filter": {"temperature": {"$gt": 20}}, "limit": 20},
+      timeout=30,
+  )
+  response.raise_for_status()
+  result = response.json()
+  if result["code"] != 0:
+      raise RuntimeError(result.get("error", result.get("msg")))
+  print(result["data"])
+  ```
 
-Enterprise v1 は `/openapi/v1` を使用します。完全リファレンスを参照し、デプロイで利用可能か確認してください。Edge API の動作は Edge デプロイで確認してください。
+    </TabItem>
+    <TabItem label="cURL">
 
-## 次へ
+  ```bash
+  curl --fail-with-body -X POST "https://your-tier0-host/openapi/v2/uns/collections/your-collection-id/samples:find" \
+    -H "content-type: application/json" \
+    -H "x-api-key: your-api-key" \
+    -d '{"recordIds": ["record_123"], "from": 1792454400000, "to": 1792540800000, "filter": {"temperature": {"$gt": 20}}, "limit": 20}'
+  ```
 
-- [UNS 上にアプリを構築](../building-apps/) — UNS データで産業アプリケーションを構築します。
-- [アプリを構築する](../building-apps/)
+    </TabItem>
+  </Tabs>
+:::tip
+すべての API エンドポイントの詳細は [API リファレンス](../../reference/api-reference/)を参照してください。
+:::

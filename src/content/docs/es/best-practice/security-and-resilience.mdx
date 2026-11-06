@@ -30,7 +30,7 @@ Para conocer los límites de red, el aislamiento de inquilinos, la protección d
 | Área | Mecanismo de Tier0 | Detalles |
 | --- | --- | --- |
 | Acceso a la plataforma | <ul><li>Cloud controla el acceso mediante la pertenencia a un Workspace.</li><li>Enterprise controla el acceso mediante cuentas de usuario.</li></ul> | [Gestión de usuarios](../../reference/user-management/) |
-| Acceso de agentes | Los agentes se autentican con una clave de API y utilizan Tier0 CLI para acceder a la plataforma y operarla. | [Autenticación de CLI](../../using-tier0/operating-on-tier0-with-agents/#autenticación) |
+| Acceso de agentes | Los agentes se conectan mediante MCP y operan la plataforma dentro de los permisos concedidos. | [Conectar un Agent](../../using-tier0/operating-on-tier0-with-agents/) |
 | Acceso a proyectos y aplicaciones | Tier0 utiliza RBAC para controlar el acceso a las aplicaciones. | [Control de acceso](../../using-tier0/building-apps/#control-de-acceso) |
 
 :::note
@@ -41,7 +41,7 @@ La pertenencia a un Workspace no crea automáticamente una cuenta. Cada usuario 
 
 | Acceso | Mecanismo de Tier0 | Detalles |
 | --- | --- | --- |
-| MQTT | <ul><li>Los clientes se autentican con credenciales generadas por Tier0.</li><li>TLS y WebSocket seguro cifran los datos en tránsito.</li></ul> | [Credenciales y conexiones MQTT](../../using-tier0/working-with-factory-data/#generar-mqtt-credentials) |
+| MQTT | <ul><li>Los clientes se autentican con credenciales generadas por Tier0.</li><li>TLS y WebSocket seguro cifran los datos en tránsito.</li></ul> | [Credenciales y conexiones MQTT](../../using-tier0/working-with-factory-data/) |
 | REST API | El acceso a los datos requiere una clave generada por Tier0. | [Referencia de API](../../reference/api-reference/) |
 
 ## Resiliencia

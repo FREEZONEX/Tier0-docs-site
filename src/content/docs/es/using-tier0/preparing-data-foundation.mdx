@@ -5,6 +5,8 @@ editions: [cloud]
 sidebar:
   order: 2
 ---
+import { Steps } from '@astrojs/starlight/components';
+
 
 Tier0 crea una base de datos para aplicaciones personalizadas: recibe datos empresariales de las aplicaciones, conecta sistemas y dispositivos existentes e integra los datos en un modelo unificado que pueden utilizar las aplicaciones.
 
@@ -69,9 +71,14 @@ flowchart LR
 
 ## Construir la base de datos
 
+<Steps>
 1. Crea la aplicación en **Builder** y deja que el Agent prepare los modelos empresariales en **Namespace**. Salvo que el prompt indique lo contrario, los genera automáticamente según la lógica empresarial de la aplicación.
+	:::note
+	Salvo que el prompt indique lo contrario, el Agent genera automáticamente los modelos de datos según la lógica empresarial de la aplicación.
+	:::
 2. Conecta las fuentes necesarias en **Connect** > **Source** con su autenticación.
 3. Pide al Agent que cree un **Stream** para recoger y procesar datos de las fuentes conectadas y guardarlos en los modelos de **Namespace** creados para la aplicación.
+</Steps>
 
 ## Siguiente
 

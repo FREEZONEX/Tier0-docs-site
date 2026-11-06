@@ -11,63 +11,73 @@ import { Tabs, TabItem } from '@astrojs/starlight/components';
 Puedes operar datos de UNS mediante MQTT y APIs.
 
 ## MQTT
-Los MQTT clients pueden conectarse al broker UNS con credentials generadas en Tier0.
+Los clientes MQTT pueden conectarse al broker UNS con credenciales generadas en Tier0.
 :::note
-Puedes usar MQTT clients como **MQTTX**, **MQTT Explorer** y **Node-RED** para conectarte al broker y publicar/suscribirte a messages.
+Puedes usar **MQTTX**, **MQTT Explorer** y **Node-RED** para conectar con el broker y publicar o suscribirte a mensajes.
 :::
-### Generar MQTT Credentials
-En la pestaña **Edge** de Tier0, crea una nueva credential y guárdala.
-
-### Conectar MQTT Clients
+### Generar credenciales MQTT
+Genera credenciales en **Connect** > **Source** > **MQTT Device** y guárdalas.
+:::note[Excepción de Tier0 Edge]
+Tier0 Edge no requiere credenciales para conexiones externas.
+:::
+### Conectar clientes MQTT
 
 :::tip
-Los siguientes clients se usan como ejemplos para mostrar cómo usar las credentials para conectarse al broker UNS.
+- El broker UNS admite conexiones TCP y WSS con las siguientes direcciones:
+    - mqtt://host:1883
+    - mqtts://host:8883
+    - ws://host:8083/mqtt
+    - wss://host:8084/mqtt
+- Los siguientes ejemplos usan TCP sin TLS.
 :::
 
 <Tabs syncKey="mqtt-client">
   <TabItem label="MQTTX">
 
-1. Install and open <a href="https://mqttx.app/" target="_blank" rel="noopener noreferrer">MQTTX</a>.
-2. Agrega una conexión con la información del broker UNS y las credentials generadas.
+1. Instala y abre <a href="https://mqttx.app/" target="_blank" rel="noopener noreferrer">MQTTX</a>.
+2. Añade una conexión con la información del broker UNS y las credenciales generadas.
     ```json
     {
       "Host": "mqtt.tier0.dev",
-      "Port": 8883,
+      "Port": 1883,
       "Client ID": "<generated client ID>",
       "Username": "<generated username>",
       "Password": "<generated password>"
     }
-    ``` 
+    ```
 
   </TabItem>
   <TabItem label="MQTT Explorer">
 
-1. Install and open <a href="https://mqtt-explorer.com/" target="_blank" rel="noopener noreferrer">MQTT Explorer</a>.
-2. Agrega una nueva conexión con la información del broker UNS y las credentials generadas.
+1. Instala y abre <a href="https://mqtt-explorer.com/" target="_blank" rel="noopener noreferrer">MQTT Explorer</a>.
+2. Añade una nueva conexión con la información del broker UNS y las credenciales generadas.
     ```json
     {
       "Protocol": "mqtt://",
       "Host": "mqtt.tier0.dev",
-      "Port": 8883,
+      "Port": 1883,
       "Username": "<generated username>",
       "Password": "<generated password>"
     }
-    ``` 
-3. Change the client ID to the credential ID in **ADVANCED** before connecting.
+    ```
+3. Antes de conectar, cambia el Client ID por el ID de la credencial en **ADVANCED**.
 
   </TabItem>
   <TabItem label="Node-RED">
-      - Usa **Event Flow** - módulo de procesamiento de datos en Tier0 basado en Node-RED.
-          1. Crea un **Event Flow** en **Flows** y empieza con un node `mqtt in`.
-          2. Select the UNS broker as **Server** (same name as the flow) and set **Topic** to a UNS model in the node.
-      - Usa una **instancia independiente de Node-RED**
-          1. Instala y abre la instancia de <a href="https://nodered.org/docs/getting-started/local" target="_blank" rel="noopener noreferrer">Node-RED</a>.
-          2. Agrega un server en el node `mqtt in` con la siguiente información.
+- Usar **Event Flow**: módulo de procesamiento de datos de Tier0 basado en Node-RED.
+
+1. Crea un **Event Flow** en **Flows** y comienza con un nodo `mqtt in`.
+2. Selecciona el broker UNS como **Server** (con el mismo nombre que el Flow) y configura **Topic** con un modelo UNS.
+
+- Usar una **instancia independiente de Node-RED**
+
+1. Instala y abre una instancia de <a href="https://nodered.org/docs/getting-started/local" target="_blank" rel="noopener noreferrer">Node-RED</a>.
+2. Añade un servidor al nodo `mqtt in` con la siguiente información.
           ```json
           {
             {/* under Connection */}
             "Server": "mqtt://mqtt.tier0.dev",
-            "Port": 8883,
+            "Port": 1883,
             "Client ID": "<generated clientId>",
             {/* under Security */}
             "Username": "<generated username>",
@@ -79,178 +89,230 @@ Los siguientes clients se usan como ejemplos para mostrar cómo usar las credent
 
 ### Probar conexiones
 <Steps>
-1. Asegúrate de que el client status sea normal.
-2. Copia un topic de modelo UNS y publica un message en él mediante el client.
+1. Comprueba que el estado del cliente sea normal.
+2. Copia un Topic de un modelo UNS y publica un mensaje desde el cliente.
 </Steps>
 
 ## API
 
-### Lectura de datos en Cloud v2
+### Información básica
 
-Cloud v2 usa `https://<your-cloud-host>/openapi/v2` con `x-api-key`. Estos ejemplos leen registros de negocio y muestras temporales reales. No se aplican a Edge ni a Enterprise.
+- **Base URL**: `https://<your-tier0-host>/openapi/v2`
+- **Authentication**: Envía la clave API obtenida en Tier0 en la cabecera `x-api-key`.
 
-Primero llama a `POST /uns/metadata:find` con `{"kind":"collection","filter":{},"page":{"mode":"offset","page":1,"size":20}}`. El `data.items[].id` de la colección elegida es `collectionId`. El `id` devuelto por `records:find` es el `recordId` para las consultas de muestras. Ninguno de los dos es una ruta UNS.
+### Ejemplos de solicitudes
 
-#### Buscar registros: `records:find`
+- `POST /uns/metadata:find` — Enumerar Collections y obtener el ID de Collection
+  :::note
+  Busca la Collection en `data.items` y copia su `id`. Si no aparece en la primera página, consulta `data.pageInfo` y solicita la siguiente.
+  :::
+  <Tabs syncKey="uns-api-language">
+    <TabItem label="JavaScript">
 
-<Tabs syncKey="uns-api-language">
-  <TabItem label="JavaScript">
+  ```js
+  const base = "https://your-tier0-host/openapi/v2";
+  const response = await fetch(`${base}/uns/metadata:find`, {
+    method: "POST",
+    headers: { "content-type": "application/json", "x-api-key": "your-api-key" },
+    body: JSON.stringify({"kind": "collection", "filter": {}, "page": {"mode": "offset", "page": 1, "size": 20}}),
+  });
+  const result = await response.json();
+  if (!response.ok || result.code !== 0) throw new Error(result.error?.code || result.msg);
+  console.log(result.data.items);
+  ```
 
-```js
-const base = process.env.TIER0_BASE_URL; // https://<your-cloud-host>/openapi/v2
-const collectionId = process.env.TIER0_COLLECTION_ID;
-const response = await fetch(`${base}/uns/collections/${encodeURIComponent(collectionId)}/records:find`, {
-  method: "POST",
-  headers: { "content-type": "application/json", "x-api-key": process.env.TIER0_API_KEY },
-  body: JSON.stringify({"filter": {"status": "running"}, "limit": 20}),
-});
-const result = await response.json();
-if (!response.ok || result.code !== 0) throw new Error(result.error?.code || result.msg);
-console.log(result.data);
-```
+    </TabItem>
+    <TabItem label="Python">
 
-  </TabItem>
-  <TabItem label="Python">
+  ```python
+  import requests
 
-```python
-import os
-import requests
+  response = requests.post(
+      "https://your-tier0-host/openapi/v2/uns/metadata:find",
+      headers={"x-api-key": "your-api-key"},
+      json={"kind": "collection", "filter": {}, "page": {"mode": "offset", "page": 1, "size": 20}},
+      timeout=30,
+  )
+  response.raise_for_status()
+  result = response.json()
+  if result["code"] != 0:
+      raise RuntimeError(result.get("error", result.get("msg")))
+  print(result["data"]["items"])
+  ```
 
-response = requests.post(
-    f"{os.environ['TIER0_BASE_URL']}/uns/collections/{os.environ['TIER0_COLLECTION_ID']}/records:find",
-    headers={"x-api-key": os.environ["TIER0_API_KEY"]},
-    json={"filter": {"status": "running"}, "limit": 20},
-    timeout=30,
-)
-response.raise_for_status()
-result = response.json()
-if result["code"] != 0:
-    raise RuntimeError(result.get("error", result.get("msg")))
-print(result["data"])
-```
+    </TabItem>
+    <TabItem label="cURL">
 
-  </TabItem>
-  <TabItem label="cURL">
+  ```bash
+  curl --fail-with-body -X POST "https://your-tier0-host/openapi/v2/uns/metadata:find" \
+    -H "content-type: application/json" \
+    -H "x-api-key: your-api-key" \
+    -d '{"kind": "collection", "filter": {}, "page": {"mode": "offset", "page": 1, "size": 20}}'
+  ```
 
-```bash
-curl --fail-with-body -X POST "$TIER0_BASE_URL/uns/collections/${TIER0_COLLECTION_ID}/records:find" \
-  -H "content-type: application/json" \
-  -H "x-api-key: $TIER0_API_KEY" \
-  -d '{"filter": {"status": "running"}, "limit": 20}'
-```
+    </TabItem>
+  </Tabs>
 
-  </TabItem>
-</Tabs>
+- `POST /uns/collections/{collectionId}/records:find` — Enumerar Records y obtener el ID de Record
+  :::note
+  - Sustituye `your-collection-id` por el ID obtenido de `metadata:find`.
+  - Busca el Record en `data.items` y copia su `id`. Si no aparece en la primera página, usa `data.pageInfo.nextCursor` como `cursor` de la siguiente solicitud cuando esté disponible.
+  :::
+  <Tabs syncKey="uns-api-language">
+    <TabItem label="JavaScript">
 
-#### Última muestra de un registro: `samples:latest`
+  ```js
+  const base = "https://your-tier0-host/openapi/v2";
+  const collectionId = "your-collection-id";
+  const response = await fetch(`${base}/uns/collections/${encodeURIComponent(collectionId)}/records:find`, {
+    method: "POST",
+    headers: { "content-type": "application/json", "x-api-key": "your-api-key" },
+    body: JSON.stringify({"limit": 20}),
+  });
+  const result = await response.json();
+  if (!response.ok || result.code !== 0) throw new Error(result.error?.code || result.msg);
+  console.log(result.data);
+  ```
 
-<Tabs syncKey="uns-api-language">
-  <TabItem label="JavaScript">
+    </TabItem>
+    <TabItem label="Python">
 
-```js
-const base = process.env.TIER0_BASE_URL; // https://<your-cloud-host>/openapi/v2
-const collectionId = process.env.TIER0_COLLECTION_ID;
-const response = await fetch(`${base}/uns/collections/${encodeURIComponent(collectionId)}/samples:latest`, {
-  method: "POST",
-  headers: { "content-type": "application/json", "x-api-key": process.env.TIER0_API_KEY },
-  body: JSON.stringify({"recordIds": ["record_123"]}),
-});
-const result = await response.json();
-if (!response.ok || result.code !== 0) throw new Error(result.error?.code || result.msg);
-console.log(result.data);
-```
+  ```python
+  import requests
 
-  </TabItem>
-  <TabItem label="Python">
+  response = requests.post(
+      "https://your-tier0-host/openapi/v2/uns/collections/your-collection-id/records:find",
+      headers={"x-api-key": "your-api-key"},
+      json={"limit": 20},
+      timeout=30,
+  )
+  response.raise_for_status()
+  result = response.json()
+  if result["code"] != 0:
+      raise RuntimeError(result.get("error", result.get("msg")))
+  print(result["data"])
+  ```
 
-```python
-import os
-import requests
+    </TabItem>
+    <TabItem label="cURL">
 
-response = requests.post(
-    f"{os.environ['TIER0_BASE_URL']}/uns/collections/{os.environ['TIER0_COLLECTION_ID']}/samples:latest",
-    headers={"x-api-key": os.environ["TIER0_API_KEY"]},
-    json={"recordIds": ["record_123"]},
-    timeout=30,
-)
-response.raise_for_status()
-result = response.json()
-if result["code"] != 0:
-    raise RuntimeError(result.get("error", result.get("msg")))
-print(result["data"])
-```
+  ```bash
+  curl --fail-with-body -X POST "https://your-tier0-host/openapi/v2/uns/collections/your-collection-id/records:find" \
+    -H "content-type: application/json" \
+    -H "x-api-key: your-api-key" \
+    -d '{"limit": 20}'
+  ```
 
-  </TabItem>
-  <TabItem label="cURL">
+    </TabItem>
+  </Tabs>
 
-```bash
-curl --fail-with-body -X POST "$TIER0_BASE_URL/uns/collections/${TIER0_COLLECTION_ID}/samples:latest" \
-  -H "content-type: application/json" \
-  -H "x-api-key: $TIER0_API_KEY" \
-  -d '{"recordIds": ["record_123"]}'
-```
+- `POST /uns/collections/{collectionId}/samples:latest` — Obtener el Sample más reciente de un Record
+  :::note
+  - Sustituye `your-collection-id` por el ID obtenido de `metadata:find`.
+  - Sustituye `record_123` en `recordIds` por el ID de Record obtenido de `records:find`.
+  :::
+  <Tabs syncKey="uns-api-language">
+    <TabItem label="JavaScript">
 
-  </TabItem>
-</Tabs>
+  ```js
+  const base = "https://your-tier0-host/openapi/v2";
+  const collectionId = "your-collection-id";
+  const response = await fetch(`${base}/uns/collections/${encodeURIComponent(collectionId)}/samples:latest`, {
+    method: "POST",
+    headers: { "content-type": "application/json", "x-api-key": "your-api-key" },
+    body: JSON.stringify({"recordIds": ["record_123"]}),
+  });
+  const result = await response.json();
+  if (!response.ok || result.code !== 0) throw new Error(result.error?.code || result.msg);
+  console.log(result.data);
+  ```
 
-#### Buscar muestras históricas: `samples:find`
+    </TabItem>
+    <TabItem label="Python">
 
-<Tabs syncKey="uns-api-language">
-  <TabItem label="JavaScript">
+  ```python
+  import requests
 
-```js
-const base = process.env.TIER0_BASE_URL; // https://<your-cloud-host>/openapi/v2
-const collectionId = process.env.TIER0_COLLECTION_ID;
-const response = await fetch(`${base}/uns/collections/${encodeURIComponent(collectionId)}/samples:find`, {
-  method: "POST",
-  headers: { "content-type": "application/json", "x-api-key": process.env.TIER0_API_KEY },
-  body: JSON.stringify({"recordIds": ["record_123"], "from": 1792454400000, "to": 1792540800000, "filter": {"temperature": {"$gt": 20}}, "limit": 20}),
-});
-const result = await response.json();
-if (!response.ok || result.code !== 0) throw new Error(result.error?.code || result.msg);
-console.log(result.data);
-```
+  response = requests.post(
+      "https://your-tier0-host/openapi/v2/uns/collections/your-collection-id/samples:latest",
+      headers={"x-api-key": "your-api-key"},
+      json={"recordIds": ["record_123"]},
+      timeout=30,
+  )
+  response.raise_for_status()
+  result = response.json()
+  if result["code"] != 0:
+      raise RuntimeError(result.get("error", result.get("msg")))
+  print(result["data"])
+  ```
 
-  </TabItem>
-  <TabItem label="Python">
+    </TabItem>
+    <TabItem label="cURL">
 
-```python
-import os
-import requests
+  ```bash
+  curl --fail-with-body -X POST "https://your-tier0-host/openapi/v2/uns/collections/your-collection-id/samples:latest" \
+    -H "content-type: application/json" \
+    -H "x-api-key: your-api-key" \
+    -d '{"recordIds": ["record_123"]}'
+  ```
 
-response = requests.post(
-    f"{os.environ['TIER0_BASE_URL']}/uns/collections/{os.environ['TIER0_COLLECTION_ID']}/samples:find",
-    headers={"x-api-key": os.environ["TIER0_API_KEY"]},
-    json={"recordIds": ["record_123"], "from": 1792454400000, "to": 1792540800000, "filter": {"temperature": {"$gt": 20}}, "limit": 20},
-    timeout=30,
-)
-response.raise_for_status()
-result = response.json()
-if result["code"] != 0:
-    raise RuntimeError(result.get("error", result.get("msg")))
-print(result["data"])
-```
+    </TabItem>
+  </Tabs>
 
-  </TabItem>
-  <TabItem label="cURL">
+- `POST /uns/collections/{collectionId}/samples:find` — Obtener Samples de un intervalo de tiempo
+  :::note
+  - Sustituye `your-collection-id` por el ID obtenido de `metadata:find`.
+  - Sustituye `record_123` en `recordIds` por el ID de Record obtenido de `records:find`.
+  - Configura `from` y `to` con el intervalo deseado.
+  - Este ejemplo también filtra por `temperature`. Elimina el filtro si quieres todos los Samples del intervalo o si tu Collection utiliza otro campo.
+  :::
+  <Tabs syncKey="uns-api-language">
+    <TabItem label="JavaScript">
 
-```bash
-curl --fail-with-body -X POST "$TIER0_BASE_URL/uns/collections/${TIER0_COLLECTION_ID}/samples:find" \
-  -H "content-type: application/json" \
-  -H "x-api-key: $TIER0_API_KEY" \
-  -d '{"recordIds": ["record_123"], "from": 1792454400000, "to": 1792540800000, "filter": {"temperature": {"$gt": 20}}, "limit": 20}'
-```
+  ```js
+  const base = "https://your-tier0-host/openapi/v2";
+  const collectionId = "your-collection-id";
+  const response = await fetch(`${base}/uns/collections/${encodeURIComponent(collectionId)}/samples:find`, {
+    method: "POST",
+    headers: { "content-type": "application/json", "x-api-key": "your-api-key" },
+    body: JSON.stringify({"recordIds": ["record_123"], "from": 1792454400000, "to": 1792540800000, "filter": {"temperature": {"$gt": 20}}, "limit": 20}),
+  });
+  const result = await response.json();
+  if (!response.ok || result.code !== 0) throw new Error(result.error?.code || result.msg);
+  console.log(result.data);
+  ```
 
-  </TabItem>
-</Tabs>
+    </TabItem>
+    <TabItem label="Python">
 
-`samples:latest` devuelve `data.series` con `{recordId, sample}` para cada registro; `sample` es `null` si no hay muestras. `samples:find` devuelve `data.items` y `data.pageInfo`. `from` y `to` son milisegundos Unix y delimitan `[from, to)`. Los filtros como `temperature` usan directamente los campos de negocio; los valores devueltos están en `data` de cada muestra.
+  ```python
+  import requests
 
-[Uso de API y errores de Cloud v2](../../reference/api-reference/) · [Referencia completa de Cloud v2](../../reference/tier0-openapi/cloud/) · [Referencia de Enterprise v1](../../reference/tier0-openapi/)
+  response = requests.post(
+      "https://your-tier0-host/openapi/v2/uns/collections/your-collection-id/samples:find",
+      headers={"x-api-key": "your-api-key"},
+      json={"recordIds": ["record_123"], "from": 1792454400000, "to": 1792540800000, "filter": {"temperature": {"$gt": 20}}, "limit": 20},
+      timeout=30,
+  )
+  response.raise_for_status()
+  result = response.json()
+  if result["code"] != 0:
+      raise RuntimeError(result.get("error", result.get("msg")))
+  print(result["data"])
+  ```
 
-Enterprise v1 usa `/openapi/v1`; consulta la referencia completa y comprueba su disponibilidad en el despliegue. Verifica el comportamiento de Edge en su propio despliegue.
+    </TabItem>
+    <TabItem label="cURL">
 
-## Siguiente
+  ```bash
+  curl --fail-with-body -X POST "https://your-tier0-host/openapi/v2/uns/collections/your-collection-id/samples:find" \
+    -H "content-type: application/json" \
+    -H "x-api-key: your-api-key" \
+    -d '{"recordIds": ["record_123"], "from": 1792454400000, "to": 1792540800000, "filter": {"temperature": {"$gt": 20}}, "limit": 20}'
+  ```
 
-- [Crear apps sobre UNS](../building-apps/) — Crea aplicaciones industriales con datos UNS.
-- [Crear apps](../building-apps/)
+    </TabItem>
+  </Tabs>
+:::tip
+Para conocer todos los endpoints, consulta la [Referencia de API](../../reference/api-reference/).
+:::

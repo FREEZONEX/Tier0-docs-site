@@ -694,10 +694,9 @@ Tier0는 topic 폭증을 피하기 위해 `Metric`, `Action`, `State` 세 가지
 
   ```json
   {
-    "temperature": 80,
-    "temperature_unit": "Celsius",
-    "temperature_status": "Normal",
-    "speed": 300
+    "light_turn_on": true,
+    "height_adjust": 12.5,
+    "_timestamp": "2026-07-10T10:00:00Z"
   }
   ```
 
@@ -735,8 +734,9 @@ Tier0는 topic 폭증을 피하기 위해 `Metric`, `Action`, `State` 세 가지
 
   ```json
   {
-    "current_job": "Job_003",
-    "product": "Product_A"
+    "water_pump_off": true,
+    "window_close": true,
+    "_timestamp": "2026-07-10T10:00:00Z"
   }
   ```
 
@@ -774,9 +774,13 @@ Tier0는 topic 폭증을 피하기 위해 `Metric`, `Action`, `State` 세 가지
 
   ```json
   {
-    "target_height": 12.5,
-    "light_on": true,
-    "requested_by": "operator"
+    "production_order_id": "PO-20260710-001",
+    "plan_id": "PLAN-001",
+    "plan_number": "WOP-20260710-001",
+    "split_count": 3,
+    "updated_at": "2026-07-10T10:00:00Z",
+    "_timestamp": "2026-07-10T10:00:00Z",
+    "_quality": "Good"
   }
   ```
 
@@ -797,50 +801,6 @@ topic payload를 설계할 때는 소비할 데이터와 다시 쓸 데이터를
 
   ```json
   {
-    "light_turn_on": true,
-    "height_adjust": 12.5,
-    "_timestamp": "2026-07-10T10:00:00Z"
-  }
-  ```
-
-    </TabItem>
-    <TabItem label="stop_job">
-
-  ```json
-  {
-    "water_pump_off": true,
-    "window_close": true,
-    "_timestamp": "2026-07-10T10:00:00Z"
-  }
-  ```
-
-    </TabItem>
-  </Tabs>
-
-- **Metric**
-
-  Metric payload에는 데이터가 Tier0 데이터베이스에 저장된 시간을 기록하는 `_timestamp`와 데이터 품질을 나타내는 `_quality`가 자동 포함됩니다.
-
-  <Tabs syncKey="payload-metric">
-    <TabItem label="ERP / SplitCount">
-
-  ```json
-  {
-    "production_order_id": "PO-20260710-001",
-    "plan_id": "PLAN-001",
-    "plan_number": "WOP-20260710-001",
-    "split_count": 3,
-    "updated_at": "2026-07-10T10:00:00Z",
-    "_timestamp": "2026-07-10T10:00:00Z",
-    "_quality": "Good"
-  }
-  ```
-
-    </TabItem>
-    <TabItem label="Site_01 / Target_Qty">
-
-  ```json
-  {
     "production_order_id": "PO-20260710-001",
     "plan_id": "PLAN-001",
     "plan_number": "WOP-20260710-001",
@@ -854,14 +814,7 @@ topic payload를 설계할 때는 소비할 데이터와 다시 쓸 데이터를
   ```
 
     </TabItem>
-  </Tabs>
-
-- **State**
-
-  State payload에는 데이터가 Tier0 데이터베이스에 저장된 시간을 기록하는 `_timestamp`가 자동 포함됩니다.
-
-  <Tabs syncKey="payload-state">
-    <TabItem label="ERP / UpsertProductionOrder">
+    <TabItem label="stop_job">
 
   ```json
   {
@@ -881,7 +834,14 @@ topic payload를 설계할 때는 소비할 데이터와 다시 쓸 데이터를
   ```
 
     </TabItem>
-    <TabItem label="Site_01 / WorkOrderStatus">
+  </Tabs>
+
+- **Metric**
+
+  Metric payload에는 데이터가 Tier0 데이터베이스에 저장된 시간을 기록하는 `_timestamp`와 데이터 품질을 나타내는 `_quality`가 자동 포함됩니다.
+
+  <Tabs syncKey="payload-metric">
+    <TabItem label="ERP / SplitCount">
 
   ```json
   {
@@ -893,6 +853,46 @@ topic payload를 설계할 때는 소비할 데이터와 다시 쓸 데이터를
     "reason": "In production",
     "updated_at": "2026-07-10T10:00:00Z",
     "_timestamp": "2026-07-10T10:00:00Z"
+  }
+  ```
+
+    </TabItem>
+    <TabItem label="Site_01 / Target_Qty">
+
+  ```json
+  {
+    "temperature": 80,
+    "temperature_unit": "Celsius",
+    "temperature_status": "Normal",
+    "speed": 300
+  }
+  ```
+
+    </TabItem>
+  </Tabs>
+
+- **State**
+
+  State payload에는 데이터가 Tier0 데이터베이스에 저장된 시간을 기록하는 `_timestamp`가 자동 포함됩니다.
+
+  <Tabs syncKey="payload-state">
+    <TabItem label="ERP / UpsertProductionOrder">
+
+  ```json
+  {
+    "current_job": "Job_003",
+    "product": "Product_A"
+  }
+  ```
+
+    </TabItem>
+    <TabItem label="Site_01 / WorkOrderStatus">
+
+  ```json
+  {
+    "target_height": 12.5,
+    "light_on": true,
+    "requested_by": "operator"
   }
   ```
 

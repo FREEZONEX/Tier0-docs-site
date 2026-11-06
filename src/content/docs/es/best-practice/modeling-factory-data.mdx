@@ -694,10 +694,9 @@ Tier0 uses 3 fixed topic types: `Metric`, `Action`, and `State` to avoid topic e
 
   ```json
   {
-    "temperature": 80,
-    "temperature_unit": "Celsius",
-    "temperature_status": "Normal",
-    "speed": 300
+    "light_turn_on": true,
+    "height_adjust": 12.5,
+    "_timestamp": "2026-07-10T10:00:00Z"
   }
   ```
 
@@ -735,8 +734,9 @@ Tier0 uses 3 fixed topic types: `Metric`, `Action`, and `State` to avoid topic e
 
   ```json
   {
-    "current_job": "Job_003",
-    "product": "Product_A"
+    "water_pump_off": true,
+    "window_close": true,
+    "_timestamp": "2026-07-10T10:00:00Z"
   }
   ```
 
@@ -774,9 +774,13 @@ Tier0 uses 3 fixed topic types: `Metric`, `Action`, and `State` to avoid topic e
 
   ```json
   {
-    "target_height": 12.5,
-    "light_on": true,
-    "requested_by": "operator"
+    "production_order_id": "PO-20260710-001",
+    "plan_id": "PLAN-001",
+    "plan_number": "WOP-20260710-001",
+    "split_count": 3,
+    "updated_at": "2026-07-10T10:00:00Z",
+    "_timestamp": "2026-07-10T10:00:00Z",
+    "_quality": "Good"
   }
   ```
 
@@ -797,50 +801,6 @@ Al estructurar el topic payload, considera tanto los datos que se consumen como 
 
   ```json
   {
-    "light_turn_on": true,
-    "height_adjust": 12.5,
-    "_timestamp": "2026-07-10T10:00:00Z"
-  }
-  ```
-
-    </TabItem>
-    <TabItem label="stop_job">
-
-  ```json
-  {
-    "water_pump_off": true,
-    "window_close": true,
-    "_timestamp": "2026-07-10T10:00:00Z"
-  }
-  ```
-
-    </TabItem>
-  </Tabs>
-
-- **Metric**
-
-  Los payloads de Metric incluyen automáticamente `_timestamp`, que registra cuándo se almacenan los datos en la base de datos de Tier0, y `_quality`, que representa la calidad de los datos.
-
-  <Tabs syncKey="payload-metric">
-    <TabItem label="ERP / SplitCount">
-
-  ```json
-  {
-    "production_order_id": "PO-20260710-001",
-    "plan_id": "PLAN-001",
-    "plan_number": "WOP-20260710-001",
-    "split_count": 3,
-    "updated_at": "2026-07-10T10:00:00Z",
-    "_timestamp": "2026-07-10T10:00:00Z",
-    "_quality": "Good"
-  }
-  ```
-
-    </TabItem>
-    <TabItem label="Site_01 / Target_Qty">
-
-  ```json
-  {
     "production_order_id": "PO-20260710-001",
     "plan_id": "PLAN-001",
     "plan_number": "WOP-20260710-001",
@@ -854,14 +814,7 @@ Al estructurar el topic payload, considera tanto los datos que se consumen como 
   ```
 
     </TabItem>
-  </Tabs>
-
-- **State**
-
-  Los payloads de State incluyen automáticamente `_timestamp`, que registra cuándo se almacenan los datos en la base de datos de Tier0.
-
-  <Tabs syncKey="payload-state">
-    <TabItem label="ERP / UpsertProductionOrder">
+    <TabItem label="stop_job">
 
   ```json
   {
@@ -881,7 +834,14 @@ Al estructurar el topic payload, considera tanto los datos que se consumen como 
   ```
 
     </TabItem>
-    <TabItem label="Site_01 / WorkOrderStatus">
+  </Tabs>
+
+- **Metric**
+
+  Los payloads de Metric incluyen automáticamente `_timestamp`, que registra cuándo se almacenan los datos en la base de datos de Tier0, y `_quality`, que representa la calidad de los datos.
+
+  <Tabs syncKey="payload-metric">
+    <TabItem label="ERP / SplitCount">
 
   ```json
   {
@@ -893,6 +853,46 @@ Al estructurar el topic payload, considera tanto los datos que se consumen como 
     "reason": "In production",
     "updated_at": "2026-07-10T10:00:00Z",
     "_timestamp": "2026-07-10T10:00:00Z"
+  }
+  ```
+
+    </TabItem>
+    <TabItem label="Site_01 / Target_Qty">
+
+  ```json
+  {
+    "temperature": 80,
+    "temperature_unit": "Celsius",
+    "temperature_status": "Normal",
+    "speed": 300
+  }
+  ```
+
+    </TabItem>
+  </Tabs>
+
+- **State**
+
+  Los payloads de State incluyen automáticamente `_timestamp`, que registra cuándo se almacenan los datos en la base de datos de Tier0.
+
+  <Tabs syncKey="payload-state">
+    <TabItem label="ERP / UpsertProductionOrder">
+
+  ```json
+  {
+    "current_job": "Job_003",
+    "product": "Product_A"
+  }
+  ```
+
+    </TabItem>
+    <TabItem label="Site_01 / WorkOrderStatus">
+
+  ```json
+  {
+    "target_height": 12.5,
+    "light_on": true,
+    "requested_by": "operator"
   }
   ```
 

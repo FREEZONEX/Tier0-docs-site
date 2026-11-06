@@ -24,10 +24,14 @@ Tier0 ofrece una solución de Fleet Management para gestionar desde un nodo cent
 
 ## Sincronizar datos entre el edge y el centro
 
-- Los datos UNS solo se pueden seleccionar y sincronizar desde los nodos edge al nodo central.
-- Desde el nodo central, puedes asignar usuarios a los nodos edge para gestionarlos.
+- Los datos UNS solo se pueden seleccionar y sincronizar desde los nodos edge al nodo central. Después de la sincronización, los datos históricos y en tiempo real de los Topics seleccionados están disponibles en el nodo central.
+- Desde el nodo central, puedes asignar usuarios o grupos de usuarios a los nodos edge para gestionarlos.
+
+:::note
+Primero configura el acceso de los grupos a las aplicaciones en el nodo central para que sus miembros puedan utilizar las aplicaciones permitidas en los nodos edge.
+:::
 
 ## Siguiente
 
 - [Modelar datos de fábrica](../../best-practice/modeling-factory-data/) — Aprende a modelar datos de fábrica en UNS.
-- [Preparar la base de datos](../preparing-data-foundation/) — Modela tu namespace y conecta los datos de origen.
+- [Preparar la base de datos](../preparing-data-foundation/) — Conecta datos externos para tus aplicaciones y modélalos en Namespace.

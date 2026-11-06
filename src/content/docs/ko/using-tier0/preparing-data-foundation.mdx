@@ -5,6 +5,8 @@ editions: [cloud]
 sidebar:
   order: 2
 ---
+import { Steps } from '@astrojs/starlight/components';
+
 
 Tier0는 맞춤형 앱을 위한 데이터 기반을 만듭니다. 앱의 비즈니스 데이터를 받고, 기존 시스템과 장치의 외부 데이터 소스를 연결하며, 앱이 사용할 수 있는 통합 모델로 데이터를 모읍니다.
 
@@ -69,9 +71,14 @@ flowchart LR
 
 ## 데이터 기반 구축
 
+<Steps>
 1. **Builder**에서 앱을 만들고 Agent가 **Namespace**에 비즈니스 데이터 모델을 준비하도록 합니다. 프롬프트에 명시하지 않으면 Agent가 앱의 비즈니스 로직에 맞춰 모델을 자동 생성합니다.
+	:::note
+	프롬프트에 명시하지 않으면 Agent가 앱의 비즈니스 로직에 맞춰 데이터 모델을 자동 생성합니다.
+	:::
 2. **Connect** > **Source**에서 필요한 데이터 소스를 연결하고 인증을 설정합니다.
 3. Agent에게 **Stream**을 만들도록 요청하여 연결된 Source의 데이터를 수집·처리하고 앱에서 생성한 **Namespace** 모델에 저장합니다.
+</Steps>
 
 ## 다음 단계
 
