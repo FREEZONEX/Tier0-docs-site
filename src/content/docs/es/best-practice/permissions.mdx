@@ -1,0 +1,32 @@
+---
+title: Control de acceso RBAC
+editions: [cloud, enterprise]
+---
+
+Tier0 usa control de acceso basado en roles (RBAC) en dos niveles: los **puestos del espacio de trabajo** controlan las funciones de la plataforma y los **roles de negocio** controlan el acceso dentro de las aplicaciones.
+
+## Puestos del espacio de trabajo
+
+Los miembros tienen dos tipos de puesto: **Builder** y **Operator**. El propietario del espacio de trabajo también es Builder.
+
+| Tipo | Capacidades |
+| --- | --- |
+| Propietario | Tiene todas las funciones del espacio de trabajo y controla en exclusiva la facturación, todos los miembros, la transferencia de propiedad y la eliminación del espacio. |
+| Builder | Tiene todas las funciones del espacio salvo las reservadas al propietario. |
+| Operator | Usa las aplicaciones a las que tiene acceso. |
+
+Establece el tipo de puesto al invitar a un miembro o cámbialo después en **Settings** > **Member**. El plan contratado limita la cantidad de cada tipo de puesto. Consulta [Elegir el mejor producto](../../get-started/choosing-the-best-product/) para obtener más información.
+
+## Roles de negocio
+
+Las aplicaciones generan roles automáticamente según la lógica de negocio. No se generan si indicas explícitamente en el prompt que no hacen falta. Tras confirmarlo contigo, el Agent puede reutilizar roles existentes de otras aplicaciones con responsabilidades similares.
+
+Los roles se pueden asignar a miembros o grupos. Un miembro puede pertenecer a varios grupos y tener varios roles por asignación directa o herencia del grupo. Eliminar una asignación no revoca un rol si queda otra asignación vigente.
+
+Un miembro con un rol puede acceder a todas las aplicaciones que lo usan, pero solo a las partes autorizadas. Los puestos del espacio de trabajo no afectan a los roles de negocio: ser Builder no concede acceso automático a ninguna aplicación. La vista previa de roles durante la generación de aplicaciones solo sirve para el desarrollo. Las aplicaciones sin roles están disponibles para todos los miembros activos del espacio.
+
+:::note[Ten en cuenta]
+- Las carpetas organizan aplicaciones y no conceden acceso.
+- Cambiar el puesto de un miembro modifica sus capacidades en la plataforma, pero conserva sus roles de negocio.
+- Eliminar un miembro del espacio de trabajo revoca su acceso al espacio y a todas las aplicaciones.
+:::

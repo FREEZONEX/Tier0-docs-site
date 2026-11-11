@@ -1,0 +1,60 @@
+---
+title: RBAC Access Control
+editions: [cloud, enterprise]
+---
+
+Tier0 uses role-based access control (RBAC) at two levels:
+- **Workspace Seats** govern platform capabilities,
+- **Business Roles** govern business access inside Apps.
+
+:::note[Edge edition]
+RBAC access control is available in Cloud and Enterprise. Edge users manage access through their own deployment.
+:::
+
+## Workspace Seats
+
+### What are Workspace Seats
+Tier0 provides only 2 types of seats for workspace members: **Builder** and **Operator**.
+
+:::note
+- Workspace owner is also a **Builder**.
+- **Builder** and **Operator** are both workspace members.
+:::
+
+| Type | Capabilities |
+| --- | --- |
+| Owner | All functions in the Workspace, and alone controls billing,  manages all members, ownership transfer, and Workspace deletion. |
+| Builder | All functions in the Workspace except those reserved for the Owner. |
+| Operator | Uses applications for which they have access. |
+
+### How to Assign Seats
+
+- Set the seat type of members when you invite them to the Workspace.
+- You can also change the seat type of existing members in **Settings** > **Member**.
+:::note
+According to the subscribed plan of the workspace, the number of each seat type is limited. For details, see [Choosing the Best Product](../../get-started/choosing-the-best-product/).
+:::
+
+## Business Roles
+
+### How to Create Roles
+- Business roles are generated automatically in applications based on business logic.
+- When specifically declared in the prompt that no roles are necessary, the application will not generate any roles.
+- The agent will reuse existing roles from other applications with similar responsibilities after confirming with you.
+
+### How to Assign Roles
+- Roles can be assigned to members or member groups.
+- A member can belong to multiple groups and hold multiple roles from both direct assignment and group inheritance.
+- Removing one assignment does not revoke a role that still comes from another source.
+
+### Permission Scope
+- A member assigned a role can access every App that uses it, but only the accessible parts.
+- Business roles are not affected by Workspace seats. Being a **Builder** doesn't automatically grant access to any application.
+- Preview roles during application generation simulate access for development only.
+- Applications with no roles are available for all active members in the workspace.
+
+:::note[Things to notice]
+- Folders organize applications and do not grant access.
+- Changing a member's workspace role changes platform capabilities but preserves their Business Roles.
+- Removing a member from the Workspace revokes their access to both workspace and all applications.
+:::

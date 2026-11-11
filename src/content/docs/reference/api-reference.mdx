@@ -20,10 +20,6 @@ description: Connect to the Tier0 API, check responses, and retry writes safely.
 - If `error.retry.safe` is `true`, retry the same request with the same idempotency key. If one was supplied, wait at least as long as indicated by `error.retry.afterMs` or the `Retry-After` header.
 - If part of a batch was committed, check which items succeeded before submitting any remaining work. If the outcome is unknown and the response does not confirm a safe retry, verify whether the write took effect before sending it again.
 
-## Glossary
-
-- **Idempotency** means repeating an operation has the same effect as performing it once. For a write that supports an idempotency key, reuse the same key when retrying the same request. Use a new key for a separate write.
-
 :::note
 Check [OpenAPI Reference](../tier0-openapi/) for detailed information.
 :::

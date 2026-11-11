@@ -1,508 +1,125 @@
 ---
-title: Connecting Industrial Protocols
-description: Connect OPC UA, Modbus, and other typical protocol devices into the UNS with Node-RED — with real flow JSON references.
+title: Connecting Data Sources
 editions: [edge, cloud, enterprise]
-sidebar:
-  order: 2
-  label: Connecting OPC UA / Modbus
 ---
 import { Steps } from '@astrojs/starlight/components';
 
-This section uses common data source types, including OPC UA, Modbus, and APIs, as examples to demonstrate how to connect data sources to **UNS** through **Source Flow**.
+Tier0 supports connecting to various industrial protocols, including OPC UA, Modbus, MQTT and more.
 
-## OPC UA
-
-### Configuring Data Flow
-
-<Steps>
-1. In a new **Source Flow**, add `inject`, `OPC UA Client` and `mqtt out` nodes.
-2. Connect them in order and configure their details.
-</Steps>
-- `inject`
-    Add a property entry and set the properties to the following items:
-        ```json
-        {
-          "msg.payload": "[
-                            {
-                                "name": "D103_CHLORIDE",
-                                "nodeId": "ns=2;i=3",
-                                "datatype": "Float"
-                            },
-                            {
-                                "name": "D103_PH",
-                                "nodeId": "ns=2;i=4",
-                                "datatype": "Float"
-                            },
-                            ...
-                        ]",
-          "msg.topic": "multiple"
-        }
-        ```
-- `OPC UA Client`
-    ```json
-    "Endpoint": "<OPC UA server address and port>", //e.g. opc.tcp://127.0.0.1:4850
-    "Action": "SUBSCRIBE",
-    "Interval": "<data collecting interval>" //e.g. 10 seconds
-    ```
-- `mqtt out`
-    ```json
-    "Server": "<embedded UNS broker>", //same name as the flow
-    "Topic": "<UNS model>",
-    ```
-
-### Flow Reference
-
-<details>
-<summary>Show OPC UA flow JSON</summary>
-
-```json
-[
-    {
-        "id": "fn_mapper_01",
-        "type": "function",
-        "z": "b002a07d1163c3de",
-        "name": "ISA95 Mapping (Air Compressor)",
-        "func": "// OPC UA NodeId → ISA-95 MQTT Topic Mapping\n\nconst mapping = {\n    \"ns=2;i=2\": {\n        topic: \"global_plant/Smart_Manufacturing_Group/Suzhou_Plant/Utility_Area/Compressed_Air_System/Air_Compressor_Station/Air_Compressor_01/Metric/outlet_temperature\",\n        field: \"temperature\"\n    },\n    \"ns=2;i=3\": {\n        topic: \"global_plant/Smart_Manufacturing_Group/Suzhou_Plant/Utility_Area/Compressed_Air_System/Air_Compressor_Station/Air_Compressor_01/Metric/discharge_pressure\",\n        field: \"pressure\"\n    },\n    \"ns=2;i=4\": {\n        topic: \"global_plant/Smart_Manufacturing_Group/Suzhou_Plant/Utility_Area/Compressed_Air_System/Air_Compressor_Station/Air_Compressor_01/Metric/vibration_rms\",\n        field: \"vibration\"\n    }\n};\n\nlet value = msg.payload;\n\n// OPC UA structure normalize\nif (value && typeof value === \"object\") {\n    if (value.value?.value !== undefined) {\n        value = value.value.value;\n    } else if (value.value !== undefined) {\n        value = value.value;\n    }\n}\n\nconst m = mapping[msg.topic];\nif (!m) return null;\n\nmsg.topic = m.topic;\n\nmsg.payload = {\n    [m.field]: Number(value)\n};\n\nreturn msg;",
-        "outputs": 1,
-        "timeout": "",
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 340,
-        "y": 320,
-        "wires": [
-            [
-                "mqtt_out_01"
-            ]
-        ]
-    },
-    {
-        "id": "mqtt_out_01",
-        "type": "mqtt out",
-        "z": "b002a07d1163c3de",
-        "name": "MQTT Air Compressor Metrics",
-        "topic": "",
-        "qos": "0",
-        "retain": "false",
-        "respTopic": "",
-        "contentType": "",
-        "userProps": "",
-        "correl": "",
-        "expiry": "",
-        "broker": "broker-djnwpg00y370",
-        "x": 570,
-        "y": 200,
-        "wires": []
-    },
-    {
-        "id": "1f242deefa9fdba9",
-        "type": "OpcUa-Client",
-        "z": "b002a07d1163c3de",
-        "endpoint": "298ef5d50e9dc411",
-        "action": "subscribe",
-        "deadbandtype": "a",
-        "deadbandvalue": 1,
-        "time": 10,
-        "timeUnit": "s",
-        "certificate": "n",
-        "localfile": "",
-        "localkeyfile": "",
-        "securitymode": "None",
-        "securitypolicy": "None",
-        "useTransport": false,
-        "maxChunkCount": 1,
-        "maxMessageSize": 8192,
-        "receiveBufferSize": 8192,
-        "sendBufferSize": 8192,
-        "setstatusandtime": false,
-        "keepsessionalive": false,
-        "name": "",
-        "x": 220,
-        "y": 220,
-        "wires": [
-            [
-                "fn_mapper_01"
-            ],
-            [],
-            []
-        ]
-    },
-    {
-        "id": "7be5f021ed1f10ef",
-        "type": "inject",
-        "z": "b002a07d1163c3de",
-        "name": "",
-        "props": [
-            {
-                "p": "payload"
-            },
-            {
-                "p": "topic",
-                "vt": "str"
-            }
-        ],
-        "repeat": "",
-        "crontab": "",
-        "once": false,
-        "onceDelay": 0.1,
-        "topic": "multiple",
-        "payload": "[{\"nodeId\":\"ns=2;i=2\",\"datatype\":\"Float\"},{\"nodeId\":\"ns=2;i=3\",\"datatype\":\"Float\"},{\"nodeId\":\"ns=2;i=4\",\"datatype\":\"Float\"}]",
-        "payloadType": "json",
-        "x": 110,
-        "y": 160,
-        "wires": [
-            [
-                "1f242deefa9fdba9"
-            ]
-        ]
-    },
-    {
-        "id": "broker-djnwpg00y370",
-        "type": "mqtt-broker",
-        "z": "b002a07d1163c3de",
-        "name": "emqx:1883",
-        "broker": "emqx",
-        "port": "1883",
-        "clientid": "355424069147520",
-        "usetls": false,
-        "protocolVersion": "4",
-        "keepalive": "60",
-        "cleansession": true,
-        "birthTopic": "",
-        "birthQos": "0",
-        "birthPayload": "",
-        "closeTopic": "",
-        "closeQos": "0",
-        "closePayload": "",
-        "willTopic": "",
-        "willQos": "0",
-        "willPayload": ""
-    },
-    {
-        "id": "298ef5d50e9dc411",
-        "type": "OpcUa-Endpoint",
-        "endpoint": "opc.tcp://172.31.151.237:4841",
-        "secpol": "None",
-        "secmode": "None",
-        "none": true,
-        "login": false,
-        "usercert": false,
-        "usercertificate": "",
-        "userprivatekey": ""
-    },
-    {
-        "id": "a003de8af8e62c75",
-        "type": "global-config",
-        "env": [],
-        "modules": {
-            "node-red-contrib-opcua": "0.2.339"
-        }
-    }
-]
-```
-
-</details>
-
-## Modbus
-### Configuring Data Flow
-In the flow, add `modbus-read` and `mqtt out` nodes and configure the required information.
-    - `modbus-read`
-        - **Settings**
-          - **FC**: Function code that specifies the Modbus action, e.g., FC 3 = Read Holding Registers.
-          - **Address**: The starting register address to read from (usually zero-based).
-          - **Quantity**:  The number of consecutive registers to read.
-          - **Poll Rate**: How often the node polls the Modbus device (e.g., every 10 seconds).
-          - **Server**: Reference to a configured Modbus server (IP, port, protocol, etc.).
-        - **Server**
-          - **Host**: Modbus server IP.
-          - **Port**: Modbus server port.
-    - `mqtt out`
-        ```json
-        "Server": "<embedded UNS broker>", //same name as the flow
-        "Topic": "<UNS model>",
-        ```
-
-### Flow Reference
-
-<details>
-<summary>Show Modbus flow JSON</summary>
-
-```json
-[
-    {
-        "id": "d3becb19e0d762f4",
-        "type": "modbus-read",
-        "z": "b002a07d1163c3de",
-        "name": "status",
-        "topic": "",
-        "showStatusActivities": false,
-        "logIOActivities": false,
-        "showErrors": false,
-        "showWarnings": true,
-        "unitid": "1",
-        "dataType": "HoldingRegister",
-        "adr": "0",
-        "quantity": "1",
-        "rate": "10",
-        "rateUnit": "s",
-        "delayOnStart": false,
-        "startDelayTime": "",
-        "server": "c665b74952f6cf5a",
-        "useIOFile": false,
-        "ioFile": "",
-        "useIOForPayload": false,
-        "emptyMsgOnFail": false,
-        "x": 130,
-        "y": 500,
-        "wires": [
-            [
-                "2987638967f632b4",
-                "09b8538e09d0766a"
-            ],
-            []
-        ]
-    },
-    {
-        "id": "b068c119928c029a",
-        "type": "mqtt out",
-        "z": "b002a07d1163c3de",
-        "name": "status",
-        "topic": "global_plant/Smart_Manufacturing_Group/Suzhou_Plant/Utility_Area/Compressed_Air_System/Air_Compressor_Station/Air_Compressor_01/State/compressor_status",
-        "qos": "",
-        "retain": "",
-        "respTopic": "",
-        "contentType": "",
-        "userProps": "",
-        "correl": "",
-        "expiry": "",
-        "broker": "broker-djnwpg00y370",
-        "x": 510,
-        "y": 540,
-        "wires": []
-    },
-    {
-        "id": "2987638967f632b4",
-        "type": "debug",
-        "z": "b002a07d1163c3de",
-        "name": "debug 3",
-        "active": true,
-        "tosidebar": true,
-        "console": false,
-        "tostatus": false,
-        "complete": "false",
-        "statusVal": "",
-        "statusType": "auto",
-        "x": 260,
-        "y": 600,
-        "wires": []
-    },
-    {
-        "id": "09b8538e09d0766a",
-        "type": "function",
-        "z": "b002a07d1163c3de",
-        "name": "function 1",
-        "func": "const value = msg.payload;\n\n// 1️⃣ verify\nif (value === undefined || value === null) {\n    node.warn(\"Empty Modbus payload\");\n    return null;\n}\n\n// 2️⃣ convert to number\nconst status_code = Number(value);\n\n// 3️⃣ mapping to status\nconst statusMap = {\n    0: \"maintenance\",\n    1: \"running\",\n    2: \"standby\",\n    3: \"debug\",\n    4: \"fault\"\n};\n\n// 4️⃣ filtering\nif (!(status_code in statusMap)) {\n    node.warn(\"Invalid status_code: \" + status_code);\n    return null;\n}\n\n// 5️⃣ contextualized output\nmsg.payload = {\n    status_code: status_code,\n    status_label: statusMap[status_code],\n    _valid: true,\n    _ts: new Date().toISOString()\n};\n\n// 6️⃣ optional  set topic\nmsg.topic = \"v1/aircompressor01/state\";\n\nreturn msg;",
-        "outputs": 1,
-        "timeout": 0,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 320,
-        "y": 500,
-        "wires": [
-            [
-                "b068c119928c029a"
-            ]
-        ]
-    },
-    {
-        "id": "c665b74952f6cf5a",
-        "type": "modbus-client",
-        "name": "modbus",
-        "clienttype": "tcp",
-        "bufferCommands": true,
-        "stateLogEnabled": false,
-        "queueLogEnabled": false,
-        "failureLogEnabled": true,
-        "tcpHost": "172.31.151.237",
-        "tcpPort": "5020",
-        "tcpType": "DEFAULT",
-        "serialPort": "/dev/ttyUSB",
-        "serialType": "RTU-BUFFERD",
-        "serialBaudrate": 9600,
-        "serialDatabits": 8,
-        "serialStopbits": 1,
-        "serialParity": "none",
-        "serialConnectionDelay": 100,
-        "serialAsciiResponseStartDelimiter": "0x3A",
-        "unit_id": 1,
-        "commandDelay": 1,
-        "clientTimeout": 1000,
-        "reconnectOnTimeout": true,
-        "reconnectTimeout": 2000,
-        "parallelUnitIdsAllowed": true,
-        "showErrors": false,
-        "showWarnings": true,
-        "showLogs": true
-    },
-    {
-        "id": "broker-djnwpg00y370",
-        "type": "mqtt-broker",
-        "z": "b002a07d1163c3de",
-        "name": "emqx:1883",
-        "broker": "emqx",
-        "port": "1883",
-        "clientid": "355424069147520",
-        "usetls": false,
-        "protocolVersion": "4",
-        "keepalive": "60",
-        "cleansession": true,
-        "birthTopic": "",
-        "birthQos": "0",
-        "birthPayload": "",
-        "closeTopic": "",
-        "closeQos": "0",
-        "closePayload": "",
-        "willTopic": "",
-        "willQos": "0",
-        "willPayload": ""
-    },
-    {
-        "id": "5cc203d0788c324d",
-        "type": "global-config",
-        "env": [],
-        "modules": {
-            "node-red-contrib-modbus": "5.43.0"
-        }
-    }
-]
-```
-
-</details>
-
-## API
-### Configuring Data Flow
-In the flow, add `inject`, `http request` and `mqtt out` nodes and configure the required information.
-    - `http request`
-        ```json
-        "Method": "<API method>",
-        "URL": "<API URL>",
-        "Return": "a parsed JSON object",
-        "Headers": "<API headers>"
-        ```
-    - `mqtt out`
-        ```json
-        "Server": "<embedded UNS broker>", //same name as the flow
-        "Topic": "<UNS model>",
-        ```
-
-### Flow Reference
-<details>
-<summary>Show API flow JSON</summary>
-
-```json
-[
-    {
-        "id": "46273fcbb98afa11",
-        "type": "inject",
-        "z": "932355c6886aaf27",
-        "name": "",
-        "props": [
-            {
-                "p": "payload"
-            },
-            {
-                "p": "topic",
-                "vt": "str"
-            }
-        ],
-        "repeat": "",
-        "crontab": "",
-        "once": false,
-        "onceDelay": 0.1,
-        "topic": "",
-        "payload": "",
-        "payloadType": "date",
-        "x": 170,
-        "y": 380,
-        "wires": [
-            [
-                "3aca156076ad6dd1"
-            ]
-        ]
-    },
-    {
-        "id": "3aca156076ad6dd1",
-        "type": "http request",
-        "z": "932355c6886aaf27",
-        "name": "",
-        "method": "GET",
-        "ret": "obj",
-        "paytoqs": "ignore",
-        "url": "http://127.0.0.1:1880/api/wms/picking-zone-a/status",
-        "tls": "",
-        "persist": false,
-        "proxy": "",
-        "insecureHTTPParser": false,
-        "authType": "",
-        "senderr": false,
-        "headers": [],
-        "x": 380,
-        "y": 380,
-        "wires": [
-            [
-                "83fd65cf177c2ddf"
-            ]
-        ]
-    },
-    {
-        "id": "83fd65cf177c2ddf",
-        "type": "mqtt out",
-        "z": "932355c6886aaf27",
-        "name": "",
-        "topic": "v1/Suzhou_Plant/Assembly-Area-1/Line-01/Station-Screwing/Metric/torque",
-        "qos": "",
-        "retain": "",
-        "respTopic": "",
-        "contentType": "",
-        "userProps": "",
-        "correl": "",
-        "expiry": "",
-        "broker": "broker-djm245hxt9d9",
-        "x": 780,
-        "y": 440,
-        "wires": []
-    },
-    {
-        "id": "broker-djm245hxt9d9",
-        "type": "mqtt-broker",
-        "name": "emqx:1883",
-        "broker": "emqx",
-        "port": "1883",
-        "clientid": "355039328257392",
-        "usetls": false,
-        "protocolVersion": "4",
-        "keepalive": "60",
-        "cleansession": true,
-        "birthTopic": "",
-        "birthQos": "0",
-        "birthPayload": "",
-        "closeTopic": "",
-        "closeQos": "0",
-        "closePayload": "",
-        "willTopic": "",
-        "willQos": "0",
-        "willPayload": ""
-    }
-]
-```
-
-</details>
-
-:::tip[Other things you might want to know]
-- A `function` node is often used to clean the data before publishing to **UNS**.
-- A `debug` node can be used to check the data on the spot.
-- For node details, see [Node-RED flows](https://flows.nodered.org/).
+:::tip
+We recommend using the agent to connect external data sources when no confidential authentication is required.
 :::
+## Connecting Data Sources
+### OPC UA
+- Security configuration is automatically obtained from the server once you enter the server address.
+- Authentication is supported through username/password or certificate.
+```json
+{
+  "name": "ua",
+  "description": "",
+  "protocol": "opcua",
+  "endpoint": "opc.tcp://220.184.175.73:4841/demo/",
+  "runtimeLocation": "local",
+  "opcua": {
+    "securityMode": "None",
+    "securityPolicy": "None"
+  }
+}
+```
+### Modbus
+Only server address and unit ID are required.
+```json
+{
+  "name": "modbus",
+  "description": "",
+  "protocol": "modbus-tcp",
+  "endpoint": "tcp://220.184.175.73:1502",
+  "runtimeLocation": "local",
+  "modbus": {
+    "unitId": 1
+  }
+}
+```
+### MQTT
+Tier0 can be used as an MQTT broker to receive data from devices, or as a client to connect to an external MQTT broker.
+
+- As a broker:
+
+    <Steps>
+        1. Generates connection credentials including client ID, username and password when connecting <b>MQTT Device</b>.
+        2. Third-party client must use the publish topic displayed on the connection panel to publish messages.
+        3. Use the agent to build a stream, with the publish topic as input, to send data to the secified <b>Namespace</b>.
+    </Steps>
+
+- As a client: Connect third-party broker.
+    ```json
+    {
+    "name": "111",
+    "description": "",
+    "protocol": "mqtt",
+    "endpoint": "mqtt://220.184.175.73:1883",
+    "runtimeLocation": "local",
+    "mqtt": {
+        "clientId": "tier0UxxxxxxxxuwQVfi"
+    }
+    }
+    ```
+### HTTP
+Tier0 can be used as an HTTP server for third-party to access, or as a client to call API from other HTTP server.
+- As a server:
+
+    <Steps>
+        1. Add an HTTP server in Tier0, and get the full address from the information panel.
+        2. Use the agent to build a stream that defines data and subsequent routing, together forming an API.
+        3. Third-party uses the address and the set routing to call the API and get the data.
+    </Steps>
+
+- As a client: Connect third-party HTTP servers.
+```json
+{
+  "name": "222",
+  "description": "",
+  "protocol": "http-api",
+  "endpoint": "http://220.184.175.73:8088/api/telemetry",
+  "runtimeLocation": "local",
+  "role": "client",
+  "http": {
+    "authentication": "none"
+  }
+}
+```
+### SQL Server
+- Database address must include both port and database name.
+- An initial query command is necessary.
+- When the database is available for anonymous connection, authentication can be skipped.
+
+```json
+{
+  "name": "eee",
+  "description": "",
+  "protocol": "edge-sql",
+  "endpoint": "mysql://hzoffice.tier0.dev:3307/demo_factory",
+  "runtimeLocation": "local",
+  "sql": {
+    "queries": {
+      "query1": "SELECT * FROM telemetry ORDER BY id DESC LIMIT 5"
+    },
+    "tlsMode": "verify-full"
+  },
+  "credentialRef": "ref_9ce47b8778xxxxxxxx7dad49a86dbad"
+}
+```
+### Github
+<Steps>
+1. Connect to Tier0 Github through OAuth.
+2. Discover resources in this organization on the source information panel.
+3. Ask the agent to build a stream to get needed data.
+</Steps>
+## Getting Data from Sources
+:::note
+Sources are only connections to the server, data acquisition and processing are handled by **Stream**.
+:::
+<Steps>
+1. Ask the agent to build streams to get data from the connected sources.
+2. Necessary information, such as Modbus registers, database queries, UA namespace URIs, MQTT topics are required in the prompt.
+</Steps>

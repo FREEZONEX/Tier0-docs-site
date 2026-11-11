@@ -20,10 +20,6 @@ description: Conecta con la API de Tier0, comprueba las respuestas y reintenta e
 - Solo si `error.retry.safe` es `true`, reintenta la misma solicitud con la misma clave de idempotencia. Si se indica una espera, respeta como mínimo `error.retry.afterMs` o la cabecera `Retry-After`.
 - Si se confirmó parte de un lote, comprueba los elementos correctos antes de enviar el resto. Si el resultado es desconocido y no se confirma un reintento seguro, verifica primero si la escritura se aplicó.
 
-## Glosario
-
-- **Idempotencia**: Repetir una operación tiene el mismo efecto que ejecutarla una vez. Reutiliza la misma clave al reintentar una escritura compatible y usa una nueva para otra escritura independiente.
-
 :::note
 Consulta la [referencia OpenAPI](../tier0-openapi/) para obtener más información.
 :::

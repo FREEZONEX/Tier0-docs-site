@@ -169,6 +169,11 @@ export default defineConfig({
 							slug: 'using-tier0/building-apps',
 						},
 						{
+							label: 'Building Digital Twins',
+							translations: { 'zh-CN': '构建数字孪生', ja: 'デジタルツインの構築', es: 'Construir gemelos digitales', ko: '디지털 트윈 구축하기' },
+							slug: 'using-tier0/building-digital-twins',
+						},
+						{
 							label: 'Preparing Data Foundation',
 							translations: { 'zh-CN': '准备数据基础', ja: 'データ基盤を準備する', es: 'Preparar la base de datos', ko: '데이터 기반 준비' },
 							slug: 'using-tier0/preparing-data-foundation',
@@ -195,6 +200,16 @@ export default defineConfig({
 					translations: { 'zh-CN': '最佳实践', ja: 'ベストプラクティス', es: 'Buenas prácticas', ko: '베스트 프랙티스' },
 					collapsed: false,
 					items: [
+						{
+							label: 'RBAC Access Control',
+							translations: { 'zh-CN': 'RBAC 访问控制', ja: 'RBAC アクセス制御', es: 'Control de acceso RBAC', ko: 'RBAC 접근 제어' },
+							slug: 'best-practice/permissions',
+						},
+						{
+							label: 'Connecting Data Sources',
+							translations: { 'zh-CN': '连接数据源', ja: 'データソースの接続', es: 'Conectar fuentes de datos', ko: '데이터 소스 연결' },
+							slug: 'best-practice/connecting-industrial-protocols',
+						},
 						{
 							label: 'Security and Resilience',
 							translations: { 'zh-CN': '安全与可靠性', ja: 'セキュリティとレジリエンス', es: 'Seguridad y resiliencia', ko: '보안 및 복원력' },
