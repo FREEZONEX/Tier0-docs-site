@@ -2,3 +2,124 @@
 title: 连接数据源
 editions: [edge, cloud, enterprise]
 ---
+import { Steps } from '@astrojs/starlight/components';
+
+Tier0 支持连接多种工业协议，包括 OPC UA、Modbus、MQTT 等。
+
+:::tip
+如果连接外部数据源不需要保密的身份验证信息，建议使用 Agent 完成连接。
+:::
+## 连接数据源
+### OPC UA
+- 输入服务器地址后，系统会自动从服务器获取安全配置。
+- 支持用户名和密码或证书身份验证。
+```json
+{
+  "name": "ua",
+  "description": "",
+  "protocol": "opcua",
+  "endpoint": "opc.tcp://220.184.175.73:4841/demo/",
+  "runtimeLocation": "local",
+  "opcua": {
+    "securityMode": "None",
+    "securityPolicy": "None"
+  }
+}
+```
+### Modbus
+只需提供服务器地址和单元 ID。
+```json
+{
+  "name": "modbus",
+  "description": "",
+  "protocol": "modbus-tcp",
+  "endpoint": "tcp://220.184.175.73:1502",
+  "runtimeLocation": "local",
+  "modbus": {
+    "unitId": 1
+  }
+}
+```
+### MQTT
+Tier0 既可以作为 MQTT Broker 接收设备数据，也可以作为客户端连接外部 MQTT Broker。
+
+- 作为 Broker：
+
+    <Steps>
+        1. 连接 <b>MQTT Device</b> 时，系统会生成客户端 ID、用户名和密码等连接凭据。
+        2. 第三方客户端必须使用连接面板中显示的发布主题来发布消息。
+        3. 让 Agent 创建以发布主题为输入的 Stream，将数据发送到指定的 <b>Namespace</b>。
+    </Steps>
+
+- 作为客户端：连接第三方 Broker。
+    ```json
+    {
+    "name": "111",
+    "description": "",
+    "protocol": "mqtt",
+    "endpoint": "mqtt://220.184.175.73:1883",
+    "runtimeLocation": "local",
+    "mqtt": {
+        "clientId": "tier0UxxxxxxxxuwQVfi"
+    }
+    }
+    ```
+### HTTP
+Tier0 既可以作为 HTTP 服务器供第三方访问，也可以作为客户端调用其他 HTTP 服务器的 API。
+- 作为服务器：
+
+    <Steps>
+        1. 在 Tier0 中添加 HTTP 服务器，并从信息面板获取完整地址。
+        2. 让 Agent 创建 Stream，定义数据和后续路由，共同构成 API。
+        3. 第三方使用该地址和设定的路由调用 API 并获取数据。
+    </Steps>
+
+- 作为客户端：连接第三方 HTTP 服务器。
+```json
+{
+  "name": "222",
+  "description": "",
+  "protocol": "http-api",
+  "endpoint": "http://220.184.175.73:8088/api/telemetry",
+  "runtimeLocation": "local",
+  "role": "client",
+  "http": {
+    "authentication": "none"
+  }
+}
+```
+### SQL Server
+- 数据库地址必须同时包含端口和数据库名。
+- 需要提供初始查询命令。
+- 如果数据库允许匿名连接，可以跳过身份验证。
+
+```json
+{
+  "name": "eee",
+  "description": "",
+  "protocol": "edge-sql",
+  "endpoint": "mysql://hzoffice.tier0.dev:3307/demo_factory",
+  "runtimeLocation": "local",
+  "sql": {
+    "queries": {
+      "query1": "SELECT * FROM telemetry ORDER BY id DESC LIMIT 5"
+    },
+    "tlsMode": "verify-full"
+  },
+  "credentialRef": "ref_9ce47b8778xxxxxxxx7dad49a86dbad"
+}
+```
+### Github
+<Steps>
+1. 通过 OAuth 连接 Tier0 Github。
+2. 在数据源信息面板中查找该组织的资源。
+3. 让 Agent 创建 Stream 以获取所需数据。
+</Steps>
+## 从数据源获取数据
+:::note
+数据源仅负责连接服务器；数据采集和处理由 **Stream** 完成。
+:::
+<Steps>
+1. 让 Agent 创建 Stream，从已连接的数据源获取数据。
+2. 在提示词中提供必要信息，例如 Modbus 寄存器、数据库查询语句、UA 命名空间 URI 和 MQTT 主题。
+</Steps>

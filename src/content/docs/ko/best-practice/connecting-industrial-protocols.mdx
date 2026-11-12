@@ -2,3 +2,124 @@
 title: 데이터 소스 연결
 editions: [edge, cloud, enterprise]
 ---
+import { Steps } from '@astrojs/starlight/components';
+
+Tier0는 OPC UA, Modbus, MQTT 등 다양한 산업용 프로토콜 연결을 지원합니다.
+
+:::tip
+기밀 인증 정보가 필요 없는 외부 데이터 소스는 Agent를 사용해 연결하는 것을 권장합니다.
+:::
+## 데이터 소스 연결
+### OPC UA
+- 서버 주소를 입력하면 서버에서 보안 설정을 자동으로 가져옵니다.
+- 사용자 이름과 암호 또는 인증서를 통한 인증을 지원합니다.
+```json
+{
+  "name": "ua",
+  "description": "",
+  "protocol": "opcua",
+  "endpoint": "opc.tcp://220.184.175.73:4841/demo/",
+  "runtimeLocation": "local",
+  "opcua": {
+    "securityMode": "None",
+    "securityPolicy": "None"
+  }
+}
+```
+### Modbus
+서버 주소와 유닛 ID만 필요합니다.
+```json
+{
+  "name": "modbus",
+  "description": "",
+  "protocol": "modbus-tcp",
+  "endpoint": "tcp://220.184.175.73:1502",
+  "runtimeLocation": "local",
+  "modbus": {
+    "unitId": 1
+  }
+}
+```
+### MQTT
+Tier0는 장치 데이터를 수신하는 MQTT Broker 또는 외부 MQTT Broker에 연결하는 클라이언트로 사용할 수 있습니다.
+
+- Broker로 사용:
+
+    <Steps>
+        1. <b>MQTT Device</b>를 연결할 때 클라이언트 ID, 사용자 이름, 암호 등의 연결 자격 증명이 생성됩니다.
+        2. 타사 클라이언트는 연결 패널에 표시된 발행 토픽을 사용해 메시지를 발행해야 합니다.
+        3. Agent에게 발행 토픽을 입력으로 사용하는 Stream을 만들어 지정한 <b>Namespace</b>로 데이터를 보내도록 요청합니다.
+    </Steps>
+
+- 클라이언트로 사용: 타사 Broker에 연결합니다.
+    ```json
+    {
+    "name": "111",
+    "description": "",
+    "protocol": "mqtt",
+    "endpoint": "mqtt://220.184.175.73:1883",
+    "runtimeLocation": "local",
+    "mqtt": {
+        "clientId": "tier0UxxxxxxxxuwQVfi"
+    }
+    }
+    ```
+### HTTP
+Tier0는 타사가 접근하는 HTTP 서버 또는 다른 HTTP 서버의 API를 호출하는 클라이언트로 사용할 수 있습니다.
+- 서버로 사용:
+
+    <Steps>
+        1. Tier0에 HTTP 서버를 추가하고 정보 패널에서 전체 주소를 확인합니다.
+        2. Agent에게 데이터와 후속 라우팅을 정의하는 Stream을 만들어 API를 구성하도록 요청합니다.
+        3. 타사는 해당 주소와 설정된 경로를 사용해 API를 호출하고 데이터를 가져옵니다.
+    </Steps>
+
+- 클라이언트로 사용: 타사 HTTP 서버에 연결합니다.
+```json
+{
+  "name": "222",
+  "description": "",
+  "protocol": "http-api",
+  "endpoint": "http://220.184.175.73:8088/api/telemetry",
+  "runtimeLocation": "local",
+  "role": "client",
+  "http": {
+    "authentication": "none"
+  }
+}
+```
+### SQL Server
+- 데이터베이스 주소에는 포트와 데이터베이스 이름이 모두 포함되어야 합니다.
+- 초기 쿼리 명령이 필요합니다.
+- 데이터베이스에서 익명 연결을 허용하면 인증을 생략할 수 있습니다.
+
+```json
+{
+  "name": "eee",
+  "description": "",
+  "protocol": "edge-sql",
+  "endpoint": "mysql://hzoffice.tier0.dev:3307/demo_factory",
+  "runtimeLocation": "local",
+  "sql": {
+    "queries": {
+      "query1": "SELECT * FROM telemetry ORDER BY id DESC LIMIT 5"
+    },
+    "tlsMode": "verify-full"
+  },
+  "credentialRef": "ref_9ce47b8778xxxxxxxx7dad49a86dbad"
+}
+```
+### Github
+<Steps>
+1. OAuth로 Tier0 Github에 연결합니다.
+2. 데이터 소스 정보 패널에서 이 조직의 리소스를 찾습니다.
+3. Agent에게 필요한 데이터를 가져오는 Stream을 만들도록 요청합니다.
+</Steps>
+## 데이터 소스에서 데이터 가져오기
+:::note
+데이터 소스는 서버에 연결만 합니다. 데이터 수집과 처리는 **Stream**이 담당합니다.
+:::
+<Steps>
+1. Agent에게 연결된 데이터 소스에서 데이터를 가져오는 Stream을 만들도록 요청합니다.
+2. Modbus 레지스터, 데이터베이스 쿼리, UA 네임스페이스 URI, MQTT 토픽 등 필요한 정보를 프롬프트에 포함합니다.
+</Steps>

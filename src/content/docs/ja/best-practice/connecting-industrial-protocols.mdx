@@ -2,3 +2,124 @@
 title: データソースの接続
 editions: [edge, cloud, enterprise]
 ---
+import { Steps } from '@astrojs/starlight/components';
+
+Tier0 は OPC UA、Modbus、MQTT など、さまざまな産業用プロトコルへの接続に対応しています。
+
+:::tip
+機密性の高い認証情報が不要な外部データソースは、Agent を使って接続することを推奨します。
+:::
+## データソースの接続
+### OPC UA
+- サーバーアドレスを入力すると、セキュリティ設定がサーバーから自動取得されます。
+- ユーザー名とパスワード、または証明書による認証に対応しています。
+```json
+{
+  "name": "ua",
+  "description": "",
+  "protocol": "opcua",
+  "endpoint": "opc.tcp://220.184.175.73:4841/demo/",
+  "runtimeLocation": "local",
+  "opcua": {
+    "securityMode": "None",
+    "securityPolicy": "None"
+  }
+}
+```
+### Modbus
+サーバーアドレスとユニット ID のみが必要です。
+```json
+{
+  "name": "modbus",
+  "description": "",
+  "protocol": "modbus-tcp",
+  "endpoint": "tcp://220.184.175.73:1502",
+  "runtimeLocation": "local",
+  "modbus": {
+    "unitId": 1
+  }
+}
+```
+### MQTT
+Tier0 は、デバイスからデータを受信する MQTT Broker としても、外部 MQTT Broker に接続するクライアントとしても使用できます。
+
+- Broker として：
+
+    <Steps>
+        1. <b>MQTT Device</b> の接続時に、クライアント ID、ユーザー名、パスワードなどの接続認証情報が生成されます。
+        2. サードパーティーのクライアントは、接続パネルに表示される公開トピックを使ってメッセージを公開する必要があります。
+        3. 公開トピックを入力とする Stream を Agent に作成させ、指定した <b>Namespace</b> にデータを送信します。
+    </Steps>
+
+- クライアントとして：サードパーティーの Broker に接続します。
+    ```json
+    {
+    "name": "111",
+    "description": "",
+    "protocol": "mqtt",
+    "endpoint": "mqtt://220.184.175.73:1883",
+    "runtimeLocation": "local",
+    "mqtt": {
+        "clientId": "tier0UxxxxxxxxuwQVfi"
+    }
+    }
+    ```
+### HTTP
+Tier0 は、外部からアクセスできる HTTP サーバーとしても、他の HTTP サーバーの API を呼び出すクライアントとしても使用できます。
+- サーバーとして：
+
+    <Steps>
+        1. Tier0 に HTTP サーバーを追加し、情報パネルから完全なアドレスを取得します。
+        2. データと後続のルーティングを定義する Stream を Agent に作成させ、API を構成します。
+        3. サードパーティーは、そのアドレスと設定したルートを使って API を呼び出し、データを取得します。
+    </Steps>
+
+- クライアントとして：サードパーティーの HTTP サーバーに接続します。
+```json
+{
+  "name": "222",
+  "description": "",
+  "protocol": "http-api",
+  "endpoint": "http://220.184.175.73:8088/api/telemetry",
+  "runtimeLocation": "local",
+  "role": "client",
+  "http": {
+    "authentication": "none"
+  }
+}
+```
+### SQL Server
+- データベースアドレスには、ポートとデータベース名の両方を含める必要があります。
+- 最初に実行するクエリが必要です。
+- データベースが匿名接続を許可する場合は、認証を省略できます。
+
+```json
+{
+  "name": "eee",
+  "description": "",
+  "protocol": "edge-sql",
+  "endpoint": "mysql://hzoffice.tier0.dev:3307/demo_factory",
+  "runtimeLocation": "local",
+  "sql": {
+    "queries": {
+      "query1": "SELECT * FROM telemetry ORDER BY id DESC LIMIT 5"
+    },
+    "tlsMode": "verify-full"
+  },
+  "credentialRef": "ref_9ce47b8778xxxxxxxx7dad49a86dbad"
+}
+```
+### Github
+<Steps>
+1. OAuth を使って Tier0 Github に接続します。
+2. データソースの情報パネルで、この組織のリソースを確認します。
+3. 必要なデータを取得する Stream を Agent に作成させます。
+</Steps>
+## データソースからデータを取得する
+:::note
+データソースはサーバーへの接続のみを担います。データの収集と処理は **Stream** が行います。
+:::
+<Steps>
+1. 接続したデータソースからデータを取得する Stream を Agent に作成させます。
+2. Modbus レジスタ、データベースクエリ、UA 名前空間 URI、MQTT トピックなど、必要な情報をプロンプトに含めます。
+</Steps>

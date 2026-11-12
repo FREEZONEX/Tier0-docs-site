@@ -2,3 +2,124 @@
 title: Conectar fuentes de datos
 editions: [edge, cloud, enterprise]
 ---
+import { Steps } from '@astrojs/starlight/components';
+
+Tier0 permite conectarse a distintos protocolos industriales, incluidos OPC UA, Modbus y MQTT.
+
+:::tip
+Recomendamos usar el Agent para conectar fuentes de datos externas cuando no se necesiten credenciales confidenciales.
+:::
+## Conectar fuentes de datos
+### OPC UA
+- Al introducir la dirección del servidor, la configuración de seguridad se obtiene automáticamente de él.
+- Se admite la autenticación mediante usuario y contraseña o certificado.
+```json
+{
+  "name": "ua",
+  "description": "",
+  "protocol": "opcua",
+  "endpoint": "opc.tcp://220.184.175.73:4841/demo/",
+  "runtimeLocation": "local",
+  "opcua": {
+    "securityMode": "None",
+    "securityPolicy": "None"
+  }
+}
+```
+### Modbus
+Solo se necesitan la dirección del servidor y el ID de unidad.
+```json
+{
+  "name": "modbus",
+  "description": "",
+  "protocol": "modbus-tcp",
+  "endpoint": "tcp://220.184.175.73:1502",
+  "runtimeLocation": "local",
+  "modbus": {
+    "unitId": 1
+  }
+}
+```
+### MQTT
+Tier0 puede actuar como Broker MQTT para recibir datos de dispositivos o como cliente para conectarse a un Broker MQTT externo.
+
+- Como Broker:
+
+    <Steps>
+        1. Al conectar un <b>MQTT Device</b>, se generan credenciales como ID de cliente, usuario y contraseña.
+        2. El cliente de terceros debe publicar los mensajes en el tema indicado en el panel de conexión.
+        3. Pide al Agent que cree un Stream con el tema de publicación como entrada para enviar los datos al <b>Namespace</b> indicado.
+    </Steps>
+
+- Como cliente: conecta un Broker de terceros.
+    ```json
+    {
+    "name": "111",
+    "description": "",
+    "protocol": "mqtt",
+    "endpoint": "mqtt://220.184.175.73:1883",
+    "runtimeLocation": "local",
+    "mqtt": {
+        "clientId": "tier0UxxxxxxxxuwQVfi"
+    }
+    }
+    ```
+### HTTP
+Tier0 puede actuar como servidor HTTP al que acceden terceros o como cliente que llama a las API de otros servidores HTTP.
+- Como servidor:
+
+    <Steps>
+        1. Añade un servidor HTTP en Tier0 y obtén la dirección completa en el panel de información.
+        2. Pide al Agent que cree un Stream que defina los datos y las rutas posteriores para formar una API.
+        3. Un tercero usa esa dirección y la ruta configurada para llamar a la API y obtener los datos.
+    </Steps>
+
+- Como cliente: conecta servidores HTTP de terceros.
+```json
+{
+  "name": "222",
+  "description": "",
+  "protocol": "http-api",
+  "endpoint": "http://220.184.175.73:8088/api/telemetry",
+  "runtimeLocation": "local",
+  "role": "client",
+  "http": {
+    "authentication": "none"
+  }
+}
+```
+### SQL Server
+- La dirección de la base de datos debe incluir el puerto y el nombre de la base de datos.
+- Es necesario definir una consulta inicial.
+- Si la base de datos permite conexiones anónimas, se puede omitir la autenticación.
+
+```json
+{
+  "name": "eee",
+  "description": "",
+  "protocol": "edge-sql",
+  "endpoint": "mysql://hzoffice.tier0.dev:3307/demo_factory",
+  "runtimeLocation": "local",
+  "sql": {
+    "queries": {
+      "query1": "SELECT * FROM telemetry ORDER BY id DESC LIMIT 5"
+    },
+    "tlsMode": "verify-full"
+  },
+  "credentialRef": "ref_9ce47b8778xxxxxxxx7dad49a86dbad"
+}
+```
+### Github
+<Steps>
+1. Conecta Tier0 Github mediante OAuth.
+2. Busca los recursos de esta organización en el panel de información de la fuente.
+3. Pide al Agent que cree un Stream para obtener los datos necesarios.
+</Steps>
+## Obtener datos de las fuentes
+:::note
+Las fuentes solo establecen la conexión con el servidor. **Stream** se encarga de obtener y procesar los datos.
+:::
+<Steps>
+1. Pide al Agent que cree Streams para obtener datos de las fuentes conectadas.
+2. Incluye en el prompt la información necesaria, como registros Modbus, consultas de base de datos, URI de espacios de nombres UA y temas MQTT.
+</Steps>
