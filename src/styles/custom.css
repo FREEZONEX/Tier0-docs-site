@@ -1397,7 +1397,7 @@ starlight-tabs.t0-topic-explosion-tabs,
 	max-width: 100%;
 	overflow: hidden;
 	background: #fcfcfc;
-	table-layout: fixed;
+	table-layout: auto;
 }
 
 :root[data-theme='light'] .sl-markdown-content th,
@@ -1432,7 +1432,7 @@ starlight-tabs.t0-topic-explosion-tabs,
 	max-width: 100%;
 	overflow: hidden;
 	background: #1f1f1f;
-	table-layout: fixed;
+	table-layout: auto;
 }
 
 :root[data-theme='dark'] .sl-markdown-content th,
@@ -1468,39 +1468,8 @@ starlight-tabs.t0-topic-explosion-tabs,
 	overflow-wrap: anywhere;
 }
 
-/* Security and Resilience: reserve more room for explanations than labels. */
-:root[data-theme] .sl-markdown-content:has(#security-scope-by-edition, #各版本的安全范围) table {
-	table-layout: auto;
-}
-
-.sl-markdown-content:has(#security-scope-by-edition, #各版本的安全范围) th:first-child {
-	width: 22%;
-}
-
-.sl-markdown-content:has(#security-scope-by-edition, #各版本的安全范围) th:nth-child(3) {
-	width: 24%;
-}
-
-/* User Management: keep action and actor compact, leaving room for descriptions. */
-.sl-markdown-content:has(#账号管理, #account-management, #アカウント管理, #gestión-de-cuentas, #계정-관리) th:first-child {
-	width: 23%;
-}
-
-.sl-markdown-content:has(#账号管理, #account-management, #アカウント管理, #gestión-de-cuentas, #계정-관리) th:nth-child(2) {
-	width: 25%;
-}
-
-.sl-markdown-content:has(#账号管理, #account-management, #アカウント管理, #gestión-de-cuentas, #계정-관리) th:nth-child(3) {
-	width: 52%;
-}
-
-/* Default tables: wrap inside the content column (no horizontal scrollbar). */
-:root[data-theme] .sl-markdown-content .t0-journey-table table {
-	table-layout: auto;
-}
-
+/* Keep journey labels together while column widths follow their content. */
 .sl-markdown-content .t0-journey-table :is(th, td):nth-child(2) {
-	min-width: 6.5rem;
 	white-space: nowrap;
 	overflow-wrap: normal;
 	word-break: normal;
@@ -1534,10 +1503,6 @@ starlight-tabs.t0-topic-explosion-tabs,
 	white-space: nowrap;
 	overflow-wrap: normal;
 	word-break: normal;
-}
-
-:root.t0-table-scroll .sl-markdown-content :is(td:first-child, th:first-child) {
-	width: 1%;
 }
 
 /* Pagination (Figma 4445:5087) */
