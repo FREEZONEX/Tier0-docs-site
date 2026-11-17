@@ -19,9 +19,16 @@ type FallbackAgent = {
   type: 'fallback';
 };
 
+type ImageAgent = {
+  name: string;
+  type: 'image';
+  src: string;
+};
+
 type Agent =
   | BrandAgent
-  | FallbackAgent;
+  | FallbackAgent
+  | ImageAgent;
 
 const agents: Agent[] = [
   {
@@ -47,6 +54,11 @@ const agents: Agent[] = [
     name: 'GitHub Copilot',
     type: 'brand',
     icon: siGithubcopilot,
+  },
+  {
+    name: 'WorkBuddy',
+    type: 'image',
+    src: '/images/workbuddy-logo.svg',
   },
 ];
 
@@ -86,6 +98,12 @@ const introText =
               >
                 <path d={agent.icon.path} />
               </svg>
+            ) : agent.type === 'image' ? (
+              <img
+                class="agent-icon"
+                src={agent.src}
+                alt=""
+              />
             ) : (
               <svg
                 class="agent-icon"
