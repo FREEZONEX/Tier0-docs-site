@@ -108,11 +108,12 @@ API 详情见 [API 参考](../../reference/tier0-openapi/)。
 - **Path**：`Factory_A/Site_01/SMT_Line_1/Metric`
 - **Topic**：`/Machine_001`。
 - **消息内容**
-    ```json
-    "temperature": 85,
-    "vibration": 2.8,
-
-    ```
+        ```json
+        {
+          "temperature": 85,
+          "vibration": 2.8
+        }
+        ```
 </TabItem>
 <TabItem label="业务数据">
 ```text
@@ -125,10 +126,12 @@ API 详情见 [API 参考](../../reference/tier0-openapi/)。
 - **Path**：`Factory_A/ERP/ProductionOrders/State`
 - **Topic**：`/OrderList`。
 - **消息内容**
-    ```json
-    "orders": "0123569876",
-    "updated_at": 2026-7-13,
-    ```
+        ```json
+        {
+          "orders": "0123569876",
+          "updated_at": "2026-07-13"
+        }
+        ```
 </TabItem>
 </Tabs>
 
@@ -141,9 +144,9 @@ Tier0 使用 PostgreSQL 存储数据。不同数据类型变化频率不同，�
 
 | 数据类型 | 存储 | 说明 |
 |-----------|---------|-------------|
-| Metric | TSDB | 针对温度、压力等高频测量数据优化。每个 topic 默认包含 `timestamp` 和 `quality` 字段。 |
-| State | PostgreSQL | 以灵活的 `JSONB` 格式存储设备或系统状态。 |
-| Action | PostgreSQL | 以灵活的 `JSONB` 格式存储命令或动作。 |
+| `METRIC` | TSDB | 针对温度、压力等高频测量数据优化。每个 topic 默认包含 `timestamp` 和 `quality` 字段。 |
+| `STATE` | PostgreSQL | 以灵活的 `JSONB` 格式存储设备或系统状态。 |
+| `ACTION` | PostgreSQL | 以灵活的 `JSONB` 格式存储命令或动作。 |
 
 ## 下一步
 

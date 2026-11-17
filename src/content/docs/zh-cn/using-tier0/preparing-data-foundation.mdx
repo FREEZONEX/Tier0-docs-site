@@ -46,7 +46,7 @@ flowchart TB
 ```mermaid
 flowchart LR
   app["应用"] -->|"业务数据"| record["Record"]
-  stream["Stream"] -->|"设备数据"| sample["Sample"]
+  stream["数据流"] -->|"设备数据"| sample["Sample"]
   classDef t0accent fill:#B2ED1D,stroke:#73B200,color:#171717
   class record,sample t0accent
 ```
@@ -55,14 +55,14 @@ flowchart LR
 
 ### 数据连接
 
-- **Source**：连接外部数据服务器，通常需要认证。
-- **Stream**：从服务器采集数据，按需处理，并存入 **Namespace** 模型。
+- **数据源**：连接外部数据服务器，通常需要认证。
+- **数据流**：从服务器采集数据，按需处理，并存入 **Namespace** 模型。
 
 <div class="t0-compact-mermaid t0-foundation-mermaid" style="max-width: 450px; margin-inline: auto;">
 
 ```mermaid
 flowchart LR
-  source["Source<br/>连接服务器"] --> stream["Stream<br/>采集并处理"]
+  source["数据源<br/>连接服务器"] --> stream["数据流<br/>采集并处理"]
   classDef t0accent fill:#B2ED1D,stroke:#73B200,color:#171717
   class source,stream t0accent
 ```
@@ -72,12 +72,12 @@ flowchart LR
 ## 构建数据基础
 
 <Steps>
-1. 在 **Builder** 中构建应用，让 Agent 在 **Namespace** 中准备业务数据模型。除非 Prompt 明确指定，否则 Agent 会根据应用业务逻辑自动生成模型。
+1. 在 **Builder** 中构建应用，让 Agent 在 **Namespace** 中准备业务数据模型。
 	:::note
 	除非 Prompt 明确指定，否则 Agent 会根据应用业务逻辑自动生成数据模型。
 	:::
-2. 在 **Connect** > **Source** 中连接所需数据源并配置认证。
-3. 让 Agent 创建 **Stream**，从已连接的 Source 采集和处理数据，写入应用生成的 **Namespace** 模型。
+2. 在 **Connect** > **数据源** 中连接所需数据源并配置认证。
+3. 让 Agent 创建**数据流**，从已连接的数据源采集和处理数据，写入应用生成的 **Namespace** 模型。
 </Steps>
 
 ## 下一步

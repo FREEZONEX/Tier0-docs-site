@@ -65,7 +65,7 @@ sidebar:
 
 ## `preview-runtime-stability`
 
-诊断托管预览的安装、启动、就绪状态、角色、端口和 HMR 故障，不负责构建业务功能。适用于依赖或锁文件错误、Vite/TanStack Start 启动故障、`5173` 端口冲突、`/api/health` 或预览角色错误、`artifact.toml` 不匹配，以及 HMR 频繁整页重载。先读取相关错误，修复有证据支持的原因，仅在必要时重启，并验证原故障、健康检查和受影响路由。
+诊断托管预览的安装、启动、就绪状态、角色、端口和 HMR 故障，不负责构建业务功能。适用于依赖或锁文件错误（包括 npm `ERESOLVE`）、Vite/TanStack Start 启动故障、`5173` 端口冲突、`/api/health` 或预览角色错误、`artifact.toml` 不匹配，以及 HMR 频繁整页重载。先读取相关错误，修复有证据支持的原因，仅在必要时重启，并验证原故障、健康检查和受影响路由。
 
 ```text
 使用 $preview-runtime-stability 诊断“Preview loading timed out”。

@@ -108,9 +108,11 @@ For example, a model in UNS looks like the tree displayed below:
     - **Path**: `Factory_A/Site_01/SMT_Line_1/Metric`
     - **Topic**: `/Machine_001`.
     - **Payload**
-        ```json
-        "temperature": 85,
-        "vibration": 2.8,
+            ```json
+        {
+          "temperature": 85,
+          "vibration": 2.8
+        }
         ```
     </TabItem>
     <TabItem label="Business Data">
@@ -124,9 +126,11 @@ For example, a model in UNS looks like the tree displayed below:
     - **Path**: `Factory_A/ERP/ProductionOrders/State`
     - **Topic**: `/OrderList`.
     - **Payload**
-        ```json
-        "orders": "0123569876",
-        "updated_at": 2026-7-13,
+            ```json
+        {
+          "orders": "0123569876",
+          "updated_at": "2026-07-13"
+        }
         ```
     </TabItem>
 </Tabs>

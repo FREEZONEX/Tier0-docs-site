@@ -209,11 +209,16 @@ Fleet Agent は、PostgreSQL/RustFS に直接置けないが、新しい Active 
 
 | 障害シナリオ | 期待される動作 | 境界 |
 | --- | --- | --- |
-| D Active 業務ノード障害 | Business VIP が E または F に移動し、新しい Owner が readiness 通過後に業務グループを起動する | Standby 上で最新 HA fileset generation が完了している必要がある |
-| PostgreSQL A Primary 障害 | B が Primary に昇格し、PostgreSQL VIP は D/E proxy 経由で書き込み可能 Primary にルーティングし続ける | データ損失は streaming replication の状態に依存する |
-| 現在の Redis ノード障害 | Redis VIP がもう一方の独立 Redis インスタンスへ移動する | キャッシュ/セッションは失われる可能性がある |
-| RustFS proxy A または B 障害 | RustFS VIP がもう一方の proxy へ移動する | RustFS データは 4 ノードクラスターの健全性に依存する |
-| 単一 RustFS データノード障害 | 冗長性条件が満たされていれば RustFS クラスターはサービスを継続する | 実際の境界はディスク数と erasure coding 構成に依存する |
+| D Active 業務ノード障害 | Business VIP が E または F に移動し、正常な Standby が fileset generation を確認してから業務グループを起動する | 最後の正常な同期後に未同期のファイルは失われる可能性がある |
+| Fleet Agent 障害 | readiness が失敗し、旧業務グループが停止して Business VIP が移動する | Agent を迂回して手動でコンテナーを起動しない |
+| PostgreSQL A Primary 障害 | B が昇格し、HAProxy が新 Primary にルーティングする。PostgreSQL VIP は変わらない | 切り替え中は接続が一時的に失敗する。後で新しい Standby を復旧する |
+| PostgreSQL HAProxy 1 台の障害 | PostgreSQL VIP がもう一方の proxy へ移動する | データベースの役割は変わらない |
+| 現在の Redis ノード障害 | Redis VIP がもう一方の独立 Redis インスタンスへ移動する | キャッシュが失われ、セッションが無効になる可能性がある |
+| RustFS データノード 1 台の障害 | 残りのクラスターノードがサービスを継続する | 許容範囲は実際の erasure coding とディスクの状態に依存する |
+| RustFS HAProxy 1 台の障害 | RustFS VIP がもう一方の proxy へ移動する | S3 アドレスは変わらず、既存の接続は再接続が必要になる場合がある |
+| deployer controller 障害 | 稼働中のデータプレーンは継続する | デプロイ、集中監視、運用が一時的に利用できず、controller 自体には自動 Standby がない |
+| ネットワーク分断 | 安全な自動リーダー選出は保証されない | VIP Owner または Active が二重になる可能性があり、障害側を隔離して手動で復旧する |
+| 任意の 2 台が同時に障害 | 一律の可用性保証はない | 結果は 2 台の役割の組み合わせに依存し、シナリオごとの検証が必要 |
 
 ネットワーク分断、複数ノード同時障害、誤った VRRP priority、ディスク満杯、時刻ずれ、deployer 外の手動変更は通常の自動復旧保証の範囲外であり、運用手順で扱う必要があります。
 
@@ -228,26 +233,38 @@ Fleet Agent は、PostgreSQL/RustFS に直接置けないが、新しい Active 
 
 ## 本番前チェック
 
-- deployer controller から 6 台すべてへ SSH で到達できる。
-- ホスト名、IP アドレス、NIC 名、NTP、DNS、ファイアウォールルールが固定され、記録されている。
-- 4 つの VIP が未使用で、候補ノード間を移動できる。
-- ディスクマウントポイントが固定され、再起動後も維持される。
-- Enterprise、PostgreSQL、Redis、RustFS、Keepalived、HAProxy、repmgr、Fleet Agent、rsync の構成が deployer により生成され、レビューされている。
-- Cluster License が Business VIP 経由で 1 回だけアクティベートされている。
-- 本番トラフィック投入前にバックアップとリストア手順をリハーサルしている。
+| 確認項目 | 合格基準 |
+| --- | --- |
+| マシンと役割 | 6 台の業務マシン A～F が計画と一致し、deployer は分離されている。 |
+| SSH と sudo | deployer が管理されたアカウントで A～F に対話なしでアクセスでき、ホストキーを確認済み。 |
+| ネットワークと時刻 | 6 台は計画されたサブネットにあり、4 つの VIP は未使用。NIC、プレフィックス、時刻同期が要件を満たす。 |
+| Docker/Compose | 6 台すべて初期化済みで、古いコンテナー、ポート、ネットワーク、データディレクトリとの競合がない。 |
+| ディスク | PostgreSQL、RustFS、Enterprise fileset が計画されたマウントポイントを使用し、容量と inode に問題がない。 |
+| PostgreSQL | Primary が 1 台、Standby は streaming 中、Witness は稼働中で、PostgreSQL VIP 経由で読み書きできる。 |
+| Redis | C/F のインスタンスが正常で、Redis VIP 経由の `PING` に成功し、切り替え後にデータが複製されない境界を了承済み。 |
+| RustFS | 4 ノードが正常で、RustFS VIP 経由でオブジェクトを書き込み、読み取り、削除できる。 |
+| Enterprise | D/E/F のバージョンが一致し、Business VIP の所有者だけが業務グループを実行する。 |
+| Fleet Agent | 3 台の Agent が稼働し、readiness、同期履歴、generation の状態を確認できる。 |
+| License | Cluster License が Business VIP 経由で 1 回だけ有効化され、切り替え後も有効。 |
+| App 同期 | `node_modules` を含むインポート済み App が同期と切り替え後も動作する。 |
+| ファイアウォール | この計画で必要な送信元、宛先、プロトコルのみ許可されている。 |
+| バックアップ | PostgreSQL、RustFS、deployer のバックアップ計画があり、少なくとも 1 回の復元テストを完了している。 |
 
 ## 実装手順
 
-1. deployer controller と 6 台のマシンを準備する。
-2. IP、VIP、NIC、ディスク、DNS、NTP、SSH、ファイアウォール情報を確認する。
-3. Enterprise オフラインパッケージと構成資料をアップロードする。
-4. PostgreSQL primary/standby と Witness をデプロイする。
-5. Redis 独立インスタンスと Redis VIP をデプロイする。
-6. RustFS 4 ノードクラスターと RustFS VIP をデプロイする。
-7. D/E/F に Enterprise、Fleet Agent、rsync fileset、Business VIP をデプロイする。
-8. Business VIP 経由で License をアクティベートする。
-9. 機能検証とフェイルオーバードリルを実行する。
-10. 最終トポロジー、パスワード/キー、バックアップポリシー、監視対象、復旧手順を記録する。
+1. 独立した deployer controller、6 台の業務マシン、4 つの VIP、NIC、ディスク構成を準備する。
+2. 完全な納品パッケージと Enterprise オフライン ZIP の SHA256 を検証する。
+3. deployer を起動し、SSH 認証情報と 6 台のマシンを登録して接続を確認する。
+4. 6 台すべてで Docker/Compose とオフラインイメージ環境を初期化する。
+5. 標準デプロイを作成し、A～F の役割と 4 つの VIP を確認する。
+6. PostgreSQL、Redis、RustFS、HAProxy、Keepalived を順にデプロイする。
+7. D/E/F 間に専用 rsync アカウントと SSH 信頼関係を設定する。
+8. D/E/F に Enterprise と Fleet Agent をデプロイし、初期 Active が D のみであることを確認する。
+9. Business VIP 経由で License を 1 回有効化し、同期完了を待つ。
+10. テスト App をインポートし、App、`node_modules`、Flow/Marimo、License fileset の同期を検証する。
+11. Enterprise、PostgreSQL、Redis、RustFS の単一ノード障害を個別に演習する。
+12. ノードを復旧し、VIP Owner、Active、Primary がそれぞれ 1 つで、同期が完了していることを確認する。
+13. バックアップ復元演習、運用引き継ぎ、現場パラメーターの記録を完了する。
 
 ## 受け入れ基準
 
@@ -271,12 +288,17 @@ Fleet Agent は、PostgreSQL/RustFS に直接置けないが、新しい Active 
 
 ## リスクと現場確認項目
 
-- ネットワークが VRRP protocol `112` を許可するか。
-- 4 つの VIP アドレスが本当に未使用か。
-- ディスクマウント構成と容量が実際のファイル保持と RustFS 冗長性要件を満たすか。
-- Redis が破棄可能なデータだけを保存しているか。
-- PostgreSQL replication lag とバックアップポリシーが業務 RPO を満たすか。
-- 運用担当者が VIP フェイルオーバー、ファイル同期、データベースレプリケーション、オブジェクトストレージ冗長性の違いを理解しているか。
+- 4 つの VIP が 6 台のマシンで共有できる同じレイヤー 2 ネットワークにあるか。
+- ネットワーク機器が VRRP/GARP を許可し、セキュリティポリシーが VIP の移動を妨げないか。
+- 現場が完全にオフラインか。deployer は Harbor への到達性を確認するため、事前に経路または proxy を検証する。
+- PostgreSQL、RustFS、Enterprise fileset の容量、増加率、RPO/RTO 目標が要件を満たすか。
+- Redis に失われてはならないデータがあるか。その場合、独立した 2 インスタンスでは要件を満たさない。
+- App/Flow/Marimo のファイル量、変更量、許容同期遅延が要件を満たすか。
+- サブネット間、データセンター間、ネットワーク分断、または任意の 2 台同時障害への可用性が必須か。
+- 本番証明書、ドメイン、パスワード、License、SSH キー、監査記録の管理責任者は誰か。
+- deployer controller の復旧方法、バックアップ周期、代替運用経路は何か。
+
+これらが変わると VIP、役割、ストレージ、障害時の境界に影響する可能性があるため、実装前に計画を更新してください。
 
 ## 結論
 

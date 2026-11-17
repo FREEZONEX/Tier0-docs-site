@@ -175,7 +175,7 @@ export default defineConfig({
 						},
 						{
 							label: 'Preparing Data Foundation',
-							translations: { 'zh-CN': '准备数据基础', ja: 'データ基盤を準備する', es: 'Preparar la base de datos', ko: '데이터 기반 준비' },
+							translations: { 'zh-CN': '准备数据基础', ja: 'データ基盤を準備する', es: 'Preparar los fundamentos de datos', ko: '데이터 기반 준비' },
 							slug: 'using-tier0/preparing-data-foundation',
 						},
 						{

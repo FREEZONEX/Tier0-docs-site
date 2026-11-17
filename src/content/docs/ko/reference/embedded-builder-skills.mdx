@@ -65,7 +65,7 @@ $responsive-craft preview로 375, 768, 1024, 1440 px를 보여 줘.
 
 ## `preview-runtime-stability`
 
-관리형 미리보기의 설치, 시작, 준비 상태, 역할, 포트, HMR 문제를 진단합니다. 비즈니스 기능은 만들지 않습니다. 의존성·lockfile 오류, Vite/TanStack Start 시작 문제, `5173` 포트 충돌, `/api/health` 실패, 미리보기 역할, `artifact.toml` 불일치, 잦은 전체 페이지 새로고침을 다룹니다. 첫 관련 오류를 확인하고 증거가 있는 원인을 수정하며 필요할 때만 재시작한 뒤 원래 오류, 상태 검사, 해당 경로를 검증합니다.
+관리형 미리보기의 설치, 시작, 준비 상태, 역할, 포트, HMR 문제를 진단합니다. 비즈니스 기능은 만들지 않습니다. 의존성·lockfile 오류(npm `ERESOLVE` 포함), Vite/TanStack Start 시작 문제, `5173` 포트 충돌, `/api/health` 실패, 미리보기 역할, `artifact.toml` 불일치, 잦은 전체 페이지 새로고침을 다룹니다. 첫 관련 오류를 확인하고 증거가 있는 원인을 수정하며 필요할 때만 재시작한 뒤 원래 오류, 상태 검사, 해당 경로를 검증합니다.
 
 ```text
 $preview-runtime-stability로 "Preview loading timed out"을 진단해 줘.

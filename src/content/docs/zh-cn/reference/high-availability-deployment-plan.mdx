@@ -1,5 +1,5 @@
 ---
-title: tier0-enterprise 三节点部署方案V2
+title: 高可用部署方案
 description: Enterprise Fleet Center 六机单活主备容灾方案。
 sidebar:
   order: 3
@@ -63,19 +63,19 @@ Enterprise 均不修改连接地址。
 以下地址只用于展示规划格式，实施时必须替换为现场同一 IPv4 子网中的实际地址。四个 VIP
 必须未被 DHCP、静态主机或其他 VRRP 实例占用。
 
-|类型|名称|示例 IP|说明|
-|---|---|---|---|
-|控制面|deployer\-controller|`10.60.10.20`|独立部署器，不计入六台业务机器|
-|业务节点|ent\-ha\-01 / A|`10.60.10.11`|PostgreSQL Primary 等职责|
-|业务节点|ent\-ha\-02 / B|`10.60.10.12`|PostgreSQL Standby 等职责|
-|业务节点|ent\-ha\-03 / C|`10.60.10.13`|Witness、Redis\-1、RustFS\-1|
-|业务节点|ent\-ha\-04 / D|`10.60.10.14`|Enterprise 初始 Active 等职责|
-|业务节点|ent\-ha\-05 / E|`10.60.10.15`|Enterprise Standby 等职责|
-|业务节点|ent\-ha\-06 / F|`10.60.10.16`|Enterprise Standby 等职责|
-|逻辑入口|Business VIP|`10.60.10.101`|Enterprise 统一入口，默认 `8088`|
-|逻辑入口|PostgreSQL VIP|`10.60.10.102`|数据库统一入口，默认 `5432`|
-|逻辑入口|Redis VIP|`10.60.10.103`|Redis 统一入口，默认 `6379`|
-|逻辑入口|RustFS VIP|`10.60.10.104`|S3 统一入口，默认 `19000`|
+|名称|示例 IP|说明|
+|---|---|---|
+|deployer\-controller|`10.60.10.20`|独立部署器，不计入六台业务机器|
+|ent\-ha\-01 / A|`10.60.10.11`|PostgreSQL Primary 等职责|
+|ent\-ha\-02 / B|`10.60.10.12`|PostgreSQL Standby 等职责|
+|ent\-ha\-03 / C|`10.60.10.13`|Witness、Redis\-1、RustFS\-1|
+|ent\-ha\-04 / D|`10.60.10.14`|Enterprise 初始 Active 等职责|
+|ent\-ha\-05 / E|`10.60.10.15`|Enterprise Standby 等职责|
+|ent\-ha\-06 / F|`10.60.10.16`|Enterprise Standby 等职责|
+|Business VIP|`10.60.10.101`|Enterprise 统一入口，默认 `8088`|
+|PostgreSQL VIP|`10.60.10.102`|数据库统一入口，默认 `5432`|
+|Redis VIP|`10.60.10.103`|Redis 统一入口，默认 `6379`|
+|RustFS VIP|`10.60.10.104`|S3 统一入口，默认 `19000`|
 
 实施前还需要确认：业务网卡名称、IPv4 前缀长度、网关、DNS、NTP、主机名、SSH 用户、
 磁盘挂载点和防火墙放行范围。VIP、节点 IP 和网卡不能靠脚本猜测后直接用于生产。

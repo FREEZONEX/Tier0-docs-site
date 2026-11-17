@@ -1,14 +1,17 @@
 ---
 import spec from '../../public/openapi/tier0-cloud-v2.en.json';
+import zhSpec from '../../public/openapi/tier0-cloud-v2.zh-cn.json';
+const isChinese = Astro.props.locale === 'zh-cn';
+const activeSpec = isChinese ? zhSpec : spec;
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang={isChinese ? 'zh-CN' : 'en'}>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="algolia-site-verification" content="958EE07D47EDCCC6" />
-    <title>Tier0 OpenAPI Reference</title>
+    <title>{isChinese ? 'Tier0 OpenAPI 参考' : 'Tier0 OpenAPI Reference'}</title>
     <link rel="stylesheet" href="https://unpkg.com/swagger-ui-dist@5/swagger-ui.css" />
     <style>
       :root {
@@ -131,8 +134,8 @@ import spec from '../../public/openapi/tier0-cloud-v2.en.json';
   </head>
   <body>
     <header class="api-header">
-      <h1>Tier0 OpenAPI Reference</h1>
-      <a href="/using-tier0/working-with-factory-data/#api">Back to Working with Factory Data</a>
+      <h1>{isChinese ? 'Tier0 OpenAPI 参考' : 'Tier0 OpenAPI Reference'}</h1>
+      <a href={isChinese ? '/zh-cn/using-tier0/working-with-factory-data/#api' : '/using-tier0/working-with-factory-data/#api'}>{isChinese ? '返回“使用工厂数据”' : 'Back to Working with Factory Data'}</a>
     </header>
     <main class="api-document">
       <div id="swagger-ui"></div>
@@ -140,11 +143,11 @@ import spec from '../../public/openapi/tier0-cloud-v2.en.json';
 
     <script is:inline src="https://unpkg.com/swagger-ui-dist@5/swagger-ui-bundle.js"></script>
     <script is:inline src="https://unpkg.com/swagger-ui-dist@5/swagger-ui-standalone-preset.js"></script>
-    <script is:inline define:vars={{ spec }}>
+    <script is:inline define:vars={{ spec: activeSpec, isChinese }}>
       window.addEventListener('load', () => {
         if (!window.SwaggerUIBundle) {
           document.querySelector('#swagger-ui').innerHTML =
-            '<p style="padding:1rem;background:#fff;border:1px solid #d8dfca;border-radius:8px;color:#7a1c1c;">The API reference could not load. Check network access to the renderer.</p>';
+            `<p style="padding:1rem;background:#fff;border:1px solid #d8dfca;border-radius:8px;color:#7a1c1c;">${isChinese ? 'API 参考无法加载，请检查渲染器的网络连接。' : 'The API reference could not load. Check network access to the renderer.'}</p>`;
           return;
         }
 
@@ -165,7 +168,7 @@ import spec from '../../public/openapi/tier0-cloud-v2.en.json';
             const tabs = document.createElement('div');
             tabs.className = 't0-response-tabs';
             tabs.setAttribute('role', 'tablist');
-            tabs.setAttribute('aria-label', 'Response status examples');
+            tabs.setAttribute('aria-label', isChinese ? '响应状态示例' : 'Response status examples');
 
             const select = (selected) => {
               entries.forEach((entry) => {
@@ -212,11 +215,41 @@ import spec from '../../public/openapi/tier0-cloud-v2.en.json';
         });
 
         const tableLabels = new Map([
-          ['HTTP status', 'HTTP Status Codes'],
-          ['error.execution', 'Write Execution States'],
-          ['Retry signal', 'Retry Rules'],
-          ['Endpoint', 'Platform Response Formats'],
+          ['HTTP status', isChinese ? 'HTTP 状态码' : 'HTTP Status Codes'],
+          ['error.execution', isChinese ? '写入执行状态' : 'Write Execution States'],
+          ['Retry signal', isChinese ? '重试规则' : 'Retry Rules'],
+          ['Endpoint', isChinese ? '平台响应格式' : 'Platform Response Formats'],
         ]);
+        const uiLabels = new Map([
+          ['Responses', '响应'],
+          ['Code', '状态码'],
+          ['Description', '说明'],
+          ['Links', '链接'],
+          ['No links', '无链接'],
+          ['Media type', '媒体类型'],
+          ['Controls Accept header.', '控制 Accept 请求头。'],
+          ['Example Value', '示例值'],
+          ['Schema', '数据结构'],
+          ['Parameters', '参数'],
+          ['Request body', '请求体'],
+          ['Try it out', '试一试'],
+          ['Execute', '执行'],
+          ['Cancel', '取消'],
+          ['Clear', '清除'],
+          ['Response body', '响应体'],
+          ['Response headers', '响应头'],
+          ['Server response', '服务器响应'],
+          ['Required', '必填'],
+        ]);
+        const localizeUi = () => {
+          if (!isChinese) return;
+          document.querySelectorAll('#swagger-ui :is(.opblock-section-header h4, .responses-table th, .response-col_links, .response-control-media-type__title, .response-control-media-type__accept-message, .tab li, .opblock-title_normal, .btn, .response-col_description__inner h4)').forEach((element) => {
+            if (element.children.length && element.querySelector('button, select, a')) return;
+            const original = element.textContent?.trim();
+            const translated = uiLabels.get(original);
+            if (translated) element.textContent = translated;
+          });
+        };
         const updateReference = () => {
           document.querySelectorAll('#swagger-ui .info .description table').forEach((table) => {
             if (table.closest('.t0-reference-table')) return;
@@ -233,6 +266,7 @@ import spec from '../../public/openapi/tier0-cloud-v2.en.json';
             content.append(table);
           });
           addResponseTabs();
+          localizeUi();
         };
 
         const referenceObserver = new MutationObserver(updateReference);

@@ -1,5 +1,5 @@
 ---
-title: Base de datos de fábrica
+title: Fundamentos de datos de fábrica
 description: "El modelo Unified Namespace: Metric, State, Action y cómo UNS almacena datos de fábrica."
 editions: [edge, cloud, enterprise]
 sidebar:
@@ -8,9 +8,9 @@ sidebar:
 import { Tabs, TabItem } from '@astrojs/starlight/components';
 
 
-En Tier0, los datos de fábrica se organizan en modelos claros con estructura de árbol basados en la metodología UNS (Unified Namespace), formando una base de datos unificada.
+En Tier0, los datos de fábrica se organizan en modelos claros con estructura de árbol basados en la metodología UNS (Unified Namespace), formando una base unificada para los datos.
 
-## Arquitectura de la base de datos
+## Arquitectura de datos de fábrica
 - El broker recibe y envía datos a través de topics del modelo.
 
 <div className="t0-uns-foundation-mermaid t0-uns-foundation-mermaid--flow">
@@ -66,6 +66,14 @@ En Tier0, los datos de fábrica se organizan en modelos claros con estructura de
     action --> jsonb
 ```
 </div>
+## Broker
+En Tier0, el broker es el componente de la plataforma que recibe y envía datos por MQTT u OpenAPI según los modelos de datos.
+- **Por MQTT**: El path completo de cada nodo en el árbol del modelo funciona como dirección del topic para pasar el payload del mensaje.
+- **Por Open API**: Ejecuta comandos CRUD sobre modelos de datos mediante solicitudes HTTP.
+:::tip[Referencia de API]
+Para detalles de API, consulta [Referencia de API](../../reference/tier0-openapi/).
+:::
+
 ## Model
 :::tip[¿Qué guía debo seguir al crear un modelo?]
 Elige el enfoque de modelado según lo que representan los datos.
@@ -99,11 +107,12 @@ Por ejemplo, un modelo en UNS se ve como el árbol siguiente:
 - **Path**: `Factory_A/Site_01/SMT_Line_1/Metric`
 - **Topic**: `/Machine_001`.
 - **Payload**
-    ```json
-    "temperature": 85,
-    "vibration": 2.8,
-
-    ```
+        ```json
+        {
+          "temperature": 85,
+          "vibration": 2.8
+        }
+        ```
 </TabItem>
 <TabItem label="Business Data">
 ```text
@@ -116,23 +125,17 @@ Por ejemplo, un modelo en UNS se ve como el árbol siguiente:
 - **Path**: `Factory_A/ERP/ProductionOrders/State`
 - **Topic**: `/OrderList`.
 - **Payload**
-    ```json
-    "orders": "0123569876",
-    "updated_at": 2026-7-13,
-    ```
+        ```json
+        {
+          "orders": "0123569876",
+          "updated_at": "2026-07-13"
+        }
+        ```
 </TabItem>
 </Tabs>
 
 :::tip[Para crear un modelo]
-Consulta [Preparar la base de datos](../preparing-data-foundation/) para ver el proceso actual de modelado.
-:::
-
-## Broker
-En Tier0, el broker es el componente de la plataforma que recibe y envía datos por MQTT u OpenAPI según los modelos de datos.
-- **Por MQTT**: El path completo de cada nodo en el árbol del modelo funciona como dirección del topic para pasar el payload del mensaje.
-- **Por Open API**: Ejecuta comandos CRUD sobre modelos de datos mediante solicitudes HTTP.
-:::tip[Referencia de API]
-Para detalles de API, consulta [Referencia de API](../../reference/tier0-openapi/).
+Consulta [Preparar los fundamentos de datos](../preparing-data-foundation/) para ver el proceso actual de modelado.
 :::
 
 ## Storage
@@ -140,9 +143,9 @@ Tier0 usa PostgreSQL para almacenar datos. Los distintos tipos de datos cambian 
 
 | Tipo de dato | Almacenamiento | Descripción |
 |-----------|---------|-------------|
-| Metric | Time-series database | Optimizado para mediciones de alta frecuencia como temperatura y presión. Cada topic incluye campos predeterminados: `timestamp` y `quality`. |
-| State | PostgreSQL | Almacena estados de máquinas o sistemas en un formato flexible `JSONB`. |
-| Action | PostgreSQL | Almacena comandos o acciones en un formato flexible `JSONB`. |
+| `METRIC` | TSDB | Optimizado para mediciones de alta frecuencia como temperatura y presión. Cada topic incluye campos predeterminados: `timestamp` y `quality`. |
+| `STATE` | PostgreSQL | Almacena estados de máquinas o sistemas en un formato flexible `JSONB`. |
+| `ACTION` | PostgreSQL | Almacena comandos o acciones en un formato flexible `JSONB`. |
 
 ## Siguiente
 

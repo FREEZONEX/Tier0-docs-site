@@ -660,8 +660,123 @@ DemoFactory
   </TabItem>
 </Tabs>
 
+## Payload 構造
+
+topic payload を設計するときは、消費されるデータと書き戻されるデータの両方を考慮します。
+
+- **Action**
+
+  Action payload には、データが Tier0 データベースに保存された時刻を記録する `_timestamp` が自動的に含まれます。
+
+  <Tabs syncKey="payload-action">
+    <TabItem label="start_job">
+
+  ```json
+  {
+    "light_turn_on": true,
+    "height_adjust": 12.5,
+    "_timestamp": "2026-07-10T10:00:00Z"
+  }
+  ```
+
+    </TabItem>
+    <TabItem label="stop_job">
+
+  ```json
+  {
+    "water_pump_off": true,
+    "window_close": true,
+    "_timestamp": "2026-07-10T10:00:00Z"
+  }
+  ```
+
+    </TabItem>
+  </Tabs>
+
+- **Metric**
+
+  Metric payload には、Tier0 データベースへの保存時刻を記録する `_timestamp` と、データ品質を表す `_quality` が自動的に含まれます。
+
+  <Tabs syncKey="payload-metric">
+    <TabItem label="ERP / SplitCount">
+
+  ```json
+  {
+    "production_order_id": "PO-20260710-001",
+    "plan_id": "PLAN-001",
+    "plan_number": "WOP-20260710-001",
+    "split_count": 3,
+    "updated_at": "2026-07-10T10:00:00Z",
+    "_timestamp": "2026-07-10T10:00:00Z",
+    "_quality": "Good"
+  }
+  ```
+
+    </TabItem>
+    <TabItem label="Site_01 / Target_Qty">
+
+  ```json
+  {
+    "production_order_id": "PO-20260710-001",
+    "plan_id": "PLAN-001",
+    "plan_number": "WOP-20260710-001",
+    "work_order_id": "WO-001",
+    "value": 1200,
+    "unit": "pcs",
+    "timestamp": "2026-07-10T10:00:00Z",
+    "_timestamp": "2026-07-10T10:00:00Z",
+    "_quality": "Good"
+  }
+  ```
+
+    </TabItem>
+  </Tabs>
+
+- **State**
+
+  State payload には、データが Tier0 データベースに保存された時刻を記録する `_timestamp` が自動的に含まれます。
+
+  <Tabs syncKey="payload-state">
+    <TabItem label="ERP / UpsertProductionOrder">
+
+  ```json
+  {
+    "event_id": "EVT-001",
+    "event_type": "UPSERT",
+    "source": "ERP",
+    "production_order_id": "PO-20260710-001",
+    "order_number": "PO-001",
+    "product_code": "SKU-1001",
+    "planned_qty": 1200,
+    "unit": "pcs",
+    "status": "Released",
+    "due_date": "2026-07-12T00:00:00Z",
+    "updated_at": "2026-07-10T10:00:00Z",
+    "_timestamp": "2026-07-10T10:00:00Z"
+  }
+  ```
+
+    </TabItem>
+    <TabItem label="Site_01 / WorkOrderStatus">
+
+  ```json
+  {
+    "production_order_id": "PO-20260710-001",
+    "plan_id": "PLAN-001",
+    "plan_number": "WOP-20260710-001",
+    "work_order_id": "WO-001",
+    "status": "Running",
+    "reason": "In production",
+    "updated_at": "2026-07-10T10:00:00Z",
+    "_timestamp": "2026-07-10T10:00:00Z"
+  }
+  ```
+
+    </TabItem>
+  </Tabs>
+
 ## Topic Explosion を避ける方法
-Tier0 uses 3 fixed topic types: `Metric`, `Action`, and `State` to avoid topic explosion. 
+Tier0 は、topic の増えすぎを防ぐために `Metric`、`Action`、`State` の 3 種類を使用します。
 
 - **高頻度リアルタイムデータには `Metric` を使う**
 
@@ -694,9 +809,10 @@ Tier0 uses 3 fixed topic types: `Metric`, `Action`, and `State` to avoid topic e
 
   ```json
   {
-    "light_turn_on": true,
-    "height_adjust": 12.5,
-    "_timestamp": "2026-07-10T10:00:00Z"
+    "temperature": 80,
+    "temperature_unit": "Celsius",
+    "temperature_status": "Normal",
+    "speed": 300
   }
   ```
 
@@ -734,9 +850,8 @@ Tier0 uses 3 fixed topic types: `Metric`, `Action`, and `State` to avoid topic e
 
   ```json
   {
-    "water_pump_off": true,
-    "window_close": true,
-    "_timestamp": "2026-07-10T10:00:00Z"
+    "current_job": "Job_003",
+    "product": "Product_A"
   }
   ```
 
@@ -774,122 +889,6 @@ Tier0 uses 3 fixed topic types: `Metric`, `Action`, and `State` to avoid topic e
 
   ```json
   {
-    "production_order_id": "PO-20260710-001",
-    "plan_id": "PLAN-001",
-    "plan_number": "WOP-20260710-001",
-    "split_count": 3,
-    "updated_at": "2026-07-10T10:00:00Z",
-    "_timestamp": "2026-07-10T10:00:00Z",
-    "_quality": "Good"
-  }
-  ```
-
-    </TabItem>
-  </Tabs>
-  </div>
-
-## Payload 構造
-
-topic payload を設計するときは、消費されるデータと書き戻されるデータの両方を考慮します。
-
-- **Action**
-
-  Action payload には、データが Tier0 データベースに保存された時刻を記録する `_timestamp` が自動的に含まれます。
-
-  <Tabs syncKey="payload-action">
-    <TabItem label="start_job">
-
-  ```json
-  {
-    "production_order_id": "PO-20260710-001",
-    "plan_id": "PLAN-001",
-    "plan_number": "WOP-20260710-001",
-    "work_order_id": "WO-001",
-    "value": 1200,
-    "unit": "pcs",
-    "timestamp": "2026-07-10T10:00:00Z",
-    "_timestamp": "2026-07-10T10:00:00Z",
-    "_quality": "Good"
-  }
-  ```
-
-    </TabItem>
-    <TabItem label="stop_job">
-
-  ```json
-  {
-    "event_id": "EVT-001",
-    "event_type": "UPSERT",
-    "source": "ERP",
-    "production_order_id": "PO-20260710-001",
-    "order_number": "PO-001",
-    "product_code": "SKU-1001",
-    "planned_qty": 1200,
-    "unit": "pcs",
-    "status": "Released",
-    "due_date": "2026-07-12T00:00:00Z",
-    "updated_at": "2026-07-10T10:00:00Z",
-    "_timestamp": "2026-07-10T10:00:00Z"
-  }
-  ```
-
-    </TabItem>
-  </Tabs>
-
-- **Metric**
-
-  Metric payload には、Tier0 データベースへの保存時刻を記録する `_timestamp` と、データ品質を表す `_quality` が自動的に含まれます。
-
-  <Tabs syncKey="payload-metric">
-    <TabItem label="ERP / SplitCount">
-
-  ```json
-  {
-    "production_order_id": "PO-20260710-001",
-    "plan_id": "PLAN-001",
-    "plan_number": "WOP-20260710-001",
-    "work_order_id": "WO-001",
-    "status": "Running",
-    "reason": "In production",
-    "updated_at": "2026-07-10T10:00:00Z",
-    "_timestamp": "2026-07-10T10:00:00Z"
-  }
-  ```
-
-    </TabItem>
-    <TabItem label="Site_01 / Target_Qty">
-
-  ```json
-  {
-    "temperature": 80,
-    "temperature_unit": "Celsius",
-    "temperature_status": "Normal",
-    "speed": 300
-  }
-  ```
-
-    </TabItem>
-  </Tabs>
-
-- **State**
-
-  State payload には、データが Tier0 データベースに保存された時刻を記録する `_timestamp` が自動的に含まれます。
-
-  <Tabs syncKey="payload-state">
-    <TabItem label="ERP / UpsertProductionOrder">
-
-  ```json
-  {
-    "current_job": "Job_003",
-    "product": "Product_A"
-  }
-  ```
-
-    </TabItem>
-    <TabItem label="Site_01 / WorkOrderStatus">
-
-  ```json
-  {
     "target_height": 12.5,
     "light_on": true,
     "requested_by": "operator"
@@ -898,3 +897,4 @@ topic payload を設計するときは、消費されるデータと書き戻さ
 
     </TabItem>
   </Tabs>
+  </div>

@@ -207,11 +207,16 @@ Permita puertos según la relación mínima necesaria entre origen y destino. No
 
 | Escenario de fallo | Comportamiento esperado | Límite |
 | --- | --- | --- |
-| Falla el nodo de negocio Active D | La Business VIP se mueve a E o F; el nuevo Owner inicia el grupo de negocio después de pasar readiness | Requiere que la última generation del HA fileset esté completa en Standby |
-| Falla PostgreSQL Primary A | B se promueve a Primary; PostgreSQL VIP sigue enrutando al Primary escribible mediante el proxy D/E | La pérdida de datos depende del estado de la replicación streaming |
-| Falla el nodo Redis actual | Redis VIP se mueve a la otra instancia Redis independiente | La caché/sesión puede perderse |
-| Falla el proxy RustFS A o B | RustFS VIP se mueve al otro proxy | Los datos RustFS siguen dependiendo de la salud del clúster de cuatro nodos |
-| Falla un solo nodo de datos RustFS | El clúster RustFS continúa el servicio si se cumplen sus condiciones de redundancia | El límite real depende del número de discos y la configuración de erasure coding |
+| Falla el nodo de negocio Active D | La Business VIP se mueve a E o F; el Standby sano verifica la generation del fileset antes de iniciar el grupo de negocio | Pueden perderse archivos no sincronizados desde la última sincronización correcta |
+| Falla Fleet Agent | Falla readiness, se detiene el grupo de negocio anterior y se mueve la Business VIP | No iniciar contenedores manualmente eludiendo el Agent |
+| Falla PostgreSQL Primary A | B se promueve; HAProxy enruta al nuevo Primary y la VIP de PostgreSQL no cambia | Las conexiones fallan brevemente durante el cambio; después se debe restaurar un nuevo Standby |
+| Falla un HAProxy de PostgreSQL | La VIP de PostgreSQL se mueve al otro proxy | Los roles de la base de datos no cambian |
+| Falla el nodo Redis actual | La VIP de Redis se mueve a la otra instancia independiente | Puede perderse la caché y caducar las sesiones |
+| Falla un nodo de datos RustFS | Los nodos restantes del clúster continúan el servicio | La tolerancia depende del erasure coding real y del estado de los discos |
+| Falla un HAProxy de RustFS | La VIP de RustFS se mueve al otro proxy | La dirección S3 no cambia; las conexiones existentes quizá deban reconectarse |
+| Falla el deployer controller | El plano de datos en ejecución continúa | Despliegue, monitoreo centralizado y operaciones quedan temporalmente indisponibles; el controller no tiene Standby automático |
+| Partición de red | No se garantiza una elección automática segura del líder | Pueden aparecer dos propietarios VIP o dos nodos Active; aislar el lado defectuoso y recuperar manualmente |
+| Fallan dos máquinas a la vez | No hay una garantía general de disponibilidad | El resultado depende de la combinación de roles y debe probarse por escenario |
 
 Particiones de red, fallos simultáneos de varios nodos, prioridad VRRP incorrecta, discos llenos, deriva de reloj y cambios manuales fuera del deployer quedan fuera de la recuperación automática normal y deben cubrirse con procedimientos operativos.
 
@@ -226,26 +231,38 @@ Particiones de red, fallos simultáneos de varios nodos, prioridad VRRP incorrec
 
 ## Comprobaciones antes de producción
 
-- Las seis máquinas son accesibles por SSH desde el deployer controller.
-- Los nombres de host, direcciones IP, nombres de NIC, NTP, DNS y reglas de firewall están fijados y registrados.
-- Las cuatro VIP no están ocupadas y pueden moverse entre sus nodos candidatos.
-- Los puntos de montaje de disco están fijados y persisten tras reinicio.
-- Las configuraciones de Enterprise, PostgreSQL, Redis, RustFS, Keepalived, HAProxy, repmgr, Fleet Agent y rsync son generadas por el deployer y revisadas.
-- La Cluster License se activa una sola vez mediante la Business VIP.
-- Los pasos de backup y restauración se ensayan antes de introducir tráfico de producción.
+| Comprobación | Criterio de aprobación |
+| --- | --- |
+| Máquinas y funciones | Las seis máquinas de negocio A–F coinciden con el plan; el deployer está separado. |
+| SSH y sudo | El deployer accede a A–F sin interacción con una cuenta controlada; las claves de host están verificadas. |
+| Red y hora | Las seis máquinas usan la subred prevista; las cuatro VIP están libres; NIC, prefijos y sincronización horaria cumplen los requisitos. |
+| Docker/Compose | Los seis nodos están inicializados, sin conflictos con contenedores, puertos, redes o directorios de datos anteriores. |
+| Discos | PostgreSQL, RustFS y los filesets de Enterprise usan los puntos de montaje previstos; capacidad e inodos están en buen estado. |
+| PostgreSQL | Hay un Primary único, un Standby en streaming y un Witness activo; la VIP de PostgreSQL permite lectura y escritura. |
+| Redis | Las instancias C/F están sanas, `PING` funciona por la VIP de Redis y se acepta que los datos no se replican tras el failover. |
+| RustFS | Los cuatro nodos están sanos; se pueden escribir, leer y borrar objetos mediante la VIP de RustFS. |
+| Enterprise | D/E/F ejecutan la misma versión; solo el propietario de la Business VIP ejecuta el grupo de negocio. |
+| Fleet Agent | Los tres Agents están activos y se pueden consultar readiness, historial de sincronización y estado de generation. |
+| License | La Cluster License se activa una vez mediante la Business VIP y sigue activa tras el failover. |
+| Sincronización de App | Una App importada que incluye `node_modules` sigue funcionando después de sincronizarse y del failover. |
+| Firewall | Solo se permiten los orígenes, destinos y protocolos necesarios para este plan. |
+| Copias de seguridad | Existen planes de backup para PostgreSQL, RustFS y deployer, con al menos una prueba de restauración completada. |
 
 ## Secuencia de implementación
 
-1. Prepare el deployer controller y las seis máquinas.
-2. Confirme la información de IP, VIP, NIC, disco, DNS, NTP, SSH y firewall.
-3. Cargue el paquete offline de Enterprise y los materiales de configuración.
-4. Despliegue PostgreSQL Primary/Standby y Witness.
-5. Despliegue las instancias Redis independientes y la Redis VIP.
-6. Despliegue el clúster RustFS de cuatro nodos y la RustFS VIP.
-7. Despliegue Enterprise en D/E/F, Fleet Agent, los filesets rsync y la Business VIP.
-8. Active la License mediante la Business VIP.
-9. Ejecute la validación funcional y los simulacros de failover.
-10. Registre la topología final, contraseñas/keys, política de backup, objetivos de monitoreo y procedimientos de recuperación.
+1. Prepare un deployer controller independiente, seis máquinas de negocio, cuatro VIP, NIC y la distribución de discos.
+2. Verifique las sumas SHA256 del paquete de entrega completo y del ZIP offline de Enterprise.
+3. Inicie el deployer, introduzca las credenciales SSH y las seis máquinas, y compruebe la conectividad.
+4. Inicialice Docker/Compose y las imágenes offline en las seis máquinas de destino.
+5. Cree un despliegue estándar y confirme las funciones A–F y las cuatro VIP.
+6. Despliegue PostgreSQL, Redis, RustFS, HAProxy y Keepalived en orden.
+7. Configure cuentas rsync dedicadas y confianza SSH entre D/E/F.
+8. Despliegue Enterprise y Fleet Agent en D/E/F; confirme que solo D está inicialmente Active.
+9. Active la License una vez mediante la Business VIP y espere a que se sincronice.
+10. Importe una App de prueba y verifique la sincronización de App, `node_modules`, Flow/Marimo y los filesets de License.
+11. Ensaye por separado fallos de un nodo de Enterprise, PostgreSQL, Redis y RustFS.
+12. Recupere los nodos y confirme un solo VIP Owner, un solo Active, un solo Primary y la sincronización completa.
+13. Complete un ensayo de restauración de backup, la entrega de operaciones y el registro de parámetros del sitio.
 
 ## Criterios de aceptación
 
@@ -269,12 +286,17 @@ Particiones de red, fallos simultáneos de varios nodos, prioridad VRRP incorrec
 
 ## Riesgos y puntos a confirmar en sitio
 
-- Si la red permite el protocolo VRRP `112`.
-- Si las cuatro direcciones VIP realmente no están ocupadas.
-- Si el diseño y la capacidad de montaje de discos cumplen los requisitos reales de retención de archivos y redundancia de RustFS.
-- Si Redis solo almacena datos descartables.
-- Si el retraso de replicación de PostgreSQL y la política de backup cumplen el RPO de negocio.
-- Si el personal de operaciones entiende la diferencia entre failover de VIP, sincronización de archivos, replicación de base de datos y redundancia de almacenamiento de objetos.
+- Si las cuatro VIP están en la misma red de capa 2 compartida por las seis máquinas.
+- Si los dispositivos de red permiten VRRP/GARP y las políticas de seguridad permiten mover las VIP.
+- Si el sitio está totalmente aislado de Internet; el deployer aún comprueba el acceso a Harbor, por lo que se deben verificar antes la ruta o el proxy.
+- Si la capacidad, el crecimiento y los objetivos RPO/RTO de PostgreSQL, RustFS y los filesets de Enterprise cumplen los requisitos.
+- Si Redis contiene datos que no pueden perderse; en ese caso, dos instancias independientes no son suficientes.
+- Si el volumen de archivos y cambios de App/Flow/Marimo y el retraso de sincronización aceptable cumplen los requisitos.
+- Si es obligatoria la disponibilidad entre subredes, entre centros de datos, durante particiones de red o ante cualquier fallo simultáneo de dos máquinas.
+- Quién custodia certificados, dominios, contraseñas, License, claves SSH y registros de auditoría de producción.
+- Cómo se recuperará y respaldará el deployer controller y qué canal de operaciones alternativo habrá.
+
+Un cambio en cualquiera de estos puntos puede afectar a las VIP, los roles, el almacenamiento y los límites de fallo. Actualiza el plan antes de implementarlo.
 
 ## Conclusión
 

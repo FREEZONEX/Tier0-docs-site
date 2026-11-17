@@ -8,10 +8,10 @@ sidebar:
 import { Tabs, TabItem } from '@astrojs/starlight/components';
 import { Steps } from '@astrojs/starlight/components';
 
-Tier0는 세 가지 edition으로 사용할 수 있습니다.
-- **Edge** - 단일 machine 또는 Docker에서 직접 실행합니다.
-- **Cloud** - 운영 인프라가 필요 없는 managed SaaS입니다.
-- **Enterprise** - enterprise environment를 위한 private deployment입니다.
+Tier0는 세 가지 에디션으로 제공됩니다.
+- **Cloud** - 인프라를 직접 운영할 필요가 없는 관리형 SaaS입니다.
+- **Enterprise** - 기업 환경을 위한 프라이빗 배포판입니다.
+- **Edge** - Docker를 사용해 로컬에서 실행하는 오픈 소스 버전입니다.
 
 어떤 edition을 선택해야 할지 확실하지 않다면 [최적의 버전 선택](../choosing-the-best-product/)을 먼저 확인하세요.
 
@@ -20,7 +20,7 @@ Tier0는 세 가지 edition으로 사용할 수 있습니다.
 <Tabs syncKey="edition">
   <TabItem label="Cloud">
 
-    Tier0 Cloud는 설치가 필요하지 않습니다. signup 후 workspace를 만들면 됩니다.
+    Tier0 Cloud를 사용하려면 먼저 체험 계정을 신청하세요.
     <Steps>
 		1. [Register Tier0](https://tier0.dev/signup)에서 계정을 등록합니다.
 		2. 이메일로 받은 인증 코드로 확인하고 등록한 계정으로 로그인합니다.
@@ -82,12 +82,16 @@ Tier0는 세 가지 edition으로 사용할 수 있습니다.
         ```bash
         ./full-cleanup.sh --env install.env --yes
         ```
-        > 이 command는 VM, operating system, installation package, Docker software는 유지하지만 Tier0 runtime data와 database backup을 삭제합니다.
+        :::caution[영향 범위]
+        이 명령은 VM, 운영체제, 설치 패키지, Docker 소프트웨어는 유지하지만 Tier0 런타임 데이터와 데이터베이스 백업을 삭제합니다.
+        :::
     - 설치 후 deployment report가 생성됩니다.
         ```text
         runtime/install-reports/<timestamp>/deployment-report.md
         ```
-        > report에 **FAIL** 항목이 있으면 project를 공유하기 전에 먼저 support에 문의하세요.
+        :::caution[보고서에 **FAIL** 항목이 있을 때]
+        보고서에 **FAIL** 항목이 있으면 프로젝트를 인도하지 말고 먼저 지원팀에 문의하세요.
+        :::
 
     #### 유지보수 참고 자료
     - [표준 포트 목록](../../reference/standard-port-list/)
@@ -103,48 +107,10 @@ Tier0는 세 가지 edition으로 사용할 수 있습니다.
 
 #### 설치
     <Steps>
-    1. GitHub에서 Tier0-Edge repository를 서버에 clone하고 project로 이동합니다.
-
-        ```bash
-        git clone https://github.com/FREEZONEX/Tier0-Edge
-        cd Tier0-Edge/deploy
-        ```
-
-    2. 배포 전에 `.env.default`에서 필요한 environment parameter를 수정합니다.
-
-        ```bash
-        cp .env.default .env
-        vi .env
-        :wq!
-        ```
-        :::note[설정 가능한 parameters]
-
-        | Field | Type | Description | Example |
-        |------|------|-------------|---------|
-        | VOLUMES_PATH | string | project data 저장 경로 | Linux에서는 `/srv/tier0/data`, Windows Bash에서는 `D:/tier0/data` 또는 `/d/tier0/data` |
-        | ENTRANCE_DOMAIN/ENTRANCE_PORT | string | Tier0 access endpoint(IP/domain + port) | `192.168.1.10` / `8088` |
-        | LANGUAGE | enum | zh-CN / en-US | `en-US` |
-        | ADMIN_INIT_PASSWORD | string | admin user initial password | 안전한 private password |
-        | COMPOSE_PROJECT_NAME/PORT_OFFSET | string | 같은 host에서 실행되는 여러 instance를 격리 | `edge_lab` / `100` |
-
-        :::
-    3. install script를 실행하고 installation status를 확인합니다.
-
-        ```bash
-        bash bin/install.sh
-        bash bin/compose.sh ps # container status 확인
-        bash bin/compose.sh logs -f backend # backend container log 확인
-        curl -fsS http://127.0.0.1:8088/readyz # backend service readiness 확인
-        ```
-
-        :::caution
-        `deploy/.env.runtime`는 수정하지 마세요. 생성된 secrets와 resolved runtime values가 포함되어 있습니다.
-        :::
-    4. 설정한 endpoint와 기본 admin account로 Tier0에 접속합니다.
-        - Username: `tier0`
-        - Password: `.env`의 `ADMIN_INIT_PASSWORD` 값. 설정하지 않았다면 `tier0`.
-
-    </Steps>
+	1. Tier0 Cloud에서 **UNS** > **연결** > **Edge**를 선택합니다.
+	2. 운영체제에 맞는 Edge를 다운로드합니다.
+	3. Tier0 Edge를 설치하고 Cloud에서 승인한 다음 연결을 완료합니다.
+	</Steps>
 
   </TabItem>
 
@@ -152,4 +118,4 @@ Tier0는 세 가지 edition으로 사용할 수 있습니다.
 
 ## 다음 단계
 
-- [최적의 버전 선택](../choosing-the-best-product/) - requirement에 맞는 edition을 선택합니다.
+[최적의 버전 선택](../choosing-the-best-product/) - requirement에 맞는 edition을 선택합니다.

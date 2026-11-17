@@ -103,48 +103,9 @@ Enterprise 的硬件要求会随部署场景变化。
 	- Ubuntu 24.04，或安装了 Docker 和 Git 的 Windows 10/11
 	#### 操作步骤
 	<Steps>
-	1. 从 GitHub 克隆 Tier0-Edge 仓库到你的服务器，并进入项目目录。
-
-		```bash
-		git clone https://github.com/FREEZONEX/Tier0-Edge
-		cd Tier0-Edge/deploy
-		```
-
-	2. 根据你的环境，在 `.env.default` 中按需编辑下表列出的参数。
-	
-		```bash
-		cp .env.default .env
-		vi .env
-		:wq!
-		```
-
-		:::note[需要配置的参数]
-
-		| 字段 | 类型 | 说明 | 示例 |
-		|------|------|------|------|
-		| VOLUMES_PATH | string | 项目数据的存储路径 | Linux 上为 `/srv/tier0/data`；Windows Bash 中为 `D:/tier0/data` 或 `/d/tier0/data` |
-		| ENTRANCE_DOMAIN/ENTRANCE_PORT | string | Tier0 访问入口（IP/域名 + 端口） | `192.168.1.10` / `8088` |
-		| LANGUAGE | enum | zh-CN / en-US | `zh-CN` |
-		| ADMIN_INIT_PASSWORD | string | 管理员用户的初始密码 | 一个私有强密码 |
-		| COMPOSE_PROJECT_NAME/PORT_OFFSET | string | 隔离同一主机上运行的多个实例 | `edge_lab` / `100` |
-
-		:::
-	3. 运行安装脚本，并检查安装状态。
-
-		```bash
-		bash bin/install.sh
-		bash bin/compose.sh ps # 检查容器状态
-		bash bin/compose.sh logs -f backend # 查看 backend 容器日志
-		curl -fsS http://127.0.0.1:8088/readyz # 检查 backend 服务是否 ready
-		```
-
-		:::caution
-		不要编辑 `deploy/.env.runtime`；它包含生成的密钥和解析后的运行时配置值。
-		:::
-	4. 使用配置好的访问入口和默认管理员账号访问 Tier0：
-		- 用户名：`tier0`
-		- 密码：`.env` 中 `ADMIN_INIT_PASSWORD` 的值；如果未设置，则为 `tier0`。
-
+	1. 在 Tier0 Cloud 中选择 **UNS** > **连接** > **Edge**。
+	2. 根据操作系统下载 Edge。
+	3. 安装 Tier0 Edge，在 Cloud 中授权并完成连接。
 	</Steps>
 		
 
@@ -153,4 +114,4 @@ Enterprise 的硬件要求会随部署场景变化。
 
 ## 下一步
 
-- [选择最合适的版本](../choosing-the-best-product/) - 比较各个版本并选择最适合你的版本。
+[选择最合适的版本](../choosing-the-best-product/) - 比较各个版本并选择最适合你的版本。

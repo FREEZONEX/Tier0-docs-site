@@ -65,7 +65,7 @@ $responsive-craft preview で 375、768、1024、1440 px を表示してくだ�
 
 ## `preview-runtime-stability`
 
-管理されたプレビューのインストール、起動、準備状態、ロール、ポート、HMR の障害を診断します。業務機能は構築しません。依存関係・ロックファイルのエラー、Vite／TanStack Start の起動、`5173` の競合、`/api/health`、プレビューのロール、`artifact.toml`、HMR の全ページ再読み込みなどが対象です。最初の関連エラーを読み、確認できた原因を修正し、必要な場合だけ再起動して、元の障害、ヘルスチェック、対象ルートを検証します。
+管理されたプレビューのインストール、起動、準備状態、ロール、ポート、HMR の障害を診断します。業務機能は構築しません。依存関係・ロックファイルのエラー（npm `ERESOLVE` を含む）、Vite／TanStack Start の起動、`5173` の競合、`/api/health`、プレビューのロール、`artifact.toml`、HMR の全ページ再読み込みなどが対象です。最初の関連エラーを読み、確認できた原因を修正し、必要な場合だけ再起動して、元の障害、ヘルスチェック、対象ルートを検証します。
 
 ```text
 $preview-runtime-stability を使って「Preview loading timed out」を調査してください。

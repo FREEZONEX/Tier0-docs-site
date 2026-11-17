@@ -11697,7 +11697,7 @@
         "tags": [
           "接口能力"
         ],
-        "description": "中心只读接口，不携带 X-Fleet-Node-Id。按 page/size 分页，可按 keyword、status 过滤。仅返回节点 ID、名称、说明及基础设施状态，不返回凭据、会话或宿主机信息。普通具有 uns.read 的工作区身份可发现；App 绑定身份不可用。使用 X-Fleet-Node-Id 读取目标 catalog、Source、Stream、Collection 和业务数据。在云端查询协议的 remoteStreamTarget；云端 Stream 的绑定使用 target:{fleetNodeId,sourceId,configRevision} 引用已有 Edge Source，Stream 请求省略节点头。Modbus TCP 支持按需读取和 Edge 周期轮询，source-event 入口声明 ranges 和可选 pollIntervalMs（100 至 3600000 毫秒，省略时沿用 Edge Source 周期），按 modbus:<rangeId> 接收 values、unitId、table 和 address。MQTT、OPC UA 和 USB HID 也支持 Edge 持续采集。绑定声明采集需求，连接凭据留在 Edge；相同需求共享 Watch，各消费者独立取消。runtime.edgeSubscriptions 区分采集、连接和数据状态；lastCloudDataAt 表示持久 capture，不等于 Collection 提交。MQTT、OPC UA、USB HID 的短时恢复受 120 秒租约、每消费者 256 条/1 MiB 内存缓存限制，满后丢最旧事件并报告 dropped，不保证进程重启补传或端到端恰好一次。Open Protocol 与 Salesforce CDC 使用 Edge 持久队列，云端所有冻结绑定入口业务任务 completed 后才确认，ackStage=businessCommit；gaps 是诊断信息，数字跳号不等于漏数。接入保留 Source、Stream 权限、资源授权和配置版本校验，不要求业务读取消费额外拥有 Fleet 运维权限。",
+        "description": "列出当前工作空间中的 Edge 节点。这是仅在 Center 使用的只读接口；不要携带 X-Fleet-Node-Id。\n\n- **权限：**具有 uns.read 权限的工作空间身份可以调用；App 绑定身份不可调用。\n- **查询：**使用 page 和 size 分页，可按 keyword 或 status 筛选。\n- **返回：**节点 ID、名称、说明和基础设施状态；不包含凭据、会话或宿主机详情。\n\n如需读取某个 Edge 节点的目录、Source、Stream、Collection 或业务数据，请在对应接口的 X-Fleet-Node-Id 请求头中填写该节点 ID。",
         "x-tier0-readonly": true,
         "x-tier0-destructive": false
       }

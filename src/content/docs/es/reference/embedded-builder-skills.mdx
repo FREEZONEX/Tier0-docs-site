@@ -65,7 +65,7 @@ Usa $responsive-craft preview para ver 375, 768, 1024 y 1440 px.
 
 ## `preview-runtime-stability`
 
-Diagnostica fallos de instalación, arranque, disponibilidad, rol, puerto y HMR del preview gestionado. No crea funciones empresariales. Abarca dependencias y lockfiles, Vite o TanStack Start, conflictos en el puerto `5173`, fallos de `/api/health`, roles de preview, discrepancias de `artifact.toml` y recargas completas frecuentes. Lee primero el error relevante, corrige la causa demostrada, reinicia solo si hace falta y verifica el fallo original, la salud y la ruta afectada.
+Diagnostica fallos de instalación, arranque, disponibilidad, rol, puerto y HMR del preview gestionado. No crea funciones empresariales. Abarca dependencias y lockfiles (incluido npm `ERESOLVE`), Vite o TanStack Start, conflictos en el puerto `5173`, fallos de `/api/health`, roles de preview, discrepancias de `artifact.toml` y recargas completas frecuentes. Lee primero el error relevante, corrige la causa demostrada, reinicia solo si hace falta y verifica el fallo original, la salud y la ruta afectada.
 
 ```text
 Usa $preview-runtime-stability para diagnosticar «Preview loading timed out».

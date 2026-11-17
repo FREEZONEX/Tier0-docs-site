@@ -66,6 +66,14 @@ Tier0에서 공장 데이터는 UNS(Unified Namespace) 방법론을 기반으로
     action --> jsonb
 ```
 </div>
+## Broker
+Tier0에서 broker는 data model을 기반으로 MQTT 또는 OpenAPI를 통해 데이터를 수신하고 전송하는 platform component입니다.
+- **By MQTT**: model tree의 각 node 전체 path가 message payload를 전달하는 topic address로 동작합니다.
+- **By OpenAPI**: HTTP request를 통해 data model에 대한 CRUD command를 수행합니다.
+:::tip[API 참조]
+API 세부 정보는 [API 참조](../../reference/tier0-openapi/)를 확인하세요.
+:::
+
 ## Model
 :::tip[model을 만들 때 어떤 guide를 따라야 하나요?]
 데이터가 무엇을 나타내는지에 따라 modeling 방법을 선택합니다.
@@ -99,10 +107,12 @@ Tier0에서 공장 데이터는 UNS(Unified Namespace) 방법론을 기반으로
 - **Path**: `Factory_A/Site_01/SMT_Line_1/Metric`
 - **Topic**: `/Machine_001`.
 - **Payload**
-    ```json
-    "temperature": 85,
-    "vibration": 2.8,
-    ```
+        ```json
+        {
+          "temperature": 85,
+          "vibration": 2.8
+        }
+        ```
 </TabItem>
 <TabItem label="Business Data">
 ```
@@ -115,23 +125,17 @@ Tier0에서 공장 데이터는 UNS(Unified Namespace) 방법론을 기반으로
 - **Path**: `Factory_A/ERP/ProductionOrders/State`
 - **Topic**: `/OrderList`.
 - **Payload**
-    ```json
-    "orders": "0123569876",
-    "updated_at": "2026-7-13",
-    ```
+        ```json
+        {
+          "orders": "0123569876",
+          "updated_at": "2026-07-13"
+        }
+        ```
 </TabItem>
 </Tabs>
 
 :::tip[model을 만들려면]
 [데이터 기반 준비](../preparing-data-foundation/)에서 현재 데이터 모델 구축 절차를 확인하세요.
-:::
-
-## Broker
-Tier0에서 broker는 data model을 기반으로 MQTT 또는 OpenAPI를 통해 데이터를 수신하고 전송하는 platform component입니다.
-- **By MQTT**: model tree의 각 node 전체 path가 message payload를 전달하는 topic address로 동작합니다.
-- **By OpenAPI**: HTTP request를 통해 data model에 대한 CRUD command를 수행합니다.
-:::tip[API 참조]
-API 세부 정보는 [API 참조](../../reference/tier0-openapi/)를 확인하세요.
 :::
 
 ## Storage
