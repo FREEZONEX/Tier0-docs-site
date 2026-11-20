@@ -19,7 +19,7 @@ Tier0 为自定义应用建立数据基础：接收应用业务数据、连接�
 
 ### Namespace
 
-所有数据都建模到 **Namespace** 下的 **Collections**，并按数据类型组织。
+所有数据都建模到 **Namespace** 下的 **Tables**，并按数据类型组织。
 
 - 主要来自业务系统的关系数据存储在 **Record** 表中。
 - 主要来自设备的时序数据存储在 **Sample** 表中。
@@ -28,11 +28,11 @@ Tier0 为自定义应用建立数据基础：接收应用业务数据、连接�
 
 ```mermaid
 flowchart TB
-  namespace["Namespace"] --> collection["Collection"]
-  collection --> record["Record 表<br/>关系数据"]
-  collection --> sample["Sample 表<br/>时序数据"]
+  namespace["Namespace"] --> table["Table"]
+  table --> record["Record 表<br/>关系数据"]
+  table --> sample["Sample 表<br/>时序数据"]
   classDef t0accent fill:#B2ED1D,stroke:#73B200,color:#171717
-  class collection t0accent
+  class table t0accent
 ```
 
 </div>

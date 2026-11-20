@@ -69,7 +69,7 @@ Use $align-platform-app to align this app to the latest Tier0 scaffold while kee
 
 - Compares the app against an exact commit of the [cloud architecture scaffold](https://github.com/FREEZONEX/Tier0-App-Scaffold/tree/feature/cloud-new-architecture-migration).
 - Preserves business behavior while aligning runtime, routing, Gateway roles, and platform contracts.
-- For a full cloud migration, moves app-owned durable records to Tier0 UNS collections through `@tier0/sdk-v2`; historical records from the original database require a separate UNS-side import when needed.
+- For a full cloud migration, moves app-owned durable records to Tier0 UNS tables through `@tier0/sdk-v2`; historical records from the original database require a separate UNS-side import when needed.
 - Verifies the changed build and runtime behavior before writing the scaffold version marker in `package.json`.
 
 :::caution

@@ -29,7 +29,7 @@ sidebar:
 
 将导入的应用迁移到 Tier0 脚手架，或使现有应用与当前脚手架契约一致。适用于旧版 Tier0 应用、自有 SQL 数据库或浏览器存储的应用，以及需要完整更新或局部平台修复的脚手架应用。
 
-它以[云架构脚手架](https://github.com/FREEZONEX/Tier0-App-Scaffold/tree/feature/cloud-new-architecture-migration)的精确提交为基准，对齐运行时、路由、Gateway 角色和平台契约，同时保留业务行为。完整云迁移会通过 `@tier0/sdk-v2` 将应用自有的持久记录迁至 Tier0 UNS collections；原数据库的历史记录如需保留，还要单独导入 UNS。完成构建和运行验证后才写入 `package.json` 中的脚手架版本标记。
+它以[云架构脚手架](https://github.com/FREEZONEX/Tier0-App-Scaffold/tree/feature/cloud-new-architecture-migration)的精确提交为基准，对齐运行时、路由、Gateway 角色和平台契约，同时保留业务行为。完整云迁移会通过 `@tier0/sdk-v2` 将应用自有的持久记录迁至 Tier0 UNS tables；原数据库的历史记录如需保留，还要单独导入 UNS。完成构建和运行验证后才写入 `package.json` 中的脚手架版本标记。
 
 ```text
 使用 $align-platform-app 将此应用对齐最新 Tier0 脚手架，并保留业务代码。

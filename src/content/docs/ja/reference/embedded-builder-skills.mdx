@@ -29,7 +29,7 @@ $app-builder を使って specs/spec.md から初回バージョンを構築し�
 
 インポートしたアプリを Tier0 スキャフォールドへ移行するか、既存アプリを現在の契約に合わせます。古い Tier0 アプリ、独自 SQL データベースやブラウザー保存を使うアプリ、全面更新または限定的なプラットフォーム修正が必要なアプリが対象です。
 
-[クラウドアーキテクチャのスキャフォールド](https://github.com/FREEZONEX/Tier0-App-Scaffold/tree/feature/cloud-new-architecture-migration)の正確なコミットと比較し、業務動作を保ちながらランタイム、ルーティング、Gateway ロール、プラットフォーム契約を合わせます。クラウドへの全面移行では、アプリ独自の永続レコードを `@tier0/sdk-v2` で Tier0 UNS collections に移します。元のデータベースにある履歴レコードが必要なら、UNS 側へ別途インポートします。ビルドと実行時の動作を検証してから `package.json` にスキャフォールドのバージョンを記録します。
+[クラウドアーキテクチャのスキャフォールド](https://github.com/FREEZONEX/Tier0-App-Scaffold/tree/feature/cloud-new-architecture-migration)の正確なコミットと比較し、業務動作を保ちながらランタイム、ルーティング、Gateway ロール、プラットフォーム契約を合わせます。クラウドへの全面移行では、アプリ独自の永続レコードを `@tier0/sdk-v2` で Tier0 UNS tables に移します。元のデータベースにある履歴レコードが必要なら、UNS 側へ別途インポートします。ビルドと実行時の動作を検証してから `package.json` にスキャフォールドのバージョンを記録します。
 
 ```text
 $align-platform-app を使い、業務コードを維持して最新の Tier0 スキャフォールドに合わせてください。

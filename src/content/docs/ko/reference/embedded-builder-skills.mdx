@@ -29,7 +29,7 @@ $app-builder로 specs/spec.md의 첫 버전을 만들어 줘.
 
 가져온 앱을 Tier0 스캐폴드로 마이그레이션하거나 기존 앱을 현재 계약에 맞춥니다. 이전 Tier0 앱, 앱 자체 SQL 데이터베이스·브라우저 저장소·모의 영속성을 쓰는 앱, 전체 업데이트나 제한적인 플랫폼 수정이 필요한 앱에 적합합니다.
 
-[클라우드 아키텍처 스캐폴드](https://github.com/FREEZONEX/Tier0-App-Scaffold/tree/feature/cloud-new-architecture-migration)의 정확한 커밋과 비교합니다. 비즈니스 동작을 유지하면서 런타임, 라우팅, Gateway 역할, 플랫폼 계약을 맞춥니다. 전체 클라우드 마이그레이션에서는 `@tier0/sdk-v2`로 앱 소유 영속 레코드를 Tier0 UNS collections로 옮깁니다. 원래 데이터베이스의 과거 기록이 필요하다면 UNS로 별도로 가져와야 합니다. 변경된 빌드와 실행 동작을 검증한 후 `package.json`에 스캐폴드 버전을 기록합니다.
+[클라우드 아키텍처 스캐폴드](https://github.com/FREEZONEX/Tier0-App-Scaffold/tree/feature/cloud-new-architecture-migration)의 정확한 커밋과 비교합니다. 비즈니스 동작을 유지하면서 런타임, 라우팅, Gateway 역할, 플랫폼 계약을 맞춥니다. 전체 클라우드 마이그레이션에서는 `@tier0/sdk-v2`로 앱 소유 영속 레코드를 Tier0 UNS tables로 옮깁니다. 원래 데이터베이스의 과거 기록이 필요하다면 UNS로 별도로 가져와야 합니다. 변경된 빌드와 실행 동작을 검증한 후 `package.json`에 스캐폴드 버전을 기록합니다.
 
 ```text
 $align-platform-app으로 비즈니스 코드를 유지하며 최신 Tier0 스캐폴드에 맞춰 줘.

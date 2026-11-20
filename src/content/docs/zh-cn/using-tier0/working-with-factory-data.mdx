@@ -102,9 +102,9 @@ Tier0 Edge 的外部连接不需要凭据。
 
 ### 请求示例
 
-- `POST /uns/metadata:find` — 列出 Collections 并获取 Collection ID
+- `POST /uns/metadata:find` — 列出 Tables 并获取 Table ID
   :::note
-  在 `data.items` 中找到目标 Collection 并复制其 `id`。如果第一页没有，检查 `data.pageInfo` 并请求下一页。
+  在 `data.items` 中找到目标 Table 并复制其 `id`。如果第一页没有，检查 `data.pageInfo` 并请求下一页。
   :::
   <Tabs syncKey="uns-api-language">
     <TabItem label="JavaScript">
@@ -264,7 +264,7 @@ Tier0 Edge 的外部连接不需要凭据。
   - 将 `your-collection-id` 替换为 `metadata:find` 返回的 ID。
   - 将 `recordIds` 中的 `record_123` 替换为 `records:find` 返回的 Record ID。
   - 将 `from` 和 `to` 设置为需要的时间范围。
-  - 本示例还按 `temperature` 筛选。如果需要范围内的全部 Samples，或者 Collection 使用其他字段，请移除该筛选条件。
+  - 本示例还按 `temperature` 筛选。如果需要范围内的全部 Samples，或者 Table 使用其他字段，请移除该筛选条件。
   :::
   <Tabs syncKey="uns-api-language">
     <TabItem label="JavaScript">

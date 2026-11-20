@@ -102,9 +102,9 @@ Tier0 Edge의 외부 연결에는 자격 증명이 필요하지 않습니다.
 
 ### 요청 예시
 
-- `POST /uns/metadata:find` — Collections 목록과 Collection ID 가져오기
+- `POST /uns/metadata:find` — Tables 목록과 Table ID 가져오기
   :::note
-  `data.items`에서 원하는 Collection을 찾아 `id`를 복사합니다. 첫 페이지에 없으면 `data.pageInfo`를 확인하고 다음 페이지를 요청합니다.
+  `data.items`에서 원하는 Table을 찾아 `id`를 복사합니다. 첫 페이지에 없으면 `data.pageInfo`를 확인하고 다음 페이지를 요청합니다.
   :::
   <Tabs syncKey="uns-api-language">
     <TabItem label="JavaScript">
@@ -264,7 +264,7 @@ Tier0 Edge의 외부 연결에는 자격 증명이 필요하지 않습니다.
   - `your-collection-id`를 `metadata:find`에서 얻은 ID로 바꿉니다.
   - `recordIds`의 `record_123`을 `records:find`에서 얻은 Record ID로 바꿉니다.
   - `from`과 `to`를 원하는 시간 범위로 설정합니다.
-  - 이 예시는 `temperature`로도 필터링합니다. 범위 내 모든 Samples가 필요하거나 Collection에서 다른 필드를 사용하면 이 필터를 제거합니다.
+  - 이 예시는 `temperature`로도 필터링합니다. 범위 내 모든 Samples가 필요하거나 Table에서 다른 필드를 사용하면 이 필터를 제거합니다.
   :::
   <Tabs syncKey="uns-api-language">
     <TabItem label="JavaScript">

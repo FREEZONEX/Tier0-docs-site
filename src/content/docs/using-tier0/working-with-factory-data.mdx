@@ -102,9 +102,9 @@ The Tier0 Edge version does not require credentials for external connections.
 
 ### Request Examples
 
-- `POST /uns/metadata:find` — List collections and get the collection ID
+- `POST /uns/metadata:find` — List tables and get the table ID
   :::note
-  Find the collection you want in `data.items` and copy its `id`. If it is missing from the first page, check `data.pageInfo` and request the next page.
+  Find the table you want in `data.items` and copy its `id`. If it is missing from the first page, check `data.pageInfo` and request the next page.
   :::
   <Tabs syncKey="uns-api-language">
     <TabItem label="JavaScript">
@@ -264,7 +264,7 @@ The Tier0 Edge version does not require credentials for external connections.
   - Replace `your-collection-id` with the ID from `metadata:find`.
   - Replace `record_123` in `recordIds` with the record ID from `records:find`.
   - Set `from` and `to` to the time range you want.
-  - This example also filters on `temperature`. Remove that filter if you want all samples in the range or if your collection uses a different field.
+  - This example also filters on `temperature`. Remove that filter if you want all samples in the range or if your table uses a different field.
   :::
   <Tabs syncKey="uns-api-language">
     <TabItem label="JavaScript">

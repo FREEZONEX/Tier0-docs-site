@@ -19,7 +19,7 @@ Tier0 はカスタムアプリのデータ基盤を作ります。アプリか�
 
 ### Namespace
 
-すべてのデータは **Namespace** 配下の **Collections** にモデル化され、データ型に応じて整理されます。
+すべてのデータは **Namespace** 配下の **Tables** にモデル化され、データ型に応じて整理されます。
 
 - 主に業務システムからのリレーショナルデータは **Record** テーブルに保存します。
 - 主にデバイスからの時系列データは **Sample** テーブルに保存します。
@@ -28,11 +28,11 @@ Tier0 はカスタムアプリのデータ基盤を作ります。アプリか�
 
 ```mermaid
 flowchart TB
-  namespace["Namespace"] --> collection["Collection"]
-  collection --> record["Record テーブル<br/>リレーショナルデータ"]
-  collection --> sample["Sample テーブル<br/>時系列データ"]
+  namespace["Namespace"] --> table["Table"]
+  table --> record["Record テーブル<br/>リレーショナルデータ"]
+  table --> sample["Sample テーブル<br/>時系列データ"]
   classDef t0accent fill:#B2ED1D,stroke:#73B200,color:#171717
-  class collection t0accent
+  class table t0accent
 ```
 
 </div>

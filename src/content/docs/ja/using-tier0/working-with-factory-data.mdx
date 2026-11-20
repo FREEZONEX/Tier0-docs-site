@@ -102,9 +102,9 @@ Tier0 Edge の外部接続には認証情報が不要です。
 
 ### リクエスト例
 
-- `POST /uns/metadata:find` — Collections を一覧表示して Collection ID を取得
+- `POST /uns/metadata:find` — Tables を一覧表示して Table ID を取得
   :::note
-  `data.items` で対象の Collection を探し、その `id` をコピーします。最初のページにない場合は `data.pageInfo` を確認して次のページを取得します。
+  `data.items` で対象の Table を探し、その `id` をコピーします。最初のページにない場合は `data.pageInfo` を確認して次のページを取得します。
   :::
   <Tabs syncKey="uns-api-language">
     <TabItem label="JavaScript">
@@ -264,7 +264,7 @@ Tier0 Edge の外部接続には認証情報が不要です。
   - `your-collection-id` を `metadata:find` で取得した ID に置き換えます。
   - `recordIds` の `record_123` を `records:find` で取得した Record ID に置き換えます。
   - `from` と `to` に取得期間を設定します。
-  - この例は `temperature` でも絞り込みます。期間内の全 Samples が必要な場合や Collection が別のフィールドを使う場合は、この条件を削除します。
+  - この例は `temperature` でも絞り込みます。期間内の全 Samples が必要な場合や Table が別のフィールドを使う場合は、この条件を削除します。
   :::
   <Tabs syncKey="uns-api-language">
     <TabItem label="JavaScript">

@@ -19,7 +19,7 @@ Tier0는 맞춤형 앱을 위한 데이터 기반을 만듭니다. 앱의 비즈
 
 ### Namespace
 
-모든 데이터는 **Namespace** 아래 **Collections**에 모델링되고 데이터 유형별로 구성됩니다.
+모든 데이터는 **Namespace** 아래 **Tables**에 모델링되고 데이터 유형별로 구성됩니다.
 
 - 주로 비즈니스 시스템의 관계형 데이터는 **Record** 테이블에 저장합니다.
 - 주로 장치의 시계열 데이터는 **Sample** 테이블에 저장합니다.
@@ -28,11 +28,11 @@ Tier0는 맞춤형 앱을 위한 데이터 기반을 만듭니다. 앱의 비즈
 
 ```mermaid
 flowchart TB
-  namespace["Namespace"] --> collection["Collection"]
-  collection --> record["Record 테이블<br/>관계형 데이터"]
-  collection --> sample["Sample 테이블<br/>시계열 데이터"]
+  namespace["Namespace"] --> table["Table"]
+  table --> record["Record 테이블<br/>관계형 데이터"]
+  table --> sample["Sample 테이블<br/>시계열 데이터"]
   classDef t0accent fill:#B2ED1D,stroke:#73B200,color:#171717
-  class collection t0accent
+  class table t0accent
 ```
 
 </div>

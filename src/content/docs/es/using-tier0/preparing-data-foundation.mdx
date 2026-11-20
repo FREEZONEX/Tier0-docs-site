@@ -19,7 +19,7 @@ Tier0 establece una base para los datos de aplicaciones personalizadas: recibe d
 
 ### Namespace
 
-Todos los datos se modelan en **Collections** dentro de **Namespace** y se organizan según su tipo.
+Todos los datos se modelan en **Tables** dentro de **Namespace** y se organizan según su tipo.
 
 - Los datos relacionales, principalmente de sistemas empresariales, se guardan en tablas **Record**.
 - Los datos de series temporales, principalmente de dispositivos, se guardan en tablas **Sample**.
@@ -28,11 +28,11 @@ Todos los datos se modelan en **Collections** dentro de **Namespace** y se organ
 
 ```mermaid
 flowchart TB
-  namespace["Namespace"] --> collection["Collection"]
-  collection --> record["Tabla Record<br/>datos relacionales"]
-  collection --> sample["Tabla Sample<br/>series temporales"]
+  namespace["Namespace"] --> table["Table"]
+  table --> record["Tabla Record<br/>datos relacionales"]
+  table --> sample["Tabla Sample<br/>series temporales"]
   classDef t0accent fill:#B2ED1D,stroke:#73B200,color:#171717
-  class collection t0accent
+  class table t0accent
 ```
 
 </div>

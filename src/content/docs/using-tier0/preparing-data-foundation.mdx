@@ -21,7 +21,7 @@ Tier0 builds a data foundation for customized applications that:
 
 ### Namespace
 
-All data is modeled into **Collections** under **Namespace** and organized based on data types.
+All data is modeled into **Tables** under **Namespace** and organized based on data types.
 - Relational data, mostly from business systems, is stored in **Record** tables.
 - Time-series data, mostly from devices, is stored in **Sample** tables.
 
@@ -29,12 +29,12 @@ All data is modeled into **Collections** under **Namespace** and organized based
 
 ```mermaid
 flowchart TB
-  namespace["Namespace"] --> collection["Collection"]
-  collection --> record["Record table<br/>relational data"]
-  collection --> sample["Sample table<br/>time-series data"]
+  namespace["Namespace"] --> table["Table"]
+  table --> record["Record table<br/>relational data"]
+  table --> sample["Sample table<br/>time-series data"]
 
   classDef t0accent fill:#B2ED1D,stroke:#73B200,color:#171717
-  class collection t0accent
+  class table t0accent
 ```
 
 </div>
@@ -49,8 +49,8 @@ flowchart TB
 
 ```mermaid
 flowchart LR
-  app["App"] -->|"business data"| record["Record"]
-  stream["Stream"] -->|"device data"| sample["Sample"]
+  app["App"] -->|"business data"| record["Record Table"]
+  stream["Source & Stream"] -->|"device data"| sample["Sample Table"]
 
   classDef t0accent fill:#B2ED1D,stroke:#73B200,color:#171717
   class record,sample t0accent
@@ -60,14 +60,14 @@ flowchart LR
 
 ### Data Connection
 
-- **Source**: Connects to external data servers, frequently with authentications.
-- **Stream**: Collects data from servers, processes it according to requirements and stores it in **Namespace** models.
+- **Source**: Connects to external data servers, often with authentications.
+- **Stream**: Collects data from servers, processes it according to requirements and stores it in **Namespace** tables.
 
 <div class="t0-compact-mermaid t0-foundation-mermaid" style="max-width: 450px; margin-inline: auto;">
 
 ```mermaid
 flowchart LR
-  source["Source<br/>connects server"] --> stream["Stream<br/>collects + processes"]
+  source["Source<br/>connects server"] --> stream["Stream<br/>collects + processes data from servers"]
 
   classDef t0accent fill:#B2ED1D,stroke:#73B200,color:#171717
   class source,stream t0accent

@@ -102,9 +102,9 @@ Tier0 Edge no requiere credenciales para conexiones externas.
 
 ### Ejemplos de solicitudes
 
-- `POST /uns/metadata:find` — Enumerar Collections y obtener el ID de Collection
+- `POST /uns/metadata:find` — Enumerar Tables y obtener el ID de Table
   :::note
-  Busca la Collection en `data.items` y copia su `id`. Si no aparece en la primera página, consulta `data.pageInfo` y solicita la siguiente.
+  Busca la Table en `data.items` y copia su `id`. Si no aparece en la primera página, consulta `data.pageInfo` y solicita la siguiente.
   :::
   <Tabs syncKey="uns-api-language">
     <TabItem label="JavaScript">
@@ -264,7 +264,7 @@ Tier0 Edge no requiere credenciales para conexiones externas.
   - Sustituye `your-collection-id` por el ID obtenido de `metadata:find`.
   - Sustituye `record_123` en `recordIds` por el ID de Record obtenido de `records:find`.
   - Configura `from` y `to` con el intervalo deseado.
-  - Este ejemplo también filtra por `temperature`. Elimina el filtro si quieres todos los Samples del intervalo o si tu Collection utiliza otro campo.
+  - Este ejemplo también filtra por `temperature`. Elimina el filtro si quieres todos los Samples del intervalo o si tu Table utiliza otro campo.
   :::
   <Tabs syncKey="uns-api-language">
     <TabItem label="JavaScript">
