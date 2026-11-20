@@ -1,7 +1,7 @@
 ---
 title: Preparar los fundamentos de datos
 description: Conecta, modela e integra datos externos en Tier0 para tus aplicaciones.
-editions: [cloud]
+editions: [cloud, enterprise, edge]
 sidebar:
   order: 2
 ---
@@ -12,7 +12,7 @@ Tier0 establece una base para los datos de aplicaciones personalizadas: recibe d
 
 :::tip[Quién se ocupa de los datos]
 - Tú gestionas las conexiones a fuentes de datos, especialmente las que requieren autenticación.
-- El Agent se ocupa del resto: adquisición, asignación y modelado de datos.
+- En Cloud y Enterprise, el Agent se ocupa del resto: adquisición, asignación y modelado de datos.
 :::
 
 ## Conceptos de los fundamentos de datos
@@ -79,6 +79,10 @@ flowchart LR
 2. Conecta las fuentes necesarias en **Connect** > **Source** con su autenticación.
 3. Pide al Agent que cree un **Stream** para recoger y procesar datos de las fuentes conectadas y guardarlos en los modelos de **Namespace** creados para la aplicación.
 </Steps>
+
+:::tip[Comprender el flujo de datos]
+Cuando se completa el proceso desde la conexión de la fuente, pasando por el procesamiento en Stream, hasta el modelado y almacenamiento en Namespace, se forma un flujo de datos en **Namespace** > **Data Flow** que muestra el linaje de los datos tanto en Cloud como en Edge.
+:::
 
 ## Siguiente
 

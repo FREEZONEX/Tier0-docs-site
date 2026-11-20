@@ -1,7 +1,7 @@
 ---
 title: データ基盤の準備
 description: アプリ向けの外部データを接続し、Tier0 でモデル化・統合します。
-editions: [cloud]
+editions: [cloud, enterprise, edge]
 sidebar:
   order: 2
 ---
@@ -12,7 +12,7 @@ Tier0 はカスタムアプリのデータ基盤を作ります。アプリか�
 
 :::tip[データ作業の担当]
 - データソースへの接続、とくに認証が必要な接続は利用者が行います。
-- データの取得、マッピング、モデル化など残りは Agent が行います。
+- Cloud と Enterprise では、データの取得、マッピング、モデル化など残りの作業を Agent が行います。
 :::
 
 ## データ基盤の概念
@@ -79,6 +79,10 @@ flowchart LR
 2. **Connect** > **Source** で必要なデータソースに接続し、認証を設定します。
 3. Agent に **Stream** を作成させ、接続済み Source のデータを収集・処理して、アプリ用に生成された **Namespace** モデルへ保存します。
 </Steps>
+
+:::tip[データの流れを理解する]
+データソースへの接続、Stream での処理、Namespace でのモデル化と保存までの一連の処理が完了すると、**Namespace** > **Data Flow** にデータフローが形成され、Cloud と Edge のデータの来歴を確認できます。
+:::
 
 ## 次へ
 

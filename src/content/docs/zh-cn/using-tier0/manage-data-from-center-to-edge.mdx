@@ -7,31 +7,56 @@ sidebar:
 ---
 
 import { Steps } from '@astrojs/starlight/components';
+import { Tabs, TabItem } from '@astrojs/starlight/components';
 
-在真实工厂中，数据通常由边缘设备采集，并从中心节点统一管理，从而减少网络带宽占用并提升数据安全性。
-Tier0 提供 Fleet Management 解决方案，让你可以从中心节点管理边缘节点上的数据。
+通过 Tier0 的边缘与中心协作，你可以在边缘设备上采集数据，并在中心平台上管理数据。
+- 边缘设备：部署在边缘节点上的 Tier0 Edge 或 Tier0 Enterprise。
+- 中心平台：部署在中心节点上的 Tier0 Cloud 或 Tier0 Enterprise。
 
 ## 将边缘节点连接到中心节点
 
-<Steps>
-1. 先在中心节点上创建 Fleet 节点。
+<Tabs syncKey="edition">
+  <TabItem label="Enterprise">
+    <Steps>
+    1. 先在中心节点上创建 Fleet 节点。
 
-        :::note
-        可连接的边缘节点数量取决于许可证。
-        :::
-2. 使用中心节点生成的 Token 连接每个边缘节点。
-</Steps>
+            :::note
+            可连接的边缘节点数量取决于许可证。
+            :::
+    2. 使用中心节点生成的 Token 连接每个边缘节点。
+    </Steps>
+  </TabItem>
+  <TabItem label="Cloud">
+    <Steps>
+    1. 根据操作系统，从 Tier0 Cloud 下载 Tier0 Edge。
+    2. 完成身份验证，建立边缘节点与云端的连接。
+    </Steps>
+  </TabItem>
+</Tabs>
 
 ## 在边缘与中心之间同步数据
 
-- UNS 数据只能从边缘节点选择并同步到中心节点。同步后，所选 Topic 的历史数据和实时数据都可以在中心节点使用。
-- 你可以从中心节点为边缘节点分配用户或用户组，以便进行节点管理。
+<Tabs syncKey="edition">
+  <TabItem label="Enterprise">
+    - Namespace Collection 只能从边缘节点选择并同步到中心节点。同步后，所选 Collection 的历史数据和实时数据都可以在中心节点使用。
+    - 你可以从中心节点为边缘节点分配用户或用户组，以便进行节点管理。
 
-:::note
-请先在中心节点为用户组设置应用访问权限，组内用户才能访问边缘节点上的授权应用。
-:::
+    :::note
+    请先在中心节点为用户组设置应用访问权限，组内用户才能访问边缘节点上的授权应用。
+    :::
+  </TabItem>
+  <TabItem label="Cloud">
+    - 连接建立后，Namespace Collection 的 schema 默认从边缘节点同步到云端。
+    - 只有选中的 Collection，其记录才会同步到云端。
+    - 你可以从中心平台为边缘节点分配用户或用户组，以便进行节点管理。
+
+    :::tip[无需在边缘节点上部署独立 Agent 即可连接数据]
+    完成连接后，你可以让云端的 Agent 连接数据源并构建数据流，在边缘节点上获取和处理数据。
+    :::
+  </TabItem>
+</Tabs>
 
 ## 下一步
 
-- [工厂数据建模](../../best-practice/modeling-factory-data/) — 了解如何在 UNS 中构建工厂数据模型。
+- [操作工厂数据](../working-with-factory-data/) — 了解如何访问和使用工厂数据。
 - [准备数据基础](../preparing-data-foundation/) — 为应用连接外部数据并在 Namespace 中建模。

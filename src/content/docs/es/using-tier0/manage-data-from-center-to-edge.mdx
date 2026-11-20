@@ -7,31 +7,56 @@ sidebar:
 ---
 
 import { Steps } from '@astrojs/starlight/components';
+import { Tabs, TabItem } from '@astrojs/starlight/components';
 
-En una fábrica real, los datos suelen recopilarse mediante dispositivos edge y gestionarse desde un nodo central para reducir el uso del ancho de banda de red y mejorar la seguridad de los datos.
-Tier0 ofrece una solución de Fleet Management para gestionar desde un nodo central los datos que se encuentran en los nodos edge.
+Con la colaboración entre el edge y el centro de Tier0, puedes recopilar datos en los dispositivos edge y gestionarlos desde la plataforma central.
+- Dispositivo edge: Tier0 Edge o Tier0 Enterprise en un nodo edge.
+- Plataforma central: Tier0 Cloud o Tier0 Enterprise en un nodo central.
 
 ## Conectar nodos edge al nodo central
 
-<Steps>
-1. Primero, crea nodos Fleet en el nodo central.
+<Tabs syncKey="edition">
+  <TabItem label="Enterprise">
+    <Steps>
+    1. Primero, crea nodos Fleet en el nodo central.
 
-        :::note
-        El número de nodos edge que se pueden conectar depende de la licencia.
-        :::
-2. Utiliza el token generado por el nodo central para conectar cada nodo edge.
-</Steps>
+            :::note
+            El número de nodos edge que se pueden conectar depende de la licencia.
+            :::
+    2. Utiliza el token generado por el nodo central para conectar cada nodo edge.
+    </Steps>
+  </TabItem>
+  <TabItem label="Cloud">
+    <Steps>
+    1. Descarga Tier0 Edge desde Tier0 Cloud según el sistema operativo.
+    2. Completa la autenticación y establece la conexión entre el edge y la nube.
+    </Steps>
+  </TabItem>
+</Tabs>
 
 ## Sincronizar datos entre el edge y el centro
 
-- Los datos UNS solo se pueden seleccionar y sincronizar desde los nodos edge al nodo central. Después de la sincronización, los datos históricos y en tiempo real de los Topics seleccionados están disponibles en el nodo central.
-- Desde el nodo central, puedes asignar usuarios o grupos de usuarios a los nodos edge para gestionarlos.
+<Tabs syncKey="edition">
+  <TabItem label="Enterprise">
+    - Las Namespace Collections solo se pueden seleccionar y sincronizar desde los nodos edge al nodo central. Después de la sincronización, los datos históricos y en tiempo real de las Collections seleccionadas están disponibles en el nodo central.
+    - Desde el nodo central, puedes asignar usuarios o grupos de usuarios a los nodos edge para gestionarlos.
 
-:::note
-Primero configura el acceso de los grupos a las aplicaciones en el nodo central para que sus miembros puedan utilizar las aplicaciones permitidas en los nodos edge.
-:::
+    :::note
+    Primero configura el acceso de los grupos a las aplicaciones en el nodo central para que sus miembros puedan utilizar las aplicaciones permitidas en los nodos edge.
+    :::
+  </TabItem>
+  <TabItem label="Cloud">
+    - Una vez establecida la conexión, los esquemas de las Namespace Collections se sincronizan del edge a la nube de forma predeterminada.
+    - Solo se sincronizan con la nube los registros de las Collections seleccionadas.
+    - Desde la plataforma central, puedes asignar usuarios o grupos de usuarios a los nodos edge para gestionarlos.
+
+    :::tip[Conectar datos en el edge sin un agente independiente]
+    Una vez establecida la conexión, puedes pedir al agente en la nube que conecte fuentes de datos y cree flujos para obtener y procesar datos en el edge.
+    :::
+  </TabItem>
+</Tabs>
 
 ## Siguiente
 
-- [Modelar datos de fábrica](../../best-practice/modeling-factory-data/) — Aprende a modelar datos de fábrica en UNS.
+- [Trabajar con datos de fábrica](../working-with-factory-data/) — Aprende a acceder a los datos de fábrica y utilizarlos.
 - [Preparar los fundamentos de datos](../preparing-data-foundation/) — Conecta datos externos para tus aplicaciones y modélalos en Namespace.

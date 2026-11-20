@@ -1,7 +1,7 @@
 ---
 title: Preparing Data Foundation
 description: Connect, model and intergrate external data into Tier0 for your applications.
-editions: [cloud]
+editions: [cloud, enterprise, edge]
 sidebar:
   order: 2
 ---
@@ -14,7 +14,7 @@ Tier0 builds a data foundation for customized applications that:
 
 :::tip[Who takes care of the data]
 - Data source connections, especially ones that require authentication, are handled by you.
-- The agent does the rest, including data acquisition, mapping and modeling.
+- The agent does the rest, including data acquisition, mapping and modeling on Cloud and Enterprise.
 :::
 
 ## Data Foundation Concept
@@ -87,6 +87,11 @@ flowchart LR
 2. Connect needed data sources under **Connect** > **Source** with authentication.
 3. Tell the agent to create **Stream** to collect and process data from connected sources into **Namespace** models generated from the application.
 </Steps>
+
+:::tip[To understand data flow]
+Once the data completes the whole process, starting from source connection, stream processing and namespace modeling and storage, a data flow
+is formed under **Namespace** > **Data Flow** to show the data lineage on both Cloud and Edge.
+:::
 
 ## Next
 

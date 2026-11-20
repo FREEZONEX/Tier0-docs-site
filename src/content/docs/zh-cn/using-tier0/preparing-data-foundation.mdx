@@ -1,7 +1,7 @@
 ---
 title: 准备数据基础
 description: 为应用连接外部数据，并在 Tier0 中建模与集成。
-editions: [cloud]
+editions: [cloud, enterprise, edge]
 sidebar:
   order: 2
 ---
@@ -12,7 +12,7 @@ Tier0 为自定义应用建立数据基础：接收应用业务数据、连接�
 
 :::tip[数据工作由谁负责]
 - 数据源连接，尤其需要认证的连接，由你处理。
-- Agent 负责其余工作，包括数据采集、映射和建模。
+- 在 Cloud 和 Enterprise 上，Agent 负责其余工作，包括数据采集、映射和建模。
 :::
 
 ## 数据基础概念
@@ -79,6 +79,10 @@ flowchart LR
 2. 在 **Connect** > **数据源** 中连接所需数据源并配置认证。
 3. 让 Agent 创建**数据流**，从已连接的数据源采集和处理数据，写入应用生成的 **Namespace** 模型。
 </Steps>
+
+:::tip[了解数据流向]
+完成数据源连接、Stream 处理以及 Namespace 建模和存储的整个流程后，**Namespace** > **Data Flow** 下会形成数据流向图，展示 Cloud 和 Edge 上的数据血缘关系。
+:::
 
 ## 下一步
 
